@@ -1,16 +1,10 @@
 # Data integration (not connected yet)
 
-Local directories, excluded from Git:
+Planned local directories, excluded from Git:
 
-- `raw/`: downloaded official files.
-  - `raw/2017-onwards-resale-prices.csv`: data.gov.sg resale transactions.
-  - `raw/policy_pages/`: saved official policy page snapshots (registered in `policy/sources.yaml`).
-- `processed/`: generated artifacts, e.g. `resale.db` from `scripts/build_resale_db.py`
-  and normalized policy chunks.
+- `raw/`: downloaded official policy snapshots and resale transaction CSVs.
+- `processed/`: normalized policy chunks, topic cards and the resale SQLite database.
 - `chroma/`: generated vector index.
-
-Reviewed, versioned inputs (source registry, topic cards) live in `policy/`, not here,
-so they are committed and reviewed like code.
 
 Policy records should preserve stable IDs, source URL, effective date, snapshot
 version and superseded status. Do not infer an effective date from a crawl date;

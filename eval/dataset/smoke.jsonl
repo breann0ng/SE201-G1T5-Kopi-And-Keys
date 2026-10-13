@@ -1,4 +1,0 @@
-{"id": "smoke-001", "family": "demo-interlocking", "message": "Explain the demo programme and its related condition.", "expected_status": "answered", "expected_citations": ["demo-programme", "demo-condition"], "notes": "Fictional fixture: requires two retrieval rounds."}
-{"id": "smoke-002", "family": "demo-price", "message": "What are resale prices?", "expected_status": "clarifying", "notes": "No price filters supplied, so the Advisor must ask."}
-{"id": "smoke-003", "family": "demo-price", "message": "What are resale prices?", "price_filters": {"town": "TAMPINES", "flat_type": "4 ROOM", "start_month": "2025-01", "end_month": "2025-12"}, "expected_status": "abstained", "notes": "Price tool is unconfigured; must abstain rather than invent figures."}
-{"id": "smoke-004", "family": "demo-no-evidence", "message": "What grants can we get?", "expected_status": "abstained", "notes": "No official evidence connected yet."}

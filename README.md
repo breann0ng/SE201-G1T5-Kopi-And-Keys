@@ -62,45 +62,19 @@ overall Advisor-step limit. Repeated identical policy queries stop the turn.
 ## Project layout
 
 ```text
-backend/kopi_keys/      Application package (installed via pyproject)
-  main.py               FastAPI entry point and dependency wiring
-  schemas.py            Validated request, decision, evidence and response models
-  state.py              Shared LangGraph state
-  workflow.py           Advisor/tool/verifier graph and budgets
-  advisor.py            Advisor interface and temporary demo implementation
-  verifier.py           Citation and source-metadata checks
+backend/kopi_keys/
+  main.py           FastAPI entry point and dependency wiring
+  schemas.py        Validated request, decision, evidence and response models
+  state.py          Shared LangGraph state
+  workflow.py       Advisor/tool/verifier graph and budgets
+  advisor.py        Advisor interface and temporary demo implementation
+  verifier.py       Citation and source-metadata checks
   tools/
-    policy.py           Retrieval interface and fictional demo retriever
-    price.py            Price-tool interface and read-only SQLite adapter
-policy/
-  sources.yaml          Registry of official policy snapshots (URL, dates, supersession)
-  topic_cards/          Reviewed topic cards (versioned JSON)
-scripts/
-  build_resale_db.py    CSV -> data/processed/resale.db with indexes and import metadata
-data/                   Raw downloads and generated indexes (mostly gitignored)
-eval/                   Labelled datasets, run_eval.py, dated results
-tests/                  Deterministic workflow and API checks (pytest)
-docs/architecture.md    Integration plan and current boundaries
-.env.example            Model names, data paths, optional LangSmith settings
-```
-
-Rebuild the resale database after downloading a new CSV into `data/raw/`
-(pass the download date for provenance). The import is rejected, leaving any
-existing database untouched, if any row fails validation. Exact duplicate rows
-are kept and counted; see the script docstring for why.
-
-```powershell
-.\.venv\Scripts\python.exe scripts\build_resale_db.py --downloaded-on 2026-10-13
-```
-
-Once built, `POST /chat` with `price_filters` answers from the database
-(`SqlitePriceTool`); without it, price questions abstain. Override the location
-with `RESALE_DB_PATH`.
-
-Run the evaluation smoke set:
-
-```powershell
-.\.venv\Scripts\python.exe eval\run_eval.py eval\dataset\smoke.jsonl
+    policy.py       Retrieval interface and fictional demo retriever
+    price.py        Price-tool interface; currently reports unconfigured
+tests/              Workflow and API checks
+docs/architecture.md  Integration plan and current boundaries
+data/README.md      Planned policy and transaction data layout
 ```
 
 ## Check the foundation
