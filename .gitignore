@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+.env
+.env.*
+!.env.example
+data/raw/
+data/processed/
+data/chroma/
+*.sqlite
+*.sqlite3
+*.db
+logs/
