@@ -13,3 +13,10 @@ data/chroma/
 *.sqlite3
 *.db
 logs/
+
+# Evaluation runs (keep the folder, commit only summaries you want to share)
+eval/results/*
+!eval/results/.gitkeep
+
+# OS / editor
+.DS_Store

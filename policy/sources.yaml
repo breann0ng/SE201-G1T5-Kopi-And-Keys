@@ -1,0 +1,13 @@
+# Registry of official policy pages ingested into the policy index.
+# One entry per snapshot. Do NOT infer effective_date from retrieved_date;
+# use null when the page does not state one.
+#
+# - id: hdb-ehg-2026-09            # stable, used as citation prefix
+#   title: Enhanced CPF Housing Grant
+#   url: https://www.hdb.gov.sg/...
+#   retrieved_date: 2026-09-30
+#   effective_date: null           # or YYYY-MM-DD if stated on the page
+#   snapshot_file: data/raw/policy_pages/hdb-ehg-2026-09.md
+#   superseded_by: null            # id of the newer snapshot, if any
+
+sources: []
