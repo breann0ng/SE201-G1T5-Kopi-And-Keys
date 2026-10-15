@@ -6,6 +6,7 @@ from time import perf_counter
 from typing import Protocol
 
 import httpx
+from langsmith import traceable
 
 
 class ModelEngineError(RuntimeError):
@@ -85,6 +86,7 @@ class OllamaEngine:
         except ValueError as error:
             raise ModelEngineError("Ollama did not return valid JSON.") from error
 
+    @traceable(run_type="llm", name="ollama_chat")
     def complete(self, messages: list[dict[str, str]]) -> Generation:
         started = perf_counter()
         data = self._request("POST", "/api/chat", {

@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic import ValidationError
 
 from kopi_keys.cli import PriceCase, report, run_case
@@ -23,6 +24,7 @@ CASES = (
 
 
 def main() -> int:
+    load_dotenv(PROJECT_ROOT / ".env")  # LangSmith tracing settings
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--validate-only", action="store_true",

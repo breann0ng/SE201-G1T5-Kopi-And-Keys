@@ -9,6 +9,7 @@ import argparse
 import json
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from .components.synthesiser import Synthesiser
@@ -67,6 +68,7 @@ def report(state, case: PriceCase) -> dict:
 
 
 def main() -> int:
+    load_dotenv()  # LangSmith tracing settings live in .env
     parser = argparse.ArgumentParser(description="Synthesise and verify a supplied SQL price result using local CPU Ollama.")
     parser.add_argument("--input", type=Path, help="JSON containing user_query, sql_result and data_origin.")
     parser.add_argument("--output", type=Path, help="Optional JSON report destination.")
