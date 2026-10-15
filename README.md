@@ -87,11 +87,15 @@ overall Advisor-step limit. Repeated identical policy queries stop the turn.
 ```text
 backend/kopi_keys/
   main.py           FastAPI entry point and dependency wiring
-  schemas.py        Validated request, decision, evidence and response models
+  schemas.py        Shared validated request, graph, decision, evidence and response models
   state.py          Shared LangGraph state
   workflow.py       Advisor/tool/verifier graph and budgets
   advisor.py        Advisor interface and temporary demo implementation
   verifier.py       Citation and source-metadata checks
+  orchestration/
+    gateway.py      Profile/query extraction and missing-field checks
+    router.py       Intent classification and canonical route selection
+    graph.py        Stage 1 LangGraph gateway orchestration
   tools/
     policy.py       Retrieval interface and fictional demo retriever
     price.py        Price-tool interface; currently reports unconfigured

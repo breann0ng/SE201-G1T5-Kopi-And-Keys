@@ -1,16 +1,26 @@
+# Local Python environment and generated Python files
 .venv/
 __pycache__/
 *.py[cod]
 .pytest_cache/
 *.egg-info/
+
+# Local secrets and environment configuration
 .env
 .env.*
 !.env.example
+
+# Imported and generated application data
 data/raw/
 data/processed/
 data/chroma/
 *.sqlite
 *.sqlite3
 *.db
+
+# Runtime output and local-only configuration
 logs/
 .local/
+
+# Folder under data. Held-out evaluation questions/data must not be committed
+held-out/

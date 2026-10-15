@@ -1,6 +1,7 @@
 """Contracts shared by the API, Advisor and tools."""
 
 from datetime import date
+from decimal import Decimal
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -8,6 +9,36 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 class Contract(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+
+Intent = Literal["policy", "price", "mixed", "discovery", "unanswerable"]
+GatewayStatus = Literal["continue", "clarify", "abstain"]
+Route = Literal["policy", "price", "mixed", "discovery", "clarify", "abstain"]
+
+
+class GraphState(Contract):
+    """Validated request state shared by the orchestration graph."""
+
+    message: str = Field(min_length=1, max_length=4000)
+    user_age: int | None = Field(default=None, ge=0, le=120)
+    income: Decimal | None = Field(default=None, ge=0)
+    citizenship: str | None = None
+    town: str | None = None
+    flat_type: str | None = None
+    missing_fields: list[str] = Field(default_factory=list)
+    intent: Intent | None = None
+    route: Route | None = None
+    status: GatewayStatus = "continue"
+    response: str | None = None
+    parse_errors: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def non_blank_profile_values(self):
+        for field in ("citizenship", "town", "flat_type"):
+            value = getattr(self, field)
+            if value is not None and not value.strip():
+                raise ValueError(f"{field} must not be blank")
+        return self
 
 
 class BuyerProfile(Contract):
