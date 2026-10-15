@@ -13,3 +13,4 @@ data/chroma/
 *.sqlite3
 *.db
 logs/
+.local/

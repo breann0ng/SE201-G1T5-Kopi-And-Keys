@@ -1,5 +1,11 @@
 # Architecture starting point
 
+The sections below describe the original demo scaffold. Under the revised
+four-stage blueprint, Person 3's midpoint implementation now lives in
+`backend/kopi_keys/midpoint/`. See [the current Stage 3/4 handoff](person3-midpoint.md).
+Its CPU model engine and numeric verification run independently of the original
+demo `/chat` workflow, ready for integration with the team's Stage 1 and Stage 2.
+
 ## Implemented now
 
 - FastAPI validates `/chat` input and returns a structured result.
@@ -47,14 +53,14 @@ required to run the starting point.
   resuming a conversation requires an explicit storage design later.
 - Demo keyword matching does not represent the future routing or LLM behaviour.
 
-## Team ownership aligned with the proposal
+## Team ownership aligned with the revised midpoint plan
 
 | Area | Starting files | Owner |
 | --- | --- | --- |
-| Architecture and harness | `workflow.py`, `state.py`, `main.py`, `advisor.py` | Sandra |
-| RAG and policy indexing | `tools/policy.py`, policy evidence schema | Tasha |
-| SQL and guardrails | `tools/price.py`, `verifier.py` | Nisha |
-| Evaluation and dataset curation | `tests/`, future reviewed evaluation data | Breann |
+| Orchestration, Stage 1 gateway and dev queries | Global graph/state and gateway integration | Breann |
+| SQLite transactions, Stage 2 SQL and income boundaries | `tools/price.py` and data import | Tasha |
+| CPU model engine, Stage 3 synthesis and Stage 4 numeric verification | `midpoint/` | Nisha |
+| Policy snapshots, initial topic cards and basic UI | Policy data and frontend | Sandra |
 
-Ownership is guidance for the existing proposal responsibilities; interfaces
-should be agreed together before implementing the real adapters.
+The original scaffold's module names are retained. Team members should use the
+revised ownership above and the explicit SQL-result contract for integration.

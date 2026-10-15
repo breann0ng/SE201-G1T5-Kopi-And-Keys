@@ -2,9 +2,32 @@
 
 HDB Resale Policy & Price Benchmark Advisor — SE201 G1T5.
 
-This is the backend starting point. It runs the proposed control flow with a
-**demo advisor and fictional policy passages**. It does not give HDB advice or
-connect to an LLM yet.
+The original `/chat` backend runs with a **demo advisor and fictional policy
+passages**. Person 3's revised midpoint implementation is available separately:
+real CPU Ollama inference, a SQL-result Synthesizer and a numeric verifier.
+
+## Person 3 midpoint (Nisha)
+
+```powershell
+# One-time download; subsequent runs restart/reuse the project-local server.
+.\scripts\setup_ollama.ps1
+
+# Run Stage 3 -> Stage 4 with clearly labelled synthetic SQL statistics.
+.\.venv\Scripts\python.exe -m kopi_keys.midpoint.cli --input examples\midpoint_sql_result.json
+
+# Confirm installation and inspect loaded model CPU/GPU status.
+.\.venv\Scripts\python.exe -m kopi_keys.midpoint.cli --check-engine
+```
+
+On this workspace Ollama and `qwen2.5:3b` have already been downloaded under the
+ignored `.local/` directory. The setup script starts a background server on
+`127.0.0.1:11434`; it does not add a Windows startup service. Every synthesis
+request sets `num_gpu=0`.
+
+Read [Person 3 setup and team handoff](docs/person3-midpoint.md) for the SQL
+contract, node integration, verifier rules and observed smoke-test results.
+The existing `/chat` endpoint still uses the original demo graph; Breann can
+connect the new Stage 3/4 subgraph after Tasha's SQL node.
 
 ## Run locally (Windows PowerShell)
 
