@@ -1,0 +1,19 @@
+{
+  "user_query": "Summarise these synthetic million-dollar statistics and preserve the full amounts.",
+  "data_origin": "synthetic_fixture",
+  "sql_result": {
+    "query_id": "synthetic-large-amounts",
+    "filters": {
+      "town": "QUEENSTOWN",
+      "flat_type": "5 ROOM",
+      "start_month": "2025-01",
+      "end_month": "2025-06"
+    },
+    "volume": 1250,
+    "mean": "1420000",
+    "median": "1400000",
+    "iqr": "180000",
+    "minimum": "1100000",
+    "maximum": "1750000"
+  }
+}

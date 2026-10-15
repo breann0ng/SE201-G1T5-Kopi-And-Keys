@@ -64,6 +64,11 @@ model with that installation and use its local API without running our setup.
 
 ## Files you own
 
+For extra manual model checks, see [the six synthetic SQL cases](../examples/midpoint_cases/README.md).
+Run them together with `.\.venv\Scripts\python.exe scripts\run_midpoint_cases.py`.
+The runner saves a per-case report and counts intentional input rejections as
+passing checks. `--validate-only` checks the input contracts without inference.
+
 | File | Purpose |
 | --- | --- |
 | `midpoint/engine.py` | Ollama HTTP wrapper, CPU options, timeouts and model errors |

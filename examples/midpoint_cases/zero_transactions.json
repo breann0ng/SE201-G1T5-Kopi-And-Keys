@@ -1,0 +1,19 @@
+{
+  "user_query": "Summarise this synthetic search with no matching transactions.",
+  "data_origin": "synthetic_fixture",
+  "sql_result": {
+    "query_id": "synthetic-zero-transactions",
+    "filters": {
+      "town": "TAMPINES",
+      "flat_type": "4 ROOM",
+      "start_month": "2025-01",
+      "end_month": "2025-06"
+    },
+    "volume": 0,
+    "mean": null,
+    "median": null,
+    "iqr": null,
+    "minimum": null,
+    "maximum": null
+  }
+}

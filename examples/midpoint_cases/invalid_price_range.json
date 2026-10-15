@@ -1,0 +1,19 @@
+{
+  "user_query": "This intentionally inconsistent synthetic SQL result must be rejected.",
+  "data_origin": "synthetic_fixture",
+  "sql_result": {
+    "query_id": "synthetic-invalid-price-range",
+    "filters": {
+      "town": "TAMPINES",
+      "flat_type": "4 ROOM",
+      "start_month": "2025-01",
+      "end_month": "2025-06"
+    },
+    "volume": 42,
+    "mean": "650000",
+    "median": "640000",
+    "iqr": "80000",
+    "minimum": "780000",
+    "maximum": "500000"
+  }
+}

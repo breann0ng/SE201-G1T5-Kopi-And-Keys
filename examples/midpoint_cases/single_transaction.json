@@ -1,0 +1,19 @@
+{
+  "user_query": "Summarise this synthetic result with one transaction.",
+  "data_origin": "synthetic_fixture",
+  "sql_result": {
+    "query_id": "synthetic-single-transaction",
+    "filters": {
+      "town": "BEDOK",
+      "flat_type": "3 ROOM",
+      "start_month": "2025-07",
+      "end_month": "2025-07"
+    },
+    "volume": 1,
+    "mean": "450000",
+    "median": "450000",
+    "iqr": "0",
+    "minimum": "450000",
+    "maximum": "450000"
+  }
+}

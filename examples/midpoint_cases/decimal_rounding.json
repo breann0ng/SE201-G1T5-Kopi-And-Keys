@@ -1,0 +1,19 @@
+{
+  "user_query": "Summarise these synthetic statistics without losing the correct cent rounding.",
+  "data_origin": "synthetic_fixture",
+  "sql_result": {
+    "query_id": "synthetic-decimal-rounding",
+    "filters": {
+      "town": "YISHUN",
+      "flat_type": "4 ROOM",
+      "start_month": "2025-01",
+      "end_month": "2025-12"
+    },
+    "volume": 7,
+    "mean": "612345.125",
+    "median": "610000.005",
+    "iqr": "33333.335",
+    "minimum": "500000",
+    "maximum": "750000"
+  }
+}
