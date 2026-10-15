@@ -1,18 +1,19 @@
-# Person 3 midpoint: CPU model, Synthesizer and numeric verifier
+# Price synthesis and numeric verification (CPU model)
 
-This implements Nisha's midpoint portion of the revised four-stage architecture:
+Owner: Nisha. This covers the price path through the Synthesiser Agent and the
+Verifier, running on a local CPU model:
 
 ```text
-Stage 2 SQLPriceResult -> Stage 3 CPU Synthesizer -> Stage 4 Regex Verifier
-                                ^                          |
-                                |---- one repair ----------|
-                                                           |
-                                               verified answer / abstention
+Price Query Tool (PriceResult) -> Synthesiser Agent (CPU LLM) -> Verifier (regex)
+                                        ^                            |
+                                        |------ one repair ----------|
+                                                                     |
+                                                 verified answer / abstention
 ```
 
-Stage 1 extraction, the official SQLite import, income-boundary rules, policy
-RAG and the frontend remain the other team integration points. The original
-`/chat` demo graph is separate from this implementation.
+These steps run as nodes in the single graph in `backend/kopi_keys/graph.py`.
+The official SQLite import, policy RAG, topic cards and the frontend are other
+team integration points.
 
 ## Run your part
 
@@ -27,13 +28,13 @@ py -m venv .venv
 .\scripts\setup_ollama.ps1
 
 # Run the provided synthetic fixture through real model inference.
-.\.venv\Scripts\python.exe -m kopi_keys.midpoint.cli --input examples\midpoint_sql_result.json
+.\.venv\Scripts\python.exe -m kopi_keys.cli --input examples\price_sql_result.json
 
 # Save evidence of a live run (reports are ignored by Git).
-.\.venv\Scripts\python.exe -m kopi_keys.midpoint.cli --input examples\midpoint_sql_result.json --output .local\reports\midpoint_cpu_smoke.json
+.\.venv\Scripts\python.exe -m kopi_keys.cli --input examples\price_sql_result.json --output .local\reports\price_cpu_smoke.json
 
 # Inspect installed and currently loaded models.
-.\.venv\Scripts\python.exe -m kopi_keys.midpoint.cli --check-engine
+.\.venv\Scripts\python.exe -m kopi_keys.cli --check-engine
 
 # Run offline automated tests; no model or network is required.
 .\.venv\Scripts\python.exe -m pytest -q
@@ -64,26 +65,27 @@ model with that installation and use its local API without running our setup.
 
 ## Files you own
 
-For extra manual model checks, see [the six synthetic SQL cases](../examples/midpoint_cases/README.md).
-Run them together with `.\.venv\Scripts\python.exe scripts\run_midpoint_cases.py`.
+For extra manual model checks, see [the six synthetic SQL cases](../examples/price_cases/README.md).
+Run them together with `.\.venv\Scripts\python.exe scripts\run_price_cases.py`.
 The runner saves a per-case report and counts intentional input rejections as
 passing checks. `--validate-only` checks the input contracts without inference.
 
 | File | Purpose |
 | --- | --- |
-| `midpoint/engine.py` | Ollama HTTP wrapper, CPU options, timeouts and model errors |
-| `midpoint/contracts.py` | SQL handoff schema and Stage 3/4 state slice |
-| `midpoint/synthesizer.py` | Formatting prompt and generation call |
-| `midpoint/numeric_verifier.py` | Regex extraction and field-by-field Decimal comparison |
-| `midpoint/pipeline.py` | Callable graph nodes and bounded Stage 3/4 subgraph |
-| `midpoint/cli.py` | Independent demo and engine inspection |
-| `tests/test_midpoint.py` | Numeric, failure-path, graph and HTTP-wrapper checks |
+| `llm.py` | Ollama HTTP wrapper, CPU options, timeouts and model errors |
+| `schemas.py` (`PriceResult`) | SQL handoff schema and display rounding |
+| `components/synthesiser.py` | Price formatting prompt and generation call |
+| `components/verifier.py` | Regex extraction and field-by-field Decimal comparison |
+| `cli.py` | Run one SQL result through the full graph; engine inspection |
+| `tests/test_synthesiser_verifier.py` | Numeric, failure-path, graph and HTTP-wrapper checks |
 
 Paths above are relative to `backend/kopi_keys/`, except `tests/`.
 
-## Stage 2 handoff for Tasha
+## Price Query Tool handoff for Tasha
 
-Pass the result of an executed parameterised SQL query as `SQLPriceResult`:
+Return the result of an executed parameterised SQL query as `PriceResult`
+(from `kopi_keys.schemas`), via `PriceQueryTool.query(filters)` in
+`components/price_query.py`:
 
 ```json
 {
@@ -108,54 +110,32 @@ These numbers are synthetic fixtures, not HDB transaction results.
 - Money is in SGD. Decimal strings preserve the precision of SQL output.
 - `volume` is an integer count. If the SQL adapter calls this `count`, map it to
   `volume` at the handoff.
-- `iqr` is the scalar width `Q3 - Q1`, computed by Stage 2. It is not the pair of
-  quartile endpoints. The Synthesizer does not calculate any statistic.
+- `iqr` is the scalar width `Q3 - Q1`, computed by the Price Query Tool. It is not the pair of
+  quartile endpoints. The Synthesiser does not calculate any statistic.
 - For zero transactions, use `volume: 0` and null/omitted monetary statistics.
-  The graph returns `no_data` and skips model inference.
+  The graph abstains with a fixed "no matching transactions" message and skips
+  model inference.
 - Non-empty results must provide all five monetary values. Input validation
   rejects negative, non-finite, missing and internally inconsistent statistics.
-- This contract adds the mean and IQR missing from the original scaffold's
-  `PriceResult`; that older, smaller demo contract is not sufficient by itself.
 - Use the actual requested filters and a stable executed-query ID. Only trusted
-  Stage 2 code should construct this context in the integrated application.
+  Price Query Tool code should construct this result in the integrated application.
 
-## LangGraph handoff for Breann
+## How it runs in the graph
 
-The subgraph includes both nodes and the one-repair limit:
+`graph.py` wires the nodes as `price_query -> topic_cards -> synthesiser ->
+verifier`. The verifier sends its errors back to the synthesiser once; a second
+failure goes to `abstention`. A model engine error goes straight to
+`abstention` without another inference call. Only the `output` node builds the
+user-facing message, so an unverified draft is never shown.
 
-```python
-from kopi_keys.midpoint import SQLPriceResult, build_price_summary_graph
-
-person3_graph = build_price_summary_graph()
-
-# Inside an integration node, after your Stage 2 SQL tool has returned:
-result = person3_graph.invoke({
-    "user_query": user_query,
-    "sql_result": SQLPriceResult.model_validate(sql_output),
-    "data_origin": "stage2",
-})
-
-# Send only final_response to the frontend, after checking status.
-final_response = result["final_response"]
-verification_passed = result["verification_passed"]
-```
-
-The integration node can return these fields into your global Pydantic
-`GraphState`: `final_response`, `status`, `verification_passed`,
-`verification_errors`, `model_calls` and `model_usage`. Invoke the subgraph only
-after Stage 1 has passed and Stage 2 has produced validated SQL context.
-
-If you want separate Stage 3 and Stage 4 nodes in your main graph, import
-`make_synthesizer_node(OllamaEngine())` and `verifier_node`. Their expected state
-fields are defined in `SynthesisState`. Reproduce the bounded repair routing in
-`pipeline.py`, and do not expose `draft_response` directly to the UI.
-
-Each call starts with fresh state. Runtime fields such as `model_calls` and
-verification flags are internal; never populate them from a frontend request.
+The relevant `GraphState` fields are `price_result`, `draft.price_text`,
+`verification_errors`, `verification_passed`, `model_calls` and `model_usage`.
+Each request starts with fresh state; runtime fields are never populated from
+a frontend request.
 
 ## Output and verification rules
 
-The SLM produces a concise, fixed-label text block:
+The model produces a concise, fixed-label text block:
 
 ```text
 Mean: SGD 650,000.13
@@ -178,8 +158,8 @@ as `650000.13`. Counts must match exactly; there is no percentage tolerance.
 The town, flat type, month range and query reference are rendered from the SQL
 context after verification so their digits do not interfere with price checks.
 
-A failed check returns errors to Stage 3 for one fresh generation. A second
-failed check returns `abstained`; no unverified draft is published. Model
+A failed check returns errors to the Synthesiser for one fresh generation. A second
+failed check abstains; no unverified draft is published. Model
 timeouts, missing models, invalid HTTP responses and truncated output also
 withhold the draft. No-data cases use a deterministic message without inference.
 
@@ -212,11 +192,12 @@ On 15 October 2026, one real local smoke test of the synthetic fixture:
 - Took 20.549 seconds including initial model loading; prompt/output usage was
   248/80 tokens.
 - Reported `size_vram: 0` in `/api/ps`, confirming no model VRAM allocation.
-- Saved its report to `.local/reports/midpoint_cpu_smoke.json`.
+- Saved its report to `.local/reports/midpoint_cpu_smoke.json` (before the
+  refactor, when the CLI lived under `midpoint/`).
 
 This is a smoke-test observation, not a throughput or quality benchmark. Use
-measured CPU results in the midpoint demo; blueprint latency estimates are not
-evaluation results. The offline suite passed 46 tests at implementation time.
+measured CPU results in the demo; blueprint latency estimates are not
+evaluation results.
 
 Implementation references: [Ollama chat API](https://docs.ollama.com/api/chat),
 [running-model inspection](https://docs.ollama.com/api/ps),

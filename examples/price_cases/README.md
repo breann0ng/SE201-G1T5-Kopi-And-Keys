@@ -1,17 +1,19 @@
 # Extra synthetic SQL cases
 
-Each JSON file represents a pretend Stage 2 result. These are hand-authored
+Each JSON file represents a pretend Price Query Tool result. These are hand-authored
 fixtures, not actual HDB transactions or a held-out evaluation dataset. No SQL
-query is executed by this suite: it checks how Person 3 handles supplied context.
+query is executed by this suite. Each case runs through the full graph
+(router, synthesiser, verifier) with the file's `sql_result` standing in for the
+Price Query Tool.
 
 ## Run all six checks
 
 ```powershell
 # Run from the project root; the model/server must already be available.
-.\.venv\Scripts\python.exe scripts\run_midpoint_cases.py
+.\.venv\Scripts\python.exe scripts\run_price_cases.py
 
 # Check only input validation, without a model/server.
-.\.venv\Scripts\python.exe scripts\run_midpoint_cases.py --validate-only
+.\.venv\Scripts\python.exe scripts\run_price_cases.py --validate-only
 ```
 
 Expected live summary: `6/6 checks passed. Mode: live_ollama.` The validation-only
@@ -19,7 +21,7 @@ mode checks accepted/rejected inputs; it does not test model generation.
 
 | File | Expected live behaviour | What to inspect |
 | --- | --- | --- |
-| `zero_transactions.json` | `no_data`; zero model calls | No price values should be invented |
+| `zero_transactions.json` | `no_data` (abstains with a fixed message); zero model calls | No price values should be invented |
 | `single_transaction.json` | `answered`; verifier passes | All prices 450,000.00, IQR 0.00, volume 1 |
 | `decimal_rounding.json` | `answered`; verifier passes | Mean 612,345.13; median 610,000.01; IQR 33,333.34 |
 | `large_amounts.json` | `answered`; verifier passes | Median 1,400,000.00; volume 1,250; no `1.4m` shorthand |
@@ -34,7 +36,7 @@ response, verification errors, model-call count and timing; find them under
 ## Run and inspect one example yourself
 
 ```powershell
-.\.venv\Scripts\python.exe -m kopi_keys.midpoint.cli --input examples\midpoint_cases\decimal_rounding.json
+.\.venv\Scripts\python.exe -m kopi_keys.cli --input examples\price_cases\decimal_rounding.json
 ```
 
 For valid non-empty results, look for `status: answered`,
@@ -56,4 +58,4 @@ validation error. That is the expected outcome.
 
 Changing a valid SQL input should change the expected answer. To test a wrong
 generated answer against unchanged SQL, use the rejection tests in
-`tests/test_midpoint.py`; changing SQL itself does not simulate hallucination.
+`tests/test_synthesiser_verifier.py`; changing SQL itself does not simulate hallucination.

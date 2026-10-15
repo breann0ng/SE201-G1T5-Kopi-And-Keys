@@ -20,7 +20,7 @@ dependencies = [
 dev = ["pytest>=8,<10"]
 
 [project.scripts]
-kopi-keys-synthesize = "kopi_keys.midpoint.cli:main"
+kopi-keys-synthesize = "kopi_keys.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["backend"]

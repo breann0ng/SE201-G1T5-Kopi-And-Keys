@@ -1,17 +1,28 @@
+"""Policy Retrieval Tool: return the top-k dated policy chunks for a query.
+
+Diagram box: "Policy Retrieval Tool (deterministic script)" over the Policy
+Vector Index. Replace DemoPolicyRetriever with a ChromaDB + EmbeddingGemma
+adapter implementing the same `PolicyRetriever.search` protocol. Preserve
+source URL, effective date, snapshot ID and superseded status on every chunk.
+"""
+
 from datetime import date
 from typing import Protocol
 
 from ..schemas import PolicyPassage
 
 
+TOP_K = 5
+
+
 class PolicyRetriever(Protocol):
-    def search(self, query: str, limit: int = 5) -> list[PolicyPassage]: ...
+    def search(self, query: str, limit: int = TOP_K) -> list[PolicyPassage]: ...
 
 
 class DemoPolicyRetriever:
-    """Two fictional passages exercise retrieval of an interlocking condition."""
+    """Two fictional passages; only queries containing "demo" match anything."""
 
-    def search(self, query: str, limit: int = 5) -> list[PolicyPassage]:
+    def search(self, query: str, limit: int = TOP_K) -> list[PolicyPassage]:
         query = query.lower()
         if "demo" not in query:
             return []

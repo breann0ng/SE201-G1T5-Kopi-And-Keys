@@ -1,4 +1,4 @@
-"""Small Ollama HTTP wrapper. Each request explicitly disables GPU offload."""
+"""Local LLM engine (Ollama over HTTP), shared by every LLM component. CPU only."""
 
 import os
 from dataclasses import dataclass, field
