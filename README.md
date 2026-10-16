@@ -86,13 +86,14 @@ backend/kopi_keys/
   cli.py                Run one SQL price result through the full graph
   components/
     query_router.py     Query Router: classify, extract filters, validate
-    policy_retrieval.py Policy Retrieval Tool (keyword search over the policy snapshot; embeddings later)
+    policy_retrieval.py Policy Retrieval Tool (hybrid: keyword + EmbeddingGemma vectors)
+    policy_index.py     Policy Vector Index (ChromaDB), built by scripts/build_policy_index.py
     price_query.py      Price Query Tool (not connected yet)
     topic_cards.py      Topic cards for discovery (placeholder)
     synthesiser.py      Synthesiser Agent (also covers discovery wording)
     verifier.py         Verifier: citations, numbers, provenance, suggestions
     abstention.py       Fixed abstention messages
-  evaluation/           Evaluation runner, metrics and baselines (placeholder)
+  evaluation/           Dev set loader, metrics and runner (python -m kopi_keys.evaluation.run_eval)
 data/
   evaluation/           Development set and labels; held-out set stays local
   topic_cards/          Reviewed topic cards (placeholder)

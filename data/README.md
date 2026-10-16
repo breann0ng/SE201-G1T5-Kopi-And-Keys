@@ -32,9 +32,9 @@ The SQLite adapter will accept validated filters and use parameterised read-only
 queries. An absent dataset must not be replaced with invented price figures.
 
 Policy passages come from the ACTIVE snapshot's chunks (`data/policy_chunks/`) through
-`SnapshotPolicyRetriever` in `backend/kopi_keys/components/policy_retrieval.py`: keyword
-search for now, until the embedding retriever replaces it. The fictional `DemoPolicyRetriever`
-there is kept for tests only. Topic cards go in
+`HybridPolicyRetriever` in `backend/kopi_keys/components/policy_retrieval.py`: keyword ranking
+fused with EmbeddingGemma vectors in `chroma/` (built locally by `scripts/build_policy_index.py`).
+The app never uses fictional evidence; test-only passages live in `tests/fakes.py`. Topic cards go in
 `topic_cards/` (see its README).
 
 ## Resale transactions (Price Query Tool)
@@ -156,3 +156,19 @@ Related variants the snapshot also states (not yet in the JSON):
 - $24,000 for extended or multi-generation families (family CPF grant);
 - $16,000 for singles buying with family or other singles;
 - $9,000 for singles buying with other singles or with parents (EHG).
+
+## Changes to teammates' code (Person 4, 2026-10-17; please review)
+
+Made while merging PR #5 and adding hybrid retrieval. Each owner should check their part.
+
+| File | Owner | Change |
+|---|---|---|
+| `backend/kopi_keys/components/policy_retrieval.py` | KahfathNisha (PR #5) / Person 2 | PR #5's keyword ranker replaced by a general keyword ranker (no question-specific boosts) fused with EmbeddingGemma vectors (`HybridPolicyRetriever`). `DemoPolicyRetriever` removed from the app; fictional test passages moved to `tests/fakes.py` |
+| `backend/kopi_keys/main.py`, `graph.py` | Breann | App uses `HybridPolicyRetriever`; graph default is the real snapshot retriever. Evidence `mode` comes from the retriever (`snapshot` or `demo`), with `data_mode` kept as an explicit override |
+| `backend/kopi_keys/components/query_router.py` | Breann | Added terms found by the combined dev set: Option to Purchase / fee, spouse and pass questions, "confirm we are eligible" (declined), "with our grants" (discovery), and "not Singaporean" no longer read as the user's citizenship |
+| `tests/test_policy_advisor.py` | KahfathNisha | Table-handling tests pin HDB's citizenship table (`CHUNK_ELIG_44`) instead of relying on keyword rank 1; the ranking test now checks the app's hybrid retriever (skipped without the vector index) |
+| `tests/test_graph.py`, `test_api.py`, `test_price_stats.py` | Breann | Use `tests/fakes.py` instead of the removed `DemoPolicyRetriever` |
+| `backend/kopi_keys/evaluation/` | Breann (placeholders) | Placeholders filled with the working runner; see its README |
+| `data/evaluation/development/` | Breann | Dev set replaced by the combined 30 questions; `stage1_gateway_labels.jsonl` is now generated from it; old files in `archive/` |
+| `pyproject.toml` | Breann | Optional `rag` extra (`chromadb`) for the vector index |
+| `docs/policy-advisor.md`, `docs/architecture.md`, `README.md` | KahfathNisha / Breann | Retrieval and evaluation sections updated |
