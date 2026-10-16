@@ -32,21 +32,21 @@ development. Production hosting is not set up yet.
 
 - `src/lib/adapter.ts` sends the latest message plus the profile to `POST /chat`.
 - **Conversation memory (frontend half, built):**
-  - **History:** with `VITE_SEND_HISTORY=true` (in `frontend/.env.local`), each request also carries
-    `history`: the last 6 turns as `{role, content}`, oldest first. It is **off by default**, because
-    the current backend rejects unknown fields. Turn it on once `ChatRequest` has
-    `history: list[HistoryTurn]` (see below).
+  - **History:** each request carries the last 12 turns as `{role, content}`, oldest first.
+    The backend accepts these as clarification context, never as policy evidence.
+    Set `VITE_SEND_HISTORY=false` in `frontend/.env.local` to disable sending history.
   - **Saved chat:** the conversation is saved in this browser (`kk:chat`, last 60 messages), so it
     survives a reload. **New chat** and Settings → **Clear my data** wipe it.
 - **Quick replies:** when a clarifying reply includes `asking_for` (e.g. `"citizenship"`), buttons
   appear under it. Tapping one fills in the sidebar profile and sends the answer as a message.
-  `asking_for` is a **proposed** backend field, so nothing shows until it exists.
+  The backend returns `asking_for` for profile clarifications. Household type is also
+  available in the sidebar.
 
-### Proposed backend contract (for the orchestration owner)
+### Backend conversation contract
 ```python
 class HistoryTurn(Contract):
     role: Literal["user", "assistant"]
-    content: str = Field(max_length=4000)
+    content: str = Field(max_length=12000)
 
 class ChatRequest(Contract):
     ...
@@ -54,7 +54,7 @@ class ChatRequest(Contract):
 
 class ChatResponse(Contract):
     ...
-    asking_for: Literal["citizenship", "age", "household_income", "first_timer"] | None = None
+    asking_for: Literal["citizenship", "age", "household_income", "first_timer", "household_type"] | None = None
 ```
 History is context for the Advisor, **not evidence**. Policy claims must still cite passages retrieved
 for the current answer, and the verifier should keep enforcing that.

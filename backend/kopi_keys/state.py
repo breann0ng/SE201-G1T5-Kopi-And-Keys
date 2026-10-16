@@ -6,6 +6,7 @@ the fields in its own section (plus `trace`).
 
 import operator
 from decimal import Decimal
+import re
 from typing import Annotated
 
 from pydantic import Field, model_validator
@@ -13,6 +14,7 @@ from pydantic import Field, model_validator
 from .schemas import (
     ChatRequest, ChatResponse, Contract, DataOrigin, Draft, Intent, PolicyPassage,
     PriceResult, Route, RouterStatus,
+    HistoryTurn,
 )
 
 
@@ -23,6 +25,9 @@ class GraphState(Contract):
     income: Decimal | None = Field(default=None, ge=0)
     citizenship: str | None = None
     first_timer: bool | None = None
+    household_type: str | None = None
+    history: list[HistoryTurn] = Field(default_factory=list)
+    followup_question: str | None = None
     town: str | None = None
     flat_type: str | None = None
     start_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
@@ -73,18 +78,77 @@ class GraphState(Contract):
         return self
 
 
+def _reply_fields(message: str, previous_reply: str = "") -> dict:
+    from .components.query_router import extract_fields
+
+    fields = extract_fields(message)
+    if fields["town"] is None and len(message) < 100:
+        fields["town"] = extract_fields("in " + message)["town"]
+    if previous_reply.startswith("Please provide:"):
+        requested = previous_reply.removeprefix("Please provide:").strip().lower()
+        if requested.startswith("age") and re.fullmatch(r"\s*\d{1,3}\s*", message):
+            value = int(message)
+            if value <= 120:
+                fields["user_age"] = value
+        elif requested.startswith("household income"):
+            match = re.fullmatch(r"\s*(?:SGD\s*)?\$?([\d,]+(?:\.\d{1,2})?)\s*([kK])?\s*", message)
+            if match:
+                fields["income"] = Decimal(match[1].replace(",", "")) * (1000 if match[2] else 1)
+        elif requested.startswith("first-timer") and message.strip().lower() in {"yes", "no"}:
+            fields["first_timer"] = message.strip().lower() == "yes"
+        elif requested.startswith("household type") and message.strip().lower() == "single":
+            fields["household_type"] = "single"
+    return fields
+
+
 def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") -> dict:
     """Convert an API request into graph input. Router extraction fills any gaps."""
     profile = request.profile
     filters = request.price_filters
+    from .components.query_router import extract_fields, classify_intent
+
+    # History supplies conversation context, never policy evidence. Explicit
+    # sidebar fields take precedence; the router then applies the current turn.
+    remembered = {}
+    previous_question = None
+    previous_reply = ""
+    for turn in request.history:
+        if turn.role == "user":
+            fields = _reply_fields(turn.content, previous_reply)
+            answering_clarification = previous_reply.startswith("Please provide:") and not re.search(
+                r"\?|\b(?:can|may|what|how|why|eligible|qualify)\b", turn.content, re.I)
+            self_description = bool(re.search(
+                r"\b(?:i am|i'm|we are|we're|my income|our income|i earn|we earn|my salary|our salary)\b",
+                turn.content, re.I,
+            ))
+            remembered.update({k: v for k, v in fields.items()
+                               if v is not None and (k in {"town", "flat_type"} or self_description or answering_clarification)})
+            if classify_intent(turn.content) != "unanswerable" and not answering_clarification:
+                previous_question = turn.content
+            previous_reply = ""
+        else:
+            previous_reply = turn.content
+    current = _reply_fields(request.message, previous_reply)
+    last_reply = request.history[-1] if request.history else None
+    if (previous_question and last_reply and last_reply.role == "assistant"
+            and last_reply.content.startswith("Please provide:")
+            and not re.search(r"\?|\b(?:can|may|what|how|why|eligible|qualify)\b", request.message, re.I)
+            and any(v is not None for v in current.values())):
+        remembered.update({k: v for k, v in current.items() if v is not None})
+        followup_question = previous_question
+    else:
+        followup_question = None
     return GraphState(
         message=request.message,
-        user_age=profile.age,
-        income=Decimal(str(profile.household_income)) if profile.household_income is not None else None,
-        citizenship=profile.citizenship,
-        first_timer=profile.first_timer,
-        town=filters.town if filters else None,
-        flat_type=filters.flat_type if filters else None,
+        history=request.history,
+        followup_question=followup_question,
+        user_age=profile.age if profile.age is not None else remembered.get("user_age"),
+        income=Decimal(str(profile.household_income)) if profile.household_income is not None else remembered.get("income"),
+        citizenship=profile.citizenship or remembered.get("citizenship"),
+        first_timer=profile.first_timer if profile.first_timer is not None else remembered.get("first_timer"),
+        household_type=profile.household_type or remembered.get("household_type"),
+        town=filters.town if filters else remembered.get("town"),
+        flat_type=filters.flat_type if filters else remembered.get("flat_type"),
         start_month=filters.start_month if filters else None,
         end_month=filters.end_month if filters else None,
         data_origin=data_origin,

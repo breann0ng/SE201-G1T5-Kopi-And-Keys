@@ -9,6 +9,7 @@ export const emptyProfile: BuyerProfile = {
   age: null,
   household_income: null,
   first_timer: null,
+  household_type: null,
 };
 
 type ProfileContextValue = {
@@ -21,7 +22,7 @@ type ProfileContextValue = {
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfile] = useState<BuyerProfile>(() => load(KEY, emptyProfile));
+  const [profile, setProfile] = useState<BuyerProfile>(() => ({ ...emptyProfile, ...load(KEY, emptyProfile) }));
   const profileRef = useRef(profile);
 
   useEffect(() => {

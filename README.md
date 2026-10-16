@@ -38,6 +38,9 @@ Example `POST /chat` requests:
 - `{"message": "Tell me a joke."}` abstains as out of scope.
 
 Each response includes its `route` and a `trace` of the nodes that ran.
+Policy questions use cited local-model summaries; personal eligibility questions
+first ask for missing topic-card inputs. See [policy advisor details](docs/policy-advisor.md)
+for grounding checks, conversation limits and live examples.
 
 ## Price synthesis on a local CPU model
 

@@ -13,6 +13,8 @@ Checks:
 - Price provenance: the result's filters match the filters the user asked for.
 - Suggestions: every suggestion uses a matched topic card and a retrieved,
   current citation.
+- Model-written policy summaries: their supporting quotes occur in the cited
+  passages, and each written number occurs in the supporting quote.
 
 These are structural checks. Whether a claim's wording is faithful to its
 source still needs manual review (Citation Faithfulness metric).
@@ -118,9 +120,44 @@ def verify(state: GraphState) -> list[str]:
     has_price = price is not None and price.volume > 0
     if not draft.claims and not has_price:
         errors.append("An answer requires cited claims or an executed price result.")
+    elif state.passages and state.route in {"policy", "mixed", "discovery"} and not draft.claims:
+        errors.append("The policy question requires a cited policy summary.")
 
+    question = state.followup_question or state.message
     for claim in draft.claims:
         errors.extend(_citation_errors(claim.citation_ids, sources, "policy claim"))
+        if claim.supporting_quote is not None:
+            quote = " ".join(claim.supporting_quote.split())
+            cited = [sources[c] for c in claim.citation_ids if c in sources]
+            if not any(quote in " ".join(p.text.split()) for p in cited):
+                errors.append("A policy supporting quote is not present in its cited source.")
+            numbers = {Decimal(n.replace(",", "")) for n in re.findall(r"\b\d[\d,]*(?:\.\d+)?\b", claim.text)}
+            supported = {Decimal(n.replace(",", "")) for n in re.findall(r"\b\d[\d,]*(?:\.\d+)?\b", quote)}
+            if claim.source_scope is not None:
+                from .policy_synthesis import table_claim
+
+                canonical = [table_claim(p, claim.supporting_quote, question) for p in cited]
+                if not any(c is not None and c.text == claim.text and c.source_scope == claim.source_scope
+                           and c.source_criterion == claim.source_criterion for c in canonical):
+                    errors.append("A table claim does not preserve its source column and cell.")
+                else:
+                    context = claim.source_scope + " " + (claim.source_criterion or "")
+                    supported |= {Decimal(n.replace(",", "")) for n in re.findall(r"\b\d[\d,]*(?:\.\d+)?\b", context)}
+            if numbers - supported:
+                errors.append("A policy claim contains numbers absent from its supporting quote.")
+
+    if (re.search(r"\b(?:pr|spr)\b|permanent resident", question, re.I)
+            and re.search(r"\bbuy\b|resale", question, re.I)):
+        from .policy_synthesis import model_evidence, scope_label
+
+        scopes = {scope_label(r["column"]).replace(" Resale ", " / Resale ") for p in state.passages
+                  for r in model_evidence(p, question).get("table_rows", [])
+                  if r["criterion"].lower() == "citizenship"}
+        standard = {s for s in scopes if "standard" in s.lower() or "unclassified" in s.lower()}
+        prime = {s for s in scopes if "prime" in s.lower() or "plus" in s.lower()}
+        used = {c.source_scope for c in draft.claims}
+        if standard and prime and (not used & standard or not used & prime):
+            errors.append("A PR resale answer must cover Standard/unclassified and Plus/Prime citizenship conditions separately, using quotes from BOTH table columns.")
 
     if has_price:
         if draft.price_text is None:
