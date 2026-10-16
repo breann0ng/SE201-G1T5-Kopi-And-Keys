@@ -33,6 +33,9 @@ POLICY_WORDS = (
     "hdb", "condo", "stuck there", "how long", "block", "neighbourhood", "full",
     "loan", "mortgage", "financing", "hfe",
     "borrow", "repayment", "interest rate", "instalment", "installment",
+    # Purchase steps and non-citizen households (combined dev set, 2026-10-17).
+    "option to purchase", "option fee", "otp", "loan-to-value",
+    "spouse", "wife", "husband", "foreigner", "work pass", "visit pass", "what pass",
 )
 BUY_ELIGIBILITY = re.compile(
     r"\b(?:can|may)\b.{0,70}\bbuy\b.{0,40}\b(?:resale|hdb|flat)\b", re.IGNORECASE,
@@ -41,10 +44,15 @@ DISCOVERY_WORDS = (
     "what can i afford", "where should i buy", "help me decide", "recommend",
     "what should i look into", "what should we look into", "where do we start",
     "what's the catch", "what is the catch",
+    "with our grants", "with my grants", "what should i know", "what should we know",
+    "anything we should check", "anything i should check",
 )
 UNANSWERABLE_PATTERNS = (
     "will this flat be worth", "buy now or wait", "recommend a good property agent",
     "what will it actually sell for",
+    # Eligibility verdicts: only HDB's HFE letter confirms eligibility (framing rule).
+    "confirm we are", "confirm i am", "confirm that we", "confirm that i", "definitely eligible",
+    "guarantee we", "guarantee i",
 )
 
 
@@ -102,9 +110,11 @@ INCOME_PATTERN = re.compile(
     r"(?:sgd\s*)?\$?\s*([\d,]+(?:\.\d{1,2})?)\s*([km])?\b",
     re.IGNORECASE,
 )
+# "not Singaporean" / "not a PR" describe someone else, so negated mentions are skipped.
 CITIZENSHIP_PATTERNS = (
-    (re.compile(r"\b(?:singaporean|singapore citizen|citizen of singapore)\b", re.IGNORECASE), "Singaporean"),
-    (re.compile(r"\b(?:permanent resident|singapore pr|pr)\b", re.IGNORECASE), "PR"),
+    (re.compile(r"\b(?<!not )(?<!not a )(?:singaporean|singapore citizen|citizen of singapore)\b", re.IGNORECASE),
+     "Singaporean"),
+    (re.compile(r"\b(?<!not )(?<!not a )(?:permanent resident|singapore pr|pr)\b", re.IGNORECASE), "PR"),
 )
 # All 26 towns in the HDB resale dataset (same list as scripts/build_resale_db.py).
 KNOWN_TOWNS = {
