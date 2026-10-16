@@ -70,3 +70,15 @@ def test_state_rejects_invalid_profile_values():
         GraphState(message="question", income=-1)
     with pytest.raises(ValidationError):
         GraphState(message="question", town="   ")
+
+
+def test_all_dataset_towns_and_aliases_are_extracted():
+    from kopi_keys.components.query_router import KNOWN_TOWNS, extract_fields
+    assert len(KNOWN_TOWNS) == 26
+    for town in KNOWN_TOWNS:
+        assert extract_fields(f"4-room flat prices in {town.title()}?")["town"] == town
+    assert extract_fields("How much is a 4-room flat in Pasir Ris going for?")["town"] == "PASIR RIS"
+    assert extract_fields("4 room in Kallang Whampoa")["town"] == "KALLANG/WHAMPOA"
+    assert extract_fields("flat in AMK")["town"] == "ANG MO KIO"
+    assert extract_fields("My parents live in Bedok, we want a 4-room in Tampines")["town"] == "TAMPINES"
+

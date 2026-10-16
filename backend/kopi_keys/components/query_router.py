@@ -101,21 +101,40 @@ CITIZENSHIP_PATTERNS = (
     (re.compile(r"\b(?:singaporean|singapore citizen|citizen of singapore)\b", re.IGNORECASE), "Singaporean"),
     (re.compile(r"\b(?:permanent resident|singapore pr|pr)\b", re.IGNORECASE), "PR"),
 )
-TOWN_PATTERN = re.compile(
-    r"\b(?:town|located in|live in|living in|in)\s*[:,-]?\s*"
-    r"([a-z][a-z ]{2,30}?)(?=\s*(?:\band\b|\bwith\b|\bfor\b|\bin\b|\bthis\b|\bover\b|\bpast\b|\bsell\b|\bsold\b|\byear\b|\bcost\b|\blisted\b|,|\?|\.|$))",
-    re.IGNORECASE,
-)
-
+# All 26 towns in the HDB resale dataset (same list as scripts/build_resale_db.py).
+KNOWN_TOWNS = {
+    "ANG MO KIO", "BEDOK", "BISHAN", "BUKIT BATOK", "BUKIT MERAH", "BUKIT PANJANG",
+    "BUKIT TIMAH", "CENTRAL AREA", "CHOA CHU KANG", "CLEMENTI", "GEYLANG", "HOUGANG",
+    "JURONG EAST", "JURONG WEST", "KALLANG/WHAMPOA", "MARINE PARADE", "PASIR RIS",
+    "PUNGGOL", "QUEENSTOWN", "SEMBAWANG", "SENGKANG", "SERANGOON", "TAMPINES",
+    "TOA PAYOH", "WOODLANDS", "YISHUN",
+}
+# Common names that are not dataset town names -> the dataset town.
 TOWN_ALIASES = {
     "AMK": "ANG MO KIO",
     "BIDADARI": "TOA PAYOH",
+    "CCK": "CHOA CHU KANG",
+    "KALLANG": "KALLANG/WHAMPOA",
+    "WHAMPOA": "KALLANG/WHAMPOA",
+    "KALLANG WHAMPOA": "KALLANG/WHAMPOA",
 }
-KNOWN_TOWNS = {
-    "ANG MO KIO", "BEDOK", "BISHAN", "CLEMENTI", "HOUGANG", "JURONG WEST",
-    "PUNGGOL", "SENGKANG", "TAMPINES", "TOA PAYOH", "WOODLANDS", "YISHUN",
-    "AMK", "BIDADARI",
-}
+# Match a known town name after a location word. Names are listed longest first
+# so "JURONG WEST" wins over a shorter prefix; spaces/slashes may vary in input.
+_TOWN_NAMES = sorted(KNOWN_TOWNS | set(TOWN_ALIASES), key=len, reverse=True)
+TOWN_PATTERN = re.compile(
+    r"\b(?:town|located in|live in|living in|in|at|near)\s*[:,-]?\s*("
+    + "|".join(r"[\s/]+".join(map(re.escape, re.split(r"[\s/]+", name))) for name in _TOWN_NAMES)
+    + r")\b",
+    re.IGNORECASE,
+)
+
+
+def _canonical_town(text: str) -> str:
+    name = " ".join(re.split(r"[\s/]+", text.strip().upper()))
+    if name in TOWN_ALIASES:
+        return TOWN_ALIASES[name]
+    return "KALLANG/WHAMPOA" if name == "KALLANG WHAMPOA" else name
+
 
 EXTRACTED_FIELDS = ("user_age", "income", "citizenship", "town", "flat_type")
 
@@ -130,8 +149,7 @@ def extract_fields(message: str) -> dict:
     town_match = next(
         (
             match for match in TOWN_PATTERN.finditer(message)
-            if match.group(1).strip().upper() in KNOWN_TOWNS | set(TOWN_ALIASES)
-            and not re.search(
+            if not re.search(
                 r"(?:parents?|mum|mom)\s+(?:stay|are|is|live|lives)?\s*"
                 r"(?:in|near)?\s*$",
                 message[max(0, match.start() - 35):match.start()],
@@ -152,10 +170,7 @@ def extract_fields(message: str) -> dict:
             if income_match else None
         ),
         "citizenship": citizenship,
-        "town": (
-            TOWN_ALIASES.get(town_match.group(1).strip().upper(), town_match.group(1).strip().upper())
-            if town_match else None
-        ),
+        "town": _canonical_town(town_match.group(1)) if town_match else None,
         "flat_type": flat_type,
     }
 
