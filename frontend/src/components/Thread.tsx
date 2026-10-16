@@ -12,6 +12,7 @@ import { load, save } from "../lib/storage";
 import { AnswerExtras, StatusBadge } from "./AnswerExtras";
 import { Logo } from "./Logo";
 import { QuickReplies } from "./QuickReplies";
+import { MarkdownText } from "./MarkdownText";
 
 const STARTERS = [
   "Am I eligible for the Enhanced CPF Housing Grant?",
@@ -133,9 +134,7 @@ function AssistantMessage() {
         ) : (
           <>
             <StatusBadge meta={meta} />
-            <div className="whitespace-pre-wrap leading-relaxed">
-              <MessagePrimitive.Parts />
-            </div>
+            <MessagePrimitive.Parts components={{ Text: MarkdownText }} />
             {meta?.kind === "response" && <AnswerExtras response={meta.response} />}
             {meta?.kind === "response" &&
               meta.response.status === "clarifying" &&

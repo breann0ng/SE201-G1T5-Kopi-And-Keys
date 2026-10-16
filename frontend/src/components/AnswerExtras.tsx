@@ -91,7 +91,52 @@ function PriceCard({ price }: { price: PriceResult }) {
           </div>
         ))}
       </div>
+      <PriceRange price={price} />
+      {price.volume > 0 && price.volume < 10 && (
+        <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
+          Only {price.volume} sales: treat these figures with caution.
+        </p>
+      )}
     </div>
+  );
+}
+
+/** Range bar: lowest to highest sale, with the median (dot) and mean (tick) placed to scale. */
+function PriceRange({ price }: { price: PriceResult }) {
+  const [lo, hi, med, mean] = [price.minimum, price.maximum, price.median, price.mean].map((v) =>
+    v === null ? null : Number(v),
+  );
+  if (lo === null || hi === null || med === null || hi <= lo) return null;
+  const pos = (v: number) => `${((v - lo) / (hi - lo)) * 100}%`;
+  return (
+    <figure className="mt-3" aria-label="Price range from lowest to highest sale">
+      <div className="relative mx-2 h-6">
+        <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-gradient-to-r from-slate-200 via-coral-300 to-slate-200 dark:from-slate-700 dark:via-coral-500/40 dark:to-slate-700" />
+        {mean !== null && (
+          <div
+            className="absolute top-1/2 h-4 w-0.5 -translate-x-1/2 -translate-y-1/2 bg-slate-500"
+            style={{ left: pos(mean) }}
+            title={`Mean ${sgd(price.mean)}`}
+          />
+        )}
+        <div
+          className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-coral-500 shadow dark:border-slate-900"
+          style={{ left: pos(med) }}
+          title={`Median ${sgd(price.median)}`}
+        />
+      </div>
+      <figcaption className="mt-1 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-slate-500">
+        <span className="flex items-center gap-1">
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-coral-500" /> Median
+        </span>
+        {mean !== null && (
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-3 w-0.5 bg-slate-500" /> Mean {sgd(price.mean)}
+          </span>
+        )}
+        {price.iqr !== null && <span>Middle 50% of sales span {sgd(price.iqr)}</span>}
+      </figcaption>
+    </figure>
   );
 }
 
