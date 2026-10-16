@@ -198,16 +198,38 @@ def effective(text: str) -> tuple[str | None, str | None]:
     return Date(int(y), MONTHS[mon], int(d)).isoformat(), phrase
 
 
+def next_counters(registry: dict[str, str]) -> dict[str, int]:
+    """Highest number already used per policy code, keyed by the bare code ("EHG").
+
+    Must use the same key as allocate(); keying on "CHUNK_EHG" here once restarted
+    numbering at 01 on every rerun, reusing IDs for new passages.
+    """
+    next_n: dict[str, int] = {}
+    for cid in registry.values():
+        prefix, n = cid.rsplit("_", 1)
+        code = prefix.removeprefix("CHUNK_")
+        next_n[code] = max(next_n.get(code, 0), int(n))
+    return next_n
+
+
+def allocate(registry: dict[str, str], next_n: dict[str, int], key: str, code: str) -> str:
+    """Give a new passage the next unused ID for its policy code."""
+    used = set(registry.values())
+    next_n[code] = next_n.get(code, 0) + 1
+    cid = f"CHUNK_{code}_{next_n[code]:02d}"
+    if cid in used:
+        raise SystemExit(f"chunk ID {cid} already assigned; registry counters are inconsistent")
+    registry[key] = cid
+    return cid
+
+
 def main() -> None:
     date = sys.argv[1] if len(sys.argv) > 1 else (SNAPS / "ACTIVE").read_text(encoding="utf-8").strip()
     snap = SNAPS / date
     manifest = json.loads((snap / "manifest.json").read_text(encoding="utf-8"))
     vocab = json.loads(VOCAB.read_text(encoding="utf-8"))
     registry = json.loads(REGISTRY.read_text(encoding="utf-8")) if REGISTRY.exists() else {}
-    next_n: dict[str, int] = {}
-    for cid in registry.values():
-        code, n = cid.rsplit("_", 1)
-        next_n[code] = max(next_n.get(code, 0), int(n))
+    next_n = next_counters(registry)
 
     rows, seen_keys = [], set()
     for page in manifest["pages"]:
@@ -229,8 +251,7 @@ def main() -> None:
                 key = f"{key}:{occurrence}"
                 seen_keys.add(key)
                 if key not in registry:
-                    next_n[code] = next_n.get(code, 0) + 1
-                    registry[key] = f"CHUNK_{code}_{next_n[code]:02d}"
+                    allocate(registry, next_n, key, code)
                 eff, eff_text = effective(content)
                 rows.append({
                     "chunk_id": registry[key],
