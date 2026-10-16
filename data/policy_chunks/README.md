@@ -27,6 +27,9 @@
   Tables over ~600 words are split between rows, with the header row repeated.
 - **Embedding.** `content` does not repeat the heading. Retrieval should embed
   `section_heading + "\n" + content`.
+- **Served by:** `SnapshotPolicyRetriever` (`backend/kopi_keys/components/policy_retrieval.py`)
+  loads this ACTIVE file, skips superseded chunks and returns the top 5 by keyword (BM25) score,
+  heading included. Interim (2026-10-16) until the ChromaDB + EmbeddingGemma retriever exists.
 - **Known limits:**
   - 12 chunks exceed 600 words. These are tables that trafilatura put on one line, so there is no
     safe row boundary to split on.

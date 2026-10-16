@@ -76,6 +76,6 @@ for the current answer, and the verifier should keep enforcing that.
 ## Scaffolded, not finished
 
 - **Feedback:** 👍/👎 is saved in the browser only. It is meant to feed the evaluation dataset later.
-- **Sources page:** reads `data/policy_snapshots/` at build time. Move it to an API endpoint once the
-  retriever serves snapshots.
+- **Sources page:** reads `data/policy_snapshots/` at build time. The backend's retriever now serves the
+  snapshot's chunks, so this could move to an API endpoint.
 - **Later:** saved conversations, language options and more profile fields (see `data/topic_cards/README.md`).

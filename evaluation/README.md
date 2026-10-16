@@ -74,7 +74,7 @@ These are baselines, not results to report.
 |---|---|---|---|
 | Discovery precision / recall | 75% / 100% | ≥ 80% / ≥ 70% | Extras: the Step-Up card for SPR and foreigner profiles (the captured Step-Up page states no citizenship rule, so code cannot exclude it), and PHG for an SC/SC couple (label call) |
 | Ask-next accuracy | 50% (2/4) | none set | The engine asks for the field that unblocks the most cards; review whether the labels or the tie-break should change |
-| Recall@5, keyword baseline | 38% (6/16) | ≥ 85% | Plain keyword search, no embeddings. MyNiceHome summary chunks outrank HDB pages. Person 2's hybrid retriever should beat it |
+| Recall@5, keyword baseline | 38% (6/16) | ≥ 85% | Plain keyword search, no embeddings. MyNiceHome summary chunks outrank HDB pages. The app now serves this same scoring (`SnapshotPolicyRetriever`, interim); Person 2's hybrid retriever should beat it |
 | End-to-end on the demo backend | not meaningful | | The backend still runs the fictional demo workflow; rerun when the real stages are connected |
 
 ## Not done here

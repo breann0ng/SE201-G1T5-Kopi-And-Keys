@@ -31,8 +31,10 @@ Transaction imports should record their source, download date, coverage and sche
 The SQLite adapter will accept validated filters and use parameterised read-only
 queries. An absent dataset must not be replaced with invented price figures.
 
-The only evidence shipped with this scaffold is fictional and lives in
-`backend/kopi_keys/components/policy_retrieval.py`. Topic cards go in
+Policy passages come from the ACTIVE snapshot's chunks (`data/policy_chunks/`) through
+`SnapshotPolicyRetriever` in `backend/kopi_keys/components/policy_retrieval.py`: keyword
+search for now, until the embedding retriever replaces it. The fictional `DemoPolicyRetriever`
+there is kept for tests only. Topic cards go in
 `topic_cards/` (see its README).
 
 ## Resale transactions (Price Query Tool)
