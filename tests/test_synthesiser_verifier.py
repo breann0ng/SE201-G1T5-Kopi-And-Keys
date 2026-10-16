@@ -5,13 +5,13 @@ import httpx
 import pytest
 from pydantic import ValidationError
 
-from kopi_keys.midpoint.contracts import SQLPriceResult, SynthesisState
-from kopi_keys.midpoint.engine import Generation, ModelEngineError, OllamaEngine, OllamaSettings
-from kopi_keys.midpoint.numeric_verifier import verify_generated_numbers
-from kopi_keys.midpoint.pipeline import build_price_summary_graph
+from kopi_keys.cli import PriceCase, run_case
+from kopi_keys.components.verifier import verify_generated_numbers
+from kopi_keys.llm import Generation, ModelEngineError, OllamaEngine, OllamaSettings
+from kopi_keys.schemas import PriceResult
 
 
-FIXTURE = Path(__file__).resolve().parents[1] / "examples" / "midpoint_sql_result.json"
+FIXTURE = Path(__file__).resolve().parents[1] / "examples" / "price_sql_result.json"
 VALID_TEXT = """Mean: SGD 650,000.13
 Median: SGD 640,000.00
 IQR: SGD 80,000.00
@@ -21,7 +21,7 @@ Volume: 42 transactions"""
 
 @pytest.fixture
 def state():
-    return SynthesisState.model_validate_json(FIXTURE.read_text(encoding="utf-8"))
+    return PriceCase.model_validate_json(FIXTURE.read_text(encoding="utf-8"))
 
 
 class FixtureEngine:
@@ -69,43 +69,43 @@ def test_regex_rejects_changed_ambiguous_or_extra_output(state, bad_text):
 
 def test_graph_repairs_bad_generation_and_exposes_only_verified_final_text(state):
     engine = FixtureEngine(VALID_TEXT.replace("640,000.00", "999,000.00"), VALID_TEXT)
-    output = build_price_summary_graph(engine).invoke(state.model_dump())
-    assert output["status"] == "answered"
-    assert output["verification_passed"] is True
-    assert output["model_calls"] == 2
-    assert "999,000" not in output["final_response"]
-    assert "SYNTHETIC TEST DATA" in output["final_response"]
+    output = run_case(state, engine)
+    assert output.response.status == "answered"
+    assert output.verification_passed is True
+    assert output.model_calls == 2
+    assert "999,000" not in output.response.message
+    assert "SYNTHETIC TEST DATA" in output.response.message
     repair_context = json.loads(engine.calls[-1][-1]["content"])
     assert any("median" in error for error in repair_context["previous_verification_errors"])
-    assert "4 ROOM flats in TAMPINES" in output["final_response"]
+    assert "4 ROOM flats in TAMPINES" in output.response.message
 
 
 def test_graph_abstains_after_one_unsuccessful_repair(state):
     engine = FixtureEngine("Median: SGD 999,000.00", "Median: SGD 999,000.00")
-    output = build_price_summary_graph(engine).invoke(state.model_dump())
-    assert output["status"] == "abstained"
-    assert output["verification_passed"] is False
-    assert output["model_calls"] == 2
-    assert "999,000" not in output["final_response"]
+    output = run_case(state, engine)
+    assert output.response.status == "abstained"
+    assert output.verification_passed is False
+    assert output.model_calls == 2
+    assert "999,000" not in output.response.message
 
 
 def test_empty_result_skips_model_entirely(state):
-    state.sql_result = SQLPriceResult(
+    state.sql_result = PriceResult(
         query_id="empty-result", filters=state.sql_result.filters, volume=0,
     )
     engine = FixtureEngine()
-    output = build_price_summary_graph(engine).invoke(state.model_dump())
-    assert output["status"] == "no_data"
-    assert output["model_calls"] == 0
+    output = run_case(state, engine)
+    assert output.abstain_reason == "no_transactions"
+    assert output.model_calls == 0
     assert engine.calls == []
 
 
 def test_engine_unavailable_abstains_without_repeated_inference(state):
     engine = FixtureEngine(ModelEngineError("Local server unavailable"))
-    output = build_price_summary_graph(engine).invoke(state.model_dump())
-    assert output["status"] == "abstained"
-    assert output["model_calls"] == 1
-    assert output["verification_errors"] == ["Local server unavailable"]
+    output = run_case(state, engine)
+    assert output.abstain_reason == "engine_unavailable"
+    assert output.model_calls == 1
+    assert output.verification_errors == ["Local server unavailable"]
 
 
 @pytest.mark.parametrize("updates", [
@@ -122,7 +122,7 @@ def test_invalid_sql_context_is_rejected_before_model_call(state, updates):
     data = state.sql_result.model_dump()
     data.update(updates)
     with pytest.raises(ValidationError):
-        SQLPriceResult.model_validate(data)
+        PriceResult.model_validate(data)
 
 
 def test_ollama_http_request_forces_cpu_and_records_usage():

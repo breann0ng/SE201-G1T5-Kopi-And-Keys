@@ -90,3 +90,17 @@ def test_loader_rejects_values_outside_vocab(tmp_path):
     (tmp_path / "card_bad.json").write_text(json.dumps(card), encoding="utf-8")
     with pytest.raises(TopicCardError, match="not in vocab"):
         load_cards(cards_dir=tmp_path)
+
+
+def test_graph_adapter_loads_repo_cards_and_maps_state_fields():
+    # graph.py loads data/topic_cards/ through components/topic_cards.py at startup.
+    from kopi_keys.components import topic_cards as adapter
+    from kopi_keys.state import GraphState
+
+    repo_cards = adapter.load_cards()
+    assert len(repo_cards) == 12
+    state = GraphState(message="hi", citizenship="SC/SPR", first_timer=True, user_age=30, income=7200)
+    result = adapter.match_profile(state, repo_cards)
+    assert result.ask_next == "household_type"  # not collected by the router yet
+    assert adapter.match_cards(state, repo_cards) == result.matched_ids
+    assert "household_income" in adapter.required_fields(["CARD_EHG"], repo_cards)

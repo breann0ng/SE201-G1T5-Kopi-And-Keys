@@ -1,0 +1,62 @@
+{
+  "_readme": "Gross monthly household income ceilings for resale-flat grants, in SGD. Each figure needs a source page, the date it took effect and the date someone checked it. Set verified=true only after checking the official HDB/CPF page or the team's dated policy snapshot. Do not edit a figure without updating its source fields.",
+  "currency": "SGD",
+  "income_basis": "average gross monthly household income",
+  "schemes": {
+    "cpf_housing_grant_family": {
+      "label": "CPF Housing Grant (Family), resale",
+      "ceiling": 16000,
+      "inclusive": true,
+      "applies_to": "Married couples / families, at least one SC applicant, first-timer",
+      "effective_from": null,
+      "source_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/cpf-housing-grants",
+      "checked_on": "2026-10-15",
+      "verified": true,
+      "note": "Verified 2026-10-16 (Person 4) against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-family-cpf-housing-grants.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. Was $14,000 before the August 2026 income ceiling changes. Secondary source only."
+    },
+    "cpf_housing_grant_single": {
+      "label": "CPF Housing Grant (Singles), resale",
+      "ceiling": 8000,
+      "inclusive": true,
+      "applies_to": "Single SC aged 35 and above, first-timer",
+      "effective_from": null,
+      "source_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/cpf-housing-grant",
+      "checked_on": "2026-10-15",
+      "verified": true,
+      "note": "Verified 2026-10-16 (Person 4) against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-singles-cpf-housing-grant.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. Was $7,000 before the August 2026 changes."
+    },
+    "enhanced_cpf_housing_grant_family": {
+      "label": "Enhanced CPF Housing Grant (Families)",
+      "ceiling": 9000,
+      "inclusive": true,
+      "applies_to": "First-timer families; grant amount falls as income rises",
+      "effective_from": null,
+      "source_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant",
+      "checked_on": "2026-10-15",
+      "verified": true,
+      "note": "Verified 2026-10-16 (Person 4) against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-family-ehg.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. No change reported in August 2026."
+    },
+    "enhanced_cpf_housing_grant_single": {
+      "label": "Enhanced CPF Housing Grant (Singles)",
+      "ceiling": 4500,
+      "inclusive": true,
+      "applies_to": "First-timer singles; for joint singles / mixed couples the rules assess half the household income",
+      "effective_from": null,
+      "source_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/enhanced-cpf-housing-grant",
+      "checked_on": "2026-10-15",
+      "verified": true,
+      "note": "Verified 2026-10-16 (Person 4) against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-singles-ehg.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. "
+    },
+    "proximity_housing_grant": {
+      "label": "Proximity Housing Grant",
+      "ceiling": null,
+      "inclusive": true,
+      "applies_to": "Buying to live with or near parents / married child",
+      "effective_from": null,
+      "source_url": "https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/",
+      "checked_on": "2026-10-15",
+      "verified": false,
+      "note": "No income ceiling. Not verifiable from snapshot 2026-10-15: the singles PHG page does not mention income, which does not prove there is no ceiling."
+    }
+  }
+}

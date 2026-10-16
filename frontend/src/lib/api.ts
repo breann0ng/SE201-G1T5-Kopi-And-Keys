@@ -23,20 +23,33 @@ export type PolicyPassage = {
 export type PriceResult = {
   query_id: string;
   filters: { town: string; flat_type: string; start_month: string; end_month: string };
-  count: number;
-  median: number | null;
-  minimum: number | null;
-  maximum: number | null;
+  volume: number;
+  // Decimals: the backend serialises these as strings (e.g. "512000.00").
+  mean: string | null;
+  median: string | null;
+  iqr: string | null;
+  minimum: string | null;
+  maximum: string | null;
 };
+
+export type Suggestion = {
+  card_id: string;
+  text: string;
+  citation_ids: string[];
+};
+
+export type Route = "policy" | "price" | "mixed" | "discovery" | "clarify" | "abstain";
 
 export type ChatStatus = "answered" | "clarifying" | "abstained";
 
 export type ChatResponse = {
   status: ChatStatus;
   mode: string;
+  route: Route | null;
   message: string;
   citations: PolicyPassage[];
   price_result: PriceResult | null;
+  suggestions: Suggestion[];
   retrieval_rounds: number;
   trace: string[];
   /**

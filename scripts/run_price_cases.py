@@ -1,16 +1,18 @@
-"""Check a small synthetic SQL handoff suite, with optional live CPU inference."""
+"""Run the synthetic SQL price cases through the full graph, with optional live CPU inference."""
 
 import argparse
 import json
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic import ValidationError
 
-from kopi_keys.midpoint import SynthesisState, build_price_summary_graph
+from kopi_keys.cli import PriceCase, report, run_case
+from kopi_keys.llm import OllamaEngine
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CASE_ROOT = PROJECT_ROOT / "examples" / "midpoint_cases"
+CASE_ROOT = PROJECT_ROOT / "examples" / "price_cases"
 CASES = (
     ("zero_transactions", "no_data", None),
     ("single_transaction", "answered", None),
@@ -22,6 +24,7 @@ CASES = (
 
 
 def main() -> int:
+    load_dotenv(PROJECT_ROOT / ".env")  # LangSmith tracing settings
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--validate-only", action="store_true",
@@ -29,11 +32,11 @@ def main() -> int:
     )
     args = parser.parse_args()
     mode = "validation_only" if args.validate_only else "live_ollama"
-    graph = None if args.validate_only else build_price_summary_graph()
+    engine = None if args.validate_only else OllamaEngine()
     results = []
     for name, expected, expected_error in CASES:
         try:
-            state = SynthesisState.model_validate_json(
+            case = PriceCase.model_validate_json(
                 (CASE_ROOT / f"{name}.json").read_text(encoding="utf-8"),
             )
         except ValidationError as error:
@@ -49,14 +52,16 @@ def main() -> int:
                 result = {"case": name, "expected": "valid_input", "actual": "valid_input", "passed": True}
             else:
                 print(f"Running {name} ...", flush=True)
-                output = graph.invoke(state.model_dump())
-                passed = output["status"] == expected
+                state = run_case(case, engine)
+                output = report(state, case)
+                actual = "no_data" if state.abstain_reason == "no_transactions" else output["status"]
+                passed = actual == expected
                 if expected == "answered":
                     passed = passed and output["verification_passed"] and not output["verification_errors"]
                 if expected == "no_data":
                     passed = passed and output["model_calls"] == 0
                 result = {
-                    "case": name, "expected": expected, "actual": output["status"],
+                    "case": name, "expected": expected, "actual": actual,
                     "passed": bool(passed), "model_calls": output["model_calls"],
                     "verification_errors": output["verification_errors"],
                     "final_response": output["final_response"], "model_usage": output["model_usage"],

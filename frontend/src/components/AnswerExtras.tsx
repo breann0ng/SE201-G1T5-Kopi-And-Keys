@@ -66,15 +66,15 @@ export function AnswerExtras({ response }: { response: ChatResponse }) {
   );
 }
 
-const sgd = (n: number | null) =>
-  n === null ? "—" : n.toLocaleString("en-SG", { style: "currency", currency: "SGD", maximumFractionDigits: 0 });
+const sgd = (n: string | null) =>
+  n === null ? "—" : Number(n).toLocaleString("en-SG", { style: "currency", currency: "SGD", maximumFractionDigits: 0 });
 
 function PriceCard({ price }: { price: PriceResult }) {
   const f = price.filters;
   return (
     <div className="mt-3 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
       <p className="text-xs text-slate-500">
-        {f.flat_type} resale flats in {f.town}, {f.start_month} to {f.end_month} · {price.count}{" "}
+        {f.flat_type} resale flats in {f.town}, {f.start_month} to {f.end_month} · {price.volume}{" "}
         transactions
       </p>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
@@ -86,7 +86,7 @@ function PriceCard({ price }: { price: PriceResult }) {
           <div key={label as string}>
             <div className="text-xs text-slate-500">{label}</div>
             <div className={`font-semibold ${label === "Median" ? "text-lg" : ""}`}>
-              {sgd(value as number | null)}
+              {sgd(value as string | null)}
             </div>
           </div>
         ))}

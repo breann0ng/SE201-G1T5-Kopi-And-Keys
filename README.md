@@ -2,114 +2,100 @@
 
 HDB Resale Policy & Price Benchmark Advisor — SE201 G1T5.
 
-The original `/chat` backend runs with a **demo advisor and fictional policy
-passages**. Person 3's revised midpoint implementation is available separately:
-real CPU Ollama inference, a SQL-result Synthesizer and a numeric verifier.
+The backend is one LangGraph harness whose nodes match the boxes on our
+architecture diagram (proposal Appendix C). Some boxes are still placeholders;
+see [docs/architecture.md](docs/architecture.md) for what is real, what is
+stubbed and who owns each part.
 
-## Person 3 midpoint (Nisha)
+## Run locally
 
-```powershell
-# One-time download; subsequent runs restart/reuse the project-local server.
-.\scripts\setup_ollama.ps1
-
-# Run Stage 3 -> Stage 4 with clearly labelled synthetic SQL statistics.
-.\.venv\Scripts\python.exe -m kopi_keys.midpoint.cli --input examples\midpoint_sql_result.json
-
-# Confirm installation and inspect loaded model CPU/GPU status.
-.\.venv\Scripts\python.exe -m kopi_keys.midpoint.cli --check-engine
-```
-
-On this workspace Ollama and `qwen2.5:3b` have already been downloaded under the
-ignored `.local/` directory. The setup script starts a background server on
-`127.0.0.1:11434`; it does not add a Windows startup service. Every synthesis
-request sets `num_gpu=0`.
-
-Read [Person 3 setup and team handoff](docs/person3-midpoint.md) for the SQL
-contract, node integration, verifier rules and observed smoke-test results.
-The existing `/chat` endpoint still uses the original demo graph; Breann can
-connect the new Stage 3/4 subgraph after Tasha's SQL node.
-
-## Run locally (Windows PowerShell)
+Windows PowerShell:
 
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m pytest -q
 .\.venv\Scripts\python.exe -m uvicorn kopi_keys.main:app --reload
 ```
 
-Open http://127.0.0.1:8000/docs for the API playground.
+macOS / Linux:
 
-`POST /chat` example:
-
-```json
-{
-  "message": "Explain the demo programme and its related condition."
-}
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e ".[dev]"
+.venv/bin/python -m pytest -q
+.venv/bin/python -m uvicorn kopi_keys.main:app --reload
 ```
 
-This deliberately retrieves a programme passage, discovers a reference to a
-second condition, retrieves again, then verifies the cited answer. Responses
-include `mode: "demo"` and a small execution trace. Real HDB questions abstain
-until official evidence and a model adapter are connected.
+The editable install (`pip install -e`) is required: without it, imports of
+`kopi_keys` fail. Open http://127.0.0.1:8000/docs for the API playground.
 
-Other requests:
+Example `POST /chat` requests:
 
-- `{"message": "What are resale prices?"}` demonstrates clarification.
-- `{"message": "What grants can we get?"}` demonstrates abstention without official evidence.
-- `GET /health` reports service health and demo mode.
+- `{"message": "What is the demo grant policy?"}` retrieves a fictional demo
+  passage and returns a cited answer.
+- `{"message": "What is the resale price?"}` asks for the missing town and flat type.
+- `{"message": "What grants can we get?"}` abstains: no official policy evidence is loaded yet.
+- `{"message": "Tell me a joke."}` abstains as out of scope.
+
+Each response includes its `route` and a `trace` of the nodes that ran.
+
+## Price synthesis on a local CPU model
+
+The price path uses a real local model through Ollama. See
+[docs/price-synthesis-and-verification.md](docs/price-synthesis-and-verification.md)
+for setup, then:
+
+```powershell
+.\scripts\setup_ollama.ps1
+.\.venv\Scripts\python.exe -m kopi_keys.cli --input examples\price_sql_result.json
+.\.venv\Scripts\python.exe scripts\run_price_cases.py
+```
 
 ## Architecture
 
 ```mermaid
 flowchart TD
-    U[POST /chat: message and optional profile] --> V[Validate request]
-    V --> A[Advisor: discovery and synthesis]
-    A -->|Search or reformulate| R[Policy retrieval tool]
-    R -->|Passages and metadata| A
-    A -->|Validated filters| S[Price query tool]
-    S -->|Executed query results| A
-    A -->|Missing buyer information| C[Clarifying question]
-    A -->|Insufficient evidence or budget exhausted| X[Abstention]
-    A -->|Draft claims and citation IDs| G[Deterministic verifier]
-    G -->|Pass| O[Answer with sources and query results]
-    G -->|Repairable: one retry| A
-    G -->|Second failure| X
+    U[User input] --> R[query_router]
+    R -->|clarify| S[synthesiser]
+    R -->|unsupported| A[abstention]
+    R -->|policy / discovery / mixed| P[policy_retrieval]
+    R -->|price| Q[price_query]
+    P -->|mixed| Q
+    P --> T[topic_cards]
+    Q --> T
+    T -->|evidence found| S
+    T -->|no usable evidence| A
+    S --> V[verifier]
+    V -->|pass| O[output]
+    V -->|first failure: errors fed back| S
+    V -->|second failure or engine error| A
 ```
-
-The Advisor sees one shared state: the request, buyer profile, accumulated
-passages, price result, previous queries, verification errors and call counts.
-Tool results return to the Advisor, so it can request missing evidence. Code
-enforces three retrieval calls, one price call, one verification repair and an
-overall Advisor-step limit. Repeated identical policy queries stop the turn.
 
 ## Project layout
 
 ```text
 backend/kopi_keys/
-  main.py           FastAPI entry point and dependency wiring
-  schemas.py        Validated request, decision, evidence and response models
-  state.py          Shared LangGraph state
-  workflow.py       Advisor/tool/verifier graph and budgets
-  advisor.py        Advisor interface and temporary demo implementation
-  verifier.py       Citation and source-metadata checks
-  tools/
-    policy.py       Retrieval interface and fictional demo retriever
-    price.py        Price-tool interface; currently reports unconfigured
-tests/              Workflow and API checks
-docs/architecture.md  Integration plan and current boundaries
-data/README.md      Planned policy and transaction data layout
+  main.py               FastAPI entry point; calls graph.py only
+  graph.py              The single LangGraph harness (one node per diagram box)
+  state.py              The single GraphState shared by every node
+  schemas.py            Request, evidence, price result, draft and response models
+  llm.py                Shared Ollama client (CPU only)
+  cli.py                Run one SQL price result through the full graph
+  components/
+    query_router.py     Query Router: classify, extract filters, validate
+    policy_retrieval.py Policy Retrieval Tool (demo retriever for now)
+    price_query.py      Price Query Tool (not connected yet)
+    topic_cards.py      Topic cards for discovery (placeholder)
+    synthesiser.py      Synthesiser Agent (also covers discovery wording)
+    verifier.py         Verifier: citations, numbers, provenance, suggestions
+    abstention.py       Fixed abstention messages
+  evaluation/           Evaluation runner, metrics and baselines (placeholder)
+data/
+  evaluation/           Development set and labels; held-out set stays local
+  topic_cards/          Reviewed topic cards (placeholder)
+docs/                   Architecture and component handoff notes
+examples/price_cases/   Synthetic SQL results for the price path
+scripts/                Ollama setup and batch runners
+tests/                  One test file per component, plus graph and API tests
 ```
-
-## Check the foundation
-
-```powershell
-.\.venv\Scripts\python.exe -m pytest
-```
-
-The API is stateless between requests. A supplied buyer profile is shared within
-that request; conversation memory and profile extraction will be added later.
-The verifier checks citation presence, known source IDs and superseded flags.
-It cannot establish semantic entailment or certify eligibility.
-
-The graph follows the [LangGraph Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api).
-The API follows [FastAPI's application pattern](https://fastapi.tiangolo.com/tutorial/first-steps/).

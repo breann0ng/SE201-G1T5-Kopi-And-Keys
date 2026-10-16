@@ -31,9 +31,14 @@ topic-card owner (Person 4) to fill in. Its example card format
 owner decides the real one". The 12 cards here use the real format above:
 `card_id` / `topic_name` / `trigger_conditions` / `supporting_chunk_ids`.
 
-When merging, the placeholder's `load_cards`, `match_cards` and `required_fields`
-will be connected to `backend/kopi_keys/topic_cards.py`, which loads and validates
-these cards. The graph's `state.candidate_card_ids` will then hold real card IDs.
+Done in the merge of `main` (2026-10-16): `components/topic_cards.py` is now a thin
+adapter over `backend/kopi_keys/topic_cards.py`, keeping the `load_cards`, `match_cards`
+and `required_fields` names graph.py calls. `profile_from_state` maps GraphState names
+onto the vocab: `user_age` becomes `age` and `income` becomes `household_income`.
+`match_cards` returns only fully matched IDs. Most cards also need fields the router
+doesn't collect yet (e.g. `household_type`), so `candidate_card_ids` stays mostly empty
+until those fields are added (question 1 below). `match_profile` gives the full result,
+including the blocked cards and `ask_next`.
 
 `CARD_INCOME_CEILING` and Tasha's `rules/income_ceilings.json` cite the same
 snapshot pages for the same figures (see `data/README.md`, "Income ceilings

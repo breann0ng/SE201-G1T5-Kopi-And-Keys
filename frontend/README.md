@@ -64,7 +64,13 @@ for the current answer, and the verifier should keep enforcing that.
   - `citations`: a numbered source list with "Verified on official site <verified_on>", the page's own
     "last updated" line, and an effective date only when one is stated.
   - `price_result`: a lowest / median / highest card.
+  It shows `volume` transactions; prices arrive as Decimal strings and are formatted as SGD.
 - `src/lib/api.ts` mirrors `backend/kopi_keys/schemas.py`. Update it when the contract changes.
+  It was last synced in the merge of `main` on 2026-10-16:
+  - `PriceResult` now has `volume` (was `count`) and gains `mean` and `iqr`;
+  - `ChatResponse` gains `route` and `suggestions`.
+
+  `suggestions` is typed but not shown in the UI yet.
 - Citizenship options come from `data/schema/vocab.json` (DRAFT).
 
 ## Scaffolded, not finished

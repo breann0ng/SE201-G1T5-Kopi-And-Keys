@@ -63,7 +63,7 @@ export function AnswerTrace({ response }: { response: ChatResponse }) {
                 {price.filters.end_month}
               </dd>
               <dt>rows</dt>
-              <dd>{price.count}</dd>
+              <dd>{price.volume}</dd>
             </dl>
           ) : (
             <p className="text-slate-500">No SQL query ran for this answer.</p>
