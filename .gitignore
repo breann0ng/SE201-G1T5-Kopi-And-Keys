@@ -11,7 +11,9 @@ __pycache__/
 !.env.example
 
 # Imported and generated application data
-data/raw/
+data/raw/*
+# Exception: the team's shared resale snapshot (data.gov.sg, downloaded 2026-10-14).
+!data/raw/2017-onwards-resale-prices.csv
 data/processed/
 data/chroma/
 *.sqlite
