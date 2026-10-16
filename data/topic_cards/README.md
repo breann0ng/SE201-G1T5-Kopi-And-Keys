@@ -31,6 +31,11 @@ topic-card owner (Person 4) to fill in. Its example card format
 owner decides the real one". The 12 cards here use the real format above:
 `card_id` / `topic_name` / `trigger_conditions` / `supporting_chunk_ids`.
 
+Why this changed: `graph.py` loads every card in this folder at startup, using the
+placeholder's `TopicCard` format. That model rejects unknown fields, so with these 12
+cards present, the graph would have failed to start. `test_graph_adapter_loads_repo_cards_and_maps_state_fields`
+(in `tests/test_topic_cards.py`) loads the real cards through the graph's path to catch this.
+
 Done in the merge of `main` (2026-10-16): `components/topic_cards.py` is now a thin
 adapter over `backend/kopi_keys/topic_cards.py`, keeping the `load_cards`, `match_cards`
 and `required_fields` names graph.py calls. `profile_from_state` maps GraphState names
