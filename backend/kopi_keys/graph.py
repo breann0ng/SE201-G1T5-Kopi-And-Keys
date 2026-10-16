@@ -57,6 +57,8 @@ def build_graph(
     max_repairs: int = MAX_REPAIRS,
 ):
     retriever = retriever or DemoPolicyRetriever()
+    # Stamped on every response; retrievers without a mode count as demo (fictional) evidence.
+    mode = getattr(retriever, "mode", "demo")
     price_tool = price_tool or UnconfiguredPriceTool()
     synthesiser = synthesiser or Synthesiser(OllamaEngine())
     cards = load_cards() if cards is None else cards
@@ -135,6 +137,7 @@ def build_graph(
             "trace": [f"abstention:{reason}"],
             "response": ChatResponse(
                 status="abstained",
+                mode=mode,
                 route=state.route,
                 message=abstention_message(reason, detail),
                 retrieval_rounds=len(state.retrieval_queries),
@@ -147,7 +150,7 @@ def build_graph(
         trace = [*state.trace, "output"]
         if draft.kind == "clarify":
             return {"trace": ["output"], "response": ChatResponse(
-                status="clarifying", route=state.route, message=draft.message, trace=trace,
+                status="clarifying", mode=mode, route=state.route, message=draft.message, trace=trace,
             )}
         parts = [f"{claim.text} [{', '.join(claim.citation_ids)}]" for claim in draft.claims]
         price = state.price_result
@@ -168,6 +171,7 @@ def build_graph(
         cited |= {cid for s in draft.suggestions for cid in s.citation_ids}
         return {"trace": ["output"], "response": ChatResponse(
             status="answered",
+            mode=mode,
             route=state.route,
             message="\n\n".join(parts),
             citations=[p for p in state.passages if p.id in cited],
@@ -218,7 +222,9 @@ def build_graph(
     graph.add_conditional_edges("verifier", after_verifier, ["synthesiser", "output", "abstention"])
     graph.add_edge("abstention", END)
     graph.add_edge("output", END)
-    return graph.compile()
+    compiled = graph.compile()
+    compiled.evidence_mode = mode  # read by /health in main.py
+    return compiled
 
 
 def run_graph(graph, request: ChatRequest, data_origin: DataOrigin = "database") -> GraphState:

@@ -44,7 +44,8 @@ export type ChatStatus = "answered" | "clarifying" | "abstained";
 
 export type ChatResponse = {
   status: ChatStatus;
-  mode: string;
+  /** Policy evidence source: "demo" = fictional test passages (UI warns), "snapshot" = official ACTIVE snapshot. */
+  mode: "demo" | "snapshot";
   route: Route | null;
   message: string;
   citations: PolicyPassage[];

@@ -15,6 +15,9 @@ Intent = Literal["policy", "price", "mixed", "discovery", "unanswerable"]
 RouterStatus = Literal["continue", "clarify", "abstain"]
 Route = Literal["policy", "price", "mixed", "discovery", "clarify", "abstain"]
 DataOrigin = Literal["database", "synthetic_fixture"]
+# Where policy evidence comes from: "demo" = fictional test passages,
+# "snapshot" = the official ACTIVE policy snapshot.
+EvidenceMode = Literal["demo", "snapshot"]
 
 CENT = Decimal("0.01")
 PRICE_METRICS = ("mean", "median", "iqr", "minimum", "maximum")
@@ -141,7 +144,7 @@ class Draft(Contract):
 
 class ChatResponse(Contract):
     status: Literal["answered", "clarifying", "abstained"]
-    mode: Literal["demo"] = "demo"
+    mode: EvidenceMode = "demo"
     route: Route | None = None
     message: str
     citations: list[PolicyPassage] = Field(default_factory=list)

@@ -28,6 +28,8 @@ class PolicyRetriever(Protocol):
 class DemoPolicyRetriever:
     """Two fictional passages; only queries containing "demo" match anything."""
 
+    mode = "demo"  # reported as ChatResponse.mode, so the UI can warn about fictional evidence
+
     def search(self, query: str, limit: int = TOP_K) -> list[PolicyPassage]:
         query = query.lower()
         if "demo" not in query:
@@ -61,6 +63,8 @@ _TOKEN = re.compile(r"[a-z0-9$%]+(?:[.,][0-9]+)*")
 
 class SnapshotPolicyRetriever:
     """Top-k chunks from data/policy_chunks/<ACTIVE>/chunks.jsonl, never superseded ones."""
+
+    mode = "snapshot"  # reported as ChatResponse.mode: real official evidence
 
     def __init__(self, data_dir: Path = DATA_DIR, k1: float = 1.5, b: float = 0.75):
         snapshot = (data_dir / "policy_snapshots" / "ACTIVE").read_text(encoding="utf-8").strip()

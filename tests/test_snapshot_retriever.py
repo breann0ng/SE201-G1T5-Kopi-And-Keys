@@ -41,3 +41,25 @@ def test_superseded_chunks_are_never_returned(tmp_path):
             {**base, "chunk_id": "CHUNK_T_02", "content": "grant ceiling new", "superseded": False}]
     (chunk_dir / "chunks.jsonl").write_text("\n".join(json.dumps(r) for r in rows), encoding="utf-8")
     assert [p.id for p in SnapshotPolicyRetriever(data_dir=tmp_path).search("grant ceiling")] == ["CHUNK_T_02"]
+
+
+def test_responses_report_which_evidence_was_used(retriever):
+    # The UI shows "fictional sample evidence" only for mode "demo".
+    from fastapi.testclient import TestClient
+
+    from kopi_keys.components.policy_retrieval import DemoPolicyRetriever
+    from kopi_keys.components.synthesiser import Synthesiser
+    from kopi_keys.graph import build_graph
+    from kopi_keys.main import create_app
+
+    def app(r):
+        return TestClient(create_app(build_graph(retriever=r, synthesiser=Synthesiser(engine=None), cards=[])))
+
+    with app(retriever) as c:
+        assert c.get("/health").json()["mode"] == "snapshot"
+        body = c.post("/chat", json={"message": "How long is an HFE letter valid?"}).json()
+        assert body["mode"] == "snapshot"
+        assert all(cite["id"].startswith("CHUNK_") for cite in body["citations"])
+    with app(DemoPolicyRetriever()) as c:
+        assert c.get("/health").json()["mode"] == "demo"
+        assert c.post("/chat", json={"message": "What is the demo grant policy?"}).json()["mode"] == "demo"

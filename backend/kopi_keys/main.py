@@ -24,7 +24,7 @@ def create_app(graph=None) -> FastAPI:
 
     @application.get("/health")
     def health():
-        return {"status": "ok", "mode": "demo"}
+        return {"status": "ok", "mode": getattr(graph, "evidence_mode", "demo")}
 
     @application.post("/chat", response_model=ChatResponse)
     def chat(request: ChatRequest) -> ChatResponse:
