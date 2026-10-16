@@ -1,0 +1,19 @@
+{
+  "card_id": "CARD_HFE_LETTER",
+  "topic_name": "HDB Flat Eligibility (HFE) letter",
+  "trigger_conditions": {},
+  "required_fields": [
+    "household_type",
+    "citizenship"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_HFE_17",
+    "CHUNK_HFE_14",
+    "CHUNK_HFE_15",
+    "CHUNK_HFE_16",
+    "CHUNK_HFE_18",
+    "CHUNK_HFE_19"
+  ],
+  "question_template": "For a {household_type} household with citizenship {citizenship}, what does the HFE letter assess, when must it be obtained, and how long is it valid?",
+  "snapshot_date": "2026-10-15"
+}

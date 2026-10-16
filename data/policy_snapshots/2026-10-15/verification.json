@@ -1,0 +1,848 @@
+{
+  "mnh-hdb-grants-guide": {
+    "visible_in_raw": 20,
+    "in_clean": 20,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-hfe-guide": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-resale-buying-guide": {
+    "visible_in_raw": 5,
+    "in_clean": 5,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-buying-guide-singles": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63",
+      "$99"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-buying-guide-young-couples": {
+    "visible_in_raw": 3,
+    "in_clean": 3,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-loans-guide": {
+    "visible_in_raw": 8,
+    "in_clean": 8,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-considerations-using-cpf-property": {
+    "visible_in_raw": 4,
+    "in_clean": 2,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-using-cpf-to-buy-a-home": {
+    "visible_in_raw": 3,
+    "in_clean": 1,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-guide-ehg-and-phg": {
+    "visible_in_raw": 13,
+    "in_clean": 11,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-how-much-cpf-for-home-purchase": {
+    "visible_in_raw": 3,
+    "in_clean": 1,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-elig-couples-families": {
+    "visible_in_raw": 12,
+    "in_clean": 12,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-grant-family-cpf-housing-grants": {
+    "visible_in_raw": 12,
+    "in_clean": 12,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-grant-family-ehg": {
+    "visible_in_raw": 20,
+    "in_clean": 20,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-grant-family-phg": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-elig-singles": {
+    "visible_in_raw": 9,
+    "in_clean": 9,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-grant-singles-cpf-housing-grant": {
+    "visible_in_raw": 9,
+    "in_clean": 9,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-grant-singles-ehg": {
+    "visible_in_raw": 20,
+    "in_clean": 19,
+    "missing_from_clean": [
+      "age35"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-hfe-letter": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-mode-of-financing": {
+    "visible_in_raw": 8,
+    "in_clean": 8,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-pdf-ehg-amount-families": {
+    "visible_in_raw": 73,
+    "in_clean": 73,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-pdf-ehg-amount-singles": {
+    "visible_in_raw": 74,
+    "in_clean": 74,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-pdf-income-ceiling-extended-family": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-conditions-after-buying-a-new-flat": {
+    "visible_in_raw": 16,
+    "in_clean": 16,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-design-features": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-standard-plus-and-prime-housing-f": {
+    "visible_in_raw": 3,
+    "in_clean": 3,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-types-of-flats": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-finding-a-new-flat-types-of-flats-community-care-apartments": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-finding-a-new-flat-types-of-flats-shortlease-2room-flexi-flat": {
+    "visible_in_raw": 2,
+    "in_clean": 2,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-application": {
+    "visible_in_raw": 2,
+    "in_clean": 2,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-new-flat-application-frequently-asked-questions-on-sales-exercise": {
+    "visible_in_raw": 1,
+    "in_clean": 1,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-new-flat-application-fresh-start-housing-scheme": {
+    "visible_in_raw": 47,
+    "in_clean": 47,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-new-flat-application-priority-schemes": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-booking-of-flat": {
+    "visible_in_raw": 4,
+    "in_clean": 4,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-key-collection": {
+    "visible_in_raw": 10,
+    "in_clean": 10,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-modes-of-sales": {
+    "visible_in_raw": 2,
+    "in_clean": 2,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-overview": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-new-flat-overview-plan-finances": {
+    "visible_in_raw": 4,
+    "in_clean": 4,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-sign-agreement-for-lea": {
+    "visible_in_raw": 18,
+    "in_clean": 18,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-executive-condominiums": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-executive-condominiums-conditions-after-buying-an-ec": {
+    "visible_in_raw": 5,
+    "in_clean": 5,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-executive-condominiums-cpf-housing-grant": {
+    "visible_in_raw": 13,
+    "in_clean": 13,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-executive-condominiums-eligibility": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-executive-condominiums-finding-an-ec": {
+    "visible_in_raw": 4,
+    "in_clean": 4,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-executive-condominiums-process-for-buying-an-ec": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-financial-planning-for-a-flat-purchase": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-financial-planning-for-a-flat-purchase-ability-to-pay": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-financial-planning-for-a-flat-purchase-budget-for-a-flat": {
+    "visible_in_raw": 1,
+    "in_clean": 1,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-financial-planning-for-a-flat-purchase-credit-to-finance-a-flat-purchase": {
+    "visible_in_raw": 5,
+    "in_clean": 5,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-flat-grant-and-loan-eligibility": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "aged35",
+      "aged55"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-flat-grant-and-loan-eligibility-application-for-an-hdb-flat-eligibility-hfe-letter-inc": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-flat-grant-and-loan-eligibility-couples-and-families-stepup-cpf-housing-grant": {
+    "visible_in_raw": 3,
+    "in_clean": 3,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-flat-grant-and-loan-eligibility-housing-loan": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-flat-grant-and-loan-eligibility-housing-loan-housing-loan-from-financial-institutions": {
+    "visible_in_raw": 2,
+    "in_clean": 2,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-flat-grant-and-loan-eligibility-housing-loan-housing-loan-from-hdb": {
+    "visible_in_raw": 12,
+    "in_clean": 12,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-flat-grant-and-loan-eligibility-seniors": {
+    "visible_in_raw": 13,
+    "in_clean": 13,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-flat-grant-and-loan-eligibility-singles-proximity-housing-grant": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-flats": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-flats-conditions-after-buying-a-resale-flat": {
+    "visible_in_raw": 16,
+    "in_clean": 16,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-flats-finding-a-resale-flat": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-flats-process-for-buying-a-resale-flat": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-flats-process-for-buying-a-resale-flat-option-to-purchase": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-resale-flat-option-to-purchase-request-for-value": {
+    "visible_in_raw": 1,
+    "in_clean": 1,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-flats-process-for-buying-a-resale-flat-overview": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-application": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-resale-flat-resale-flat-application-application-process": {
+    "visible_in_raw": 3,
+    "in_clean": 3,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-resale-flat-resale-flat-application-approval-of-application": {
+    "visible_in_raw": 14,
+    "in_clean": 14,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-resale-flat-resale-flat-application-request-for-enhanced-contra-f": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-completion": {
+    "visible_in_raw": 1,
+    "in_clean": 1,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-planning": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-resale-flat-resale-flat-planning-eip-and-spr-quota": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-resale-flat-resale-flat-planning-managing-the-flat-purchase": {
+    "visible_in_raw": 3,
+    "in_clean": 3,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-resale-flat-resale-flat-planning-overview": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-process-for-buying-a-resale-flat-resale-flat-planning-resale-seminars": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-buying-guide": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-bto-sbf-buying-guide": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-bto-sales-launch": {
+    "visible_in_raw": 3,
+    "in_clean": 3,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$11",
+      "$116",
+      "$126",
+      "$127",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-flat-types-classification-guide": {
+    "visible_in_raw": 3,
+    "in_clean": 3,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-priority-schemes-guide": {
+    "visible_in_raw": 3,
+    "in_clean": 3,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "mnh-hdb-buying-guide-seniors": {
+    "visible_in_raw": 8,
+    "in_clean": 8,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [
+      "$1",
+      "$13",
+      "$21",
+      "$25",
+      "$36",
+      "$44",
+      "$5",
+      "$52",
+      "$62",
+      "$63"
+    ],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership": {
+    "visible_in_raw": 2,
+    "in_clean": 0,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership-using-your-cpf-to-buy-a-home-apply-to-use-cpf-for-your-property": {
+    "visible_in_raw": 2,
+    "in_clean": 0,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership-using-your-cpf-to-buy-a-home-cpf-refund-when-selling-or-transferring-pr": {
+    "visible_in_raw": 4,
+    "in_clean": 3,
+    "missing_from_clean": [
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership-using-your-cpf-to-buy-a-home-retain-20000-in-your-oa-if-you-are-taking-": {
+    "visible_in_raw": 13,
+    "in_clean": 11,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership-protecting-against-losing-your-home": {
+    "visible_in_raw": 3,
+    "in_clean": 1,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership-protecting-against-losing-your-home-claiming-under-the-home-protection-": {
+    "visible_in_raw": 2,
+    "in_clean": 0,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership-protecting-against-losing-your-home-single-premium-home-protection-sche": {
+    "visible_in_raw": 2,
+    "in_clean": 1,
+    "missing_from_clean": [
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership-home-buying-guide-for-members-below-55": {
+    "visible_in_raw": 24,
+    "in_clean": 22,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership-home-buying-guide-for-members-below-55-housing-case-study": {
+    "visible_in_raw": 2,
+    "in_clean": 0,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "cpf-home-ownership-home-buying-guide-for-members-above-55": {
+    "visible_in_raw": 9,
+    "in_clean": 7,
+    "missing_from_clean": [
+      "age55",
+      "age65"
+    ],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-pdf-otp-important-notes": {
+    "visible_in_raw": 6,
+    "in_clean": 6,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-pdf-resale-terms-conditions": {
+    "visible_in_raw": 11,
+    "in_clean": 11,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  },
+  "hdb-pdf-ecf-terms-conditions": {
+    "visible_in_raw": 0,
+    "in_clean": 0,
+    "missing_from_clean": [],
+    "only_in_scripts_not_visible": [],
+    "in_clean_not_in_visible_raw": []
+  }
+}

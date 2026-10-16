@@ -1,0 +1,2056 @@
+{
+  "snapshot_date": "2026-10-15",
+  "fetch_count": 105,
+  "robots": {
+    "cpf.gov.sg": {
+      "url": "https://www.cpf.gov.sg/robots.txt",
+      "final_url": "https://www.cpf.gov.sg/robots.txt",
+      "status": 200,
+      "fetched_at": "2026-10-15T17:52:52+08:00"
+    },
+    "mynicehome.gov.sg": {
+      "url": "https://www.mynicehome.gov.sg/robots.txt",
+      "final_url": "https://www.mynicehome.gov.sg/robots.txt",
+      "status": 200,
+      "fetched_at": "2026-10-15T17:52:52+08:00"
+    },
+    "hdb.gov.sg": {
+      "url": "https://www.hdb.gov.sg/robots.txt",
+      "final_url": "https://www.hdb.gov.sg/robots.txt",
+      "status": 200,
+      "fetched_at": "2026-10-15T18:46:58+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))"
+    }
+  },
+  "pages": {
+    "mnh-hdb-grants-guide": {
+      "slug": "mnh-hdb-grants-guide",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-grants-guide/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-grants-guide/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:53:32+08:00",
+      "method": "httpx",
+      "content_type": "text/html",
+      "sha256": "ce8d237c1675ef5685c7f0fb39c3e6bfda67136d804ba3a29b09af7d551b07c9",
+      "redirect_chain": []
+    },
+    "mnh-hdb-hfe-guide": {
+      "slug": "mnh-hdb-hfe-guide",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-hfe-guide/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-hfe-guide/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:53:35+08:00",
+      "method": "httpx",
+      "content_type": "text/html",
+      "sha256": "40c5beeae02e7462701acfd4b9cb335247991d740d5b53dab35e2a973a583404",
+      "redirect_chain": []
+    },
+    "mnh-hdb-resale-buying-guide": {
+      "slug": "mnh-hdb-resale-buying-guide",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-resale-buying-guide/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-resale-buying-guide/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:53:38+08:00",
+      "method": "httpx",
+      "content_type": "text/html",
+      "sha256": "9f4a730a8812c9ecbf622d57debad60ff856f37a7e85116c6cb3203591cc7012",
+      "redirect_chain": []
+    },
+    "mnh-hdb-buying-guide-singles": {
+      "slug": "mnh-hdb-buying-guide-singles",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-singles/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-singles/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:53:41+08:00",
+      "method": "httpx",
+      "content_type": "text/html",
+      "sha256": "6cfd09dacca27cbf7abe68b09a62a160e068bf9eabab9b776e7765fe0a625323",
+      "redirect_chain": []
+    },
+    "mnh-hdb-buying-guide-young-couples": {
+      "slug": "mnh-hdb-buying-guide-young-couples",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-young-couples/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-young-couples/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:53:44+08:00",
+      "method": "httpx",
+      "content_type": "text/html",
+      "sha256": "28ae9879753a0860da0b3665cd482e602132dd11bd16f0a4beea67c66922ab6b",
+      "redirect_chain": []
+    },
+    "mnh-hdb-loans-guide": {
+      "slug": "mnh-hdb-loans-guide",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-loans-guide/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-loans-guide/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:53:47+08:00",
+      "method": "httpx",
+      "content_type": "text/html",
+      "sha256": "cf9fa379c57dac85edca22f0efa144988f0cc901adf0ca9aac3c7a315896d9b1",
+      "redirect_chain": []
+    },
+    "cpf-considerations-using-cpf-property": {
+      "slug": "cpf-considerations-using-cpf-property",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/considerations-when-using-cpf-to-buy-property",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/considerations-when-using-cpf-to-buy-property",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:53:47+08:00",
+      "method": "httpx",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "7caa56e1b62e83284d91d6838c59d81388ebcc2f8892e9b2c5919114057e3a51",
+      "redirect_chain": []
+    },
+    "cpf-using-cpf-to-buy-a-home": {
+      "slug": "cpf-using-cpf-to-buy-a-home",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:56:08+08:00",
+      "method": "playwright",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "4ea280e8dd977d558a8091bf92bb97fe4660362ee73633a2866c17662699bf85",
+      "redirect_chain": [],
+      "rendered": true
+    },
+    "cpf-guide-ehg-and-phg": {
+      "slug": "cpf-guide-ehg-and-phg",
+      "requested_url": "https://www.cpf.gov.sg/member/infohub/educational-resources/a-guide-to-enhanced-cpf-housing-and-proximity-grant",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/infohub/educational-resources/a-guide-to-enhanced-cpf-housing-and-proximity-grant",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:53:53+08:00",
+      "method": "httpx",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "16660bd328a728fb94365068d25a04e2363593457e1620c6dfd04da49ca65e62",
+      "redirect_chain": []
+    },
+    "cpf-how-much-cpf-for-home-purchase": {
+      "slug": "cpf-how-much-cpf-for-home-purchase",
+      "requested_url": "https://www.cpf.gov.sg/member/infohub/educational-resources/how-much-cpf-savings-you-can-use-for-your-home-purchase",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/infohub/educational-resources/how-much-cpf-savings-you-can-use-for-your-home-purchase",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T17:56:19+08:00",
+      "method": "httpx",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "293af3ea4cc9cb83d2c648ed40b7c3978f5515cd49f0de26f570a118dcc4add2",
+      "redirect_chain": []
+    },
+    "hdb-elig-couples-families": {
+      "slug": "hdb-elig-couples-families",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:48:11+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "202538ef9c6910c42a84a241ce95a713641417e90b305f067e73143614cd1c56",
+      "redirect_chain": []
+    },
+    "hdb-grant-family-cpf-housing-grants": {
+      "slug": "hdb-grant-family-cpf-housing-grants",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/cpf-housing-grants",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/cpf-housing-grants",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:48:14+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "8c0918970603e154d1cdb277a082cb3b658df2bed99d57cd20d05dc81d43c3fa",
+      "redirect_chain": []
+    },
+    "hdb-grant-family-ehg": {
+      "slug": "hdb-grant-family-ehg",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:48:17+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "aab7761e6067bcbc728e18b533a7ff60f59c6653c3619c8bbec52f655d8473f9",
+      "redirect_chain": []
+    },
+    "hdb-grant-family-phg": {
+      "slug": "hdb-grant-family-phg",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/proximity-housing-grant",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/proximity-housing-grant",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:48:20+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "7fd40a99ab13964057d2f3626e5ff4ae0f04601ce36059d364f987315d606fd8",
+      "redirect_chain": []
+    },
+    "hdb-elig-singles": {
+      "slug": "hdb-elig-singles",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:48:23+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "6c207babaa0d9b2955b4212e8868ee0d58d9f24f24fabf9dbdf14dd08289961d",
+      "redirect_chain": []
+    },
+    "hdb-grant-singles-cpf-housing-grant": {
+      "slug": "hdb-grant-singles-cpf-housing-grant",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/cpf-housing-grant",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/cpf-housing-grant",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:48:26+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "a280c7b2a055ff11dac138abab7266783b346513017c085a06e20d6121516455",
+      "redirect_chain": []
+    },
+    "hdb-grant-singles-ehg": {
+      "slug": "hdb-grant-singles-ehg",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/enhanced-cpf-housing-grant",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/enhanced-cpf-housing-grant",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:48:29+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "fbfee5b31d33c7871758b872411448ff36bcb0d70aae8b096db98f24d25d68da",
+      "redirect_chain": []
+    },
+    "hdb-hfe-letter": {
+      "slug": "hdb-hfe-letter",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/application-for-an-hdb-flat-eligibility-hfe-letter",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/application-for-an-hdb-flat-eligibility-hfe-letter",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:48:32+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "85b648231ff42a2f6aa8d1f9f052f939dddf750941b54345b36bf0198b1b4f25",
+      "redirect_chain": []
+    },
+    "hdb-resale-mode-of-financing": {
+      "slug": "hdb-resale-mode-of-financing",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/mode-of-financing",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/mode-of-financing",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:48:35+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "75635bbdf13c3a00dfd2e253bb6c50ddcf4664a0ecbb79a6ef2d14a7b821a8c7",
+      "redirect_chain": []
+    },
+    "hdb-pdf-ehg-amount-families": {
+      "slug": "hdb-pdf-ehg-amount-families",
+      "requested_url": "https://www.hdb.gov.sg/-/media/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant/EHG-amount-Families.pdf?sc_lang=en&hash=147B5C1B4AA5C09281FCDF3D8A04752D",
+      "final_url": "https://www.hdb.gov.sg/-/media/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant/EHG-amount-Families.pdf?sc_lang=en&hash=147B5C1B4AA5C09281FCDF3D8A04752D",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:51:23+08:00",
+      "method": "pdf",
+      "robots_allowed": true,
+      "sha256": "33030ee40e300a634864de40ab8c3af5ab8ad4dba385bede985a4bac6dbd7bdf"
+    },
+    "hdb-pdf-ehg-amount-singles": {
+      "slug": "hdb-pdf-ehg-amount-singles",
+      "requested_url": "https://www.hdb.gov.sg/-/media/buying-a-flat/flat-grant-and-loan-eligibility/singles/enhanced-cpf-housing-grant/EHG-amount-Singles.pdf?sc_lang=en&hash=7261ECD8E1FE7054F0787D2C5E74318A",
+      "final_url": "https://www.hdb.gov.sg/-/media/buying-a-flat/flat-grant-and-loan-eligibility/singles/enhanced-cpf-housing-grant/EHG-amount-Singles.pdf?sc_lang=en&hash=7261ECD8E1FE7054F0787D2C5E74318A",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T18:51:24+08:00",
+      "method": "pdf",
+      "robots_allowed": true,
+      "sha256": "eda0782f956cf1a697de674cdbb2eca6af99d8eb9673ab54842e739051ca9de4"
+    },
+    "hdb-pdf-income-ceiling-extended-family": {
+      "slug": "hdb-pdf-income-ceiling-extended-family",
+      "requested_url": "https://www.hdb.gov.sg/-/media/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/Income-ceiling-for-extended-family-guide.pdf?sc_lang=en&hash=0E76F0C419381FFAE7EE01691C5D0E8C",
+      "final_url": "https://www.hdb.gov.sg/-/media/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/Income-ceiling-for-extended-family-guide.pdf?sc_lang=en&hash=0E76F0C419381FFAE7EE01691C5D0E8C",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T19:40:04+08:00",
+      "method": "pdf",
+      "robots_allowed": true,
+      "sha256": "3aed448f6574dae5c617a691af17d19226a03a6c40d944686f2d1f87d883fb43"
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:12+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "b5d0ed9839e5bf10024bca48bbea2f1afcb5d594990bdcabb6b34394f06e74e3",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-conditions-after-buying-a-new-flat": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-conditions-after-buying-a-new-flat",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/conditions-after-buying-a-new-flat",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/conditions-after-buying-a-new-flat",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:16+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "7f340da374b684c929295bf3e421ff243230cb5901ee6d8af840aaacfd780238",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:18+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "5e13ae236f739438f4f82200f750e92bf3651526f449702cd3aa4ab633ade962",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-design-features": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-design-features",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/design-features",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/design-features",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:21+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "09a8257bdac487e5065848299f1891a147b76a83a389e76fafb18271e550fad4",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-standard-plus-and-prime-housing-f": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-standard-plus-and-prime-housing-f",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/standard-plus-and-prime-housing-framework",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/standard-plus-and-prime-housing-framework",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:24+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "5cc93c84a5106c5e50edef289686bda4d124e26733e79f477e6392945fb9bbc3",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-types-of-flats": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-types-of-flats",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:27+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "99cca74f1bf869d2706ef72c9af3befcfcd0c039244fdc1ca03dfbc285e81519",
+      "redirect_chain": []
+    },
+    "hdb-finding-a-new-flat-types-of-flats-community-care-apartments": {
+      "slug": "hdb-finding-a-new-flat-types-of-flats-community-care-apartments",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats/community-care-apartments",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats/community-care-apartments",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:30+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "f41d19eebc9540ee9f83d392abd7d0ed72b7de947444d263ad3f1e825cbefd7a",
+      "redirect_chain": []
+    },
+    "hdb-finding-a-new-flat-types-of-flats-shortlease-2room-flexi-flat": {
+      "slug": "hdb-finding-a-new-flat-types-of-flats-shortlease-2room-flexi-flat",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats/shortlease-2room-flexi-flat",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats/shortlease-2room-flexi-flat",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:33+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "d8a22dbbe865451a314c8a354b8326899adb5dbea551c15f9ea54adcd5c114f3",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:36+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "59b10211d0c9e6b0f3027f7a4601e0d22cbbbf7c6ab5bc94ff87ee62a89dbb03",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-application": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-application",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:39+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "0315236c8e86017f45e39cc436f987ad3e554f41782a00900c3c6f5ca178d2aa",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-new-flat-application-frequently-asked-questions-on-sales-exercise": {
+      "slug": "hdb-process-for-buying-a-new-flat-application-frequently-asked-questions-on-sales-exercise",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/frequently-asked-questions-on-sales-exercises",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/frequently-asked-questions-on-sales-exercises",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:42+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "11c339f169b24d8aac2e4ec1c793619b899ca4d41f74f2736dcfbf9368d9cc83",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-new-flat-application-fresh-start-housing-scheme": {
+      "slug": "hdb-process-for-buying-a-new-flat-application-fresh-start-housing-scheme",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/fresh-start-housing-scheme",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/fresh-start-housing-scheme",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:45+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "b60cbf605485b77e83d26144751c151a4ccf0288942f9a4bcbfc53ac6b30a88a",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-new-flat-application-priority-schemes": {
+      "slug": "hdb-process-for-buying-a-new-flat-application-priority-schemes",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/priority-schemes",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/priority-schemes",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:48+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "16096b3ec62002c25673e5d5789ce303a21637c976aff19d35286098b8a6fe38",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-booking-of-flat": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-booking-of-flat",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/booking-of-flat",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/booking-of-flat",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:51+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "53d574980a9254cf6316a0bb8dfc513f66b58953c6f4e8217ab9cad90ca389d4",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-key-collection": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-key-collection",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/key-collection",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/key-collection",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:54+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "8d5cb09290ba41891a61f8f761ff4babfac44cb1a0dc296c9fc7c4afb0030d41",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-modes-of-sales": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-modes-of-sales",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/modes-of-sales",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/modes-of-sales",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:16:57+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "d56012df34d701e33a2bb0d5891892cf092f1a7ba88593ad833c3374291f7789",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-overview": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-overview",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/overview",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/overview",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:00+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "13d03e9c06884728fb8b97593447d7e1e28d26bf9ad8fb9563358004ac5e47de",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-new-flat-overview-plan-finances": {
+      "slug": "hdb-process-for-buying-a-new-flat-overview-plan-finances",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/overview/plan-finances",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/overview/plan-finances",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:03+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "8fca85f2f81580366c07e1ead2f0fd663fbc2c851c29277ddf775425acfe5b31",
+      "redirect_chain": []
+    },
+    "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-sign-agreement-for-lea": {
+      "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-sign-agreement-for-lea",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/sign-agreement-for-lease",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/sign-agreement-for-lease",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:06+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "d9cf56b0ddad416725fb9d277d366a5aa37cdf5b05ddf45e92ef9da2870b37a5",
+      "redirect_chain": []
+    },
+    "hdb-executive-condominiums": {
+      "slug": "hdb-executive-condominiums",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:09+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "383560877c640c3d624f4a627462747ef99b8a2552ecb86122d53f2a79b0020c",
+      "redirect_chain": []
+    },
+    "hdb-executive-condominiums-conditions-after-buying-an-ec": {
+      "slug": "hdb-executive-condominiums-conditions-after-buying-an-ec",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/conditions-after-buying-an-ec",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/conditions-after-buying-an-ec",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:12+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "9d944f12ccb8225b8c151ea0eb1fff3f091215246666cf5f1af0256769198361",
+      "redirect_chain": []
+    },
+    "hdb-executive-condominiums-cpf-housing-grant": {
+      "slug": "hdb-executive-condominiums-cpf-housing-grant",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/cpf-housing-grant",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/cpf-housing-grant",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:15+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "f31037afe7a02abf62ba8c8a82551abbee719ccca00f70672063f019bb33d738",
+      "redirect_chain": []
+    },
+    "hdb-executive-condominiums-eligibility": {
+      "slug": "hdb-executive-condominiums-eligibility",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/eligibility",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/eligibility",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:18+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "4061ae0c801fe198d22a27fe396fa1529f823f5c440e3a100cbe2852e8755096",
+      "redirect_chain": []
+    },
+    "hdb-executive-condominiums-finding-an-ec": {
+      "slug": "hdb-executive-condominiums-finding-an-ec",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/finding-an-ec",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/finding-an-ec",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:21+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "d5ff24fa52592d1193d5d4977a329e9dc0e74682af5bc293f7ae5501ae21d736",
+      "redirect_chain": []
+    },
+    "hdb-executive-condominiums-process-for-buying-an-ec": {
+      "slug": "hdb-executive-condominiums-process-for-buying-an-ec",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/process-for-buying-an-ec",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/process-for-buying-an-ec",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:24+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "771ca8ad7fb27cdf32efa9c432e2c4e2ab3cb07eaf36baebf357b11a52387a03",
+      "redirect_chain": []
+    },
+    "hdb-financial-planning-for-a-flat-purchase": {
+      "slug": "hdb-financial-planning-for-a-flat-purchase",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:27+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "1a718655cf9065245ca70b5171a308cee1ba76680e354f166afe1cb05aa2cb6d",
+      "redirect_chain": []
+    },
+    "hdb-financial-planning-for-a-flat-purchase-ability-to-pay": {
+      "slug": "hdb-financial-planning-for-a-flat-purchase-ability-to-pay",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/ability-to-pay",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/ability-to-pay",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:30+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "d409d093e4abb3ae7df519a3f27a6109425e37b634dbc6754e73681512f5c7aa",
+      "redirect_chain": []
+    },
+    "hdb-financial-planning-for-a-flat-purchase-budget-for-a-flat": {
+      "slug": "hdb-financial-planning-for-a-flat-purchase-budget-for-a-flat",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/budget-for-a-flat",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/budget-for-a-flat",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:33+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "dc9d7fd7688f04807ac4f52404212b936c3a7f692439b1ab5eca0d64a320a3ca",
+      "redirect_chain": []
+    },
+    "hdb-financial-planning-for-a-flat-purchase-credit-to-finance-a-flat-purchase": {
+      "slug": "hdb-financial-planning-for-a-flat-purchase-credit-to-finance-a-flat-purchase",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/credit-to-finance-a-flat-purchase",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/credit-to-finance-a-flat-purchase",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:36+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "6954cce75d04056dcf17412ef2ba388521288a26ec724aaa7b00d59441e5a352",
+      "redirect_chain": []
+    },
+    "hdb-flat-grant-and-loan-eligibility": {
+      "slug": "hdb-flat-grant-and-loan-eligibility",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:39+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "944f628d657bf6a8d1cc8060d245edb220465c103223cc98295a64c7fa3778e8",
+      "redirect_chain": []
+    },
+    "hdb-flat-grant-and-loan-eligibility-application-for-an-hdb-flat-eligibility-hfe-letter-inc": {
+      "slug": "hdb-flat-grant-and-loan-eligibility-application-for-an-hdb-flat-eligibility-hfe-letter-inc",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/application-for-an-hdb-flat-eligibility-hfe-letter/income-guidelines-and-documents",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/application-for-an-hdb-flat-eligibility-hfe-letter/income-guidelines-and-documents",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:42+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "03c534666f4b525636d5ea10a2bc83fdbbe9c3dd3677b24084fd7b9587b503f9",
+      "redirect_chain": []
+    },
+    "hdb-flat-grant-and-loan-eligibility-couples-and-families-stepup-cpf-housing-grant": {
+      "slug": "hdb-flat-grant-and-loan-eligibility-couples-and-families-stepup-cpf-housing-grant",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/stepup-cpf-housing-grant",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/stepup-cpf-housing-grant",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:46+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "3b7d8e1369bb982e2c205d62a0130d22dc4ec8c52376f0577d65e0275d24cb2b",
+      "redirect_chain": []
+    },
+    "hdb-flat-grant-and-loan-eligibility-housing-loan": {
+      "slug": "hdb-flat-grant-and-loan-eligibility-housing-loan",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:48+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "9048a102dc83bd133cfaaf703727bd159391cfbc2ed570f981ae0f9c688549fe",
+      "redirect_chain": []
+    },
+    "hdb-flat-grant-and-loan-eligibility-housing-loan-housing-loan-from-financial-institutions": {
+      "slug": "hdb-flat-grant-and-loan-eligibility-housing-loan-housing-loan-from-financial-institutions",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-financial-institutions",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-financial-institutions",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:51+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "2aa694a2c9fcb5d6cccda43cb9ce7730355f14b5166ca2398ab2a3435fbec843",
+      "redirect_chain": []
+    },
+    "hdb-flat-grant-and-loan-eligibility-housing-loan-housing-loan-from-hdb": {
+      "slug": "hdb-flat-grant-and-loan-eligibility-housing-loan-housing-loan-from-hdb",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-hdb",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-hdb",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:54+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "be4763dfb62a011022a3d20353d4aa5f87ab5b6f82f004450c89b8f6da5d7b0a",
+      "redirect_chain": []
+    },
+    "hdb-flat-grant-and-loan-eligibility-seniors": {
+      "slug": "hdb-flat-grant-and-loan-eligibility-seniors",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/seniors",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/seniors",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:17:57+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "a0e1dbd03d4cc87165fbf65071bf37e105d03ec3a45134ead33e16a90e05e8b8",
+      "redirect_chain": []
+    },
+    "hdb-flat-grant-and-loan-eligibility-singles-proximity-housing-grant": {
+      "slug": "hdb-flat-grant-and-loan-eligibility-singles-proximity-housing-grant",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/proximity-housing-grant",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/proximity-housing-grant",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:00+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "9ac42b1f285cb734ff9e37888e54c0dda7a544a3271a34600860aaae4b9433ab",
+      "redirect_chain": []
+    },
+    "hdb-resale-flats": {
+      "slug": "hdb-resale-flats",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:03+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "316d3e24a99ba3c7ef9012bd8bd3c7d1e2d44ba015caad20ec57eadd53c27b72",
+      "redirect_chain": []
+    },
+    "hdb-resale-flats-conditions-after-buying-a-resale-flat": {
+      "slug": "hdb-resale-flats-conditions-after-buying-a-resale-flat",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/conditions-after-buying-a-resale-flat",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/conditions-after-buying-a-resale-flat",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:06+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "ae33d01b20ec2642d3d1cf79ede4392bf96493936361d83dd9bd517975545baa",
+      "redirect_chain": []
+    },
+    "hdb-resale-flats-finding-a-resale-flat": {
+      "slug": "hdb-resale-flats-finding-a-resale-flat",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/finding-a-resale-flat",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/finding-a-resale-flat",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:09+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "3364b3ba70fba9cedb540dbcabd37dd3d8bba9b74738a58cae576def065f5db4",
+      "redirect_chain": []
+    },
+    "hdb-resale-flats-process-for-buying-a-resale-flat": {
+      "slug": "hdb-resale-flats-process-for-buying-a-resale-flat",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:12+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "937120105aca6a8cb49518bbab36cd7a3a74c013120f3765f5abab85510efc49",
+      "redirect_chain": []
+    },
+    "hdb-resale-flats-process-for-buying-a-resale-flat-option-to-purchase": {
+      "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-option-to-purchase",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/option-to-purchase",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/option-to-purchase",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:15+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "d3c762496cc7d7214cb1f2b9fe4309d2bb32d6a0c504baf749d5bbcd2e5e43ff",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-resale-flat-option-to-purchase-request-for-value": {
+      "slug": "hdb-process-for-buying-a-resale-flat-option-to-purchase-request-for-value",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/option-to-purchase/request-for-value",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/option-to-purchase/request-for-value",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:18+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "772a1d599fb5ab45743f39e3e35d58d0f63bb36b835d780516a192cc3ce2c35e",
+      "redirect_chain": []
+    },
+    "hdb-resale-flats-process-for-buying-a-resale-flat-overview": {
+      "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-overview",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/overview",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/overview",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:21+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "dbf6342e01a7b6e10da0b00204532b22b5dc3fee2d6d7816d331a1d90895f592",
+      "redirect_chain": []
+    },
+    "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-application": {
+      "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-application",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:25+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "6d920aed4ee02dcdc1a461b11ea3d28bcf618eef3fa923536f13ceb4d5524e2a",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-resale-flat-resale-flat-application-application-process": {
+      "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-application-application-process",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/application-process",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/application-process",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:27+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "67060e906b97792f84daeaaf4e98ffa59ae6a818f6a1e38f22787d68c6135eb7",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-resale-flat-resale-flat-application-approval-of-application": {
+      "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-application-approval-of-application",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/approval-of-application",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/approval-of-application",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:30+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "4127b85f24525b08a55f84e247e9d1d8b43283df6120104a92c0206a20b7331b",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-resale-flat-resale-flat-application-request-for-enhanced-contra-f": {
+      "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-application-request-for-enhanced-contra-f",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/request-for-enhanced-contra-facility",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/request-for-enhanced-contra-facility",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:33+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "46aba476e300e70edef83fe5b579d3a7a4d3b6ceb66d7d28ad4c8c42a09589cf",
+      "redirect_chain": []
+    },
+    "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-completion": {
+      "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-completion",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-completion",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-completion",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:36+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "549640b03eaeff0260ce088505668a8abf923c7c3a60a83f06215cd927c07daa",
+      "redirect_chain": []
+    },
+    "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-planning": {
+      "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-planning",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:39+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "5bbedb6e09439906b6f02976bf23d902c40fc05ce3b245a14625f4adc0656638",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-resale-flat-resale-flat-planning-eip-and-spr-quota": {
+      "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-planning-eip-and-spr-quota",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/eip-and-spr-quota",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/eip-and-spr-quota",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:42+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "61213e1b54f077d25c1763ad3ea217878e2a0cd4768356640c2b71774ee8b1ff",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-resale-flat-resale-flat-planning-managing-the-flat-purchase": {
+      "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-planning-managing-the-flat-purchase",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/managing-the-flat-purchase",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/managing-the-flat-purchase",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:45+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "019cd1da90bedac1883a371342c1b9e35ae16b611cc88201b4e0e62e4ebf8ea5",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-resale-flat-resale-flat-planning-overview": {
+      "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-planning-overview",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/overview",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/overview",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:48+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "448d01af8f3c7c94935783c32bf8526158a303cac3cb0f79019276c027ef1f3b",
+      "redirect_chain": []
+    },
+    "hdb-process-for-buying-a-resale-flat-resale-flat-planning-resale-seminars": {
+      "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-planning-resale-seminars",
+      "requested_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/resale-seminars",
+      "robots_allowed": true,
+      "final_url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/resale-seminars",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:52+08:00",
+      "method": "httpx",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "content_type": "text/html; charset=utf-8",
+      "sha256": "f527f6a5f1b33e3dfeeedfcf2a26b48a96fd9cc9547659fe8f246a73c3ba2ebc",
+      "redirect_chain": []
+    },
+    "mnh-hdb-buying-guide": {
+      "slug": "mnh-hdb-buying-guide",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:52+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html",
+      "sha256": "68a7d06f793d0484e293b501f9d54a909230abc908739649438464bcdff285f4",
+      "redirect_chain": []
+    },
+    "mnh-hdb-bto-sbf-buying-guide": {
+      "slug": "mnh-hdb-bto-sbf-buying-guide",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-bto-sbf-buying-guide/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-bto-sbf-buying-guide/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:55+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html",
+      "sha256": "50257be5367133cd430aa7850182a9224b3f127de6f51676577845125d536b90",
+      "redirect_chain": []
+    },
+    "mnh-hdb-bto-sales-launch": {
+      "slug": "mnh-hdb-bto-sales-launch",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-bto-sales-launch/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-bto-sales-launch/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:18:58+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html",
+      "sha256": "cda20544696f49f41d9ed617626b09e76fabea429f0aebad4baee69c19e879f4",
+      "redirect_chain": []
+    },
+    "mnh-hdb-flat-types-classification-guide": {
+      "slug": "mnh-hdb-flat-types-classification-guide",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-flat-types-classification-guide/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-flat-types-classification-guide/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:01+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html",
+      "sha256": "4edf2a015000a0b4622515fbbc0b72e2b2c539a2cfd30b8c851973c5caa029ab",
+      "redirect_chain": []
+    },
+    "mnh-hdb-priority-schemes-guide": {
+      "slug": "mnh-hdb-priority-schemes-guide",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-priority-schemes-guide/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-priority-schemes-guide/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:04+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html",
+      "sha256": "09a08968ce0a675f1ac6cc65ca84c2f8d5e85c2d0454f41a33a9e0e138b041ee",
+      "redirect_chain": []
+    },
+    "mnh-hdb-buying-guide-seniors": {
+      "slug": "mnh-hdb-buying-guide-seniors",
+      "requested_url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-seniors/",
+      "robots_allowed": true,
+      "final_url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-seniors/",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:07+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html",
+      "sha256": "27a858a532e0ed22d4969cc1424bbd1b88f0c8aced912c7a7eaf970d77c78ccc",
+      "redirect_chain": []
+    },
+    "cpf-home-ownership": {
+      "slug": "cpf-home-ownership",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:07+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "6f49039470aef177739bcef599e0cbaf25de6f49a9478eae9bfabe8afd223aec",
+      "redirect_chain": []
+    },
+    "cpf-home-ownership-using-your-cpf-to-buy-a-home-apply-to-use-cpf-for-your-property": {
+      "slug": "cpf-home-ownership-using-your-cpf-to-buy-a-home-apply-to-use-cpf-for-your-property",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/apply-to-use-cpf-for-your-property",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/apply-to-use-cpf-for-your-property",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:20:19+08:00",
+      "method": "playwright",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "ad9b7c24405d729c2b0c733729c49900442d03483ce4636bf299deca74756473",
+      "redirect_chain": [],
+      "rendered": true
+    },
+    "cpf-home-ownership-using-your-cpf-to-buy-a-home-cpf-refund-when-selling-or-transferring-pr": {
+      "slug": "cpf-home-ownership-using-your-cpf-to-buy-a-home-cpf-refund-when-selling-or-transferring-pr",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/cpf-refund-when-selling-or-transferring-property",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/cpf-refund-when-selling-or-transferring-property",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:13+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "f8fa61821bbcef02b6101780262855e262fd74b3e07c6ff577564cbf8f30c894",
+      "redirect_chain": []
+    },
+    "cpf-home-ownership-using-your-cpf-to-buy-a-home-retain-20000-in-your-oa-if-you-are-taking-": {
+      "slug": "cpf-home-ownership-using-your-cpf-to-buy-a-home-retain-20000-in-your-oa-if-you-are-taking-",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/retain-20000-in-your-oa-if-you-are-taking-a-housing-loan",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/retain-20000-in-your-oa-if-you-are-taking-a-housing-loan",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:17+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "9ab0d827505d2986a50af5c7f0804108c101c5e3bad8ec31c2a00eaef7a9d71a",
+      "redirect_chain": []
+    },
+    "cpf-home-ownership-protecting-against-losing-your-home": {
+      "slug": "cpf-home-ownership-protecting-against-losing-your-home",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:19+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "11c2f3c6f4d7a3b307ec272ab7119b67c61b335403a441bca222dbc0b4e0cf00",
+      "redirect_chain": []
+    },
+    "cpf-home-ownership-protecting-against-losing-your-home-claiming-under-the-home-protection-": {
+      "slug": "cpf-home-ownership-protecting-against-losing-your-home-claiming-under-the-home-protection-",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home/claiming-under-the-home-protection-scheme",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home/claiming-under-the-home-protection-scheme",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:22+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "37056dfc0979aff8a8373ec414c629a15fade3924e716100748116abc3dc27dc",
+      "redirect_chain": []
+    },
+    "cpf-home-ownership-protecting-against-losing-your-home-single-premium-home-protection-sche": {
+      "slug": "cpf-home-ownership-protecting-against-losing-your-home-single-premium-home-protection-sche",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home/single-premium-home-protection-scheme-cover",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home/single-premium-home-protection-scheme-cover",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:25+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "6731bb778ad78eef3a89221965cb3324b8b7e4bb38b0b6b5f331026f624b0163",
+      "redirect_chain": []
+    },
+    "cpf-home-ownership-home-buying-guide-for-members-below-55": {
+      "slug": "cpf-home-ownership-home-buying-guide-for-members-below-55",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-below-55",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-below-55",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:28+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "d1b6d6692f2e9119b852c4a3b50732b8a9e5be93019a1b799f401cd6fa914328",
+      "redirect_chain": []
+    },
+    "cpf-home-ownership-home-buying-guide-for-members-below-55-housing-case-study": {
+      "slug": "cpf-home-ownership-home-buying-guide-for-members-below-55-housing-case-study",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-below-55/housing-case-study",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-below-55/housing-case-study",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:20:23+08:00",
+      "method": "playwright",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "ddf0418a25880411aba1f94c92228407b5111bc0010b2d0228c8ab3cfba3b0db",
+      "redirect_chain": [],
+      "rendered": true
+    },
+    "cpf-home-ownership-home-buying-guide-for-members-above-55": {
+      "slug": "cpf-home-ownership-home-buying-guide-for-members-above-55",
+      "requested_url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-above-55",
+      "robots_allowed": true,
+      "final_url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-above-55",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:19:34+08:00",
+      "method": "httpx",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "content_type": "text/html;charset=utf-8",
+      "sha256": "9b7f7db7cd54aa8d7565e18c745c0ca3781c3ee94e8466d7a8f5e4441991039c",
+      "redirect_chain": []
+    },
+    "hdb-pdf-otp-important-notes": {
+      "slug": "hdb-pdf-otp-important-notes",
+      "requested_url": "https://www.hdb.gov.sg/-/media/managing-my-home/selling-a-flat/process-for-selling-a-flat/option-to-purchase/OTP-Important-Notes.pdf?sc_lang=en&hash=715B8A05E0B5DB1A4A835B6FBAE4203D",
+      "final_url": "https://www.hdb.gov.sg/-/media/managing-my-home/selling-a-flat/process-for-selling-a-flat/option-to-purchase/OTP-Important-Notes.pdf?sc_lang=en&hash=715B8A05E0B5DB1A4A835B6FBAE4203D",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:20:08+08:00",
+      "method": "pdf",
+      "robots_allowed": true,
+      "sha256": "463cfe4f9befe8d28128b26cdebae0c17eccf6a079178376c7f7aca5702914a8"
+    },
+    "hdb-pdf-resale-terms-conditions": {
+      "slug": "hdb-pdf-resale-terms-conditions",
+      "requested_url": "https://www.hdb.gov.sg/-/media/managing-my-home/selling-a-flat/process-for-selling-a-flat/option-to-purchase/Resale-Terms--Conditions.pdf?sc_lang=en&hash=9EF92CAB044AA54F4B093A670530BF1E",
+      "final_url": "https://www.hdb.gov.sg/-/media/managing-my-home/selling-a-flat/process-for-selling-a-flat/option-to-purchase/Resale-Terms--Conditions.pdf?sc_lang=en&hash=9EF92CAB044AA54F4B093A670530BF1E",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:20:09+08:00",
+      "method": "pdf",
+      "robots_allowed": true,
+      "sha256": "3eb7d8097c76182e99c55b18b8cc8f660ff67febfddbc36c415c0415b4e3969f"
+    },
+    "hdb-pdf-ecf-terms-conditions": {
+      "slug": "hdb-pdf-ecf-terms-conditions",
+      "requested_url": "https://www.hdb.gov.sg/-/media/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/request-for-enhanced-contra-facility/ECF-TC.pdf",
+      "final_url": "https://www.hdb.gov.sg/-/media/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/request-for-enhanced-contra-facility/ECF-TC.pdf",
+      "http_status": 200,
+      "fetched_at": "2026-10-15T20:20:10+08:00",
+      "method": "pdf",
+      "robots_allowed": true,
+      "sha256": "9bdb71eef78535cec0011a6d8766a0af2d944f1bd4e5a2f1ded741bcdaf057a7"
+    }
+  },
+  "events": [
+    {
+      "n": 1,
+      "kind": "robots",
+      "url": "https://www.hdb.gov.sg/robots.txt",
+      "at": "2026-10-15T17:52:52+08:00"
+    },
+    {
+      "n": 2,
+      "kind": "robots",
+      "url": "https://www.cpf.gov.sg/robots.txt",
+      "at": "2026-10-15T17:52:52+08:00"
+    },
+    {
+      "n": 3,
+      "kind": "robots",
+      "url": "https://www.mynicehome.gov.sg/robots.txt",
+      "at": "2026-10-15T17:52:52+08:00"
+    },
+    {
+      "n": 4,
+      "kind": "sitemap",
+      "url": "https://www.mynicehome.gov.sg/sitemap.xml",
+      "at": "2026-10-15T17:53:07+08:00"
+    },
+    {
+      "n": 5,
+      "kind": "sitemap",
+      "url": "https://www.cpf.gov.sg/sitemap.xml",
+      "at": "2026-10-15T17:53:07+08:00"
+    },
+    {
+      "n": 6,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-grants-guide/",
+      "at": "2026-10-15T17:53:32+08:00"
+    },
+    {
+      "n": 7,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-hfe-guide/",
+      "at": "2026-10-15T17:53:32+08:00"
+    },
+    {
+      "n": 8,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-resale-buying-guide/",
+      "at": "2026-10-15T17:53:35+08:00"
+    },
+    {
+      "n": 9,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-singles/",
+      "at": "2026-10-15T17:53:38+08:00"
+    },
+    {
+      "n": 10,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-young-couples/",
+      "at": "2026-10-15T17:53:41+08:00"
+    },
+    {
+      "n": 11,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-loans-guide/",
+      "at": "2026-10-15T17:53:44+08:00"
+    },
+    {
+      "n": 12,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/considerations-when-using-cpf-to-buy-property",
+      "at": "2026-10-15T17:53:47+08:00"
+    },
+    {
+      "n": 13,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home",
+      "at": "2026-10-15T17:53:47+08:00"
+    },
+    {
+      "n": 14,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/infohub/educational-resources/a-guide-to-enhanced-cpf-housing-and-proximity-grant",
+      "at": "2026-10-15T17:53:50+08:00"
+    },
+    {
+      "n": 15,
+      "kind": "render",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home",
+      "at": "2026-10-15T17:56:03+08:00"
+    },
+    {
+      "n": 16,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/infohub/educational-resources/how-much-cpf-savings-you-can-use-for-your-home-purchase",
+      "at": "2026-10-15T17:56:19+08:00"
+    },
+    {
+      "n": 17,
+      "kind": "robots",
+      "url": "https://www.hdb.gov.sg/robots.txt",
+      "at": "2026-10-15T18:46:57+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 18,
+      "kind": "sitemap",
+      "url": "https://www.hdb.gov.sg/sitemap.xml",
+      "at": "2026-10-15T18:47:27+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 19,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families",
+      "at": "2026-10-15T18:48:11+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 20,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/cpf-housing-grants",
+      "at": "2026-10-15T18:48:11+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 21,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant",
+      "at": "2026-10-15T18:48:14+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 22,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/proximity-housing-grant",
+      "at": "2026-10-15T18:48:17+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 23,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles",
+      "at": "2026-10-15T18:48:20+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 24,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/cpf-housing-grant",
+      "at": "2026-10-15T18:48:23+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 25,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/enhanced-cpf-housing-grant",
+      "at": "2026-10-15T18:48:26+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 26,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/application-for-an-hdb-flat-eligibility-hfe-letter",
+      "at": "2026-10-15T18:48:29+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 27,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/mode-of-financing",
+      "at": "2026-10-15T18:48:32+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 28,
+      "kind": "pdf",
+      "url": "https://www.hdb.gov.sg/-/media/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant/EHG-amount-Families.pdf?sc_lang=en&hash=147B5C1B4AA5C09281FCDF3D8A04752D",
+      "at": "2026-10-15T18:51:23+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 29,
+      "kind": "pdf",
+      "url": "https://www.hdb.gov.sg/-/media/buying-a-flat/flat-grant-and-loan-eligibility/singles/enhanced-cpf-housing-grant/EHG-amount-Singles.pdf?sc_lang=en&hash=7261ECD8E1FE7054F0787D2C5E74318A",
+      "at": "2026-10-15T18:51:24+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 30,
+      "kind": "pdf",
+      "url": "https://www.hdb.gov.sg/-/media/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/Income-ceiling-for-extended-family-guide.pdf?sc_lang=en&hash=0E76F0C419381FFAE7EE01691C5D0E8C",
+      "at": "2026-10-15T19:40:04+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 31,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats",
+      "at": "2026-10-15T20:16:12+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 32,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/conditions-after-buying-a-new-flat",
+      "at": "2026-10-15T20:16:12+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 33,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat",
+      "at": "2026-10-15T20:16:16+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 34,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/design-features",
+      "at": "2026-10-15T20:16:18+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 35,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/standard-plus-and-prime-housing-framework",
+      "at": "2026-10-15T20:16:21+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 36,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats",
+      "at": "2026-10-15T20:16:24+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 37,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats/community-care-apartments",
+      "at": "2026-10-15T20:16:27+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 38,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats/shortlease-2room-flexi-flat",
+      "at": "2026-10-15T20:16:30+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 39,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat",
+      "at": "2026-10-15T20:16:33+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 40,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application",
+      "at": "2026-10-15T20:16:36+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 41,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/frequently-asked-questions-on-sales-exercises",
+      "at": "2026-10-15T20:16:39+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 42,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/fresh-start-housing-scheme",
+      "at": "2026-10-15T20:16:42+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 43,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/priority-schemes",
+      "at": "2026-10-15T20:16:45+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 44,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/booking-of-flat",
+      "at": "2026-10-15T20:16:48+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 45,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/key-collection",
+      "at": "2026-10-15T20:16:51+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 46,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/modes-of-sales",
+      "at": "2026-10-15T20:16:54+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 47,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/overview",
+      "at": "2026-10-15T20:16:57+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 48,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/overview/plan-finances",
+      "at": "2026-10-15T20:17:00+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 49,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/sign-agreement-for-lease",
+      "at": "2026-10-15T20:17:03+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 50,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums",
+      "at": "2026-10-15T20:17:06+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 51,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/conditions-after-buying-an-ec",
+      "at": "2026-10-15T20:17:09+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 52,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/cpf-housing-grant",
+      "at": "2026-10-15T20:17:12+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 53,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/eligibility",
+      "at": "2026-10-15T20:17:15+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 54,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/finding-an-ec",
+      "at": "2026-10-15T20:17:18+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 55,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/process-for-buying-an-ec",
+      "at": "2026-10-15T20:17:21+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 56,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase",
+      "at": "2026-10-15T20:17:24+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 57,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/ability-to-pay",
+      "at": "2026-10-15T20:17:27+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 58,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/budget-for-a-flat",
+      "at": "2026-10-15T20:17:30+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 59,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/credit-to-finance-a-flat-purchase",
+      "at": "2026-10-15T20:17:33+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 60,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility",
+      "at": "2026-10-15T20:17:36+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 61,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/application-for-an-hdb-flat-eligibility-hfe-letter/income-guidelines-and-documents",
+      "at": "2026-10-15T20:17:39+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 62,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/stepup-cpf-housing-grant",
+      "at": "2026-10-15T20:17:42+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 63,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan",
+      "at": "2026-10-15T20:17:46+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 64,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-financial-institutions",
+      "at": "2026-10-15T20:17:48+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 65,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-hdb",
+      "at": "2026-10-15T20:17:51+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 66,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/seniors",
+      "at": "2026-10-15T20:17:54+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 67,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/proximity-housing-grant",
+      "at": "2026-10-15T20:17:57+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 68,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats",
+      "at": "2026-10-15T20:18:00+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 69,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/conditions-after-buying-a-resale-flat",
+      "at": "2026-10-15T20:18:03+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 70,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/finding-a-resale-flat",
+      "at": "2026-10-15T20:18:06+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 71,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat",
+      "at": "2026-10-15T20:18:09+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 72,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/option-to-purchase",
+      "at": "2026-10-15T20:18:12+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 73,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/option-to-purchase/request-for-value",
+      "at": "2026-10-15T20:18:15+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 74,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/overview",
+      "at": "2026-10-15T20:18:18+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 75,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application",
+      "at": "2026-10-15T20:18:21+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 76,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/application-process",
+      "at": "2026-10-15T20:18:25+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 77,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/approval-of-application",
+      "at": "2026-10-15T20:18:27+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 78,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/request-for-enhanced-contra-facility",
+      "at": "2026-10-15T20:18:30+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 79,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-completion",
+      "at": "2026-10-15T20:18:33+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 80,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning",
+      "at": "2026-10-15T20:18:36+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 81,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/eip-and-spr-quota",
+      "at": "2026-10-15T20:18:39+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 82,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/managing-the-flat-purchase",
+      "at": "2026-10-15T20:18:42+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 83,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/overview",
+      "at": "2026-10-15T20:18:45+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 84,
+      "kind": "page",
+      "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/resale-seminars",
+      "at": "2026-10-15T20:18:48+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 85,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide/",
+      "at": "2026-10-15T20:18:52+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 86,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-bto-sbf-buying-guide/",
+      "at": "2026-10-15T20:18:52+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 87,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-bto-sales-launch/",
+      "at": "2026-10-15T20:18:55+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 88,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-flat-types-classification-guide/",
+      "at": "2026-10-15T20:18:58+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 89,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-priority-schemes-guide/",
+      "at": "2026-10-15T20:19:01+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 90,
+      "kind": "page",
+      "url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-seniors/",
+      "at": "2026-10-15T20:19:04+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 91,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership",
+      "at": "2026-10-15T20:19:07+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 92,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/apply-to-use-cpf-for-your-property",
+      "at": "2026-10-15T20:19:07+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 93,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/cpf-refund-when-selling-or-transferring-property",
+      "at": "2026-10-15T20:19:10+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 94,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/retain-20000-in-your-oa-if-you-are-taking-a-housing-loan",
+      "at": "2026-10-15T20:19:13+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 95,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home",
+      "at": "2026-10-15T20:19:17+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 96,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home/claiming-under-the-home-protection-scheme",
+      "at": "2026-10-15T20:19:19+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 97,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home/single-premium-home-protection-scheme-cover",
+      "at": "2026-10-15T20:19:22+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 98,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-below-55",
+      "at": "2026-10-15T20:19:25+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 99,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-below-55/housing-case-study",
+      "at": "2026-10-15T20:19:28+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 100,
+      "kind": "page",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-above-55",
+      "at": "2026-10-15T20:19:31+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)",
+      "http_status": 200
+    },
+    {
+      "n": 101,
+      "kind": "pdf",
+      "url": "https://www.hdb.gov.sg/-/media/managing-my-home/selling-a-flat/process-for-selling-a-flat/option-to-purchase/OTP-Important-Notes.pdf?sc_lang=en&hash=715B8A05E0B5DB1A4A835B6FBAE4203D",
+      "at": "2026-10-15T20:20:08+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 102,
+      "kind": "pdf",
+      "url": "https://www.hdb.gov.sg/-/media/managing-my-home/selling-a-flat/process-for-selling-a-flat/option-to-purchase/Resale-Terms--Conditions.pdf?sc_lang=en&hash=9EF92CAB044AA54F4B093A670530BF1E",
+      "at": "2026-10-15T20:20:08+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 103,
+      "kind": "pdf",
+      "url": "https://www.hdb.gov.sg/-/media/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/request-for-enhanced-contra-facility/ECF-TC.pdf",
+      "at": "2026-10-15T20:20:09+08:00",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 (compatible; SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only))",
+      "http_status": 200
+    },
+    {
+      "n": 104,
+      "kind": "render",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/apply-to-use-cpf-for-your-property",
+      "at": "2026-10-15T20:20:11+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)"
+    },
+    {
+      "n": 105,
+      "kind": "render",
+      "url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-below-55/housing-case-study",
+      "at": "2026-10-15T20:20:20+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (university group project; HDB policy advisor; low-rate, public pages only)"
+    }
+  ],
+  "robots_history": [
+    {
+      "domain": "hdb.gov.sg",
+      "url": "https://www.hdb.gov.sg/robots.txt",
+      "final_url": "https://www.hdb.gov.sg/robots.txt",
+      "status": 403,
+      "fetched_at": "2026-10-15T17:52:52+08:00",
+      "user_agent": "SMU-SE201-StudentResearch/0.1 (research UA)",
+      "superseded_reason": "403 WAF page to research UA; retried with browser-compatible UA after user approval 2026-10-15"
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "status": "DRAFT",
+  "version": "0.1.0",
+  "drafted_by": "Person 4 (policy data)",
+  "drafted_on": "2026-10-15",
+  "confirm_with": [
+    "Owner of GraphState / BuyerProfile (citizenship, household_type, first_timer values)",
+    "Owner of the SQLite resale tool (flat_type and town db_form values)"
+  ],
+  "notes": [
+    "Canonical values are what chunks (eligibility_tags) and topic cards (trigger_conditions) use.",
+    "The data.gov.sg HDB resale dataset uses uppercase forms such as '4 ROOM' and 'TAMPINES'. Use the db_form mapping below when building SQL filters; never put display forms into SQL.",
+    "db_form values are drafted from the public dataset's conventions and are NOT yet verified against the team's SQLite import. Confirm with the SQL tool owner before relying on them.",
+    "Citizenship codes follow the abbreviations used on hdb.gov.sg ('SC/ SC', 'SC/ SPR', 'SPR household', 'non-resident spouse'). They describe the HOUSEHOLD (applicant/co-applicant pair), not one person.",
+    "No captured page states rules for foreigners buying on their own. 'foreigner_only' exists so the advisor can route such users to an explicit 'not covered by our sources' answer, not to invent one."
+  ],
+  "fields": {
+    "citizenship": {
+      "description": "Citizenship mix of the buying household.",
+      "values": {
+        "SC/SC": {"display": "Two Singapore Citizens", "source_wording": "SC/ SC"},
+        "SC/SPR": {"display": "Singapore Citizen with Singapore Permanent Resident", "source_wording": "SC/ SPR"},
+        "SPR/SPR": {"display": "Singapore Permanent Residents only (SPR household)", "source_wording": "SPR household (i.e., an SPR household with no SC applicant)"},
+        "SC/NR": {"display": "Singapore Citizen with non-resident spouse/ family", "source_wording": "non-resident spouse"},
+        "SC_single": {"display": "Single Singapore Citizen", "source_wording": "single citizens / first-timer singles"},
+        "foreigner_only": {"display": "Foreigner(s) without an SC or SPR in the household", "source_wording": null}
+      }
+    },
+    "household_type": {
+      "description": "Type of application.",
+      "values": {
+        "couple_family": {"display": "Married couple / family", "source_wording": "couples and families"},
+        "fiance": {"display": "Fiancé/ fiancée couple", "source_wording": "fiancé/ fiancée"},
+        "single": {"display": "Single", "source_wording": "singles"},
+        "extended_family": {"display": "Extended / multi-generation family", "source_wording": "extended or multi-generation family"},
+        "senior": {"display": "Senior", "source_wording": "seniors"}
+      }
+    },
+    "first_timer": {
+      "description": "Whether the household is buying with first-timer status (as defined by HDB).",
+      "values": {
+        "true": {"display": "First-timer", "source_wording": "first-timer"},
+        "false": {"display": "Second-timer", "source_wording": "second-timer"}
+      }
+    },
+    "flat_type": {
+      "description": "HDB flat type.",
+      "values": {
+        "1-room": {"display": "1-room", "db_form": "1 ROOM"},
+        "2-room": {"display": "2-room", "db_form": "2 ROOM"},
+        "3-room": {"display": "3-room", "db_form": "3 ROOM"},
+        "4-room": {"display": "4-room", "db_form": "4 ROOM"},
+        "5-room": {"display": "5-room", "db_form": "5 ROOM"},
+        "executive": {"display": "Executive", "db_form": "EXECUTIVE"},
+        "multi-generation": {"display": "Multi-Generation", "db_form": "MULTI-GENERATION"},
+        "3gen": {"display": "3Gen", "db_form": null, "note": "Not confirmed as a separate flat_type in the resale dataset."},
+        "2-room-flexi": {"display": "2-room Flexi", "db_form": null, "note": "Not confirmed as a separate flat_type in the resale dataset."}
+      }
+    },
+    "town": {
+      "description": "HDB town. Canonical value = db_form (uppercase, as in the resale dataset).",
+      "values": {
+        "ANG MO KIO": {"display": "Ang Mo Kio"},
+        "BEDOK": {"display": "Bedok"},
+        "BISHAN": {"display": "Bishan"},
+        "BUKIT BATOK": {"display": "Bukit Batok"},
+        "BUKIT MERAH": {"display": "Bukit Merah"},
+        "BUKIT PANJANG": {"display": "Bukit Panjang"},
+        "BUKIT TIMAH": {"display": "Bukit Timah"},
+        "CENTRAL AREA": {"display": "Central Area"},
+        "CHOA CHU KANG": {"display": "Choa Chu Kang"},
+        "CLEMENTI": {"display": "Clementi"},
+        "GEYLANG": {"display": "Geylang"},
+        "HOUGANG": {"display": "Hougang"},
+        "JURONG EAST": {"display": "Jurong East"},
+        "JURONG WEST": {"display": "Jurong West"},
+        "KALLANG/WHAMPOA": {"display": "Kallang/ Whampoa"},
+        "MARINE PARADE": {"display": "Marine Parade"},
+        "PASIR RIS": {"display": "Pasir Ris"},
+        "PUNGGOL": {"display": "Punggol"},
+        "QUEENSTOWN": {"display": "Queenstown"},
+        "SEMBAWANG": {"display": "Sembawang"},
+        "SENGKANG": {"display": "Sengkang"},
+        "SERANGOON": {"display": "Serangoon"},
+        "TAMPINES": {"display": "Tampines"},
+        "TENGAH": {"display": "Tengah"},
+        "TOA PAYOH": {"display": "Toa Payoh"},
+        "WOODLANDS": {"display": "Woodlands"},
+        "YISHUN": {"display": "Yishun"}
+      }
+    }
+  }
+}

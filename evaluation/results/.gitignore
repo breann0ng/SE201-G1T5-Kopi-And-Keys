@@ -1,0 +1,3 @@
+# Run outputs are local; commit a summary in the report instead.
+*
+!.gitignore

@@ -1,0 +1,26 @@
+{
+  "card_id": "CARD_STEPUP_GRANT",
+  "topic_name": "Step-Up CPF Housing Grant",
+  "trigger_conditions": {
+    "first_timer": [
+      "false"
+    ],
+    "household_type": [
+      "couple_family"
+    ]
+  },
+  "required_fields": [
+    "citizenship",
+    "household_type",
+    "first_timer",
+    "household_income",
+    "current_flat_type"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_STEPUP_01",
+    "CHUNK_STEPUP_03",
+    "CHUNK_STEPUP_05"
+  ],
+  "question_template": "For a {household_type} household with citizenship {citizenship}, first-timer status {first_timer}, average gross monthly household income of {household_income}, currently owning a {current_flat_type}, does the Step-Up CPF Housing Grant apply?",
+  "snapshot_date": "2026-10-15"
+}

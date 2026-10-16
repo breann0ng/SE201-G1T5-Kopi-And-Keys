@@ -1,0 +1,442 @@
+[
+  {
+    "slug": "mnh-hdb-grants-guide",
+    "topic": "CPF housing grants (EHG, Family, PHG, Singles)",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-grants-guide/"
+  },
+  {
+    "slug": "mnh-hdb-hfe-guide",
+    "topic": "HDB Flat Eligibility (HFE) letter",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-hfe-guide/"
+  },
+  {
+    "slug": "mnh-hdb-resale-buying-guide",
+    "topic": "Resale buying eligibility",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-resale-buying-guide/"
+  },
+  {
+    "slug": "mnh-hdb-buying-guide-singles",
+    "topic": "Singles eligibility",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-singles/"
+  },
+  {
+    "slug": "mnh-hdb-buying-guide-young-couples",
+    "topic": "Couples/fiance eligibility",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-young-couples/"
+  },
+  {
+    "slug": "mnh-hdb-loans-guide",
+    "topic": "Income ceilings / HDB loan / lease",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-loans-guide/"
+  },
+  {
+    "slug": "cpf-considerations-using-cpf-property",
+    "topic": "Remaining lease rules for CPF use",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/considerations-when-using-cpf-to-buy-property"
+  },
+  {
+    "slug": "cpf-using-cpf-to-buy-a-home",
+    "topic": "CPF housing usage overview",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home"
+  },
+  {
+    "slug": "cpf-guide-ehg-and-phg",
+    "topic": "EHG and PHG (CPF guide article)",
+    "url": "https://www.cpf.gov.sg/member/infohub/educational-resources/a-guide-to-enhanced-cpf-housing-and-proximity-grant"
+  },
+  {
+    "slug": "hdb-elig-couples-families",
+    "topic": "Eligibility: couples & families, fiance/fiancee",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families"
+  },
+  {
+    "slug": "hdb-grant-family-cpf-housing-grants",
+    "topic": "CPF Housing Grant (resale) for families",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/cpf-housing-grants"
+  },
+  {
+    "slug": "hdb-grant-family-ehg",
+    "topic": "EHG for families (income tiers)",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant"
+  },
+  {
+    "slug": "hdb-grant-family-phg",
+    "topic": "PHG for families",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/proximity-housing-grant"
+  },
+  {
+    "slug": "hdb-elig-singles",
+    "topic": "Eligibility: singles",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles"
+  },
+  {
+    "slug": "hdb-grant-singles-cpf-housing-grant",
+    "topic": "Singles Grant (resale)",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/cpf-housing-grant"
+  },
+  {
+    "slug": "hdb-grant-singles-ehg",
+    "topic": "EHG for singles",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/enhanced-cpf-housing-grant"
+  },
+  {
+    "slug": "hdb-hfe-letter",
+    "topic": "HFE letter",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/application-for-an-hdb-flat-eligibility-hfe-letter"
+  },
+  {
+    "slug": "hdb-resale-mode-of-financing",
+    "topic": "Remaining lease / CPF / HDB loan for resale",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/mode-of-financing"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-conditions-after-buying-a-new-flat",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/conditions-after-buying-a-new-flat"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-design-features",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/design-features"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-standard-plus-and-prime-housing-f",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/standard-plus-and-prime-housing-framework"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-finding-a-new-flat-types-of-flats",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats"
+  },
+  {
+    "slug": "hdb-finding-a-new-flat-types-of-flats-community-care-apartments",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats/community-care-apartments"
+  },
+  {
+    "slug": "hdb-finding-a-new-flat-types-of-flats-shortlease-2room-flexi-flat",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/finding-a-new-flat/types-of-flats/shortlease-2room-flexi-flat"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-application",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-new-flat-application-frequently-asked-questions-on-sales-exercise",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/frequently-asked-questions-on-sales-exercises"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-new-flat-application-fresh-start-housing-scheme",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/fresh-start-housing-scheme"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-new-flat-application-priority-schemes",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/application/priority-schemes"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-booking-of-flat",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/booking-of-flat"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-key-collection",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/key-collection"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-modes-of-sales",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/modes-of-sales"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-overview",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/overview"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-new-flat-overview-plan-finances",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/overview/plan-finances"
+  },
+  {
+    "slug": "hdb-bto-sbf-and-open-booking-of-flats-process-for-buying-a-new-flat-sign-agreement-for-lea",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/sign-agreement-for-lease"
+  },
+  {
+    "slug": "hdb-executive-condominiums",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums"
+  },
+  {
+    "slug": "hdb-executive-condominiums-conditions-after-buying-an-ec",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/conditions-after-buying-an-ec"
+  },
+  {
+    "slug": "hdb-executive-condominiums-cpf-housing-grant",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/cpf-housing-grant"
+  },
+  {
+    "slug": "hdb-executive-condominiums-eligibility",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/eligibility"
+  },
+  {
+    "slug": "hdb-executive-condominiums-finding-an-ec",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/finding-an-ec"
+  },
+  {
+    "slug": "hdb-executive-condominiums-process-for-buying-an-ec",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/executive-condominiums/process-for-buying-an-ec"
+  },
+  {
+    "slug": "hdb-financial-planning-for-a-flat-purchase",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase"
+  },
+  {
+    "slug": "hdb-financial-planning-for-a-flat-purchase-ability-to-pay",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/ability-to-pay"
+  },
+  {
+    "slug": "hdb-financial-planning-for-a-flat-purchase-budget-for-a-flat",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/budget-for-a-flat"
+  },
+  {
+    "slug": "hdb-financial-planning-for-a-flat-purchase-credit-to-finance-a-flat-purchase",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/credit-to-finance-a-flat-purchase"
+  },
+  {
+    "slug": "hdb-flat-grant-and-loan-eligibility",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility"
+  },
+  {
+    "slug": "hdb-flat-grant-and-loan-eligibility-application-for-an-hdb-flat-eligibility-hfe-letter-inc",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/application-for-an-hdb-flat-eligibility-hfe-letter/income-guidelines-and-documents"
+  },
+  {
+    "slug": "hdb-flat-grant-and-loan-eligibility-couples-and-families-stepup-cpf-housing-grant",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/stepup-cpf-housing-grant"
+  },
+  {
+    "slug": "hdb-flat-grant-and-loan-eligibility-housing-loan",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan"
+  },
+  {
+    "slug": "hdb-flat-grant-and-loan-eligibility-housing-loan-housing-loan-from-financial-institutions",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-financial-institutions"
+  },
+  {
+    "slug": "hdb-flat-grant-and-loan-eligibility-housing-loan-housing-loan-from-hdb",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-hdb"
+  },
+  {
+    "slug": "hdb-flat-grant-and-loan-eligibility-seniors",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/seniors"
+  },
+  {
+    "slug": "hdb-flat-grant-and-loan-eligibility-singles-proximity-housing-grant",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/proximity-housing-grant"
+  },
+  {
+    "slug": "hdb-resale-flats",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats"
+  },
+  {
+    "slug": "hdb-resale-flats-conditions-after-buying-a-resale-flat",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/conditions-after-buying-a-resale-flat"
+  },
+  {
+    "slug": "hdb-resale-flats-finding-a-resale-flat",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/finding-a-resale-flat"
+  },
+  {
+    "slug": "hdb-resale-flats-process-for-buying-a-resale-flat",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat"
+  },
+  {
+    "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-option-to-purchase",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/option-to-purchase"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-resale-flat-option-to-purchase-request-for-value",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/option-to-purchase/request-for-value"
+  },
+  {
+    "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-overview",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/overview"
+  },
+  {
+    "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-application",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-application-application-process",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/application-process"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-application-approval-of-application",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/approval-of-application"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-application-request-for-enhanced-contra-f",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-application/request-for-enhanced-contra-facility"
+  },
+  {
+    "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-completion",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-completion"
+  },
+  {
+    "slug": "hdb-resale-flats-process-for-buying-a-resale-flat-resale-flat-planning",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-planning-eip-and-spr-quota",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/eip-and-spr-quota"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-planning-managing-the-flat-purchase",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/managing-the-flat-purchase"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-planning-overview",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/overview"
+  },
+  {
+    "slug": "hdb-process-for-buying-a-resale-flat-resale-flat-planning-resale-seminars",
+    "topic": "scope:sitemap",
+    "url": "https://www.hdb.gov.sg/buying-a-flat/resale-flats/process-for-buying-a-resale-flat/resale-flat-planning/resale-seminars"
+  },
+  {
+    "slug": "mnh-hdb-buying-guide",
+    "topic": "scope:sitemap",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide/"
+  },
+  {
+    "slug": "mnh-hdb-bto-sbf-buying-guide",
+    "topic": "scope:sitemap",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-bto-sbf-buying-guide/"
+  },
+  {
+    "slug": "mnh-hdb-bto-sales-launch",
+    "topic": "scope:sitemap",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-bto-sales-launch/"
+  },
+  {
+    "slug": "mnh-hdb-flat-types-classification-guide",
+    "topic": "scope:sitemap",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-flat-types-classification-guide/"
+  },
+  {
+    "slug": "mnh-hdb-priority-schemes-guide",
+    "topic": "scope:sitemap",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-priority-schemes-guide/"
+  },
+  {
+    "slug": "mnh-hdb-buying-guide-seniors",
+    "topic": "scope:sitemap",
+    "url": "https://www.mynicehome.gov.sg/get-started/hdb-buying-guide-seniors/"
+  },
+  {
+    "slug": "cpf-home-ownership",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership"
+  },
+  {
+    "slug": "cpf-home-ownership-using-your-cpf-to-buy-a-home-apply-to-use-cpf-for-your-property",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/apply-to-use-cpf-for-your-property"
+  },
+  {
+    "slug": "cpf-home-ownership-using-your-cpf-to-buy-a-home-cpf-refund-when-selling-or-transferring-pr",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/cpf-refund-when-selling-or-transferring-property"
+  },
+  {
+    "slug": "cpf-home-ownership-using-your-cpf-to-buy-a-home-retain-20000-in-your-oa-if-you-are-taking-",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/using-your-cpf-to-buy-a-home/retain-20000-in-your-oa-if-you-are-taking-a-housing-loan"
+  },
+  {
+    "slug": "cpf-home-ownership-protecting-against-losing-your-home",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home"
+  },
+  {
+    "slug": "cpf-home-ownership-protecting-against-losing-your-home-claiming-under-the-home-protection-",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home/claiming-under-the-home-protection-scheme"
+  },
+  {
+    "slug": "cpf-home-ownership-protecting-against-losing-your-home-single-premium-home-protection-sche",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/protecting-against-losing-your-home/single-premium-home-protection-scheme-cover"
+  },
+  {
+    "slug": "cpf-home-ownership-home-buying-guide-for-members-below-55",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-below-55"
+  },
+  {
+    "slug": "cpf-home-ownership-home-buying-guide-for-members-below-55-housing-case-study",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-below-55/housing-case-study"
+  },
+  {
+    "slug": "cpf-home-ownership-home-buying-guide-for-members-above-55",
+    "topic": "scope:sitemap",
+    "url": "https://www.cpf.gov.sg/member/home-ownership/home-buying-guide-for-members-above-55"
+  }
+]

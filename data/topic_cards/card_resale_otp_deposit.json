@@ -1,0 +1,19 @@
+{
+  "card_id": "CARD_RESALE_OTP_DEPOSIT",
+  "topic_name": "Resale Option to Purchase (OTP) and deposit",
+  "trigger_conditions": {},
+  "required_fields": [
+    "has_hfe_letter",
+    "stage_of_purchase"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_LEASE_07",
+    "CHUNK_RESALE_41",
+    "CHUNK_RESALE_44",
+    "CHUNK_RESALE_45",
+    "CHUNK_RESALE_52",
+    "CHUNK_RESALE_53"
+  ],
+  "question_template": "At the {stage_of_purchase} stage of buying a resale flat (HFE letter obtained: {has_hfe_letter}), what are the Option Fee and Option Exercise Fee rules and what happens next?",
+  "snapshot_date": "2026-10-15"
+}

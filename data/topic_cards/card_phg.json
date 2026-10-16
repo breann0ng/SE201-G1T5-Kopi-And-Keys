@@ -1,0 +1,26 @@
+{
+  "card_id": "CARD_PHG",
+  "topic_name": "Proximity Housing Grant (PHG)",
+  "trigger_conditions": {
+    "citizenship": [
+      "SC/SC",
+      "SC/SPR",
+      "SC_single"
+    ]
+  },
+  "required_fields": [
+    "citizenship",
+    "household_type",
+    "lives_with_or_near_parents_or_child",
+    "distance_to_parents_or_child"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_PHG_01",
+    "CHUNK_PHG_03",
+    "CHUNK_PHG_04",
+    "CHUNK_PHG_06",
+    "CHUNK_PHG_09"
+  ],
+  "question_template": "For a {household_type} household with citizenship {citizenship} that will {lives_with_or_near_parents_or_child} their parents/ child, at a distance of {distance_to_parents_or_child}, does the Proximity Housing Grant apply, and which amount is stated?",
+  "snapshot_date": "2026-10-15"
+}

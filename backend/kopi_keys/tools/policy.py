@@ -26,6 +26,7 @@ class DemoPolicyRetriever:
             ),
             source_url="demo://condition" if related else "demo://programme",
             effective_date=date(2000, 1, 1),
+            verified_on=date(2000, 1, 1),
             snapshot_id="fictional-demo-v1",
         )
         return [passage][:limit]

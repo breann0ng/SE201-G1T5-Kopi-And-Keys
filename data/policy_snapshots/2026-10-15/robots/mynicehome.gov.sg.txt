@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+Disallow: /search
+
+Sitemap: https://www.mynicehome.gov.sg/sitemap.xml

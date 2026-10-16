@@ -1,0 +1,26 @@
+{
+  "card_id": "CARD_SINGLES_GRANT",
+  "topic_name": "CPF Housing Grant for Resale Flats (Singles)",
+  "trigger_conditions": {
+    "household_type": [
+      "single"
+    ],
+    "citizenship": [
+      "SC_single",
+      "SC/NR"
+    ]
+  },
+  "required_fields": [
+    "citizenship",
+    "age",
+    "first_timer",
+    "household_income",
+    "flat_type"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_SINGLES_01",
+    "CHUNK_SINGLES_03"
+  ],
+  "question_template": "For a single applicant with citizenship {citizenship}, aged {age}, first-timer status {first_timer} and average gross monthly income of {household_income}, buying a {flat_type} resale flat, does the Singles Grant apply, and what amount is stated?",
+  "snapshot_date": "2026-10-15"
+}

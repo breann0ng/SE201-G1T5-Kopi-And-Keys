@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Favicon: K with the coral key from the Kopi & Keys logo. -->
+  <rect width="64" height="64" rx="14" fill="#1f2a4a"/>
+  <path d="M16 12v40M16 34l18-22M22 28l14 24" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="43" cy="22" r="6" fill="none" stroke="#e3787a" stroke-width="4.5"/>
+  <path d="M47 27l9 12m-4-5l-4 3" fill="none" stroke="#e3787a" stroke-width="5" stroke-linecap="round"/>
+</svg>
