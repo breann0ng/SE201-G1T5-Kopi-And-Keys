@@ -1,4 +1,4 @@
-from kopi_keys.components.policy_retrieval import DemoPolicyRetriever
+from fakes import FictionalRetriever
 from kopi_keys.components.synthesiser import SynthesisResult, Synthesiser
 from kopi_keys.graph import build_graph, run_graph
 from kopi_keys.schemas import ChatRequest, Claim, Draft, PriceFilters, PriceResult, Suggestion
@@ -21,7 +21,7 @@ class ScriptedSynthesiser:
 
 def graph(synthesiser=None, retriever=None, price_tool=None):
     return build_graph(
-        retriever=retriever or DemoPolicyRetriever(),
+        retriever=retriever or FictionalRetriever(),
         price_tool=price_tool,
         synthesiser=synthesiser or Synthesiser(engine=None),
         cards=[],
@@ -76,7 +76,7 @@ def test_persistent_unknown_citation_is_never_shown():
 def test_superseded_source_is_rejected():
     class OldAndNewRetriever:
         def search(self, query, limit=5):
-            current = DemoPolicyRetriever().search("demo programme")[0]
+            current = FictionalRetriever().search("demo programme")[0]
             old = current.model_copy(update={"id": "demo-old", "superseded": True})
             return [current, old]
 

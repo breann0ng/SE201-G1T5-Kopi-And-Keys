@@ -1,12 +1,13 @@
 from fastapi.testclient import TestClient
 
+from fakes import FictionalRetriever
 from kopi_keys.components.synthesiser import Synthesiser
 from kopi_keys.graph import build_graph
 from kopi_keys.main import create_app
 
 
 def client():
-    return TestClient(create_app(build_graph(synthesiser=Synthesiser(engine=None), cards=[])))
+    return TestClient(create_app(build_graph(retriever=FictionalRetriever(), synthesiser=Synthesiser(engine=None), cards=[])))
 
 
 def test_health_and_policy_answer():
