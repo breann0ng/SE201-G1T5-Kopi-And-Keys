@@ -1,0 +1,20 @@
+{
+  "card_id": "CARD_LEASE_ELIGIBILITY",
+  "topic_name": "Remaining lease, CPF usage and HDB loan for older resale flats",
+  "trigger_conditions": {},
+  "required_fields": [
+    "remaining_lease",
+    "age",
+    "intends_to_use_cpf",
+    "loan_type"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_LEASE_11",
+    "CHUNK_LEASE_15",
+    "CHUNK_LEASE_01",
+    "CHUNK_LEASE_02",
+    "CHUNK_LEASE_04"
+  ],
+  "question_template": "For a resale flat with remaining lease of {remaining_lease}, where the youngest buyer is aged {age}, using CPF: {intends_to_use_cpf}, with a {loan_type} loan, how much CPF can be used and does the remaining lease cover the youngest buyer as required?",
+  "snapshot_date": "2026-10-15"
+}

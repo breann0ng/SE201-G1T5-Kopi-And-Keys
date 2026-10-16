@@ -1,0 +1,28 @@
+{
+  "card_id": "CARD_FAMILY_GRANT",
+  "topic_name": "CPF Housing Grant for Resale Flats (Families)",
+  "trigger_conditions": {
+    "household_type": [
+      "couple_family",
+      "fiance"
+    ],
+    "citizenship": [
+      "SC/SC",
+      "SC/SPR"
+    ]
+  },
+  "required_fields": [
+    "citizenship",
+    "household_type",
+    "first_timer",
+    "household_income",
+    "flat_type"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_FAMILY_06",
+    "CHUNK_FAMILY_04",
+    "CHUNK_FAMILY_01"
+  ],
+  "question_template": "For a {household_type} household with citizenship {citizenship}, first-timer status {first_timer} and average gross monthly household income of {household_income}, buying a {flat_type} resale flat, does the CPF Housing Grant for Resale Flats (Families) apply, and what amount is stated for this citizenship and flat type?",
+  "snapshot_date": "2026-10-15"
+}

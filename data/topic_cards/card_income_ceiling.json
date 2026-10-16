@@ -1,0 +1,19 @@
+{
+  "card_id": "CARD_INCOME_CEILING",
+  "topic_name": "Income Ceiling Check",
+  "trigger_conditions": {},
+  "required_fields": [
+    "household_type",
+    "household_income",
+    "scheme_of_interest"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_FAMILY_04",
+    "CHUNK_SINGLES_03",
+    "CHUNK_INCOME_01",
+    "CHUNK_INCOME_03",
+    "CHUNK_LOAN_28"
+  ],
+  "question_template": "For a {household_type} household with average gross monthly household income of {household_income}, which income ceiling applies to {scheme_of_interest}, and is the household within it?",
+  "snapshot_date": "2026-10-15"
+}

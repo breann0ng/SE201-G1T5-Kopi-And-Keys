@@ -57,7 +57,12 @@ class PolicyPassage(Contract):
     title: str
     text: str
     source_url: str
-    effective_date: date
+    # Only when the source states one; never derived from verified_on.
+    effective_date: date | None = None
+    # Snapshot date: when this text was last seen on the live official page.
+    verified_on: date
+    # The page's own "Last updated ..." line, verbatim, if it prints one.
+    page_last_updated: str | None = None
     snapshot_id: str
     superseded: bool = False
 

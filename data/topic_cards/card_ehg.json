@@ -1,0 +1,32 @@
+{
+  "card_id": "CARD_EHG",
+  "topic_name": "Enhanced CPF Housing Grant (EHG)",
+  "trigger_conditions": {
+    "first_timer": [
+      "true"
+    ],
+    "citizenship": [
+      "SC/SC",
+      "SC/SPR",
+      "SC/NR",
+      "SC_single"
+    ]
+  },
+  "required_fields": [
+    "citizenship",
+    "household_type",
+    "first_timer",
+    "age",
+    "household_income"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_EHG_29",
+    "CHUNK_EHG_31",
+    "CHUNK_EHG_19",
+    "CHUNK_EHG_07",
+    "CHUNK_EHG_09",
+    "CHUNK_EHG_11"
+  ],
+  "question_template": "For a {household_type} household with citizenship {citizenship}, first-timer status {first_timer}, youngest applicant aged {age} and average gross monthly household income of {household_income}, is the household eligible for the Enhanced CPF Housing Grant, and which EHG amount applies?",
+  "snapshot_date": "2026-10-15"
+}

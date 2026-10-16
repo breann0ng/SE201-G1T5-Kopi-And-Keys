@@ -1,0 +1,25 @@
+{
+  "card_id": "CARD_EIP_SPR_QUOTA",
+  "topic_name": "Ethnic Integration Policy (EIP) and SPR quota",
+  "trigger_conditions": {
+    "citizenship": [
+      "SC/SPR",
+      "SPR/SPR"
+    ]
+  },
+  "required_fields": [
+    "citizenship",
+    "ethnic_group",
+    "town",
+    "block"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_EIP_01",
+    "CHUNK_EIP_02",
+    "CHUNK_EIP_03",
+    "CHUNK_EIP_04",
+    "CHUNK_EIP_05"
+  ],
+  "question_template": "For a household with citizenship {citizenship} and ethnic group {ethnic_group}, buying a resale flat in block {block}, {town}, do the EIP and SPR quotas allow the purchase?",
+  "snapshot_date": "2026-10-15"
+}

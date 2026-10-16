@@ -32,10 +32,9 @@ The editable install (`pip install -e`) is required: without it, imports of
 
 Example `POST /chat` requests:
 
-- `{"message": "What is the demo grant policy?"}` retrieves a fictional demo
-  passage and returns a cited answer.
+- `{"message": "How long is an HFE letter valid?"}` retrieves passages from the
+  official policy snapshot and returns a cited answer (needs Ollama running).
 - `{"message": "What is the resale price?"}` asks for the missing town and flat type.
-- `{"message": "What grants can we get?"}` abstains: no official policy evidence is loaded yet.
 - `{"message": "Tell me a joke."}` abstains as out of scope.
 
 Each response includes its `route` and a `trace` of the nodes that ran.
@@ -84,7 +83,7 @@ backend/kopi_keys/
   cli.py                Run one SQL price result through the full graph
   components/
     query_router.py     Query Router: classify, extract filters, validate
-    policy_retrieval.py Policy Retrieval Tool (demo retriever for now)
+    policy_retrieval.py Policy Retrieval Tool (keyword search over the policy snapshot; embeddings later)
     price_query.py      Price Query Tool (not connected yet)
     topic_cards.py      Topic cards for discovery (placeholder)
     synthesiser.py      Synthesiser Agent (also covers discovery wording)

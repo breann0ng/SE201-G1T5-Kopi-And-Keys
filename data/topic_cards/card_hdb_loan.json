@@ -1,0 +1,21 @@
+{
+  "card_id": "CARD_HDB_LOAN",
+  "topic_name": "HDB housing loan eligibility",
+  "trigger_conditions": {},
+  "required_fields": [
+    "citizenship",
+    "household_type",
+    "household_income",
+    "age"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_LOAN_26",
+    "CHUNK_LOAN_28",
+    "CHUNK_LOAN_29",
+    "CHUNK_LOAN_30",
+    "CHUNK_LOAN_31",
+    "CHUNK_LOAN_32"
+  ],
+  "question_template": "For a {household_type} household with citizenship {citizenship}, average gross monthly household income of {household_income} and average applicant age {age}, is the household eligible for an HDB housing loan, and what loan tenure and amount rules apply?",
+  "snapshot_date": "2026-10-15"
+}

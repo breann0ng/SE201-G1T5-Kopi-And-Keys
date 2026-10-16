@@ -1,0 +1,8 @@
+"No. of Previous Unsuccessful BTO Applications for Standard
+            Flats",Typical Ballot Chances,"Additional Ballot Chances ( + 1 for every BTO application for a Standard flat after 2
+            unsuccessful BTO applications for Standard flats)",Total Ballot Chances
+FT(PMC),Non-FT(PMC),FT(PMC),Non-FT(PMC)
+(a),(b),(c),(a) + (c),(b) + (c)
+0 or 1,3,2,0,3,2
+2,3,2,1,4,3
+3 or more,3,2,2,5,4

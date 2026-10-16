@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* Dark mode follows data-theme on <html> ("light" | "dark"); "system" sets it from the OS. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Palette from the Kopi & Keys logo: navy (primary), coral (key/accents), kopi brown. */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Baloo 2", ui-rounded, system-ui, sans-serif;
+  --color-brand-50: #eef0f6;
+  --color-brand-100: #d6dbe8;
+  --color-brand-200: #aab3cc;
+  --color-brand-500: #1f2a4a;
+  --color-brand-600: #18213d;
+  --color-brand-700: #111830;
+  --color-coral-50: #fdf1f1;
+  --color-coral-300: #f0a9aa;
+  --color-coral-500: #e3787a;
+  --color-coral-600: #d65f62;
+  --color-kopi-500: #9a6142;
+}
+
+/* Logo-only colours: on dark backgrounds the navy parts switch to a light tint so they stay
+   visible, and "white" fills (cup, window) take the page background. */
+:root {
+  --logo-navy: #1f2a4a;
+  --logo-bg: #ffffff;
+}
+[data-theme="dark"] {
+  --logo-navy: #c9d0e3;
+  --logo-bg: #0b1222;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-white text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+}

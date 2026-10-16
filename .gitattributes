@@ -1,0 +1,3 @@
+# Raw policy snapshots are evidence: keep their bytes exactly as downloaded so the
+# sha256 values in each manifest.json stay valid (no CRLF/LF conversion on Windows).
+data/policy_snapshots/**/raw/** -text

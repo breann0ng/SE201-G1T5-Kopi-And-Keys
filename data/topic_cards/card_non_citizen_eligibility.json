@@ -1,0 +1,28 @@
+{
+  "card_id": "CARD_NON_CITIZEN_ELIGIBILITY",
+  "topic_name": "Eligibility for PR and non-citizen households",
+  "trigger_conditions": {
+    "citizenship": [
+      "SC/SPR",
+      "SPR/SPR",
+      "SC/NR",
+      "foreigner_only"
+    ]
+  },
+  "required_fields": [
+    "citizenship",
+    "household_type",
+    "age",
+    "spouse_pass_type"
+  ],
+  "supporting_chunk_ids": [
+    "CHUNK_ELIG_24",
+    "CHUNK_ELIG_58",
+    "CHUNK_ELIG_62",
+    "CHUNK_ELIG_21",
+    "CHUNK_ELIG_25",
+    "CHUNK_ELIG_28"
+  ],
+  "question_template": "For a {household_type} household with citizenship {citizenship}, applicant aged {age}, and (if applicable) a non-resident spouse holding {spouse_pass_type}, can the household buy a resale flat, and which conditions apply?",
+  "snapshot_date": "2026-10-15"
+}

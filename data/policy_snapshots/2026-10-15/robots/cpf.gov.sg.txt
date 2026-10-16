@@ -1,0 +1,17 @@
+User-agent: *
+Disallow: /content/dam/web/edm/
+Disallow: /content/dam/web/videos/
+Disallow: /content/web/sg/en/member/logout
+Disallow: /content/web/sg/en/member/login/qr-code
+Disallow: /content/web/sg/en/member/login/qr-code
+Disallow: /content/web/sg/en/member/ds/statements/contribution-history
+Disallow: /member/ds/statements/contribution-history
+Disallow: /memberservices
+Disallow: /memberservices/
+Disallow: /memberservices2
+Disallow: /memberservices2/
+Disallow: /memberservices2/eservices/bff/
+
+Sitemap: https://www.cpf.gov.sg/sitemap.xml
+
+Sitemap: https://www.cpf.gov.sg/service/sitemap.xml

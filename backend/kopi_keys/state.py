@@ -43,7 +43,7 @@ class GraphState(Contract):
     price_result: PriceResult | None = None
     price_error: str | None = None
 
-    # Topic cards (placeholder; matched in code, worded by the Synthesiser)
+    # Topic cards (matched in code by components/topic_cards.py, worded by the Synthesiser)
     candidate_card_ids: list[str] = Field(default_factory=list)
 
     # Synthesiser Agent
