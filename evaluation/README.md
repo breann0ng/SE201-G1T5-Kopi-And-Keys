@@ -9,7 +9,7 @@ Owner: Person 4. The labels need a second team member's review before held-out r
 
 | | Breann (`main`) | This folder |
 |---|---|---|
-| Questions | `data/evaluation/development/`: 30 dev questions and the Stage 1 router labels | `questions.json`: 50 questions (30 dev, 20 held-out) with verbatim evidence tied to chunk IDs |
+| Questions | `data/evaluation/development/`: 30 dev questions and the Stage 1 router labels | `questions.json`: 30 dev questions with verbatim evidence tied to chunk IDs; 20 held-out questions kept privately (see below) |
 | Runner | `backend/kopi_keys/evaluation/run_eval.py`: placeholder, not built yet | `run_eval.py`: working |
 | Metrics / baselines | `backend/kopi_keys/evaluation/metrics.py`, `baselines.py`: starters | inside `run_eval.py` (discovery metrics, BM25 baseline) |
 
@@ -40,7 +40,13 @@ Use a single runner. This folder's `run_eval.py` would fill in the placeholder a
 | unanswerable | 8 | 4 | 4 |
 | **Total** | **50** | **30** | **20** |
 
-- **Held-out split:** it only runs with `--final`. Don't look at it while iterating.
+- **Held-out split (private, since 2026-10-16):** the 20 held-out questions are not in the repo. They live in
+  `evaluation/held-out/questions.json`, which the repo's `held-out/` ignore rule keeps out of Git, or in any folder
+  named by `KOPI_HELDOUT_DIR`. The evaluation owner shares the file privately (not through GitHub).
+  `build_eval_set.py` resolves it into `<held-out dir>/eval_set.jsonl` when present; `run_eval.py --split heldout --final`
+  reads it from there. Use it only for final reported results. Don't look at it while iterating.
+  They were committed earlier in this branch's history (moved out after PR #3 review), so treat them as seen by
+  anyone who read that history; nobody should tune on them.
 - **Price questions:** ground truth is computed at evaluation time by an independent SQL query on the same filters. Confirm the "recently = last 6 complete months" convention with Person 2.
 - **Policy changed:** 4 of 6 have both values from official text:
   - **EHG for families:** $80,000 → $120,000. The old value is from the MND & HDB 2024 press release in the proposal.
@@ -74,4 +80,4 @@ These are baselines, not results to report.
 ## Not done here
 
 - **LLM-judged metrics** (faithfulness, answer relevance): these need a judge model. `--api` writes `results/*_ragas.jsonl` (question, answer, contexts, ground_truth), ready for Ragas or TruLens once the team picks a judge (e.g. a local Ollama model). Ragas isn't installed to keep dependencies light.
-- **Explicit routing:** routing is inferred from the response `trace` until the backend returns its route.
+- **Routing labels:** `expected_route` uses the backend's `schemas.Route` labels (`policy`, `price`, `mixed`, `discovery`, `abstain`), and `run_eval.py` compares them with the response's `route` field. Changed 2026-10-16 after PR review: the old trace search looked for `price:` but the graph writes `price_query:`.

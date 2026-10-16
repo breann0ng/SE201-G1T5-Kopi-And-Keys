@@ -5,11 +5,16 @@ build fails if a quote is missing, so every expected passage is traceable to
 official text. Rebuild after a new snapshot goes live: chunk IDs may change,
 the quotes should not.
 
+Held-out questions are private: they live in evaluation/held-out/questions.json
+(gitignored), or in the folder named by KOPI_HELDOUT_DIR. When present they are
+resolved into <held-out dir>/eval_set.jsonl; the committed eval_set.jsonl is dev only.
+
 Usage: python evaluation/build_eval_set.py
 """
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from collections import Counter
@@ -23,6 +28,8 @@ sys.path.insert(0, str(ROOT / "backend"))
 from kopi_keys.topic_cards import load_cards  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
+# Private held-out set (gitignored by the repo's `held-out/` rule), or a folder outside the repo.
+HELDOUT_DIR = Path(os.environ.get("KOPI_HELDOUT_DIR", HERE / "held-out"))
 CATEGORY_COUNTS = {"policy": 12, "price": 10, "mixed": 8, "discovery": 6, "policy_changed": 6, "unanswerable": 8}
 DEV_COUNTS = {"policy": 7, "price": 6, "mixed": 5, "discovery": 4, "policy_changed": 4, "unanswerable": 4}
 
@@ -48,7 +55,8 @@ class Question(BaseModel):
     split: Literal["dev", "heldout"]
     question: str = Field(min_length=5)
     profile: dict[str, Any]
-    expected_route: Literal["policy", "price", "mixed", "unsupported"]
+    # Same labels as backend schemas.Route (minus "clarify"), so run_eval compares them directly.
+    expected_route: Literal["policy", "price", "mixed", "discovery", "abstain"]
     should_abstain: bool
     expected_answer: str | None = None
     evidence: list[Evidence] = []
@@ -65,6 +73,11 @@ class Question(BaseModel):
 
 def main() -> int:
     spec = json.loads((HERE / "questions.json").read_text(encoding="utf-8"))
+    committed = list(spec["questions"])
+    heldout_path = HELDOUT_DIR / "questions.json"
+    has_heldout = heldout_path.exists()
+    if has_heldout:
+        spec["questions"] = committed + json.loads(heldout_path.read_text(encoding="utf-8"))["questions"]
     active = (ROOT / "data" / "policy_snapshots" / "ACTIVE").read_text(encoding="utf-8").strip()
     chunks = [json.loads(ln) for ln in (ROOT / "data" / "policy_chunks" / active / "chunks.jsonl")
               .read_text(encoding="utf-8").splitlines()]
@@ -106,7 +119,7 @@ def main() -> int:
             problems.append(f"{q.id}: price question without price_filters")
         if q.category == "discovery" and not q.expected_cards:
             problems.append(f"{q.id}: discovery question without expected_cards")
-        if q.should_abstain != (q.expected_route == "unsupported"):
+        if q.should_abstain != (q.expected_route == "abstain"):
             problems.append(f"{q.id}: should_abstain inconsistent with expected_route")
         out.append({**q.model_dump(exclude_none=True), "expected_chunk_ids": chunk_ids, "snapshot_date": active})
 
@@ -115,7 +128,11 @@ def main() -> int:
         problems.append("duplicate question ids")
     cats = Counter(r["category"] for r in out)
     devs = Counter(r["category"] for r in out if r["split"] == "dev")
-    if dict(cats) != CATEGORY_COUNTS:
+    if any(q.get("split") == "heldout" for q in committed):
+        problems.append("held-out questions must not be in the committed evaluation/questions.json")
+    if not has_heldout:
+        print(f"note: no held-out file at {heldout_path}; building the dev split only")
+    elif dict(cats) != CATEGORY_COUNTS:
         problems.append(f"category counts {dict(cats)} != {CATEGORY_COUNTS}")
     if dict(devs) != DEV_COUNTS:
         problems.append(f"dev split {dict(devs)} != {DEV_COUNTS} (30 dev / 20 heldout, stratified)")
@@ -129,10 +146,15 @@ def main() -> int:
         for p in problems:
             print("  - " + p)
         return 1
-    with (HERE / "eval_set.jsonl").open("w", encoding="utf-8", newline="\n") as f:
-        for r in out:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
-    print(f"wrote {HERE / 'eval_set.jsonl'}")
+    targets = [(HERE / "eval_set.jsonl", "dev")]
+    if has_heldout:
+        targets.append((HELDOUT_DIR / "eval_set.jsonl", "heldout"))
+    for path, split in targets:
+        with path.open("w", encoding="utf-8", newline="\n") as f:
+            for r in out:
+                if r["split"] == split:
+                    f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        print(f"wrote {path}")
     return 0
 
 

@@ -11,8 +11,8 @@ Metrics (targets from proposal Appendix E):
   retrieval Recall@5 (>= 85%)                                             [policy, mixed, policy_changed]
   end-to-end (--api): routing accuracy (>= 90%), unsafe answering (<= 5%), over-abstention (<= 10%),
                       uncited answers (0), staleness errors (0%)
-Routing is inferred from the response trace ("retrieval:" -> policy, "price:" -> price) until the
-backend returns an explicit route.
+Routing uses the response's explicit `route` field (backend schemas.Route); expected_route in
+questions.json uses the same labels.
 
 LLM-judged metrics (faithfulness, answer relevance) need a judge model: --api also writes a
 Ragas-format JSONL (question, answer, contexts, ground_truth) for scoring later with Ragas/TruLens.
@@ -23,6 +23,7 @@ import argparse
 import importlib
 import json
 import math
+import os
 import re
 import sys
 from collections import Counter
@@ -38,12 +39,21 @@ PROFILE_FIELDS = ("citizenship", "age", "household_income", "first_timer")  # Bu
 TOKEN = re.compile(r"[a-z0-9$%]+(?:[.,][0-9]+)*")
 
 
+# Private held-out set (gitignored), or a folder outside the repo; see build_eval_set.py.
+HELDOUT_DIR = Path(os.environ.get("KOPI_HELDOUT_DIR", HERE / "held-out"))
+
+
 def load_items(split: str) -> list[dict]:
-    path = HERE / "eval_set.jsonl"
-    if not path.exists():
-        raise SystemExit("Run evaluation/build_eval_set.py first.")
-    items = [json.loads(ln) for ln in path.read_text(encoding="utf-8").splitlines()]
-    return [i for i in items if split == "all" or i["split"] == split]
+    """Dev items come from the committed eval_set.jsonl, held-out items from the private folder."""
+    paths = {"dev": [HERE / "eval_set.jsonl"], "heldout": [HELDOUT_DIR / "eval_set.jsonl"]}
+    paths["all"] = paths["dev"] + paths["heldout"]
+    items = []
+    for path in paths[split]:
+        if not path.exists():
+            hint = " Held-out questions are private: ask the evaluation owner." if path.parent == HELDOUT_DIR else ""
+            raise SystemExit(f"{path} not found. Run evaluation/build_eval_set.py first.{hint}")
+        items += [json.loads(ln) for ln in path.read_text(encoding="utf-8").splitlines()]
+    return items
 
 
 def pct(n: int, d: int) -> str:
@@ -124,16 +134,9 @@ def eval_retrieval(items: list[dict], retriever, k: int = 5) -> dict:
 
 # ---------------- end to end ----------------
 
-def infer_route(resp: dict) -> str:
-    trace = " ".join(resp.get("trace", []))
-    policy, price = "retrieval:" in trace, "price:" in trace
-    if policy and price:
-        return "mixed"
-    if price:
-        return "price"
-    if policy:
-        return "policy"
-    return "unsupported"
+def response_route(resp: dict) -> str | None:
+    """The route the backend reports (schemas.Route), e.g. "price" or "abstain"."""
+    return resp.get("route")
 
 
 def eval_api(items: list[dict], api: str, out_stem: Path) -> dict:
@@ -153,7 +156,7 @@ def eval_api(items: list[dict], api: str, out_stem: Path) -> dict:
             text = resp.get("message", "")
             row = {
                 "id": it["id"], "category": it["category"], "status": resp["status"],
-                "route": infer_route(resp), "expected_route": it["expected_route"],
+                "route": response_route(resp), "expected_route": it["expected_route"],
                 "unsafe": it["should_abstain"] and not abstained,
                 "over_abstained": not it["should_abstain"] and abstained,
                 "uncited": resp["status"] == "answered" and not resp.get("citations") and not resp.get("price_result"),
@@ -166,8 +169,8 @@ def eval_api(items: list[dict], api: str, out_stem: Path) -> dict:
                               "contexts": [c.get("text", "") for c in resp.get("citations", [])],
                               "ground_truth": it.get("expected_answer", "")})
     ok = [r for r in rows if "error" not in r]
-    should_abstain = [r for r in ok if r["expected_route"] == "unsupported"]
-    answerable = [r for r in ok if r["expected_route"] != "unsupported"]
+    should_abstain = [r for r in ok if r["expected_route"] == "abstain"]
+    answerable = [r for r in ok if r["expected_route"] != "abstain"]
     changed = [r for r in ok if r["category"] == "policy_changed"]
     ragas_path = out_stem.with_name(out_stem.name + "_ragas.jsonl")
     ragas_path.write_text("".join(json.dumps(x, ensure_ascii=False) + "\n" for x in ragas), encoding="utf-8")
