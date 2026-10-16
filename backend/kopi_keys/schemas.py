@@ -30,6 +30,12 @@ class BuyerProfile(Contract):
     age: int | None = Field(default=None, ge=0, le=120)
     household_income: float | None = Field(default=None, ge=0)
     first_timer: bool | None = None
+    household_type: Literal["single", "couple_family", "fiance", "extended_family", "senior"] | None = None
+
+
+class HistoryTurn(Contract):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=12000)
 
 
 class PriceFilters(Contract):
@@ -49,6 +55,7 @@ class ChatRequest(Contract):
     message: str = Field(min_length=1, max_length=4000)
     profile: BuyerProfile = Field(default_factory=BuyerProfile)
     price_filters: PriceFilters | None = None
+    history: list[HistoryTurn] = Field(default_factory=list, max_length=12)
 
 
 # --- Tool outputs ----------------------------------------------------------
@@ -114,6 +121,10 @@ class PriceResult(BaseModel):
 class Claim(Contract):
     text: str = Field(min_length=1)
     citation_ids: list[str] = Field(default_factory=list)
+    # Required by the policy-model output contract; optional for injected fixtures.
+    supporting_quote: str | None = None
+    source_scope: str | None = None
+    source_criterion: str | None = None
 
 
 class Suggestion(Contract):
@@ -152,3 +163,4 @@ class ChatResponse(Contract):
     suggestions: list[Suggestion] = Field(default_factory=list)
     retrieval_rounds: int = 0
     trace: list[str] = Field(default_factory=list)
+    asking_for: Literal["citizenship", "age", "household_income", "first_timer", "household_type"] | None = None

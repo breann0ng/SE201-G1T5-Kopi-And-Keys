@@ -1,3 +1,7 @@
 # Raw policy snapshots are evidence: keep their bytes exactly as downloaded so the
 # sha256 values in each manifest.json stay valid (no CRLF/LF conversion on Windows).
 data/policy_snapshots/**/raw/** -text
+
+# Shared resale CSV: keep bytes exact so its sha256 (stored in hdb_prices.db and
+# used in price query IDs) is identical on every machine.
+data/raw/2017-onwards-resale-prices.csv -text

@@ -1,0 +1,105 @@
+# Policy advisor and conversation handling
+
+The API uses the ACTIVE official policy snapshot and local CPU Ollama. The model
+remains `qwen2.5:3b`; these changes fix routing and integration before comparing
+larger models. The resale price formatter and its numeric verifier retain their
+existing prompt and inference limits.
+
+## What happens for a policy question
+
+1. The rule-based router recognises housing loans, mortgages, financing and
+   questions such as “Can a Singapore PR couple buy a resale flat?”. General
+   questions about HDB ask which topic the user wants.
+2. Keyword retrieval removes polite filler, normalises common word forms and PR
+   terminology, favours substantive official conditions, and removes duplicate
+   text. This remains a keyword retriever, not the final embedding/hybrid RAG.
+3. Personal EHG and loan-eligibility requests use the relevant topic card's
+   `required_fields`. Missing details produce a clarification before inference.
+   Household type is available in the profile sidebar. Having those details does
+   not establish complete eligibility or replace an HFE assessment.
+4. General PR-couple purchase questions use the retrieved citizenship table's
+   Standard/unclassified and Plus/Prime columns directly, with separate citations
+   and scopes. The app explains these published conditions; it does not issue a
+   personal eligibility decision. Other policy questions send up to three complete
+   passages (at most 1,100 source words) to Ollama. Well-formed tables are passed as
+   explicit row/column/cell objects. It requests structured JSON selecting at most
+   three short, self-contained source quotes with citations. Free-form model
+   paraphrases are never displayed as policy facts. Its context is
+   4,096 tokens and output limit is 850 tokens; CPU-only inference is retained.
+5. Deterministic checks reject unknown/superseded citations, invented supporting
+   quotes and numbers absent from the supporting quote. A selected table cell is
+   rendered from the source together with its row condition and column scope,
+   instead of using a potentially misleading model paraphrase. A PR resale answer
+   must cover both relevant citizenship columns. A failed draft gets one
+   repair attempt. A second failure or model-engine error abstains.
+
+Source wording prevents invented paraphrases but does not establish relevance or
+completeness. A model can still select an unrelated or incomplete excerpt, and a
+malformed source table may have lost context during scraping. Review household
+scope and answer relevance separately. The corpus itself also needs review;
+these changes do not rewrite or certify scraped policy text.
+
+## Follow-up context
+
+`POST /chat` accepts up to 12 recent `history` turns with `role` (`user` or
+`assistant`) and `content`. Each content is bounded to 12,000 characters. The
+frontend sends the most recent 12 turns by default; `VITE_SEND_HISTORY=false`
+disables that feature. History stays client-owned: requests do not share server
+state, and assistant replies never become policy evidence.
+
+The backend can resume a clarification using replies such as “Yishun, 4-room”,
+an age, household income, or a household type. A hypothetical question about a
+PR couple is not saved as the user's own citizenship/household profile. This is
+bounded clarification handling, not unrestricted conversational reasoning.
+
+## Provenance and testing
+
+The default API reports `mode: "snapshot"`; injected demo graphs still report
+`demo`. The frontend consequently does not label official snapshot answers as
+fictional. Saved messages retain their original metadata; start a new chat to
+see the new behaviour consistently.
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m pytest -q tests\test_policy_advisor.py
+```
+
+Live examples to try after starting Ollama, the backend and the frontend:
+
+- `Can a Singapore PR couple buy a resale flat?`
+- `may i know about loans`
+- `Am I eligible for the Enhanced CPF Housing Grant?` (asks for missing details)
+- `i want to know about HDB` (asks for a topic)
+- `What is the resale price?`, followed by `Yishun, 4-room`
+
+Policy excerpt selection uses real inference and can take much longer than the former
+copied-passage output. Record latency and verifier repairs when comparing models.
+
+## Model comparison and optional policy model
+
+Qwen3:4b was downloaded and compared locally on the PR table question. Both 3B
+and 4B misinterpreted the columns; 4B was slower and its drafts were rejected by
+the verifier. This single diagnostic case is not a general model benchmark.
+The default remains Qwen2.5:3b. Critical citizenship-table facts use the deterministic path
+above rather than relying on either model to interpret columns.
+
+To experiment with a separate policy model, without changing the price model:
+
+```powershell
+.\scripts\setup_ollama.ps1 -Model qwen3:4b
+```
+
+Then set `KOPI_POLICY_MODEL=qwen3:4b` in your local `.env` and restart the backend.
+Qwen3 thinking is disabled by the wrapper for these short grounded answers.
+Leave that variable unset to use the existing model. The downloaded Qwen3 model
+can remain installed without changing the application's default.
+
+Production retrieval scoring can be evaluated on the committed dev split with:
+
+```powershell
+.\.venv\Scripts\python.exe evaluation\run_eval.py --retriever kopi_keys.components.policy_retrieval:retrieve_chunk_ids
+```
+
+On the current dev snapshot this scores Recall@5 56% (9/16), compared with 38%
+(6/16) for the untouched plain-BM25 baseline. This is development evidence,
+below the 85% target, not a held-out result or a claim of final policy accuracy.

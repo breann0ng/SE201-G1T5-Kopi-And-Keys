@@ -4,14 +4,13 @@ import { load, save } from "./storage";
 /**
  * Conversation memory, frontend half (option A in the team discussion).
  *
- * SEND_HISTORY is OFF until the backend's ChatRequest accepts a `history` field:
- * the backend rejects unknown fields (extra="forbid"), so sending it early would
- * fail every request. Turn on with VITE_SEND_HISTORY=true in frontend/.env.local.
+ * The backend accepts recent turns as context, never as policy evidence.
+ * Set VITE_SEND_HISTORY=false to disable sending recent turns.
  */
-export const SEND_HISTORY = import.meta.env.VITE_SEND_HISTORY === "true";
+export const SEND_HISTORY = import.meta.env.VITE_SEND_HISTORY !== "false";
 
 /** Previous turns sent to the model. Kept small for the local model's context window. */
-export const MAX_HISTORY_MESSAGES = 6;
+export const MAX_HISTORY_MESSAGES = 12;
 
 export type HistoryTurn = { role: "user" | "assistant"; content: string };
 
@@ -25,7 +24,7 @@ const textOf = (m: ThreadMessage) =>
 export function toHistory(earlier: readonly ThreadMessage[]): HistoryTurn[] {
   return earlier
     .filter((m) => m.role === "user" || m.role === "assistant")
-    .map((m) => ({ role: m.role as "user" | "assistant", content: textOf(m) }))
+    .map((m) => ({ role: m.role as "user" | "assistant", content: textOf(m).slice(0, 12000) }))
     .filter((t) => t.content)
     .slice(-MAX_HISTORY_MESSAGES);
 }

@@ -23,7 +23,7 @@ from .components.price_query import (
 )
 from .components.query_router import EXTRACTED_FIELDS, route_query
 from .components.synthesiser import Synthesiser, SynthesiserAgent
-from .components.topic_cards import TopicCard, load_cards, match_cards
+from .components.topic_cards import TopicCard, load_cards, match_cards, personal_eligibility_fields
 from .components.verifier import verify
 from .llm import OllamaEngine
 from .schemas import ChatRequest, ChatResponse, DataOrigin
@@ -55,10 +55,12 @@ def build_graph(
     synthesiser: SynthesiserAgent | None = None,
     cards: list[TopicCard] | None = None,
     max_repairs: int = MAX_REPAIRS,
+    data_mode: str | None = None,
 ):
     retriever = retriever or DemoPolicyRetriever()
-    # Stamped on every response; retrievers without a mode count as demo (fictional) evidence.
-    mode = getattr(retriever, "mode", "demo")
+    # Stamped on every response: the retriever declares its evidence ("snapshot" or "demo");
+    # data_mode overrides it (tests with stub retrievers). No declaration counts as demo.
+    mode = data_mode or getattr(retriever, "mode", "demo")
     price_tool = price_tool or UnconfiguredPriceTool()
     synthesiser = synthesiser or Synthesiser(OllamaEngine())
     cards = load_cards() if cards is None else cards
@@ -67,11 +69,15 @@ def build_graph(
 
     def query_router(state: GraphState):
         known = {field: getattr(state, field) for field in EXTRACTED_FIELDS}
-        routed = route_query(state.message, known)
+        routed = route_query(state.message, known, context_question=state.followup_question)
         return {**routed.model_dump(), "trace": [f"query_router:{routed.route}"]}
 
     def policy_retrieval(state: GraphState):
-        query = state.message
+        query = state.followup_question or state.message
+        if state.household_type == "single":
+            query += " singles"
+        elif state.household_type in {"couple_family", "fiance", "extended_family"}:
+            query += " families"
         passages = retriever.search(query, limit=TOP_K)
         accumulated = {p.id: p for p in state.passages}
         accumulated.update({p.id: p for p in passages})
@@ -89,6 +95,10 @@ def build_graph(
         return {"price_result": result, "trace": [f"price_query:{result.volume} transactions"]}
 
     def topic_cards(state: GraphState):
+        missing = personal_eligibility_fields(state, cards)
+        if missing:
+            return {"route": "clarify", "missing_fields": missing,
+                    "trace": ["topic_cards:needs_profile"]}
         card_ids = match_cards(state, cards)
         return {"candidate_card_ids": card_ids, "trace": [f"topic_cards:{len(card_ids)} matched"]}
 
@@ -151,6 +161,10 @@ def build_graph(
         if draft.kind == "clarify":
             return {"trace": ["output"], "response": ChatResponse(
                 status="clarifying", mode=mode, route=state.route, message=draft.message, trace=trace,
+                asking_for={"user_age": "age", "income": "household_income"}.get(
+                    state.missing_fields[0], state.missing_fields[0])
+                    if state.missing_fields and state.missing_fields[0] in {
+                        "user_age", "income", "citizenship", "first_timer", "household_type"} else None,
             )}
         parts = [f"{claim.text} [{', '.join(claim.citation_ids)}]" for claim in draft.claims]
         price = state.price_result
@@ -194,6 +208,8 @@ def build_graph(
         return "price_query" if state.route in PRICE_ROUTES else "topic_cards"
 
     def after_topic_cards(state: GraphState) -> str:
+        if state.route == "clarify":
+            return "synthesiser"
         return "abstention" if evidence_problem(state) else "synthesiser"
 
     def after_verifier(state: GraphState) -> str:

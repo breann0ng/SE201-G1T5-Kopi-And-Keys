@@ -31,6 +31,11 @@ POLICY_WORDS = (
     "cpf", "ehg", "mop", "lease", "rent", "rental", "income ceiling", "ethnic",
     "parents", "proximity", "wait-out", "wait out", "private property", "single",
     "hdb", "condo", "stuck there", "how long", "block", "neighbourhood", "full",
+    "loan", "mortgage", "financing", "hfe",
+    "borrow", "repayment", "interest rate", "instalment", "installment",
+)
+BUY_ELIGIBILITY = re.compile(
+    r"\b(?:can|may)\b.{0,70}\bbuy\b.{0,40}\b(?:resale|hdb|flat)\b", re.IGNORECASE,
 )
 DISCOVERY_WORDS = (
     "what can i afford", "where should i buy", "help me decide", "recommend",
@@ -48,7 +53,7 @@ def classify_intent(message: str) -> Intent:
     if any(pattern in normalized for pattern in UNANSWERABLE_PATTERNS):
         return "unanswerable"
     has_price = any(word in normalized for word in PRICE_WORDS)
-    has_policy = any(word in normalized for word in POLICY_WORDS)
+    has_policy = any(word in normalized for word in POLICY_WORDS) or bool(BUY_ELIGIBILITY.search(message))
     is_discovery = any(phrase in normalized for phrase in DISCOVERY_WORDS)
     if is_discovery:
         return "discovery"
@@ -66,7 +71,7 @@ def classify_intent(message: str) -> Intent:
     )
     has_mixed_policy = any(
         word in normalized for word in POLICY_WORDS if word not in {"lease"}
-    )
+    ) or bool(BUY_ELIGIBILITY.search(message))
     if has_price_context and "grant" in normalized and not has_explicit_price_stat:
         return "policy"
     if has_price_context and has_mixed_policy:
@@ -136,7 +141,7 @@ def _canonical_town(text: str) -> str:
     return "KALLANG/WHAMPOA" if name == "KALLANG WHAMPOA" else name
 
 
-EXTRACTED_FIELDS = ("user_age", "income", "citizenship", "town", "flat_type")
+EXTRACTED_FIELDS = ("user_age", "income", "citizenship", "town", "flat_type", "first_timer", "household_type")
 
 
 def extract_fields(message: str) -> dict:
@@ -146,6 +151,17 @@ def extract_fields(message: str) -> dict:
         (value for pattern, value in CITIZENSHIP_PATTERNS if pattern.search(message)),
         None,
     )
+    # Preserve household citizenship when replying with a sidebar option.
+    for pattern, value in (
+        (r"\bSC/SC\b|two Singapore citizens", "SC/SC"),
+        (r"\bSC/SPR\b|Singapore Citizen with Singapore Permanent Resident", "SC/SPR"),
+        (r"\bSPR/SPR\b|Singapore Permanent Residents only", "SPR/SPR"),
+        (r"\bSC/NR\b|Singapore Citizen with non-resident", "SC/NR"),
+        (r"\bSC_single\b|Single Singapore Citizen", "SC_single"),
+    ):
+        if re.search(pattern, message, re.I):
+            citizenship = value
+            break
     town_match = next(
         (
             match for match in TOWN_PATTERN.finditer(message)
@@ -162,6 +178,16 @@ def extract_fields(message: str) -> dict:
     flat_type = flat_match.group(1).upper() if flat_match else None
     if flat_match and flat_match.group(2):
         flat_type = f"{flat_match.group(2)} ROOM"
+    first_timer = None
+    if re.search(r"\b(?:second[- ]timer|not (?:a )?first[- ]timer)\b", message, re.I):
+        first_timer = False
+    elif re.search(r"\bfirst[- ]timer\b", message, re.I):
+        first_timer = True
+    household_type = None
+    if re.search(r"\b(?:couple|married|family|families)\b", message, re.I):
+        household_type = "couple_family"
+    elif re.search(r"\b(?:i am|i'm|as a|buying as a)\s+single\b", message, re.I):
+        household_type = "single"
     return {
         "user_age": int(age_match.group(1)) if age_match else None,
         "income": (
@@ -172,6 +198,8 @@ def extract_fields(message: str) -> dict:
         "citizenship": citizenship,
         "town": _canonical_town(town_match.group(1)) if town_match else None,
         "flat_type": flat_type,
+        "first_timer": first_timer,
+        "household_type": household_type,
     }
 
 
@@ -211,18 +239,24 @@ class RouterOutput(Contract):
     citizenship: str | None = None
     town: str | None = None
     flat_type: str | None = None
+    first_timer: bool | None = None
+    household_type: str | None = None
 
 
-def route_query(message: str, known: dict | None = None) -> RouterOutput:
+def route_query(message: str, known: dict | None = None, context_question: str | None = None) -> RouterOutput:
     """Classify and extract. Values found in the message win; `known` fills gaps."""
     known = known or {}
     intent = classify_intent(message)
+    if context_question:
+        intent = classify_intent(context_question)
     extracted = extract_fields(message)
     values = {
         field: extracted[field] if extracted[field] is not None else known.get(field)
         for field in EXTRACTED_FIELDS
     }
     missing = missing_fields(intent, message, values)
+    if re.fullmatch(r"\s*(?:i (?:want|would like) to know about|tell me about|what is|explain)\s+hdb[?.! ]*", message, re.I):
+        missing = ["topic"]
     if missing:
         route, status = "clarify", "clarify"
     elif intent == "unanswerable":

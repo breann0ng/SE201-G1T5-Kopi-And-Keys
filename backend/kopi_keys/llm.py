@@ -1,7 +1,7 @@
 """Local LLM engine (Ollama over HTTP), shared by every LLM component. CPU only."""
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from time import perf_counter
 from typing import Protocol
 
@@ -21,6 +21,7 @@ class OllamaSettings:
     num_threads: int = 4
     context_size: int = 2048
     max_output_tokens: int = 220
+    response_format: dict | None = None
 
     def __post_init__(self):
         url = httpx.URL(self.base_url)
@@ -59,6 +60,15 @@ class OllamaEngine:
         self.settings = settings or OllamaSettings.from_env()
         self._client = client
 
+    def for_policy(self, schema: dict):
+        """Separate policy budgets; the strict price formatter keeps its limits."""
+        settings = replace(
+            self.settings, context_size=4096, max_output_tokens=850,
+            response_format=schema,
+            model=os.getenv("KOPI_POLICY_MODEL", self.settings.model),
+        )
+        return OllamaEngine(settings=settings, client=self._client)
+
     def _request(self, method: str, path: str, payload: dict | None = None) -> dict:
         def send(client):
             response = client.request(
@@ -89,7 +99,7 @@ class OllamaEngine:
     @traceable(run_type="llm", name="ollama_chat")
     def complete(self, messages: list[dict[str, str]]) -> Generation:
         started = perf_counter()
-        data = self._request("POST", "/api/chat", {
+        payload = {
             "model": self.settings.model,
             "messages": messages,
             "stream": False,
@@ -102,7 +112,12 @@ class OllamaEngine:
                 "temperature": 0,
                 "seed": 42,
             },
-        })
+        }
+        if self.settings.response_format is not None:
+            payload["format"] = self.settings.response_format
+        if self.settings.model.startswith("qwen3"):
+            payload["think"] = False
+        data = self._request("POST", "/api/chat", payload)
         message = data.get("message")
         text = message.get("content") if isinstance(message, dict) else None
         if data.get("done") is not True or not isinstance(text, str) or not text.strip():
