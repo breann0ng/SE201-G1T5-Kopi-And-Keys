@@ -1,66 +1,64 @@
-# Architecture starting point
+# Architecture
 
-The sections below describe the original demo scaffold. Under the revised
-four-stage blueprint, Person 3's midpoint implementation now lives in
-`backend/kopi_keys/midpoint/`. See [the current Stage 3/4 handoff](person3-midpoint.md).
-Its CPU model engine and numeric verification run independently of the original
-demo `/chat` workflow, ready for integration with the team's Stage 1 and Stage 2.
+The system is one LangGraph graph (`backend/kopi_keys/graph.py`). Every box on
+the proposal's architecture diagram is one node and one module under
+`backend/kopi_keys/components/`. All nodes read and write a single
+`GraphState` (`state.py`).
 
-## Implemented now
+## Design change from the proposal
 
-- FastAPI validates `/chat` input and returns a structured result.
-- One Advisor contract handles discovery, evidence gaps and answer drafting.
-- LangGraph returns tool results to the Advisor through shared per-request state.
-- Policy searches accumulate evidence and are capped at three calls.
-- The Advisor may clarify, answer, retrieve, query prices or abstain.
-- Deterministic verification sends errors back for one repair, then abstains.
-- API responses expose source records and simple stage traces for development.
+The proposal described three LLM stages: Query Router, Discovery Agent and
+Synthesiser Agent. We merged the Discovery Agent into the Synthesiser Agent.
+Discovery relevance is still decided in code (topic-card matching). Only the
+wording and selection of up to three suggestions moved into the Synthesiser's
+single model call. This saves one model call per turn on a CPU-bound local
+model, and Discovery precision and recall are still scored against
+pre-labelled card IDs.
 
-The demo workflow uses a scripted Advisor and fictional policy evidence. The
-price adapter deliberately reports that no transaction database is connected.
-No model downloads, API keys, external tracing or official policy ingestion are
-required to run the starting point.
+## Box, file, owner and status
 
-## Next integrations, in order
+| Diagram box | File | Owner | Status |
+| --- | --- | --- | --- |
+| Query Router (LLM) | `components/query_router.py` | Breann | Rule-based baseline; passes all 30 dev-set labels. LLM classifier not built. |
+| Discovery (merged) | `components/topic_cards.py`, `data/topic_cards/` | Sandra | Placeholder: schema and loader only; matching returns nothing. |
+| Policy Retrieval Tool | `components/policy_retrieval.py` | TBC | Demo retriever with two fictional passages. ChromaDB not connected. |
+| Price Query Tool | `components/price_query.py` | Tasha | Interface and contract only. SQLite not connected. |
+| Synthesiser Agent (LLM) | `components/synthesiser.py` | Nisha | Price summary uses a real CPU model. Policy answers are an extractive placeholder. Suggestions not built. |
+| Verifier | `components/verifier.py` | Nisha | Numeric checks, citation checks, superseded sources, price provenance and topic-card IDs. |
+| Abstention Output | `components/abstention.py` | Breann | Fixed messages per reason. |
+| Harness | `graph.py`, `state.py` | Breann | One graph; one retry, then abstain. |
+| Evaluation | `evaluation/` | TBC | Placeholder: runner, metrics and baselines not built. |
+| Tracing | `trace` field on every response | Breann | Node-level trace only; LangSmith not connected. |
 
-1. Implement an Ollama/Qwen Advisor using `Advisor.decide(state)`. Give it the
-   complete state and require an `AdvisorDecision` structured output. Handle
-   model timeouts and invalid structured outputs explicitly; never let them
-   bypass graph budgets or output verification.
-2. Implement `PolicyRetriever.search(query, limit)` using ChromaDB and
-   EmbeddingGemma. Preserve provenance and version metadata. Add date and
-   applicability handling before calling any source current or authoritative.
-3. Implement `PriceQueryTool.query(filters)` over an imported official resale
-   dataset in SQLite. Use fixed parameterised queries, stable query IDs and
-   defined statistics; never execute model-supplied SQL directly.
-4. Add reviewed topic cards as an Advisor input/tool. Keep policy-dependent
-   thresholds and supporting source IDs in versioned data.
-5. Add conversation storage and profile extraction, then connect a frontend.
-6. Add the reviewed evaluation dataset and optional LangSmith tracing. Keep
-   development/test scenario families separate.
+## Flow
+
+1. `query_router` classifies and extracts town, flat type, age, income and
+   citizenship. Missing required fields go to `synthesiser` as a clarifying
+   question. Out-of-scope questions go to `abstention`.
+2. Policy, discovery and mixed routes call `policy_retrieval`. Price and mixed
+   routes call `price_query`. Mixed questions run retrieval first, then price.
+3. `topic_cards` records which cards the Synthesiser may suggest.
+4. If no tool produced usable evidence, the graph abstains before any model call.
+5. `synthesiser` drafts the answer. `verifier` checks it. One failure sends the
+   errors back for a single retry, and a second failure abstains. A model engine
+   error abstains immediately.
+6. `output` builds the user-facing message from verified parts only. Price
+   headers come from the SQL result, not from the model.
+
+## Assumptions to review
+
+- When a price question gives no date range, the price tool uses the last 12
+  months (`DEFAULT_LOOKBACK_MONTHS` in `price_query.py`).
+- A mixed question whose price data is unavailable still answers the policy
+  part and states that the price benchmark is unavailable.
+- The required-field gate is hard-coded in `query_router.py`. It should be
+  driven by the topic cards' required fields once they exist.
 
 ## Boundaries to preserve
 
-- The Advisor requests tools; the graph validates the action and owns execution.
-- Missing buyer information leads to clarification; missing evidence leads to
-  another search or abstention.
-- Evidence is accumulated across searches instead of replacing previous results.
-- The price result is rendered from tool output. The model does not calculate
-  the displayed benchmark.
-- Citation existence and metadata checks are structural checks, not proof that
-  a free-text claim follows from its source. Semantic faithfulness needs review.
-- No cross-request memory exists yet. Clarification returns a normal response;
-  resuming a conversation requires an explicit storage design later.
-- Demo keyword matching does not represent the future routing or LLM behaviour.
-
-## Team ownership aligned with the revised midpoint plan
-
-| Area | Starting files | Owner |
-| --- | --- | --- |
-| Orchestration, Stage 1 gateway and dev queries | Global graph/state and gateway integration | Breann |
-| SQLite transactions, Stage 2 SQL and income boundaries | `tools/price.py` and data import | Tasha |
-| CPU model engine, Stage 3 synthesis and Stage 4 numeric verification | `midpoint/` | Nisha |
-| Policy snapshots, initial topic cards and basic UI | Policy data and frontend | Sandra |
-
-The original scaffold's module names are retained. Team members should use the
-revised ownership above and the explicit SQL-result contract for integration.
+- The model never calculates or invents a statistic. Every figure comes from an
+  executed query and is checked against it to the cent.
+- Citation checks are structural. Whether a claim faithfully reflects its
+  source still needs manual review.
+- The API is stateless. There is no conversation memory yet.
+- The held-out set must not be used while tuning.

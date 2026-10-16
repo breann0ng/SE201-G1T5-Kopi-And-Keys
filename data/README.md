@@ -3,7 +3,8 @@
 Planned local directories, excluded from Git:
 
 - `raw/`: downloaded official policy snapshots and resale transaction CSVs.
-- `processed/`: normalized policy chunks, topic cards and the resale SQLite database.
+- `processed/`: normalized policy chunks and the resale SQLite database.
+- `topic_cards/`: committed, reviewed discovery cards (placeholder for now).
 - `evaluation/`
     - `development/`: committed development questions and Stage 1 gateway labels.
     - `held-out/`: private final-evaluation questions; kept outside the repository
@@ -29,4 +30,5 @@ The SQLite adapter will accept validated filters and use parameterised read-only
 queries. An absent dataset must not be replaced with invented price figures.
 
 The only evidence shipped with this scaffold is fictional and lives in
-`backend/kopi_keys/tools/policy.py`.
+`backend/kopi_keys/components/policy_retrieval.py`. Topic cards go in
+`topic_cards/` (see its README).

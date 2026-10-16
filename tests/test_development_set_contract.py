@@ -2,7 +2,7 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
-from kopi_keys.orchestration.graph import run_stage1
+from kopi_keys.components.query_router import route_query
 
 
 LABELS = Path(__file__).resolve().parents[1] / "data" / "evaluation" / "development" / "stage1_gateway_labels.jsonl"
@@ -27,9 +27,9 @@ def test_stage1_labels_have_a_complete_machine_readable_contract():
     assert "TO FILL" not in LABELS.read_text(encoding="utf-8")
 
 
-def test_stage1_labels_match_gateway_output():
+def test_stage1_labels_match_query_router_output():
     for record in load_labels():
-        state = run_stage1(record["turns"][0]["user"])
+        state = route_query(record["turns"][0]["user"])
         actual = {
             field: getattr(state, field)
             for field in record["expected_extraction"]
