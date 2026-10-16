@@ -6,6 +6,7 @@ export type BuyerProfile = {
   age: number | null;
   household_income: number | null;
   first_timer: boolean | null;
+  household_type: "single" | "couple_family" | "fiance" | "extended_family" | "senior" | null;
 };
 
 export type PolicyPassage = {
@@ -52,10 +53,7 @@ export type ChatResponse = {
   suggestions: Suggestion[];
   retrieval_rounds: number;
   trace: string[];
-  /**
-   * PROPOSED (not in the backend yet): on a "clarifying" reply, the profile field being
-   * asked about, e.g. "citizenship". Lets the UI offer quick-reply buttons.
-   */
+  /** Profile field requested by a clarification; drives quick-reply buttons. */
   asking_for?: keyof BuyerProfile | null;
 };
 
@@ -72,7 +70,7 @@ export async function postChat(
     res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      // `history` is only sent when enabled; the current backend rejects unknown fields.
+      // Recent turns are conversation context, not policy evidence.
       body: JSON.stringify(history ? { message, profile, history } : { message, profile }),
       signal,
     });

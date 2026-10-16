@@ -45,6 +45,7 @@ def profile_from_state(state: GraphState) -> dict:
     return {
         "citizenship": state.citizenship,
         "first_timer": state.first_timer,
+        "household_type": state.household_type,
         "age": state.user_age,
         "household_income": state.income,
         "town": state.town,
@@ -70,3 +71,24 @@ def required_fields(card_ids: list[str], cards: list[TopicCard]) -> list[str]:
         if card.card_id in wanted:
             fields += [f for f in card.required_fields if f not in fields]
     return fields
+
+
+def personal_eligibility_fields(state: GraphState, cards: list[TopicCard]) -> list[str]:
+    """Ask for a card's inputs before attempting a personal eligibility answer.
+
+    A general question about PR couples is not a request to assess this user.
+    Card requirements describe necessary inputs, not a complete eligibility rule.
+    """
+    import re
+
+    query = (state.followup_question or state.message).casefold()
+    if not re.search(r"\b(?:am i|are we|do i qualify|do we qualify|can i|can we)\b", query):
+        return []
+    wanted = []
+    if "ehg" in query or "enhanced cpf housing grant" in query:
+        wanted = ["CARD_EHG"]
+    elif "loan" in query and any(word in query for word in ("eligible", "qualify", "can i get", "can we get")):
+        wanted = ["CARD_HDB_LOAN"]
+    names = {"age": "user_age", "household_income": "income"}
+    return [names.get(f, f) for f in required_fields(wanted, cards)
+            if getattr(state, names.get(f, f), None) is None]

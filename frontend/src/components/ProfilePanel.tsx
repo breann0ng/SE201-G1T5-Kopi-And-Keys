@@ -1,6 +1,7 @@
 import { UserRound } from "lucide-react";
 import { emptyProfile, useProfile } from "../lib/profile";
 import { citizenshipOptions } from "../lib/vocab";
+import type { BuyerProfile } from "../lib/api";
 
 const field =
   "mt-1 w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900";
@@ -32,6 +33,22 @@ export function ProfilePanel() {
               {o.label}
             </option>
           ))}
+        </select>
+      </label>
+
+      <label className="block text-xs font-medium">
+        Household type
+        <select
+          className={field}
+          value={profile.household_type ?? ""}
+          onChange={(e) => setProfile({ ...profile, household_type: (e.target.value || null) as BuyerProfile["household_type"] })}
+        >
+          <option value="">Not specified</option>
+          <option value="single">Single</option>
+          <option value="couple_family">Couple / family</option>
+          <option value="fiance">Fiancé / fiancée</option>
+          <option value="extended_family">Extended family</option>
+          <option value="senior">Senior household</option>
         </select>
       </label>
 

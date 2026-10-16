@@ -12,12 +12,16 @@ const OPTIONS: Partial<Record<keyof BuyerProfile, Option[]>> = {
     { label: "First-timer (never bought or received a housing subsidy)", value: true },
     { label: "Second-timer", value: false },
   ],
+  household_type: [
+    { label: "I am buying as a single", value: "single" },
+    { label: "We are a couple / family", value: "couple_family" },
+  ],
 };
 
 /**
  * Buttons under a clarifying question. Tapping one fills in the sidebar profile and sends
  * the answer as a chat message, so it works with or without conversation memory.
- * Needs the backend's proposed `asking_for` field; shows nothing until that exists.
+ * The backend's `asking_for` field selects the relevant options.
  */
 export function QuickReplies({ field }: { field: keyof BuyerProfile }) {
   const { runtime } = useChat();

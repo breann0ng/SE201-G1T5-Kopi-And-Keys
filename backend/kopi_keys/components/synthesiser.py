@@ -8,9 +8,10 @@ What is real today and what is a placeholder:
 - Price summary: real LLM call (Ollama, CPU) with a strict five-line format
   that the Verifier checks number by number.
 - Clarifying question: deterministic template from the router's missing fields.
-- Policy answer: PLACEHOLDER. Quotes retrieved passages verbatim with their
-  citations. Replace with an LLM prompt that returns cited `Claim`s.
-- Discovery suggestions: PLACEHOLDER. Always empty until topic cards exist.
+- Policy answer: bounded LLM summary with citations and verbatim supporting quotes.
+  Personal eligibility requests first collect the topic card's required fields.
+  PR-couple citizenship-table answers use scoped source cells without inference.
+- Discovery suggestions: wording remains unimplemented; cards are matched in code.
 
 On a retry, `state.verification_errors` holds the Verifier's feedback.
 """
@@ -21,6 +22,7 @@ from typing import Protocol
 from ..llm import Generation, ModelEngineError, TextEngine
 from ..schemas import Claim, Draft, PriceResult
 from ..state import GraphState
+from .policy_synthesis import PolicySummariser, citizenship_conditions
 
 
 PRICE_SYSTEM_PROMPT = """You format already-computed HDB resale transaction statistics.
@@ -42,6 +44,8 @@ FIELD_LABELS = {
     "user_age": "age",
     "income": "household income",
     "citizenship": "citizenship",
+    "household_type": "household type (single, couple/family, or another household type)",
+    "first_timer": "first-timer status",
 }
 
 
@@ -82,6 +86,8 @@ class PriceSummariser:
 
 
 def clarifying_question(missing: list[str]) -> str:
+    if missing == ["topic"]:
+        return "Which part of HDB housing would you like to know about: resale eligibility, grants, housing loans, or CPF and lease rules?"
     labels = [FIELD_LABELS.get(field, field) for field in missing]
     return f"Please provide: {', '.join(labels)}."
 
@@ -97,14 +103,25 @@ def extractive_policy_claims(state: GraphState) -> list[Claim]:
 class Synthesiser:
     def __init__(self, engine: TextEngine | None):
         self.price = PriceSummariser(engine) if engine is not None else None
+        self.policy = PolicySummariser(engine) if engine is not None else None
 
     def synthesise(self, state: GraphState) -> SynthesisResult:
         if state.route == "clarify":
             return SynthesisResult(Draft(kind="clarify", message=clarifying_question(state.missing_fields)))
 
-        claims = extractive_policy_claims(state)
+        claims = citizenship_conditions(state)
         price_text = None
         generations = []
+        if state.passages and not claims:
+            if self.policy is None:
+                # Offline/demo fixtures explicitly inject engine=None.
+                claims = extractive_policy_claims(state)
+            else:
+                try:
+                    claims, generation = self.policy.generate(state)
+                except ModelEngineError as error:
+                    return SynthesisResult(None, error=str(error), model_calls=1)
+                generations.append(generation)
         price = state.price_result
         if price is not None and price.volume > 0:
             if self.price is None:
@@ -112,7 +129,7 @@ class Synthesiser:
             try:
                 generation = self.price.generate(state.message, price, state.verification_errors)
             except ModelEngineError as error:
-                return SynthesisResult(None, error=str(error), model_calls=1)
+                return SynthesisResult(None, generations=generations, error=str(error), model_calls=len(generations) + 1)
             generations.append(generation)
             price_text = generation.text
         return SynthesisResult(Draft(kind="answer", claims=claims, price_text=price_text), generations)
