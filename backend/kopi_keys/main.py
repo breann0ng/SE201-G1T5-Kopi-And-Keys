@@ -6,7 +6,7 @@ load_dotenv()
 
 from fastapi import FastAPI
 
-from .components.policy_retrieval import SnapshotPolicyRetriever
+from .components.policy_retrieval import HybridPolicyRetriever
 from .components.price_query import SqlitePriceTool
 from .graph import build_graph, run_chat
 from .schemas import ChatRequest, ChatResponse
@@ -16,11 +16,11 @@ def create_app(graph=None) -> FastAPI:
     application = FastAPI(
         title="Kopi & Keys",
         version="0.1.0",
-        description="Backend foundation. Policy passages from the ACTIVE snapshot (keyword search); resale prices from data/processed/hdb_prices.db when built.",
+        description="Backend foundation. Policy passages from the ACTIVE snapshot (hybrid keyword + vector search); resale prices from data/processed/hdb_prices.db when built.",
     )
     # Without a built database the SQLite tool reports "unavailable", like the old placeholder.
     graph = graph if graph is not None else build_graph(
-        retriever=SnapshotPolicyRetriever(), price_tool=SqlitePriceTool())
+        retriever=HybridPolicyRetriever(), price_tool=SqlitePriceTool())
 
     @application.get("/health")
     def health():

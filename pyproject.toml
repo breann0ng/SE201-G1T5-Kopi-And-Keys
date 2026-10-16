@@ -19,6 +19,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10"]
+# Policy Vector Index (scripts/build_policy_index.py). Without it, retrieval falls back to BM25.
+rag = ["chromadb>=1.0,<2"]
 
 [project.scripts]
 kopi-keys-synthesize = "kopi_keys.cli:main"

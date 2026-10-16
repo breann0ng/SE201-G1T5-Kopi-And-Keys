@@ -17,7 +17,7 @@ from langgraph.graph import END, START, StateGraph
 from pydantic import ValidationError
 
 from .components.abstention import abstention_message
-from .components.policy_retrieval import TOP_K, DemoPolicyRetriever, PolicyRetriever
+from .components.policy_retrieval import TOP_K, PolicyRetriever, KeywordPolicyRetriever
 from .components.price_query import (
     PriceQueryTool, ToolUnavailableError, UnconfiguredPriceTool, filters_from_state,
 )
@@ -57,9 +57,9 @@ def build_graph(
     max_repairs: int = MAX_REPAIRS,
     data_mode: str | None = None,
 ):
-    retriever = retriever or DemoPolicyRetriever()
+    retriever = retriever or KeywordPolicyRetriever()
     # Stamped on every response: the retriever declares its evidence ("snapshot" or "demo");
-    # data_mode overrides it (tests with stub retrievers). No declaration counts as demo.
+    # data_mode overrides it (tests with stub retrievers). Undeclared stubs count as demo.
     mode = data_mode or getattr(retriever, "mode", "demo")
     price_tool = price_tool or UnconfiguredPriceTool()
     synthesiser = synthesiser or Synthesiser(OllamaEngine())
