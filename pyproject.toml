@@ -26,5 +26,8 @@ kopi-keys-synthesize = "kopi_keys.cli:main"
 [tool.setuptools.packages.find]
 where = ["backend"]
 
+[tool.setuptools.package-data]
+kopi_keys = ["rules/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
