@@ -144,12 +144,14 @@
       "robots_allowed": true,
       "page_title": "Considerations when using CPF to buy property",
       "word_count": 416,
-      "sha256": "7caa56e1b62e83284d91d6838c59d81388ebcc2f8892e9b2c5919114057e3a51",
+      "sha256": "d07cf692bd67ff8e3c661d1725ab03232abe6a932f26f68a7bf04f34fe2053d4",
       "last_updated_printed": "Last updated 06 Aug 2025",
       "tables": [],
       "source_tier": 1,
       "source_tier_label": "CPF official scheme page",
-      "notes": "Clean text starts with a temporary 'Notice' banner about CPF hotlines (kept verbatim). Page has no remaining-lease rules. HDB-loan vs bank-loan comparison is rendered as label/value blocks, not an HTML table."
+      "notes": "Clean text starts with a temporary 'Notice' banner about CPF hotlines (kept verbatim). Page has no remaining-lease rules. HDB-loan vs bank-loan comparison is rendered as label/value blocks, not an HTML table.",
+      "sha256_download": "7caa56e1b62e83284d91d6838c59d81388ebcc2f8892e9b2c5919114057e3a51",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "cpf-using-cpf-to-buy-a-home",
@@ -178,7 +180,7 @@
       "robots_allowed": true,
       "page_title": "A guide to the Enhanced CPF Housing Grant and Proximity Grant",
       "word_count": 959,
-      "sha256": "16660bd328a728fb94365068d25a04e2363593457e1620c6dfd04da49ca65e62",
+      "sha256": "7f52fb36e2c41d8174ad4b5c9c017c07080f62ecf711c447b1a76ed09d38b419",
       "last_updated_printed": "Last updated 25 Mar 2026",
       "tables": [
         "cpf-guide-ehg-and-phg_1.csv",
@@ -186,7 +188,9 @@
       ],
       "source_tier": 3,
       "source_tier_label": "CPF explainer article (infohub)",
-      "notes": "CPF educational article (infohub), not a scheme page. Clean text starts with the CPF hotline 'Notice' banner."
+      "notes": "CPF educational article (infohub), not a scheme page. Clean text starts with the CPF hotline 'Notice' banner.",
+      "sha256_download": "16660bd328a728fb94365068d25a04e2363593457e1620c6dfd04da49ca65e62",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "cpf-how-much-cpf-for-home-purchase",
@@ -198,14 +202,16 @@
       "robots_allowed": true,
       "page_title": "How much CPF savings you can use for your home purchase",
       "word_count": 932,
-      "sha256": "293af3ea4cc9cb83d2c648ed40b7c3978f5515cd49f0de26f570a118dcc4add2",
+      "sha256": "9b414bc0a808fa246a1d7012523b132c0e604d1413dfc6c5cd76d6c974f29ad2",
       "last_updated_printed": "Last updated 26 May 2026",
       "tables": [
         "cpf-how-much-cpf-for-home-purchase_1.csv"
       ],
       "source_tier": 3,
       "source_tier_label": "CPF explainer article (infohub)",
-      "notes": "Extra page #1 (not in seed list): fetched because no seed page stated the remaining-lease rule for CPF usage. Found via CPF sitemap."
+      "notes": "Extra page #1 (not in seed list): fetched because no seed page stated the remaining-lease rule for CPF usage. Found via CPF sitemap.",
+      "sha256_download": "293af3ea4cc9cb83d2c648ed40b7c3978f5515cd49f0de26f570a118dcc4add2",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "hdb-elig-couples-families",
@@ -1728,12 +1734,14 @@
       "robots_allowed": true,
       "page_title": "Home ownership",
       "word_count": 379,
-      "sha256": "6f49039470aef177739bcef599e0cbaf25de6f49a9478eae9bfabe8afd223aec",
+      "sha256": "7bd06e959bc9c40b3162692d3a8234fdaafbe2994bb48f4396ad2535ae8b7d8d",
       "last_updated_printed": "Last updated 29 Jan 2026",
       "tables": [],
       "source_tier": 1,
       "source_tier_label": "CPF official scheme page",
-      "notes": ""
+      "notes": "",
+      "sha256_download": "6f49039470aef177739bcef599e0cbaf25de6f49a9478eae9bfabe8afd223aec",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "cpf-home-ownership-using-your-cpf-to-buy-a-home-apply-to-use-cpf-for-your-property",
@@ -1762,12 +1770,14 @@
       "robots_allowed": true,
       "page_title": "CPF refund when selling or transferring property",
       "word_count": 709,
-      "sha256": "f8fa61821bbcef02b6101780262855e262fd74b3e07c6ff577564cbf8f30c894",
+      "sha256": "e4e9e666a61f9a849ed62d012bf2b088bc62c47088074501b4ccaf13069701af",
       "last_updated_printed": "Last updated 11 Jun 2026",
       "tables": [],
       "source_tier": 1,
       "source_tier_label": "CPF official scheme page",
-      "notes": ""
+      "notes": "",
+      "sha256_download": "f8fa61821bbcef02b6101780262855e262fd74b3e07c6ff577564cbf8f30c894",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "cpf-home-ownership-using-your-cpf-to-buy-a-home-retain-20000-in-your-oa-if-you-are-taking-",
@@ -1779,7 +1789,7 @@
       "robots_allowed": true,
       "page_title": "Retain $20,000 in your OA if you are taking a housing loan",
       "word_count": 559,
-      "sha256": "9ab0d827505d2986a50af5c7f0804108c101c5e3bad8ec31c2a00eaef7a9d71a",
+      "sha256": "4ad525660232eedd5cc9e2721c83f59582e0be8c816d94f5e2bcf3540a28302b",
       "last_updated_printed": "Last updated 25 Mar 2026",
       "tables": [
         "cpf-home-ownership-using-your-cpf-to-buy-a-home-retain-20000-in-your-oa-if-you-are-taking-_1.csv",
@@ -1787,7 +1797,9 @@
       ],
       "source_tier": 1,
       "source_tier_label": "CPF official scheme page",
-      "notes": ""
+      "notes": "",
+      "sha256_download": "9ab0d827505d2986a50af5c7f0804108c101c5e3bad8ec31c2a00eaef7a9d71a",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "cpf-home-ownership-protecting-against-losing-your-home",
@@ -1799,12 +1811,14 @@
       "robots_allowed": true,
       "page_title": "Protecting against losing your home",
       "word_count": 1224,
-      "sha256": "11c2f3c6f4d7a3b307ec272ab7119b67c61b335403a441bca222dbc0b4e0cf00",
+      "sha256": "7bbf78c050b0c1f256f18a3bc47363812226fb5cdab1ffe8d8eeb5b0c20cf701",
       "last_updated_printed": "Last updated 18 Mar 2026",
       "tables": [],
       "source_tier": 1,
       "source_tier_label": "CPF official scheme page",
-      "notes": ""
+      "notes": "",
+      "sha256_download": "11c2f3c6f4d7a3b307ec272ab7119b67c61b335403a441bca222dbc0b4e0cf00",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "cpf-home-ownership-protecting-against-losing-your-home-claiming-under-the-home-protection-",
@@ -1816,12 +1830,14 @@
       "robots_allowed": true,
       "page_title": "Claiming under the Home Protection Scheme",
       "word_count": 459,
-      "sha256": "37056dfc0979aff8a8373ec414c629a15fade3924e716100748116abc3dc27dc",
+      "sha256": "5be92b9a898ab4ed5796f39180d400e4c10d23db0cbfb856012e3a8a32590fcc",
       "last_updated_printed": "Last updated 07 Aug 2025",
       "tables": [],
       "source_tier": 1,
       "source_tier_label": "CPF official scheme page",
-      "notes": ""
+      "notes": "",
+      "sha256_download": "37056dfc0979aff8a8373ec414c629a15fade3924e716100748116abc3dc27dc",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "cpf-home-ownership-protecting-against-losing-your-home-single-premium-home-protection-sche",
@@ -1833,12 +1849,14 @@
       "robots_allowed": true,
       "page_title": "Single Premium Home Protection Scheme cover",
       "word_count": 385,
-      "sha256": "6731bb778ad78eef3a89221965cb3324b8b7e4bb38b0b6b5f331026f624b0163",
+      "sha256": "505ee93730b3919ea3cdfb020280cda5041669edbf6db555c37b8fa9ccadaed5",
       "last_updated_printed": "Last updated 19 Jul 2024",
       "tables": [],
       "source_tier": 1,
       "source_tier_label": "CPF official scheme page",
-      "notes": ""
+      "notes": "",
+      "sha256_download": "6731bb778ad78eef3a89221965cb3324b8b7e4bb38b0b6b5f331026f624b0163",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "cpf-home-ownership-home-buying-guide-for-members-below-55",
@@ -1850,7 +1868,7 @@
       "robots_allowed": true,
       "page_title": "Home buying guide for members below 55",
       "word_count": 4672,
-      "sha256": "d1b6d6692f2e9119b852c4a3b50732b8a9e5be93019a1b799f401cd6fa914328",
+      "sha256": "a6e77900975add66c073dd6c1d8d1ce241cec99f8f3fb1f72bc5b235087a9201",
       "last_updated_printed": "Last updated 06 Jul 2026",
       "tables": [
         "cpf-home-ownership-home-buying-guide-for-members-below-55_1.csv",
@@ -1862,7 +1880,9 @@
       ],
       "source_tier": 1,
       "source_tier_label": "CPF official scheme page",
-      "notes": ""
+      "notes": "",
+      "sha256_download": "d1b6d6692f2e9119b852c4a3b50732b8a9e5be93019a1b799f401cd6fa914328",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "cpf-home-ownership-home-buying-guide-for-members-below-55-housing-case-study",
@@ -1891,12 +1911,14 @@
       "robots_allowed": true,
       "page_title": "Home buying guide for members above 55",
       "word_count": 1085,
-      "sha256": "9b7f7db7cd54aa8d7565e18c745c0ca3781c3ee94e8466d7a8f5e4441991039c",
+      "sha256": "9cc245fd1b6a40ae6fc2e10a17d96af3bc113985d6ccd7dad182ad83cdb70919",
       "last_updated_printed": "Last updated 14 Aug 2026",
       "tables": [],
       "source_tier": 1,
       "source_tier_label": "CPF official scheme page",
-      "notes": ""
+      "notes": "",
+      "sha256_download": "9b7f7db7cd54aa8d7565e18c745c0ca3781c3ee94e8466d7a8f5e4441991039c",
+      "sha256_note": "Line endings were normalised when first committed (2026-10-16), before .gitattributes kept raw/ byte-exact. sha256 = committed bytes; sha256_download = bytes as fetched. Text content is unchanged."
     },
     {
       "slug": "hdb-pdf-otp-important-notes",

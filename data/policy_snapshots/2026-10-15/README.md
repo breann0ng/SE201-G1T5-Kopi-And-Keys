@@ -107,3 +107,17 @@ Navigation components (Cards, AdvisoryBanner, etc.) are skipped and named in eac
   - non-resident spouse
   - EHG (Singles) with a non-resident spouse
   - the EIP/SPR quota
+
+## Correction: raw file checksums (2026-10-16, after PR #3 review)
+
+Git's Windows line-ending conversion (`core.autocrlf`) changed the line endings of 14 CPF
+raw HTML files when they were first committed, so their bytes no longer matched the
+`sha256` values in `manifest.json`. The page text is unchanged.
+
+- `.gitattributes` now keeps `raw/` byte-exact (`-text`), so this can't happen again.
+- 3 files still had their original download bytes locally and were recommitted as downloaded.
+- For the other 11, the original bytes are gone. Their manifest entries now record
+  `sha256` = the committed bytes and `sha256_download` = the bytes as fetched, plus a
+  `sha256_note` explaining why.
+- `scripts/scraping/validate.py` now checks every raw file against its manifest hash
+  (check 8).

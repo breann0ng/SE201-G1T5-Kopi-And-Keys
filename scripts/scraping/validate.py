@@ -11,6 +11,7 @@ Checks:
  5. every supporting_chunk_id exists (and is not superseded or low-priority)
  6. every trigger_conditions key/value exists in vocab.json
  7. question_template has no policy figures (digits or $) and only {placeholders}
+ 8. every raw file's sha256 matches manifest.json (snapshot evidence is byte-exact)
 """
 from __future__ import annotations
 
@@ -115,6 +116,21 @@ def main() -> int:
         missing += [f"{c.chunk_id}: {f!r} not in clean/{c.source_slug}.md"
                     for f in set(DOLLAR.findall(c.content)) if f not in src]
     check("chunk $ figures in source clean .md", missing)
+
+    # 8. raw evidence unchanged since capture (.gitattributes keeps raw/ byte-exact)
+    manifest = json.loads((SNAPS / day / "manifest.json").read_text(encoding="utf-8"))
+    raw_bad = []
+    for page in manifest["pages"]:
+        if not page.get("sha256"):
+            continue
+        method = page.get("method")
+        ext = ".pdf" if method == "pdf" else ".rendered.html" if method == "playwright" else ".html"
+        raw = SNAPS / day / "raw" / f"{page['slug']}{ext}"
+        if not raw.exists():
+            raw_bad.append(f"{page['slug']}: raw/{raw.name} missing")
+        elif hashlib.sha256(raw.read_bytes()).hexdigest() != page["sha256"]:
+            raw_bad.append(f"{page['slug']}: raw/{raw.name} sha256 differs from manifest")
+    check("raw files match manifest sha256", raw_bad)
 
     # 5-7. cards
     cards, card_parse = [], []
