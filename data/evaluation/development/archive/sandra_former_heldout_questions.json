@@ -1,5 +1,5 @@
 {
-  "status": "PRIVATE held-out set: do not commit, do not use while tuning. DRAFT v0.1 — labels need a second team member's review before held-out results are reported",
+  "status": "RETIRED draft, kept for reference only. These 20 questions were drafted as a held-out set on 2026-10-16, then retired in the PR #3 review; two became dev questions (POL-07, OOS-04). They are public and have been seen while tuning, so never use them, or rephrasings of them, as held-out questions. The real held-out set lives outside the repo (KOPI_HELDOUT_DIR).",
   "drafted_by": "Sandra",
   "drafted_on": "2026-10-16",
   "snapshot_date": "2026-10-15",
