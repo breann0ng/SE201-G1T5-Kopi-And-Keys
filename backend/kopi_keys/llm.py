@@ -22,6 +22,9 @@ class OllamaSettings:
     context_size: int = 2048
     max_output_tokens: int = 220
     response_format: dict | None = None
+    # Added 2026-10-17 (Sandra): how long Ollama keeps the model in memory after a request.
+    # Reloading it costs 10-20 s on a laptop CPU; "-1" keeps it until Ollama stops.
+    keep_alive: str = "30m"
 
     def __post_init__(self):
         url = httpx.URL(self.base_url)
@@ -41,6 +44,7 @@ class OllamaSettings:
             model=os.getenv("KOPI_OLLAMA_MODEL", "qwen2.5:3b"),
             timeout_seconds=float(os.getenv("KOPI_OLLAMA_TIMEOUT", "180")),
             num_threads=int(os.getenv("KOPI_OLLAMA_NUM_THREADS", "4")),
+            keep_alive=os.getenv("KOPI_OLLAMA_KEEP_ALIVE", "30m"),
         )
 
 
@@ -96,6 +100,15 @@ class OllamaEngine:
         except ValueError as error:
             raise ModelEngineError("Ollama did not return valid JSON.") from error
 
+    def warm_up(self) -> None:
+        """Load the model into memory without generating anything (Ollama: a request with no
+        prompt). Called once at startup so the first question doesn't pay the load time."""
+        self._request("POST", "/api/generate", {
+            "model": self.settings.model, "keep_alive": self.settings.keep_alive,
+            "options": {"num_gpu": 0, "num_thread": self.settings.num_threads,
+                        "num_ctx": self.settings.context_size},
+        })
+
     @traceable(run_type="llm", name="ollama_chat")
     def complete(self, messages: list[dict[str, str]]) -> Generation:
         started = perf_counter()
@@ -103,7 +116,7 @@ class OllamaEngine:
             "model": self.settings.model,
             "messages": messages,
             "stream": False,
-            "keep_alive": "5m",
+            "keep_alive": self.settings.keep_alive,
             "options": {
                 "num_gpu": 0,
                 "num_thread": self.settings.num_threads,

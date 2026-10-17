@@ -46,3 +46,32 @@ def test_structured_price_filters_reach_price_tool():
         }}).json()
     assert body["status"] == "abstained"
     assert "price_query:unavailable" in body["trace"]
+
+
+def test_stream_reports_each_step_then_the_same_answer():
+    """Added 2026-10-17 (Sandra): /chat/stream for progress in the UI."""
+    import json
+
+    with client() as c:
+        lines = [json.loads(l) for l in c.post("/chat/stream", json={"message": "What is the demo grant policy?"}).text.splitlines()]
+        plain = c.post("/chat", json={"message": "What is the demo grant policy?"}).json()
+    steps = [l["step"] for l in lines if "step" in l]
+    assert steps[:2] == ["query_router", "policy_retrieval"] and "verifier" in steps
+    assert lines[-1]["response"] == plain
+
+
+def test_repeated_question_is_served_from_the_cache():
+    calls = []
+
+    class Counting(Synthesiser):
+        def synthesise(self, state):
+            calls.append(state.message)
+            return super().synthesise(state)
+
+    app = create_app(build_graph(retriever=FictionalRetriever(), synthesiser=Counting(engine=None), cards=[]))
+    with TestClient(app) as c:
+        first = c.post("/chat", json={"message": "What is the demo grant policy?"}).json()
+        again = c.post("/chat", json={"message": "What is the demo grant policy?"}).json()
+        other = c.post("/chat", json={"message": "What is the demo grant policy?", "profile": {"age": 30}}).json()
+    assert first == again and len(calls) == 2  # the profile change is a new answer
+    assert other["status"] == "answered"
