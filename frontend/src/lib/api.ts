@@ -82,8 +82,8 @@ export type ChatResponse = {
   profile_hint?: boolean;
   retrieval_rounds: number;
   trace: string[];
-  /** Profile field requested by a clarification; drives quick-reply buttons. */
-  asking_for?: keyof BuyerProfile | null;
+  /** Field requested by a clarification (a profile field or a price filter); drives quick-reply buttons. */
+  asking_for?: keyof BuyerProfile | "flat_type" | null;
 };
 
 export class ApiError extends Error {}

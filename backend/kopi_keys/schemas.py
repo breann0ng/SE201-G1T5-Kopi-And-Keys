@@ -185,7 +185,7 @@ class ChatResponse(Contract):
     suggestions: list[Suggestion] = Field(default_factory=list)
     retrieval_rounds: int = 0
     trace: list[str] = Field(default_factory=list)
-    asking_for: Literal["citizenship", "age", "household_income", "first_timer", "household_type"] | None = None
+    asking_for: Literal["citizenship", "age", "household_income", "first_timer", "household_type", "flat_type"] | None = None
     # Broad questions: one row per relevant scheme, each cited (see topic_cards.overview_topic).
     overview: list[OverviewItem] = Field(default_factory=list)
     # Retrieved official passages the answer did not quote, for readers who want more context.

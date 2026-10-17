@@ -226,7 +226,7 @@ def build_graph(
                 asking_for={"user_age": "age", "income": "household_income"}.get(
                     state.missing_fields[0], state.missing_fields[0])
                     if state.missing_fields and state.missing_fields[0] in {
-                        "user_age", "income", "citizenship", "first_timer", "household_type"} else None,
+                        "user_age", "income", "citizenship", "first_timer", "household_type", "flat_type"} else None,
             )}
         parts = [f"{claim.text} [{', '.join(claim.citation_ids)}]" for claim in draft.claims]
         price = state.price_result
