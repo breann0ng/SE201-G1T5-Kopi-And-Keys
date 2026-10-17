@@ -56,6 +56,15 @@ _GENERIC_WEIGHT = 0.2
 _HEADING_BONUS = 0.6          # per query word that also appears in the section heading
 _TIER_WEIGHT = {1: 1.0, 2: 0.85, 3: 0.7}  # official scheme pages first (decision D7)
 _LOW_PRIORITY_WEIGHT = 0.3    # thin pages and "recommended reads" link lists
+# Added 2026-10-17 (Sandra): HDB's worked examples ("Details of Mr B, Mr C, and Mr D") describe a
+# fictional household, not a rule. They outranked the rules for eligibility questions, and the model
+# stitched their cells into an invented quote. Ranked down unless the question asks for an example.
+_WORKED_EXAMPLE = re.compile(r"\|\s*Details of (?:Mr|Mrs|Ms|Mdm|Miss)\b")
+_WORKED_EXAMPLE_WEIGHT = 0.3
+
+
+def is_worked_example(content: str) -> bool:
+    return bool(_WORKED_EXAMPLE.match(content))
 _SHORT_CHUNK_WORDS = 35       # very short chunks are usually intros, not conditions
 _SHORT_CHUNK_WEIGHT = 0.4
 
@@ -204,6 +213,7 @@ class HybridPolicyRetriever:
 
     def search(self, query: str, limit: int = TOP_K) -> list[PolicyPassage]:
         rankings = [(1.0, self.keyword.ranked_ids(query, CANDIDATES))]
+        wants_example = bool(re.search(r"\bexamples?\b|\bworked\b|\billustrat", query, re.I))
         if self.collection is not None:
             try:
                 rankings.append((DENSE_WEIGHT, self._dense(query)))
@@ -219,6 +229,8 @@ class HybridPolicyRetriever:
             scores[chunk_id] *= _TIER_WEIGHT.get(c.get("source_tier"), 0.7)
             if c.get("low_priority"):
                 scores[chunk_id] *= _LOW_PRIORITY_WEIGHT
+            if is_worked_example(c["content"]) and not wants_example:
+                scores[chunk_id] *= _WORKED_EXAMPLE_WEIGHT
         best, seen = [], set()
         for chunk_id in sorted(scores, key=scores.get, reverse=True):
             fingerprint = _fingerprint(self.keyword.by_id[chunk_id]["content"])
