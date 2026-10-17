@@ -22,5 +22,9 @@
     "CHUNK_STEPUP_05"
   ],
   "question_template": "For a {household_type} household with citizenship {citizenship}, first-timer status {first_timer}, average gross monthly household income of {household_income}, currently owning a {current_flat_type}, does the Step-Up CPF Housing Grant apply?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_STEPUP_01",
+    "quote": "If you and your family are second-timer applicants, you may apply for the Step-Up CPF Housing Grant of $15,000 to help with your new or resale flat purchase."
+  }
 }

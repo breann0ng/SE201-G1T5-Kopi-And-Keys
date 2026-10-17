@@ -17,6 +17,7 @@ boolean first_timer becomes "true"/"false".
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
@@ -39,6 +40,15 @@ FIELD_PRIORITY = (
 )
 
 
+class OverviewQuote(BaseModel):
+    """One verbatim official sentence summarising the card, for overview answers."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    chunk_id: str
+    quote: str = Field(min_length=10)
+
+
 class TopicCard(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -49,6 +59,7 @@ class TopicCard(BaseModel):
     supporting_chunk_ids: list[str] = Field(min_length=1)
     question_template: str = Field(min_length=1)
     snapshot_date: date
+    overview: OverviewQuote | None = None
 
 
 @dataclass(frozen=True)
@@ -151,3 +162,39 @@ def match_cards(
         rank = {f: i for i, f in enumerate(FIELD_PRIORITY)}
         ask_next = min(counts, key=lambda f: (-counts[f], rank.get(f, len(rank)), f))
     return MatchResult(matched=matched, blocked=blocked, ask_next=ask_next)
+
+
+# --- Overview answers for broad questions ---------------------------------
+# "What grants are there?" gets an overview table: each listed card's verbatim
+# official sentence (card.overview), cited to its chunk. Questions naming one
+# scheme are not broad, so they get the normal quoted answer only.
+
+OVERVIEW_TOPICS = {
+    "grants": ("CARD_EHG", "CARD_FAMILY_GRANT", "CARD_SINGLES_GRANT", "CARD_PHG", "CARD_STEPUP_GRANT"),
+    "loans": ("CARD_HDB_LOAN", "CARD_INCOME_CEILING", "CARD_LEASE_ELIGIBILITY"),
+    "buying": ("CARD_HFE_LETTER", "CARD_NON_CITIZEN_ELIGIBILITY", "CARD_EIP_SPR_QUOTA", "CARD_RESALE_OTP_DEPOSIT"),
+}
+_TOPIC_WORDS = {
+    "grants": r"grants?|subsid(?:y|ies)|schemes?",
+    "loans": r"(?:housing )?loans?|financing|mortgages?",
+    "buying": r"(?:buying|resale|purchase) (?:process|steps?)|steps? to buy|how to buy",
+}
+_BROAD = re.compile(
+    r"\b(?:what|which|any|all|list|types? of|kinds? of|tell me about|know about|overview of|explain|summar\w*)\b"
+    r"[^?.]{0,40}?\b(?P<topic>" + "|".join(f"(?P<{k}>{v})" for k, v in _TOPIC_WORDS.items()) + r")\b",
+    re.IGNORECASE,
+)
+_NAMED_SCHEME = re.compile(
+    r"\b(?:ehg|enhanced cpf|phg|proximity|step-?up|singles grant|family grant|hfe|eip|spr quota|option fee)\b",
+    re.IGNORECASE,
+)
+
+
+def overview_topic(message: str) -> str | None:
+    """The broad topic a question asks about ("grants", "loans", "buying"), or None."""
+    if _NAMED_SCHEME.search(message):
+        return None
+    match = _BROAD.search(message)
+    if match is None:
+        return None
+    return next(name for name in _TOPIC_WORDS if match.group(name))

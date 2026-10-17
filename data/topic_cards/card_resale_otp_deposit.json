@@ -15,5 +15,9 @@
     "CHUNK_RESALE_53"
   ],
   "question_template": "At the {stage_of_purchase} stage of buying a resale flat (HFE letter obtained: {has_hfe_letter}), what are the Option Fee and Option Exercise Fee rules and what happens next?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_RESALE_41",
+    "quote": "You must pay flat sellers an Option Fee when they grant you an OTP, and an Option Exercise Fee when you exercise the OTP."
+  }
 }

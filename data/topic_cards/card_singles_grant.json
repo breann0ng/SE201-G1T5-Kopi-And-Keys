@@ -22,5 +22,9 @@
     "CHUNK_SINGLES_03"
   ],
   "question_template": "For a single applicant with citizenship {citizenship}, aged {age}, first-timer status {first_timer} and average gross monthly income of {household_income}, buying a {flat_type} resale flat, does the Singles Grant apply, and what amount is stated?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_SINGLES_01",
+    "quote": "If you are a first-timer Singapore Citizen (SC) and buying a resale flat on your own, you may qualify for a Singles Grant of $40,000 for the purchase of a 2- to 4- room resale flat or $25,000 for a 5-room resale flat."
+  }
 }

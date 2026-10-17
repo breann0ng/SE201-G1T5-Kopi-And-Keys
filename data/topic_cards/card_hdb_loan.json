@@ -17,5 +17,9 @@
     "CHUNK_LOAN_32"
   ],
   "question_template": "For a {household_type} household with citizenship {citizenship}, average gross monthly household income of {household_income} and average applicant age {age}, is the household eligible for an HDB housing loan, and what loan tenure and amount rules apply?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_LOAN_26",
+    "quote": "If you need financing to buy or take over the ownership of a flat, you may apply for a housing loan from HDB or the financial institutions (FI)."
+  }
 }
