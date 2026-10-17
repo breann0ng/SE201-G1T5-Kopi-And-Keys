@@ -18,6 +18,7 @@ from pydantic import ValidationError
 
 from .components.abstention import abstention_message
 from .components.policy_retrieval import TOP_K, PolicyRetriever, KeywordPolicyRetriever
+from .components.price_display import price_answer
 from .components.price_query import (
     PriceQueryTool, ToolUnavailableError, UnconfiguredPriceTool, filters_from_state,
 )
@@ -226,16 +227,17 @@ def build_graph(
                 asking_for={"user_age": "age", "income": "household_income"}.get(
                     state.missing_fields[0], state.missing_fields[0])
                     if state.missing_fields and state.missing_fields[0] in {
-                        "user_age", "income", "citizenship", "first_timer", "household_type"} else None,
+                        "user_age", "income", "citizenship", "first_timer", "household_type", "flat_type"} else None,
             )}
         parts = [f"{claim.text} [{', '.join(claim.citation_ids)}]" for claim in draft.claims]
+        if state.router_note:
+            parts.insert(0, f"*{state.router_note}*")
         price = state.price_result
         if price is not None and price.volume > 0:
-            f = price.filters
-            header = f"{f.flat_type} flats in {f.town}, {f.start_month} to {f.end_month} [query: {price.query_id}]"
+            text = price_answer(draft.price_text, price)
             if state.data_origin == "synthetic_fixture":
-                header = "SYNTHETIC TEST DATA - not actual market statistics.\n" + header
-            parts.append(header + "\n" + draft.price_text.strip())
+                text = "SYNTHETIC TEST DATA - not actual market statistics.\n\n" + text
+            parts.append(text)
         elif state.route in PRICE_ROUTES:
             parts.append(abstention_message("no_transactions") if price is not None
                          else f"Price benchmark unavailable: {state.price_error}")

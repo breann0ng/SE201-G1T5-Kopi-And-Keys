@@ -82,3 +82,36 @@ def test_all_dataset_towns_and_aliases_are_extracted():
     assert extract_fields("flat in AMK")["town"] == "ANG MO KIO"
     assert extract_fields("My parents live in Bedok, we want a 4-room in Tampines")["town"] == "TAMPINES"
 
+
+
+def test_how_much_for_a_flat_or_town_asks_for_flat_type_instead_of_declining():
+    from kopi_keys.components.query_router import route_query
+    for question, town in [
+        ("how much is a flat in toa payoh", "TOA PAYOH"),
+        ("how much are flats in tampines", "TAMPINES"),
+        ("how much did units in bishan sell for", "BISHAN"),
+    ]:
+        routed = route_query(question, {})
+        assert routed.route == "clarify", question
+        assert routed.town == town and routed.missing_fields == ["flat_type"]
+    # Policy questions that mention a flat stay policy questions.
+    assert route_query("how much CPF can I use for a resale flat?", {}).route == "policy"
+    assert route_query("how much is the option fee?", {}).route == "policy"
+    assert route_query("Tell me a joke.", {}).route == "abstain"
+
+
+def test_town_anywhere_go_for_maisonettes_and_address_blocks():
+    from kopi_keys.components.query_router import BLOCK_NOTE, MAISONETTE_NOTE, route_query
+    routed = route_query("how much does toa payoh lorong 1 block 236 masionettes go for?", {})
+    assert (routed.route, routed.town, routed.flat_type) == ("price", "TOA PAYOH", "EXECUTIVE")
+    assert MAISONETTE_NOTE in routed.router_note and BLOCK_NOTE in routed.router_note
+    # An explicit flat type wins over the maisonette default, and needs no note.
+    routed = route_query("how much is a 5-room maisonette in Tampines?", {})
+    assert routed.flat_type == "5 ROOM" and routed.router_note is None
+    routed = route_query("how much do toa payoh flats go for?", {})
+    assert (routed.route, routed.town, routed.missing_fields) == ("clarify", "TOA PAYOH", ["flat_type"])
+    # "block" as a policy topic still routes to policy; an address does not.
+    assert route_query("Is my block affected by the ethnic quota?", {}).route == "policy"
+    # A town in someone else's address is not read as the user's town for declined questions.
+    assert route_query("There's a unit at Blk 201 Tampines St 21 asking $620k. "
+                       "What will it actually sell for?", {}).town is None

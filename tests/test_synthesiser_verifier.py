@@ -77,7 +77,8 @@ def test_graph_repairs_bad_generation_and_exposes_only_verified_final_text(state
     assert "SYNTHETIC TEST DATA" in output.response.message
     repair_context = json.loads(engine.calls[-1][-1]["content"])
     assert any("median" in error for error in repair_context["previous_verification_errors"])
-    assert "4 ROOM flats in TAMPINES" in output.response.message
+    assert "4-room flats in Tampines" in output.response.message
+    assert "[query:" not in output.response.message
 
 
 def test_graph_abstains_after_one_unsuccessful_repair(state):

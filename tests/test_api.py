@@ -75,3 +75,10 @@ def test_repeated_question_is_served_from_the_cache():
         other = c.post("/chat", json={"message": "What is the demo grant policy?", "profile": {"age": 30}}).json()
     assert first == again and len(calls) == 2  # the profile change is a new answer
     assert other["status"] == "answered"
+
+
+def test_flat_type_clarification_asks_for_flat_type_so_the_ui_shows_buttons():
+    with client() as c:
+        body = c.post("/chat", json={"message": "how much is a flat in toa payoh"}).json()
+    assert body["status"] == "clarifying"
+    assert body["asking_for"] == "flat_type"

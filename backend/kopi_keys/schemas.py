@@ -38,11 +38,19 @@ class HistoryTurn(Contract):
     content: str = Field(min_length=1, max_length=12000)
 
 
+# Optional price refinements, chosen from the resale data (see components/price_query.py):
+# remaining lease at the time of sale, and the floor band from the storey range.
+LeaseBand = Literal["under_60", "60_79", "80_plus"]
+StoreyBand = Literal["low", "mid", "high"]
+
+
 class PriceFilters(Contract):
     town: str = Field(min_length=1, max_length=100)
     flat_type: str = Field(min_length=1, max_length=50)
     start_month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     end_month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+    lease_band: LeaseBand | None = None
+    storey_band: StoreyBand | None = None
 
     @model_validator(mode="after")
     def ordered_months(self):
@@ -77,6 +85,27 @@ class PolicyPassage(Contract):
     superseded: bool = False
 
 
+class BandStat(Contract):
+    """Sales and median price in one lease or floor band (computed in SQL code, not by the model)."""
+
+    dimension: Literal["lease", "storey"]
+    band: str
+    volume: int = Field(ge=0)
+    median: Decimal | None = None
+
+
+class RecentSale(Contract):
+    """One recent matching transaction, as recorded by HDB (a comparable, not a valuation)."""
+
+    month: str
+    block: str
+    street_name: str
+    storey_range: str
+    floor_area_sqm: Decimal
+    remaining_lease: str
+    resale_price: Decimal
+
+
 class PriceResult(BaseModel):
     """Trusted Price Query Tool output. IQR is the width Q3 - Q1, in SGD."""
 
@@ -89,6 +118,10 @@ class PriceResult(BaseModel):
     iqr: Decimal | None = Field(default=None, ge=0, max_digits=20)
     minimum: Decimal | None = Field(default=None, ge=0, max_digits=20)
     maximum: Decimal | None = Field(default=None, ge=0, max_digits=20)
+    # Context for the user, not checked against model output: medians by lease and floor band
+    # (each computed with the other refinement applied) and the most recent matching sales.
+    breakdown: list[BandStat] = Field(default_factory=list)
+    recent_sales: list[RecentSale] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def consistent_statistics(self):
@@ -185,7 +218,7 @@ class ChatResponse(Contract):
     suggestions: list[Suggestion] = Field(default_factory=list)
     retrieval_rounds: int = 0
     trace: list[str] = Field(default_factory=list)
-    asking_for: Literal["citizenship", "age", "household_income", "first_timer", "household_type"] | None = None
+    asking_for: Literal["citizenship", "age", "household_income", "first_timer", "household_type", "flat_type"] | None = None
     # Broad questions: one row per relevant scheme, each cited (see topic_cards.overview_topic).
     overview: list[OverviewItem] = Field(default_factory=list)
     # Retrieved official passages the answer did not quote, for readers who want more context.
