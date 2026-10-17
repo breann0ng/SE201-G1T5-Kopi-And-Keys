@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { BandStat, LeaseBand, PriceFilters, PriceResult, StoreyBand } from "../lib/api";
-import { LEASE, STOREY, bandLabels } from "../lib/priceBands";
+import { LEASE, MIN_SUMMARY_VOLUME, STOREY, bandLabels } from "../lib/priceBands";
 import { useChat } from "../lib/chat";
 import { setPendingPriceFilters } from "../lib/pendingPriceFilters";
 
@@ -40,7 +40,9 @@ export function BandTables({ price }: { price: PriceResult }) {
             <tr key={r.value} className={current === r.value ? "font-semibold" : ""}>
               <td className="py-0.5">{r.label}</td>
               <td className="py-0.5 text-right">{s.volume}</td>
-              <td className="py-0.5 text-right">{sgd0(s.median)}</td>
+              <td className="py-0.5 text-right" title={s.volume < MIN_SUMMARY_VOLUME ? "Too few sales for a median" : undefined}>
+                {s.volume < MIN_SUMMARY_VOLUME ? "—" : sgd0(s.median)}
+              </td>
             </tr>
           );
         })}
@@ -53,6 +55,9 @@ export function BandTables({ price }: { price: PriceResult }) {
     <div className="mt-3 grid gap-4 border-t border-slate-200 pt-3 sm:grid-cols-2 dark:border-slate-700">
       {table(`By remaining lease${labels.storey ? ` (${labels.storey})` : ""}`, "lease", LEASE, price.filters.lease_band)}
       {table(`By floor${labels.lease ? ` (${labels.lease})` : ""}`, "storey", STOREY, price.filters.storey_band)}
+      {breakdown.some((b) => b.volume > 0 && b.volume < MIN_SUMMARY_VOLUME) && (
+        <p className="text-xs text-slate-500 sm:col-span-2">— fewer than {MIN_SUMMARY_VOLUME} sales: too few for a median.</p>
+      )}
     </div>
   );
 }
@@ -64,13 +69,14 @@ const monthLabel = (yyyyMm: string) => {
 };
 
 /** The latest matching sales: real comparables, not a valuation. */
-export function RecentSales({ price }: { price: PriceResult }) {
+export function RecentSales({ price, open = false }: { price: PriceResult; open?: boolean }) {
   const sales = price.recent_sales ?? [];
   if (!sales.length) return null;
+  const all = sales.length === price.volume;
   return (
-    <details className="mt-3 border-t border-slate-200 pt-2 text-xs dark:border-slate-700">
+    <details open={open} className="mt-3 border-t border-slate-200 pt-2 text-xs dark:border-slate-700">
       <summary className="cursor-pointer font-medium text-slate-600 dark:text-slate-300">
-        {sales.length} most recent matching sales
+        {all ? `All ${sales.length} matching ${sales.length === 1 ? "sale" : "sales"}` : `${sales.length} most recent matching sales`}
       </summary>
       <div className="mt-2 overflow-x-auto">
         <table className="w-full min-w-[480px]">
@@ -216,7 +222,7 @@ export function NarrowItDown({ price }: { price: PriceResult }) {
           onClick={submit}
           className="rounded-full bg-coral-500 px-3 py-1 text-sm text-white hover:bg-coral-600"
         >
-          Update estimate
+          Update figures
         </button>
         <button type="button" onClick={() => setOpen(false)} className="px-2 text-sm text-slate-500 hover:underline">
           Cancel

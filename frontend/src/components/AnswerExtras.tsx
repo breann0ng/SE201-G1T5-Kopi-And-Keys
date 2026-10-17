@@ -5,7 +5,7 @@ import { usePrefs } from "../lib/prefs";
 import { AnswerTrace } from "./AnswerTrace";
 import { IncomeNotes, OverviewTable, RelatedPassages } from "./Overview";
 import { BandTables, NarrowItDown, RecentSales } from "./PriceRefine";
-import { bandLabels } from "../lib/priceBands";
+import { MIN_SUMMARY_VOLUME, bandLabels } from "../lib/priceBands";
 import { SourceMaterial } from "./SourceMaterial";
 
 export function StatusBadge({ meta }: { meta: AdvisorMeta | undefined }) {
@@ -107,6 +107,13 @@ function PriceCard({ price }: { price: PriceResult }) {
         {Object.values(bandLabels(f)).filter(Boolean).map((label) => ` · ${label}`)} · {period} ·{" "}
         {price.volume.toLocaleString("en-SG")} {price.volume === 1 ? "sale" : "sales"}
       </p>
+      {price.volume < MIN_SUMMARY_VOLUME ? (
+        <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
+          Only {price.volume} matching {price.volume === 1 ? "sale" : "sales"}: too few for a reliable summary, and not
+          a guide to what any particular flat is worth. Each sale is shown below; widen the filters for a summary.
+        </p>
+      ) : (
+      <>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
         {[
           ["Lowest", price.minimum],
@@ -122,13 +129,15 @@ function PriceCard({ price }: { price: PriceResult }) {
         ))}
       </div>
       <PriceRange price={price} />
-      {price.volume > 0 && price.volume < 10 && (
+      {price.volume < 10 && (
         <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
           Only {price.volume} sales: treat these figures with caution, or widen the filters.
         </p>
       )}
+      </>
+      )}
       <BandTables price={price} />
-      <RecentSales price={price} />
+      <RecentSales price={price} open={price.volume < MIN_SUMMARY_VOLUME} />
       <NarrowItDown price={price} />
     </div>
   );

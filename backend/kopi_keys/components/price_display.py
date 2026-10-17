@@ -13,6 +13,9 @@ from decimal import Decimal
 
 from ..schemas import PriceFilters, PriceResult
 
+# Below this many sales a median would read like a price for one flat (a valuation), so the
+# answer lists the sales instead. The UI uses the same threshold (src/lib/priceBands.ts).
+MIN_SUMMARY_VOLUME = 5
 _MONEY = r"(?:SGD\s*|S\$\s*|\$\s*)?([\d,]+(?:\.\d+)?)"
 _LINES = {
     "mean": re.compile(rf"^\s*Mean:\s*{_MONEY}\s*$", re.IGNORECASE),
@@ -108,6 +111,15 @@ def price_answer(price_text: str, price: PriceResult) -> str:
         return f"**{subject}**, {period}\n\n{lines}"
     sales = int(parsed["volume"][0].replace(",", ""))
     low, high = parsed["range"]
+    if sales < MIN_SUMMARY_VOLUME:
+        return (
+            f"**{subject}** had only {sales} matching {'sale' if sales == 1 else 'sales'} ({period}): "
+            "too few for a reliable summary, and not a guide to what any particular flat is worth. "
+            f"{'It sold' if sales == 1 else 'They sold'} for {money(low)}"
+            + (f" to {money(high)}" if low != high else "")
+            + "; each sale is listed below. Widen the filters for a summary.\n\n"
+            "*Source: HDB resale flat prices (data.gov.sg). Past sales only, not a valuation of any particular flat.*"
+        )
     note = lease_note(price)
     return (
         f"**{subject}** sold for a median of **{money(parsed['median'][0])}** "

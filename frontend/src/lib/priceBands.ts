@@ -1,5 +1,9 @@
 import type { LeaseBand, PriceFilters, StoreyBand } from "./api";
 
+/** Below this many sales, show each sale instead of a median (a median of 2-3 sales reads like a
+ * valuation of one flat). Matches MIN_SUMMARY_VOLUME in backend/kopi_keys/components/price_display.py. */
+export const MIN_SUMMARY_VOLUME = 5;
+
 // Bands match backend/kopi_keys/components/price_query.py (LEASE_BANDS, STOREY_BANDS).
 export const LEASE: { value: LeaseBand; label: string }[] = [
   { value: "under_60", label: "Under 60 yrs" },

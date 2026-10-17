@@ -32,6 +32,15 @@ def test_labels():
 
 def test_one_sale_is_singular_and_unexpected_layout_falls_back_to_the_verified_lines():
     one = VERIFIED.replace("143 transactions", "1 transactions")
-    assert "1 sale)" in price_answer(one, PRICE)
+    text = price_answer(one, PRICE)
+    assert "only 1 matching sale" in text and "median" not in text
     fallback = price_answer("Median: SGD 1,050,000.00", PRICE)
     assert "- Median: SGD 1,050,000.00" in fallback
+
+
+def test_fewer_than_five_sales_lists_sales_instead_of_a_median():
+    few = VERIFIED.replace("143 transactions", "4 transactions")
+    text = price_answer(few, PRICE)
+    assert "only 4 matching sales" in text and "too few for a reliable summary" in text
+    assert "$510,000 to $1,588,000" in text and "median" not in text
+    assert "median of" in price_answer(VERIFIED.replace("143 transactions", "5 transactions"), PRICE)
