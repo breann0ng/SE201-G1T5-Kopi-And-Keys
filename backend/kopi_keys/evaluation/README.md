@@ -49,6 +49,26 @@ End-to-end runs call Ollama for every question and take a long time on CPU.
 | Ask-next accuracy | 67% (2/3) | none set |
 | Recall@5, hybrid retriever | 60% (12/20) | ≥ 85% |
 
+End to end (`--retriever hybrid --local`, 8 threads, 3 passages / 800 words; ~20 min):
+
+| Metric | Run 1 | Run 2 (after date and hyphen fixes) | Run 3 (after reply and keep-verified fixes) | Target |
+|---|---|---|---|---|
+| Routing | 100% (30/30) | 100% (30/30) | 100% (30/30) | ≥ 90% |
+| Unsafe answering | 25% (1/4) | 0% (0/4) | 0% (0/4) | ≤ 5% |
+| Over-abstention | 15% (4/26) | 12% (3/26) | 8% (2/26) | ≤ 10% |
+| Uncited answers | 0 | 0 | 0 | 0 |
+| Staleness | 0% (0/4) | 0% (0/4) | 0% (0/4) | 0% |
+
+Run 1's unsafe answer (OOS-02) gave recent prices to a question about another year; the
+router now reads named periods (`extract_month_range`). One false rejection (MIX-01) came
+from a PDF word split after a hyphen; the verifier now joins those (`_comparable`).
+Run 3 (2026-10-17) adds the multi-value clarification reply and keeping verified quotes:
+over-abstention is within target. Still declined: DSC-02 and CHG-04 (CHG-04's paraphrase is
+correctly rejected).
+Run 4 (2026-10-17) adds worked-example down-ranking: every figure identical to run 3 (no
+regression; no dev question depends on the four example chunks). Its benefit is on eligibility
+questions outside the dev set, such as the EHG question with an income.
+
 Recall@5 on the same 20 questions: keyword ranker alone 45%, dense vectors alone 55%,
 PR #5's keyword ranker 35%. The hybrid result was the same (60%) for dense weights 1 to 6,
 so `DENSE_WEIGHT = 3` is not finely tuned. Several remaining misses retrieve a different
@@ -57,3 +77,23 @@ changing the ranker.
 
 Discovery precision is low because the matcher suggests every card a profile *could*
 match (blocked cards included) and cards can't yet rule out by income.
+
+## Speed tuning (policy answers, laptop CPU)
+
+Measured on the first 8 dev policy questions (POL-01 to POL-07, CHG-01), Intel i7-1255U
+(2 performance + 8 efficiency cores), plugged in, Windows "Best performance" mode, Ollama
+qwen2.5:3b, nothing else using Ollama. Medians per answer; one run each, so treat as indicative.
+
+| Setting | Median | Answered + verified | Right source |
+|---|---|---|---|
+| 4 threads, 3 passages / 1,100 words (old default) | ~103 s | 8/8 | 4/8 |
+| 8 threads, 3 / 1,100 | ~67 s | 8/8 | 3/8 |
+| 6 threads / 10 threads, 3 / 1,100 | ~75 s / ~60 s | 6/8 / 7/8 | one 28 to 48 min stall each |
+| 8 threads, 2 / 800 | ~19 s | 5/8 (3 declined) | 1/8 |
+| **8 threads, 3 / 800 (new default)** | **~37 s** | **8/8** | **4/8** |
+
+- Threads: `KOPI_OLLAMA_NUM_THREADS=8` in `.env` (documented in `.env.example`).
+- Passage budget: `KOPI_POLICY_MAX_PASSAGES` / `KOPI_POLICY_MAX_WORDS`, defaults 3 / 800.
+- Output length was not cut: answers use about 120 to 175 output tokens, far below the 850-token
+  cap, so a lower cap would save little and risk truncated (declined) answers.
+- On battery or in a power-saving mode the same answers took about twice as long.
