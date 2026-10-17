@@ -82,3 +82,19 @@ def test_all_dataset_towns_and_aliases_are_extracted():
     assert extract_fields("flat in AMK")["town"] == "ANG MO KIO"
     assert extract_fields("My parents live in Bedok, we want a 4-room in Tampines")["town"] == "TAMPINES"
 
+
+
+def test_how_much_for_a_flat_or_town_asks_for_flat_type_instead_of_declining():
+    from kopi_keys.components.query_router import route_query
+    for question, town in [
+        ("how much is a flat in toa payoh", "TOA PAYOH"),
+        ("how much are flats in tampines", "TAMPINES"),
+        ("how much did units in bishan sell for", "BISHAN"),
+    ]:
+        routed = route_query(question, {})
+        assert routed.route == "clarify", question
+        assert routed.town == town and routed.missing_fields == ["flat_type"]
+    # Policy questions that mention a flat stay policy questions.
+    assert route_query("how much CPF can I use for a resale flat?", {}).route == "policy"
+    assert route_query("how much is the option fee?", {}).route == "policy"
+    assert route_query("Tell me a joke.", {}).route == "abstain"

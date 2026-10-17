@@ -57,6 +57,16 @@ UNANSWERABLE_PATTERNS = (
 )
 
 
+# "How much is a flat in Toa Payoh?" names no flat type and no strong price word,
+# but a flat or a town makes "how much" / "sold" a price question (the router then
+# asks for the missing flat type instead of declining).
+PRICE_SUBJECT = re.compile(r"\b(?:flats?|units?)\b", re.IGNORECASE)
+
+
+def _names_a_town(message: str) -> bool:
+    return bool(TOWN_PATTERN.search(message))
+
+
 def classify_intent(message: str) -> Intent:
     normalized = message.casefold()
     if any(pattern in normalized for pattern in UNANSWERABLE_PATTERNS):
@@ -71,6 +81,7 @@ def classify_intent(message: str) -> Intent:
         or any(word in normalized for word in (
             "price", "median", "benchmark", "going for", "cost", "damage", "listed at",
         ))
+        or (not has_policy and (bool(PRICE_SUBJECT.search(message)) or _names_a_town(message)))
     )
     has_explicit_price_stat = any(
         word in normalized
