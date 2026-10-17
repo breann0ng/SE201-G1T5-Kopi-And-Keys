@@ -1,4 +1,4 @@
-from kopi_keys.components.policy_retrieval import DemoPolicyRetriever
+from fakes import FictionalRetriever
 from kopi_keys.components.synthesiser import SynthesisResult, Synthesiser
 from kopi_keys.graph import build_graph, run_graph
 from kopi_keys.schemas import ChatRequest, Claim, Draft, PriceFilters, PriceResult, Suggestion
@@ -21,7 +21,7 @@ class ScriptedSynthesiser:
 
 def graph(synthesiser=None, retriever=None, price_tool=None):
     return build_graph(
-        retriever=retriever or DemoPolicyRetriever(),
+        retriever=retriever or FictionalRetriever(),
         price_tool=price_tool,
         synthesiser=synthesiser or Synthesiser(engine=None),
         cards=[],
@@ -76,7 +76,7 @@ def test_persistent_unknown_citation_is_never_shown():
 def test_superseded_source_is_rejected():
     class OldAndNewRetriever:
         def search(self, query, limit=5):
-            current = DemoPolicyRetriever().search("demo programme")[0]
+            current = FictionalRetriever().search("demo programme")[0]
             old = current.model_copy(update={"id": "demo-old", "superseded": True})
             return [current, old]
 
@@ -161,3 +161,20 @@ def test_structured_filters_from_request_reach_the_price_tool():
     filters = PriceFilters(town="TAMPINES", flat_type="4 ROOM", start_month="2025-01", end_month="2025-12")
     run_graph(graph(price_tool=RecordingPriceTool()), ChatRequest(message="prices", price_filters=filters))
     assert seen == [filters]
+
+
+def test_verified_quotes_are_kept_and_invented_ones_dropped_without_a_repair():
+    """Added 2026-10-17: one invented quote no longer sinks a genuine one, and needs no repair."""
+    good = "The fictional demo programme requires the related demo condition to be met."
+    real = Claim(text=good, citation_ids=["demo-programme"], supporting_quote=good)
+    fake = Claim(text="Invented sentence.", citation_ids=["demo-programme"], supporting_quote="Invented sentence.")
+    state = run_graph(graph(ScriptedSynthesiser(answer(real, fake))),
+                      ChatRequest(message=POLICY_QUESTION))
+    assert state.response.status == "answered"
+    assert [c.text for c in state.draft.claims] == [good]
+
+
+def test_final_repair_still_declines_when_no_quote_is_verified():
+    fake = Claim(text="Invented sentence.", citation_ids=["demo-programme"], supporting_quote="Invented sentence.")
+    state = run_graph(graph(ScriptedSynthesiser(answer(fake), answer(fake))), ChatRequest(message=POLICY_QUESTION))
+    assert state.response.status == "abstained"

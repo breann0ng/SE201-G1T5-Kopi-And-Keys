@@ -15,5 +15,9 @@
     "CHUNK_HFE_19"
   ],
   "question_template": "For a {household_type} household with citizenship {citizenship}, what does the HFE letter assess, when must it be obtained, and how long is it valid?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_HFE_01",
+    "quote": "You need an HFE letter before you can buy an HDB flat."
+  }
 }

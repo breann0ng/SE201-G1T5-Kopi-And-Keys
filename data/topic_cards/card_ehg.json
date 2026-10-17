@@ -28,5 +28,9 @@
     "CHUNK_EHG_11"
   ],
   "question_template": "For a {household_type} household with citizenship {citizenship}, first-timer status {first_timer}, youngest applicant aged {age} and average gross monthly household income of {household_income}, is the household eligible for the Enhanced CPF Housing Grant, and which EHG amount applies?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_EHG_05",
+    "quote": "From 20 August 2024, first-timer families may qualify for an EHG of up to $120,000, while a couple comprising a first-timer and second-timer may qualify for an EHG (Singles) of up to $60,000."
+  }
 }

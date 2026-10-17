@@ -17,16 +17,20 @@ from langgraph.graph import END, START, StateGraph
 from pydantic import ValidationError
 
 from .components.abstention import abstention_message
-from .components.policy_retrieval import TOP_K, DemoPolicyRetriever, PolicyRetriever
+from .components.policy_retrieval import TOP_K, PolicyRetriever, KeywordPolicyRetriever
 from .components.price_query import (
     PriceQueryTool, ToolUnavailableError, UnconfiguredPriceTool, filters_from_state,
 )
 from .components.query_router import EXTRACTED_FIELDS, route_query
 from .components.synthesiser import Synthesiser, SynthesiserAgent
-from .components.topic_cards import TopicCard, load_cards, match_cards, personal_eligibility_fields
+from .components.topic_cards import (
+    TopicCard, discovery_question_field, income_ceiling_checks, load_cards, match_cards,
+    personal_eligibility_fields, suggestion_cards,
+)
+from .topic_cards import OVERVIEW_TOPICS, overview_topic
 from .components.verifier import verify
 from .llm import OllamaEngine
-from .schemas import ChatRequest, ChatResponse, DataOrigin
+from .schemas import ChatRequest, ChatResponse, DataOrigin, IncomeNote, OverviewItem, Suggestion
 from .state import GraphState, initial_state
 
 
@@ -55,9 +59,12 @@ def build_graph(
     synthesiser: SynthesiserAgent | None = None,
     cards: list[TopicCard] | None = None,
     max_repairs: int = MAX_REPAIRS,
-    data_mode: str = "demo",
+    data_mode: str | None = None,
 ):
-    retriever = retriever or DemoPolicyRetriever()
+    retriever = retriever or KeywordPolicyRetriever()
+    # Stamped on every response: the retriever declares its evidence ("snapshot" or "demo");
+    # data_mode overrides it (tests with stub retrievers). Undeclared stubs count as demo.
+    mode = data_mode or getattr(retriever, "mode", "demo")
     price_tool = price_tool or UnconfiguredPriceTool()
     synthesiser = synthesiser or Synthesiser(OllamaEngine())
     cards = load_cards() if cards is None else cards
@@ -65,7 +72,7 @@ def build_graph(
     # --- Nodes --------------------------------------------------------------
 
     def query_router(state: GraphState):
-        known = {field: getattr(state, field) for field in EXTRACTED_FIELDS}
+        known = {field: getattr(state, field) for field in (*EXTRACTED_FIELDS, "start_month", "end_month")}
         routed = route_query(state.message, known, context_question=state.followup_question)
         return {**routed.model_dump(), "trace": [f"query_router:{routed.route}"]}
 
@@ -97,7 +104,49 @@ def build_graph(
             return {"route": "clarify", "missing_fields": missing,
                     "trace": ["topic_cards:needs_profile"]}
         card_ids = match_cards(state, cards)
-        return {"candidate_card_ids": card_ids, "trace": [f"topic_cards:{len(card_ids)} matched"]}
+        update = {"candidate_card_ids": card_ids, "trace": [f"topic_cards:{len(card_ids)} matched"]}
+        # Discovery questions are answered straight away; when a missing profile detail would
+        # unlock more topic cards, the answer carries a hint to fill in "Your situation".
+        if discovery_question_field(state, cards):
+            update["profile_hint"] = True
+        # Broad questions ("what grants are there?") also get an overview table: each scheme's
+        # verbatim official sentence from its card, cited to its chunk. Needs a retriever that
+        # can fetch named chunks (the real snapshot retrievers can; test stubs can't).
+        topic = overview_topic(state.followup_question or state.message)
+        if topic and state.route in POLICY_ROUTES and hasattr(retriever, "get"):
+            by_id = {card.card_id: card for card in cards}
+            passages = {p.id: p for p in state.passages}
+            items = []
+            for card_id in OVERVIEW_TOPICS[topic]:
+                card = by_id.get(card_id)
+                if card is None or card.overview is None:
+                    continue
+                found = retriever.get([card.overview.chunk_id])
+                if found:
+                    passages.setdefault(found[0].id, found[0])
+                    items.append(OverviewItem(card_id=card_id, title=card.topic_name,
+                                              quote=card.overview.quote, citation_id=found[0].id))
+            if items:
+                update.update(overview=items, passages=list(passages.values()))
+                update["trace"] = [f"topic_cards:{len(card_ids)} matched, overview:{topic} ({len(items)})"]
+        # Matched cards the answer didn't cover become cited suggestions (not with an overview,
+        # which already lists the schemes).
+        if card_ids and "overview" not in update and state.route in POLICY_ROUTES and hasattr(retriever, "get"):
+            passages = {p.id: p for p in update.get("passages", state.passages)}
+            seeds = []
+            for card in suggestion_cards(card_ids, cards, state.followup_question or state.message):
+                found = retriever.get([card.overview.chunk_id])
+                if found:
+                    passages.setdefault(found[0].id, found[0])
+                    seeds.append(Suggestion(card_id=card.card_id, text=card.topic_name, citation_ids=[found[0].id]))
+            if seeds:
+                update.update(suggestion_seeds=seeds, passages=list(passages.values()))
+        notes = income_ceiling_checks(state, card_ids, topic)
+        if notes:
+            update["income_notes"] = [IncomeNote(
+                scheme=c.scheme, label=c.label, ceiling=f"{c.ceiling:,.0f}", within_ceiling=c.within_ceiling,
+                message=c.message, source_url=c.source_url, conditions=list(c.conditions)) for c in notes]
+        return update
 
     def synthesiser_node(state: GraphState):
         result = synthesiser.synthesise(state)
@@ -125,6 +174,22 @@ def build_graph(
             "trace": ["verifier:failed" if errors else "verifier:passed"],
         }
         if errors:
+            # Added 2026-10-17: keep the quotes that pass every check on their own, if the
+            # trimmed answer then passes in full, instead of a ~60 s repair or declining everything.
+            # E.g. a genuine EHG quote was lost because a second quote stitched worked-example table
+            # cells into a sentence that is not in the source. A repair still runs when no quote passes.
+            if state.draft is not None and state.draft.claims:
+                kept = [c for c in state.draft.claims
+                        if not verify(state.model_copy(update={"draft": state.draft.model_copy(update={"claims": [c]})}))]
+                if kept and len(kept) < len(state.draft.claims):
+                    trimmed = state.draft.model_copy(update={"claims": kept})
+                    if not verify(state.model_copy(update={"draft": trimmed})):
+                        return {
+                            "draft": trimmed,
+                            "verification_errors": [],
+                            "verification_passed": True,
+                            "trace": [f"verifier:passed after dropping {len(state.draft.claims) - len(kept)} unverified quote(s)"],
+                        }
             if state.repair_count >= max_repairs:
                 update["abstain_reason"] = "verification_failed"
             else:
@@ -143,8 +208,8 @@ def build_graph(
             "abstain_reason": reason,
             "trace": [f"abstention:{reason}"],
             "response": ChatResponse(
-                mode=data_mode,
                 status="abstained",
+                mode=mode,
                 route=state.route,
                 message=abstention_message(reason, detail),
                 retrieval_rounds=len(state.retrieval_queries),
@@ -157,7 +222,7 @@ def build_graph(
         trace = [*state.trace, "output"]
         if draft.kind == "clarify":
             return {"trace": ["output"], "response": ChatResponse(
-                mode=data_mode, status="clarifying", route=state.route, message=draft.message, trace=trace,
+                status="clarifying", mode=mode, route=state.route, message=draft.message, trace=trace,
                 asking_for={"user_age": "age", "income": "household_income"}.get(
                     state.missing_fields[0], state.missing_fields[0])
                     if state.missing_fields and state.missing_fields[0] in {
@@ -180,14 +245,19 @@ def build_graph(
             ))
         cited = {cid for claim in draft.claims for cid in claim.citation_ids}
         cited |= {cid for s in draft.suggestions for cid in s.citation_ids}
+        cited |= {item.citation_id for item in state.overview}
         return {"trace": ["output"], "response": ChatResponse(
-            mode=data_mode,
             status="answered",
+            mode=mode,
             route=state.route,
             message="\n\n".join(parts),
             citations=[p for p in state.passages if p.id in cited],
             price_result=price,
             suggestions=draft.suggestions,
+            overview=state.overview,
+            profile_hint=state.profile_hint,
+            income_notes=state.income_notes,
+            related=[p for p in state.passages if p.id not in cited and not p.superseded],
             retrieval_rounds=len(state.retrieval_queries),
             trace=trace,
         )}
@@ -235,7 +305,9 @@ def build_graph(
     graph.add_conditional_edges("verifier", after_verifier, ["synthesiser", "output", "abstention"])
     graph.add_edge("abstention", END)
     graph.add_edge("output", END)
-    return graph.compile()
+    compiled = graph.compile()
+    compiled.evidence_mode = mode  # read by /health in main.py
+    return compiled
 
 
 def run_graph(graph, request: ChatRequest, data_origin: DataOrigin = "database") -> GraphState:

@@ -24,5 +24,9 @@
     "CHUNK_FAMILY_01"
   ],
   "question_template": "For a {household_type} household with citizenship {citizenship}, first-timer status {first_timer} and average gross monthly household income of {household_income}, buying a {flat_type} resale flat, does the CPF Housing Grant for Resale Flats (Families) apply, and what amount is stated for this citizenship and flat type?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_FAMILY_01",
+    "quote": "Under the CPF Housing Grant Scheme, you may qualify for a housing subsidy of up to $80,000 to help with the purchase of a resale flat."
+  }
 }

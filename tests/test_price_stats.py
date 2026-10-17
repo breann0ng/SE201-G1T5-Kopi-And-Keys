@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from kopi_keys.components.policy_retrieval import DemoPolicyRetriever
+from fakes import FictionalRetriever
 from kopi_keys.components.price_query import (
     InvalidPriceFilterError, SqlitePriceTool, ToolUnavailableError, _cents, _quantile, is_low_volume,
 )
@@ -141,7 +141,7 @@ def test_stage3_verifier_accepts_text_built_from_stage2_output(tool):
 # --- inside the graph --------------------------------------------------------
 
 def _graph(tool):
-    return build_graph(retriever=DemoPolicyRetriever(), price_tool=tool,
+    return build_graph(retriever=FictionalRetriever(), price_tool=tool,
                        synthesiser=Synthesiser(engine=None), cards=[])
 
 

@@ -12,6 +12,7 @@ Checks:
  6. every trigger_conditions key/value exists in vocab.json
  7. question_template has no policy figures (digits or $) and only {placeholders}
  8. every raw file's sha256 matches manifest.json (snapshot evidence is byte-exact)
+ 9. every card's overview quote appears verbatim in its current (not superseded) chunk
 """
 from __future__ import annotations
 
@@ -53,6 +54,11 @@ class Chunk(Strict):
     content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
+class OverviewQuote(Strict):
+    chunk_id: str
+    quote: str = Field(min_length=10)
+
+
 class Card(Strict):
     card_id: str = Field(pattern=r"^CARD_[A-Z_]+$")
     topic_name: str = Field(min_length=1)
@@ -61,6 +67,7 @@ class Card(Strict):
     supporting_chunk_ids: list[str] = Field(min_length=1)
     question_template: str = Field(min_length=1)
     snapshot_date: date
+    overview: OverviewQuote | None = None
 
 
 def main() -> int:
@@ -161,6 +168,16 @@ def main() -> int:
         if card.snapshot_date.isoformat() != day:
             tmpl.append(f"{card.card_id}: snapshot_date {card.snapshot_date} != {day}")
     check("question_template has no figures", tmpl)
+    overview = []
+    for card in cards:
+        if card.overview is None:
+            continue
+        c = chunks.get(card.overview.chunk_id)
+        if c is None or c.superseded:
+            overview.append(f"{card.card_id}: overview chunk {card.overview.chunk_id} missing or superseded")
+        elif card.overview.quote not in c.content:
+            overview.append(f"{card.card_id}: overview quote not verbatim in {card.overview.chunk_id}")
+    check("overview quotes verbatim", overview)
 
     print(f"Validating snapshot {day}: {len(chunks)} chunks, {len(cards)} cards\n")
     for name, n in results:

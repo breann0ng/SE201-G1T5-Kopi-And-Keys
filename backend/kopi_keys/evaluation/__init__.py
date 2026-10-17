@@ -1,6 +1,7 @@
-"""Evaluation harness: PLACEHOLDER (proposal section 4 and Appendix E).
+"""Evaluation harness (proposal section 4 and Appendix E). See README.md.
 
-run_eval.py   run the development or held-out set through graph.run_graph
-metrics.py    one function per Appendix E metric
-baselines.py  same LLM without tools; naive single-call RAG
+dataset.py    load, validate and resolve the labelled question sets; regenerate Stage 1 labels
+metrics.py    one function per Appendix E metric that can be computed deterministically
+baselines.py  retrievers to score; answer-level baselines (TODO)
+run_eval.py   python -m kopi_keys.evaluation.run_eval
 """

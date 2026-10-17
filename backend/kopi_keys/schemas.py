@@ -15,6 +15,9 @@ Intent = Literal["policy", "price", "mixed", "discovery", "unanswerable"]
 RouterStatus = Literal["continue", "clarify", "abstain"]
 Route = Literal["policy", "price", "mixed", "discovery", "clarify", "abstain"]
 DataOrigin = Literal["database", "synthetic_fixture"]
+# Where policy evidence comes from: "demo" = fictional test passages,
+# "snapshot" = the official ACTIVE policy snapshot.
+EvidenceMode = Literal["demo", "snapshot"]
 
 CENT = Decimal("0.01")
 PRICE_METRICS = ("mean", "median", "iqr", "minimum", "maximum")
@@ -150,9 +153,31 @@ class Draft(Contract):
 
 # --- API output ------------------------------------------------------------
 
+class OverviewItem(Contract):
+    """One row of an overview answer: a topic card and its verbatim official sentence."""
+
+    card_id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    quote: str = Field(min_length=1)
+    citation_id: str = Field(min_length=1)
+
+
+class IncomeNote(Contract):
+    """A grant's income ceiling compared with the stated income (rules/income.py). Never a verdict."""
+
+    scheme: str
+    label: str
+    ceiling: str
+    within_ceiling: bool
+    message: str
+    source_url: str
+    # HDB's ceiling variants, verbatim from source_url (rules/income_ceilings.json "conditions").
+    conditions: list[str] = Field(default_factory=list)
+
+
 class ChatResponse(Contract):
     status: Literal["answered", "clarifying", "abstained"]
-    mode: Literal["demo", "snapshot"] = "demo"
+    mode: EvidenceMode = "demo"
     route: Route | None = None
     message: str
     citations: list[PolicyPassage] = Field(default_factory=list)
@@ -161,3 +186,11 @@ class ChatResponse(Contract):
     retrieval_rounds: int = 0
     trace: list[str] = Field(default_factory=list)
     asking_for: Literal["citizenship", "age", "household_income", "first_timer", "household_type"] | None = None
+    # Broad questions: one row per relevant scheme, each cited (see topic_cards.overview_topic).
+    overview: list[OverviewItem] = Field(default_factory=list)
+    # Retrieved official passages the answer did not quote, for readers who want more context.
+    related: list[PolicyPassage] = Field(default_factory=list)
+    # Grant questions with a stated income: verified ceilings compared with it (never eligibility).
+    income_notes: list[IncomeNote] = Field(default_factory=list)
+    # Discovery question where a missing "Your situation" detail would unlock more topic cards.
+    profile_hint: bool = False

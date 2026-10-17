@@ -26,7 +26,7 @@ Supporting chunks are selected by rule:
 ## How this fits the graph on `main` (note for the team, 2026-10-16)
 
 On `main`, `backend/kopi_keys/components/topic_cards.py` is a placeholder for the
-topic-card owner (Person 4) to fill in. Its example card format
+topic-card owner (Sandra) to fill in. Its example card format
 (`id` / `title` / `triggers` / `chunk_ids`) was marked "illustrative only; the card
 owner decides the real one". The 12 cards here use the real format above:
 `card_id` / `topic_name` / `trigger_conditions` / `supporting_chunk_ids`.

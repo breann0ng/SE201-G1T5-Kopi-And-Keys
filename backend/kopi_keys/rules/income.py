@@ -36,6 +36,8 @@ class IncomeCheck:
     effective_from: str | None
     checked_on: str
     verified: bool                # False: figure not yet confirmed on an official page
+    # Added 2026-10-17: HDB's ceiling variants, verbatim (e.g. $24,000 for extended families).
+    conditions: tuple[str, ...] = ()
 
     @property
     def message(self) -> str:
@@ -47,6 +49,8 @@ class IncomeCheck:
         else:
             text = (f"An income of SGD {self.income:,.2f} is above the {self.label} "
                     f"ceiling of SGD {self.ceiling:,.2f}.")
+        if self.conditions:
+            text += " Different ceilings apply in some situations; see HDB's conditions."
         if self.near_boundary:
             text += " It is close to the ceiling, so HDB's own income assessment will decide."
         text += " Other conditions also apply; only HDB's HFE letter confirms eligibility."
@@ -102,6 +106,7 @@ def check_income_ceiling(scheme: str, monthly_household_income, *, config: Path 
         within_ceiling=within, near_boundary=near, margin=margin,
         source_url=rule["source_url"], effective_from=rule.get("effective_from"),
         checked_on=rule["checked_on"], verified=bool(rule["verified"]),
+        conditions=tuple(rule.get("conditions", ())),
     )
 
 

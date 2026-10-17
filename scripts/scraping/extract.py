@@ -21,7 +21,7 @@ from bs4 import BeautifulSoup
 from fetch import ROOT, SNAPSHOT_DATE
 
 THIN_WORDS = 200
-# Source ranking for retrieval/citation (1 = most authoritative). Decided by Person 4,
+# Source ranking for retrieval/citation (1 = most authoritative). Decided by Sandra,
 # 2026-10-15: explainer articles rank below official scheme pages.
 SOURCE_TIERS = [
     ("https://www.hdb.gov.sg/", 1, "HDB official scheme page / HDB-published PDF"),

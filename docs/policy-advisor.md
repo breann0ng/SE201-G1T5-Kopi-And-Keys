@@ -10,9 +10,12 @@ existing prompt and inference limits.
 1. The rule-based router recognises housing loans, mortgages, financing and
    questions such as “Can a Singapore PR couple buy a resale flat?”. General
    questions about HDB ask which topic the user wants.
-2. Keyword retrieval removes polite filler, normalises common word forms and PR
-   terminology, favours substantive official conditions, and removes duplicate
-   text. This remains a keyword retriever, not the final embedding/hybrid RAG.
+2. Retrieval is hybrid (updated 2026-10-17, replacing this PR's keyword-only
+   ranker): a keyword ranker that removes filler, folds plurals, expands
+   abbreviations (PR, EHG, HFE, OTP), weights official pages above explainers
+   and removes duplicate text, fused with EmbeddingGemma vectors in ChromaDB.
+   Build the index once with `scripts/build_policy_index.py`; without it the
+   keyword ranker serves alone. See `components/policy_retrieval.py`.
 3. Personal EHG and loan-eligibility requests use the relevant topic card's
    `required_fields`. Missing details produce a clarification before inference.
    Household type is available in the profile sidebar. Having those details does
@@ -94,12 +97,13 @@ Qwen3 thinking is disabled by the wrapper for these short grounded answers.
 Leave that variable unset to use the existing model. The downloaded Qwen3 model
 can remain installed without changing the application's default.
 
-Production retrieval scoring can be evaluated on the committed dev split with:
+Production retrieval is scored on the committed dev set with:
 
 ```powershell
-.\.venv\Scripts\python.exe evaluation\run_eval.py --retriever kopi_keys.components.policy_retrieval:retrieve_chunk_ids
+.\.venv\Scripts\python.exe -m kopi_keys.evaluation.run_eval --retriever hybrid
 ```
 
-On the current dev snapshot this scores Recall@5 56% (9/16), compared with 38%
-(6/16) for the untouched plain-BM25 baseline. This is development evidence,
-below the 85% target, not a held-out result or a claim of final policy accuracy.
+On the combined 30-question dev set (2026-10-17) Recall@5 is 60% (12/20) for the
+hybrid retriever and 45% for the keyword ranker alone (this PR's original keyword
+ranker scored 35% on the same set). This is development evidence, below the 85%
+target, not a held-out result. See `backend/kopi_keys/evaluation/README.md`.

@@ -21,5 +21,9 @@
     "CHUNK_EIP_05"
   ],
   "question_template": "For a household with citizenship {citizenship} and ethnic group {ethnic_group}, buying a resale flat in block {block}, {town}, do the EIP and SPR quotas allow the purchase?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_EIP_01",
+    "quote": "When buying an HDB resale flat, you must ensure your household is within the EIP quota for the block and neighbourhood, and if applicable, the SPR quota as well."
+  }
 }

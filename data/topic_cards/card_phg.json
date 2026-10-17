@@ -22,5 +22,9 @@
     "CHUNK_PHG_09"
   ],
   "question_template": "For a {household_type} household with citizenship {citizenship} that will {lives_with_or_near_parents_or_child} their parents/ child, at a distance of {distance_to_parents_or_child}, does the Proximity Housing Grant apply, and which amount is stated?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_PHG_01",
+    "quote": "$30,000 to live with your parents/ child\n- $20,000 to live near your parents/ child (within 4km)"
+  }
 }

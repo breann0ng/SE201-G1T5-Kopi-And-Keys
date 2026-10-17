@@ -16,5 +16,9 @@
     "CHUNK_LEASE_04"
   ],
   "question_template": "For a resale flat with remaining lease of {remaining_lease}, where the youngest buyer is aged {age}, using CPF: {intends_to_use_cpf}, with a {loan_type} loan, how much CPF can be used and does the remaining lease cover the youngest buyer as required?",
-  "snapshot_date": "2026-10-15"
+  "snapshot_date": "2026-10-15",
+  "overview": {
+    "chunk_id": "CHUNK_LEASE_11",
+    "quote": "The total amount of CPF savings that can be used for your flat purchase and/ or paying monthly mortgage instalments will depend on the extent the remaining lease of the flat can cover the youngest buyer up to the age of 95."
+  }
 }

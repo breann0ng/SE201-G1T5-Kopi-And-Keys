@@ -161,6 +161,40 @@ CARDS = {
 }
 
 
+# One verbatim sentence per card for the overview table shown on broad questions
+# ("what grants are there?"). Hand-picked for being the clearest official summary;
+# each quote must appear word for word in its chunk, or the build stops.
+OVERVIEW = {
+    "CARD_EHG": ("CHUNK_EHG_05", "From 20 August 2024, first-timer families may qualify for an EHG of up to "
+                 "$120,000, while a couple comprising a first-timer and second-timer may qualify for an EHG "
+                 "(Singles) of up to $60,000."),
+    "CARD_FAMILY_GRANT": ("CHUNK_FAMILY_01", "Under the CPF Housing Grant Scheme, you may qualify for a housing "
+                          "subsidy of up to $80,000 to help with the purchase of a resale flat."),
+    "CARD_SINGLES_GRANT": ("CHUNK_SINGLES_01", "If you are a first-timer Singapore Citizen (SC) and buying a "
+                           "resale flat on your own, you may qualify for a Singles Grant of $40,000 for the "
+                           "purchase of a 2- to 4- room resale flat or $25,000 for a 5-room resale flat."),
+    "CARD_PHG": ("CHUNK_PHG_01", "$30,000 to live with your parents/ child\n- $20,000 to live near your "
+                 "parents/ child (within 4km)"),
+    "CARD_STEPUP_GRANT": ("CHUNK_STEPUP_01", "If you and your family are second-timer applicants, you may apply "
+                          "for the Step-Up CPF Housing Grant of $15,000 to help with your new or resale flat "
+                          "purchase."),
+    "CARD_HDB_LOAN": ("CHUNK_LOAN_26", "If you need financing to buy or take over the ownership of a flat, you "
+                      "may apply for a housing loan from HDB or the financial institutions (FI)."),
+    "CARD_INCOME_CEILING": ("CHUNK_FAMILY_04", "Your average gross monthly household income must not exceed: "
+                            "$16,000"),
+    "CARD_LEASE_ELIGIBILITY": ("CHUNK_LEASE_11", "The total amount of CPF savings that can be used for your flat "
+                               "purchase and/ or paying monthly mortgage instalments will depend on the extent "
+                               "the remaining lease of the flat can cover the youngest buyer up to the age of 95."),
+    "CARD_HFE_LETTER": ("CHUNK_HFE_01", "You need an HFE letter before you can buy an HDB flat."),
+    "CARD_NON_CITIZEN_ELIGIBILITY": ("CHUNK_ELIG_62", "Long Term Visit Pass or Work Pass of at least 6 months"),
+    "CARD_EIP_SPR_QUOTA": ("CHUNK_EIP_01", "When buying an HDB resale flat, you must ensure your household is "
+                           "within the EIP quota for the block and neighbourhood, and if applicable, the SPR "
+                           "quota as well."),
+    "CARD_RESALE_OTP_DEPOSIT": ("CHUNK_RESALE_41", "You must pay flat sellers an Option Fee when they grant you "
+                                "an OTP, and an Option Exercise Fee when you exercise the OTP."),
+}
+
+
 def main() -> None:
     date = sys.argv[1] if len(sys.argv) > 1 else (SNAPS / "ACTIVE").read_text(encoding="utf-8").strip()
     rows = [json.loads(ln) for ln in (ROOT / "data" / "policy_chunks" / date / "chunks.jsonl")
@@ -197,6 +231,12 @@ def main() -> None:
             "question_template": spec["question_template"],
             "snapshot_date": date,
         }
+        if card_id in OVERVIEW:
+            chunk_id, quote = OVERVIEW[card_id]
+            source = next((r for r in rows if r["chunk_id"] == chunk_id and not r["superseded"]), None)
+            if source is None or quote not in source["content"]:
+                raise SystemExit(f"{card_id}: overview quote not found verbatim in {chunk_id}")
+            card["overview"] = {"chunk_id": chunk_id, "quote": quote}
         path = out_dir / f"{card_id.lower()}.json"
         path.write_text(json.dumps(card, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"{card_id}: {len(picked)} matching chunks, kept {len(chosen)}: "

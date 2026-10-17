@@ -1,6 +1,7 @@
 """Bounded, cited policy summaries over retrieved evidence, not model memory."""
 
 import json
+import os
 import re
 import html
 from pydantic import Field, ValidationError, ValidationInfo, model_validator
@@ -149,6 +150,15 @@ def citizenship_conditions(state: GraphState) -> list[Claim]:
     return []
 
 
+# Evidence sent to the model per policy answer. Fewer words means faster CPU inference
+# but risks dropping the passage that holds the answer. Measured on 8 dev policy questions
+# at 8 threads (backend/kopi_keys/evaluation/README.md): 3 passages / 1,100 words took a
+# median 67 s; 3 / 800 took 37 s with the same 8/8 verified answers; 2 / 800 took 19 s but
+# declined 3 of 8. Default: 3 / 800.
+MAX_PASSAGES = int(os.getenv("KOPI_POLICY_MAX_PASSAGES", "3"))
+MAX_WORDS = int(os.getenv("KOPI_POLICY_MAX_WORDS", "800"))
+
+
 class PolicySummariser:
     def __init__(self, engine: TextEngine):
         self.engine = engine.for_policy(PolicyAnswer.model_json_schema()) if isinstance(engine, OllamaEngine) else engine
@@ -160,12 +170,12 @@ class PolicySummariser:
         for passage in state.passages:
             size = len(passage.text.split())
             heading_key = (passage.source_url, passage.title)
-            if passage.superseded or words + size > 1100 or heading_key in headings:
+            if passage.superseded or words + size > MAX_WORDS or heading_key in headings:
                 continue
             passages.append(passage)
             headings.add(heading_key)
             words += size
-            if len(passages) == 3:
+            if len(passages) == MAX_PASSAGES:
                 break
         if not passages:
             raise ModelEngineError("No policy evidence fits the model context budget.")

@@ -21,13 +21,13 @@ pre-labelled card IDs.
 | --- | --- | --- | --- |
 | Query Router (LLM) | `components/query_router.py` | Breann | Rule-based baseline; passes all 30 dev-set labels. LLM classifier not built. |
 | Discovery (merged) | `components/topic_cards.py`, `data/topic_cards/` | Sandra | Placeholder: schema and loader only; matching returns nothing. |
-| Policy Retrieval Tool | `components/policy_retrieval.py` | TBC | `SnapshotPolicyRetriever`: keyword (BM25) search over the ACTIVE snapshot's 849 chunks (interim, 2026-10-16). ChromaDB + EmbeddingGemma not connected yet; `DemoPolicyRetriever` kept for tests. |
+| Policy Retrieval Tool | `components/policy_retrieval.py` | TBC | `HybridPolicyRetriever`: keyword ranker (`KeywordPolicyRetriever`) fused with EmbeddingGemma vectors in ChromaDB (`components/policy_index.py`, built by `scripts/build_policy_index.py`); keyword-only fallback without the index. Fictional test passages live in `tests/fakes.py`, never in the app. Each retriever declares `mode` (`snapshot` or `demo`), stamped on every `ChatResponse` and on `/health`; the UI warns about fictional evidence only for `demo`. |
 | Price Query Tool | `components/price_query.py` | Tasha | Interface and contract only. SQLite not connected. |
 | Synthesiser Agent (LLM) | `components/synthesiser.py` | Nisha | Price summary uses a real CPU model. Policy answers are an extractive placeholder. Suggestions not built. |
 | Verifier | `components/verifier.py` | Nisha | Numeric checks, citation checks, superseded sources, price provenance and topic-card IDs. |
 | Abstention Output | `components/abstention.py` | Breann | Fixed messages per reason. |
 | Harness | `graph.py`, `state.py` | Breann | One graph; one retry, then abstain. |
-| Evaluation | `evaluation/` | TBC | Placeholder: runner, metrics and baselines not built. |
+| Evaluation | `evaluation/` | Sandra | Dev set loader, metrics and runner (`python -m kopi_keys.evaluation.run_eval`); answer-level baselines still TODO. See its README. |
 | Tracing | `trace` field on every response | Breann | Node-level trace only; LangSmith not connected. |
 
 ## Flow
