@@ -81,13 +81,28 @@ export function AnswerExtras({ response }: { response: ChatResponse }) {
 const sgd = (n: string | null) =>
   n === null ? "—" : Number(n).toLocaleString("en-SG", { style: "currency", currency: "SGD", maximumFractionDigits: 0 });
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const monthLabel = (yyyyMm: string) => {
+  const [y, m] = yyyyMm.split("-");
+  return `${MONTHS[Number(m) - 1]} ${y}`;
+};
+/** "5 ROOM" -> "5-room", "EXECUTIVE" -> "Executive". */
+const flatLabel = (t: string) => {
+  const m = /^(\d)\s*ROOM$/i.exec(t.trim());
+  return m ? `${m[1]}-room` : t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+};
+/** "TOA PAYOH" -> "Toa Payoh", "KALLANG/WHAMPOA" -> "Kallang/Whampoa". */
+const townLabel = (t: string) => t.toLowerCase().replace(/[a-z]+/g, (w) => w[0].toUpperCase() + w.slice(1));
+
 function PriceCard({ price }: { price: PriceResult }) {
   const f = price.filters;
+  const period =
+    f.start_month === f.end_month ? monthLabel(f.start_month) : `${monthLabel(f.start_month)} to ${monthLabel(f.end_month)}`;
   return (
     <div className="mt-3 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
       <p className="text-xs text-slate-500">
-        {f.flat_type} resale flats in {f.town}, {f.start_month} to {f.end_month} · {price.volume}{" "}
-        transactions
+        {flatLabel(f.flat_type)} resale flats in {townLabel(f.town)} · {period} · {price.volume.toLocaleString("en-SG")}{" "}
+        {price.volume === 1 ? "sale" : "sales"}
       </p>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
         {[
@@ -128,7 +143,7 @@ function PriceRange({ price }: { price: PriceResult }) {
           <div
             className="absolute top-1/2 h-4 w-0.5 -translate-x-1/2 -translate-y-1/2 bg-slate-500"
             style={{ left: pos(mean) }}
-            title={`Mean ${sgd(price.mean)}`}
+            title={`Average ${sgd(price.mean)}`}
           />
         )}
         <div
@@ -143,10 +158,10 @@ function PriceRange({ price }: { price: PriceResult }) {
         </span>
         {mean !== null && (
           <span className="flex items-center gap-1">
-            <span className="inline-block h-3 w-0.5 bg-slate-500" /> Mean {sgd(price.mean)}
+            <span className="inline-block h-3 w-0.5 bg-slate-500" /> Average {sgd(price.mean)}
           </span>
         )}
-        {price.iqr !== null && <span>Middle 50% of sales span {sgd(price.iqr)}</span>}
+        {price.iqr !== null && <span>Middle 50% of prices within a {sgd(price.iqr)} band</span>}
       </figcaption>
     </figure>
   );
