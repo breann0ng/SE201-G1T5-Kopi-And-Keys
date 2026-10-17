@@ -26,6 +26,7 @@ FLAT_PATTERN = re.compile(r"\b(([1-5])\s*[- ]?room|executive)(?:\s+flat)?\b", re
 PRICE_WORDS = (
     "price", "prices", "selling", "sold", "cost", "median", "benchmark",
     "going for", "what did", "how much", "damage", "listed at", "normal",
+    "go for", "goes for", "sell for", "sells for",
 )
 POLICY_WORDS = (
     "eligible", "eligibility", "grant", "scheme", "policy", "can i buy", "allowed",
@@ -61,10 +62,19 @@ UNANSWERABLE_PATTERNS = (
 # but a flat or a town makes "how much" / "sold" a price question (the router then
 # asks for the missing flat type instead of declining).
 PRICE_SUBJECT = re.compile(r"\b(?:flats?|units?)\b", re.IGNORECASE)
+# Maisonette (a flat model, not a flat type), incl. common misspellings: masionette, maisonnette.
+MAISONETTE = re.compile(r"\bma[a-z]{0,3}on+et+e?s?\b", re.IGNORECASE)
+# An address ("block 236", "blk 12A") is not a question about HDB block rules.
+ADDRESS_BLOCK = re.compile(r"\b(?:block|blk)\s*\d+[a-z]?\b", re.IGNORECASE)
+BLOCK_NOTE = "These are town-wide figures: the advisor does not look up a single block yet."
+MAISONETTE_NOTE = (
+    "HDB's resale data records maisonettes as Executive flats (about 94% of maisonette sales; "
+    "the rest are 5-room), so these figures cover all Executive flats, not maisonettes only."
+)
 
 
 def _names_a_town(message: str) -> bool:
-    return bool(TOWN_PATTERN.search(message))
+    return bool(TOWN_PATTERN.search(message) or BARE_TOWN_PATTERN.search(message))
 
 
 def classify_intent(message: str) -> Intent:
@@ -72,14 +82,17 @@ def classify_intent(message: str) -> Intent:
     if any(pattern in normalized for pattern in UNANSWERABLE_PATTERNS):
         return "unanswerable"
     has_price = any(word in normalized for word in PRICE_WORDS)
-    has_policy = any(word in normalized for word in POLICY_WORDS) or bool(BUY_ELIGIBILITY.search(message))
+    policy_text = ADDRESS_BLOCK.sub(" ", normalized)
+    has_policy = any(word in policy_text for word in POLICY_WORDS) or bool(BUY_ELIGIBILITY.search(message))
     is_discovery = any(phrase in normalized for phrase in DISCOVERY_WORDS)
     if is_discovery:
         return "discovery"
     has_price_context = has_price and (
         bool(FLAT_PATTERN.search(message))
+        or bool(MAISONETTE.search(message))
         or any(word in normalized for word in (
             "price", "median", "benchmark", "going for", "cost", "damage", "listed at",
+            "go for", "goes for", "sell for", "sells for",
         ))
         or (not has_policy and (bool(PRICE_SUBJECT.search(message)) or _names_a_town(message)))
     )
@@ -90,7 +103,7 @@ def classify_intent(message: str) -> Intent:
         )
     )
     has_mixed_policy = any(
-        word in normalized for word in POLICY_WORDS if word not in {"lease"}
+        word in policy_text for word in POLICY_WORDS if word not in {"lease"}
     ) or bool(BUY_ELIGIBILITY.search(message))
     if has_price_context and "grant" in normalized and not has_explicit_price_stat:
         return "policy"
@@ -156,6 +169,15 @@ TOWN_PATTERN = re.compile(
 )
 
 
+# A known town named anywhere ("how much does toa payoh lorong 1 ... go for?"); used only
+# when no "in / at / near <town>" phrase is found.
+BARE_TOWN_PATTERN = re.compile(
+    r"\b(" + "|".join(r"[\s/]+".join(map(re.escape, re.split(r"[\s/]+", name))) for name in _TOWN_NAMES)
+    + r")\b",
+    re.IGNORECASE,
+)
+
+
 def _canonical_town(text: str) -> str:
     name = " ".join(re.split(r"[\s/]+", text.strip().upper()))
     if name in TOWN_ALIASES:
@@ -166,7 +188,8 @@ def _canonical_town(text: str) -> str:
 EXTRACTED_FIELDS = ("user_age", "income", "citizenship", "town", "flat_type", "first_timer", "household_type")
 
 
-def extract_fields(message: str) -> dict:
+def extract_fields(message: str, bare_town: bool = False) -> dict:
+    """`bare_town`: also accept a town named without "in/at/near" (price questions only)."""
     age_match = AGE_PATTERN.search(message)
     income_match = INCOME_PATTERN.search(message)
     citizenship = "Singaporean" if re.search(r"\b(?:i am|i'm) a citizen\b", message, re.IGNORECASE) else next(
@@ -184,22 +207,23 @@ def extract_fields(message: str) -> dict:
         if re.search(pattern, message, re.I):
             citizenship = value
             break
-    town_match = next(
-        (
-            match for match in TOWN_PATTERN.finditer(message)
-            if not re.search(
-                r"(?:parents?|mum|mom)\s+(?:stay|are|is|live|lives)?\s*"
-                r"(?:in|near)?\s*$",
-                message[max(0, match.start() - 35):match.start()],
-                re.IGNORECASE,
-            )
-        ),
-        None,
-    )
+    def not_parents_town(match) -> bool:
+        return not re.search(
+            r"(?:parents?|mum|mom)\s+(?:stay|are|is|live|lives)?\s*"
+            r"(?:in|near)?\s*$",
+            message[max(0, match.start() - 35):match.start()],
+            re.IGNORECASE,
+        )
+
+    town_match = next((m for m in TOWN_PATTERN.finditer(message) if not_parents_town(m)), None)
+    if town_match is None and bare_town:
+        town_match = next((m for m in BARE_TOWN_PATTERN.finditer(message) if not_parents_town(m)), None)
     flat_match = FLAT_PATTERN.search(message)
     flat_type = flat_match.group(1).upper() if flat_match else None
     if flat_match and flat_match.group(2):
         flat_type = f"{flat_match.group(2)} ROOM"
+    if flat_type is None and MAISONETTE.search(message):
+        flat_type = "EXECUTIVE"  # see MAISONETTE_NOTE
     first_timer = None
     if re.search(r"\b(?:second[- ]timer|not (?:a )?first[- ]timer)\b", message, re.I):
         first_timer = False
@@ -316,6 +340,8 @@ class RouterOutput(Contract):
     household_type: str | None = None
     start_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     end_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+    # An assumption the answer must state (e.g. maisonettes counted as Executive flats).
+    router_note: str | None = None
 
 
 def route_query(message: str, known: dict | None = None, context_question: str | None = None) -> RouterOutput:
@@ -324,7 +350,7 @@ def route_query(message: str, known: dict | None = None, context_question: str |
     intent = classify_intent(message)
     if context_question:
         intent = classify_intent(context_question)
-    extracted = extract_fields(message)
+    extracted = extract_fields(message, bare_town=intent in ("price", "mixed"))
     values = {
         field: extracted[field] if extracted[field] is not None else known.get(field)
         for field in EXTRACTED_FIELDS
@@ -340,4 +366,11 @@ def route_query(message: str, known: dict | None = None, context_question: str |
         route, status = "abstain", "abstain"
     else:
         route, status = route_for_intent(intent), "continue"
-    return RouterOutput(intent=intent, route=route, status=status, missing_fields=missing, **values)
+    notes = []
+    if MAISONETTE.search(message) and not FLAT_PATTERN.search(message) and values.get("flat_type") == "EXECUTIVE":
+        notes.append(MAISONETTE_NOTE)
+    if intent in ("price", "mixed") and ADDRESS_BLOCK.search(message):
+        notes.append(BLOCK_NOTE)
+    note = " ".join(notes) or None
+    return RouterOutput(intent=intent, route=route, status=status, missing_fields=missing,
+                        router_note=note, **values)

@@ -42,6 +42,7 @@ class GraphState(Contract):
     route: Route | None = None
     status: RouterStatus = "continue"
     missing_fields: list[str] = Field(default_factory=list)
+    router_note: str | None = None
 
     # Policy Retrieval Tool
     retrieval_queries: list[str] = Field(default_factory=list)

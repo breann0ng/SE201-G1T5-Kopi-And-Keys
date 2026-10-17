@@ -230,6 +230,8 @@ def build_graph(
                         "user_age", "income", "citizenship", "first_timer", "household_type", "flat_type"} else None,
             )}
         parts = [f"{claim.text} [{', '.join(claim.citation_ids)}]" for claim in draft.claims]
+        if state.router_note:
+            parts.insert(0, f"*{state.router_note}*")
         price = state.price_result
         if price is not None and price.volume > 0:
             text = price_answer(draft.price_text, price)
