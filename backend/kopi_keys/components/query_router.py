@@ -12,6 +12,7 @@ should eventually be driven by the topic cards' required fields
 """
 
 import re
+from datetime import date
 from decimal import Decimal
 
 from pydantic import Field
@@ -213,6 +214,57 @@ def extract_fields(message: str) -> dict:
     }
 
 
+# --- Date range ----------------------------------------------------------------
+# Added 2026-10-18 (Sandra): price questions naming a period used to fall back to the
+# last 12 months, so "in 2012" or "the last half of 2025" got recent prices. Phrases
+# such as "past year", "recently" or "these days" still use that default window.
+
+_MONTHS = {m: i for i, m in enumerate(
+    ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], start=1)}
+_MONTH = r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
+_YEAR = r"((?:19|20)\d{2})"
+
+
+def _ym(year: int, month: int) -> str:
+    return f"{year:04d}-{month:02d}"
+
+
+def _cap(year: int, month: int, today: date) -> str:
+    """A month, but never later than the current one."""
+    return _ym(year, month) if (year, month) <= (today.year, today.month) else _ym(today.year, today.month)
+
+
+def extract_month_range(message: str, today: date | None = None) -> tuple[str, str] | None:
+    """(start_month, end_month) for a period named in the question, else None (default window)."""
+    today = today or date.today()
+    text = message.casefold()
+    m = re.search(rf"\b(?:from\s+)?{_MONTH}\s*(?:{_YEAR}\s*)?(?:to|-|until|till)\s*{_MONTH}\s+{_YEAR}\b", text)
+    if m:
+        end_year = int(m.group(4))
+        start_year = int(m.group(2)) if m.group(2) else end_year
+        return (_ym(start_year, _MONTHS[m.group(1)[:3]]), _cap(end_year, _MONTHS[m.group(3)[:3]], today))
+    m = re.search(rf"\b(first|1st|second|2nd|last|latter)\s+half\s+(?:of\s+)?{_YEAR}\b", text)
+    if m:
+        year = int(m.group(2))
+        if m.group(1) in ("first", "1st"):
+            return _ym(year, 1), _cap(year, 6, today)
+        return _ym(year, 7), _cap(year, 12, today)
+    m = re.search(r"\b(?:past|last)\s+(\d{1,2})\s+months?\b", text)
+    if m:
+        n = max(1, min(int(m.group(1)), 120))
+        first = today.year * 12 + today.month - n
+        return _ym(first // 12, first % 12 + 1), _ym(today.year, today.month)
+    if re.search(r"\bthis year\b", text):
+        return _ym(today.year, 1), _ym(today.year, today.month)
+    if re.search(r"\blast year\b", text):
+        return _ym(today.year - 1, 1), _ym(today.year - 1, 12)
+    m = re.search(rf"\b(?:in|for|during|of|since)\s+{_YEAR}\b|\b{_YEAR}\s+so far\b|\b{_YEAR}\b", text)
+    if m:
+        year = int(next(g for g in m.groups() if g))
+        return _ym(year, 1), _cap(year, 12, today)
+    return None
+
+
 # --- Required-field gate (to be replaced by topic-card requirements) -------
 
 REQUIRED_FIELDS: dict[Intent, tuple[str, ...]] = {
@@ -251,6 +303,8 @@ class RouterOutput(Contract):
     flat_type: str | None = None
     first_timer: bool | None = None
     household_type: str | None = None
+    start_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+    end_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
 
 
 def route_query(message: str, known: dict | None = None, context_question: str | None = None) -> RouterOutput:
@@ -264,6 +318,8 @@ def route_query(message: str, known: dict | None = None, context_question: str |
         field: extracted[field] if extracted[field] is not None else known.get(field)
         for field in EXTRACTED_FIELDS
     }
+    period = extract_month_range(message) or (extract_month_range(context_question) if context_question else None)
+    values["start_month"], values["end_month"] = period or (known.get("start_month"), known.get("end_month"))
     missing = missing_fields(intent, message, values)
     if re.fullmatch(r"\s*(?:i (?:want|would like) to know about|tell me about|what is|explain)\s+hdb[?.! ]*", message, re.I):
         missing = ["topic"]
