@@ -1,6 +1,6 @@
 # Evaluation (proposal section 4, Appendix E)
 
-Scores the advisor against labelled questions. Owner: Person 4 (Sandra).
+Scores the advisor against labelled questions. Owner: Sandra.
 
 | File | What it does |
 |---|---|
@@ -12,7 +12,7 @@ Scores the advisor against labelled questions. Owner: Person 4 (Sandra).
 ## Question sets
 
 - **Development (committed):** `data/evaluation/development/dev_set_questions.jsonl`, 30 questions
-  combined from Breann's and Sandra's earlier sets on 2026-10-17 (20 and 10; each records its
+  combined from two earlier sets on 2026-10-17 (20 and 10; each records its
   `origin`). Stratified as the proposal says: policy 7, price 6, mixed 5, discovery 4,
   policy-changed 4, unanswerable 4. Each question carries the router labels (intent, route,
   status, extracted fields, missing fields, turns) and answer labels (verbatim evidence, price

@@ -1,4 +1,4 @@
-"""Added 2026-10-17 (Sandra): the ceiling variants in rules/income_ceilings.json are HDB's own
+"""Added 2026-10-17: the ceiling variants in rules/income_ceilings.json are HDB's own
 wording. Each condition must appear verbatim on the cited page in the ACTIVE snapshot."""
 import json
 from pathlib import Path

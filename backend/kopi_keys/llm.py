@@ -22,7 +22,7 @@ class OllamaSettings:
     context_size: int = 2048
     max_output_tokens: int = 220
     response_format: dict | None = None
-    # Added 2026-10-17 (Sandra): how long Ollama keeps the model in memory after a request.
+    # Added 2026-10-17: how long Ollama keeps the model in memory after a request.
     # Reloading it costs 10-20 s on a laptop CPU; "-1" keeps it until Ollama stops.
     keep_alive: str = "30m"
 

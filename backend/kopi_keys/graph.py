@@ -174,7 +174,7 @@ def build_graph(
             "trace": ["verifier:failed" if errors else "verifier:passed"],
         }
         if errors:
-            # Added 2026-10-17 (Sandra): keep the quotes that pass every check on their own, if the
+            # Added 2026-10-17: keep the quotes that pass every check on their own, if the
             # trimmed answer then passes in full, instead of a ~60 s repair or declining everything.
             # E.g. a genuine EHG quote was lost because a second quote stitched worked-example table
             # cells into a sentence that is not in the source. A repair still runs when no quote passes.

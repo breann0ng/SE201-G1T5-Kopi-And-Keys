@@ -164,7 +164,7 @@ def test_structured_filters_from_request_reach_the_price_tool():
 
 
 def test_verified_quotes_are_kept_and_invented_ones_dropped_without_a_repair():
-    """Added 2026-10-17 (Sandra): one invented quote no longer sinks a genuine one, and needs no repair."""
+    """Added 2026-10-17: one invented quote no longer sinks a genuine one, and needs no repair."""
     good = "The fictional demo programme requires the related demo condition to be met."
     real = Claim(text=good, citation_ids=["demo-programme"], supporting_quote=good)
     fake = Claim(text="Invented sentence.", citation_ids=["demo-programme"], supporting_quote="Invented sentence.")

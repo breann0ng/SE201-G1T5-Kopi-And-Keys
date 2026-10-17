@@ -102,7 +102,7 @@ def _reply_fields(message: str, previous_reply: str = "") -> dict:
             fields["first_timer"] = message.strip().lower() == "yes"
         elif requested.startswith("household type") and message.strip().lower() == "single":
             fields["household_type"] = "single"
-        # Added 2026-10-17 (Sandra): one reply answering several requested numbers in order,
+        # Added 2026-10-17: one reply answering several requested numbers in order,
         # e.g. "22, 50000" to "Please provide: age, household income." used to be ignored.
         numeric = [f for f in (part.strip() for part in requested.rstrip(".").split(","))
                    if f.startswith(("age", "household income"))]

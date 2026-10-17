@@ -24,7 +24,7 @@ function splitRow(line: string): string[] {
 
 /** Every pipe table in the passage. Tables missing the |---| line are still recognised. */
 /**
- * Added 2026-10-17 (Sandra): some captured tables have a line break inside a cell
+ * Added 2026-10-17: some captured tables have a line break inside a cell
  * ("…who are buying:\nA flat from HDB…"). Markdown ends a row at a line break, so the rest of the
  * cell became a broken one-column row. Rejoin until the row's closing "|" (display only).
  */

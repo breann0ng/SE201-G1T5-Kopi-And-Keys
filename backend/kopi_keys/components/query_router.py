@@ -215,7 +215,7 @@ def extract_fields(message: str) -> dict:
 
 
 # --- Date range ----------------------------------------------------------------
-# Added 2026-10-18 (Sandra): price questions naming a period used to fall back to the
+# Added 2026-10-18: price questions naming a period used to fall back to the
 # last 12 months, so "in 2012" or "the last half of 2025" got recent prices. Phrases
 # such as "past year", "recently" or "these days" still use that default window.
 

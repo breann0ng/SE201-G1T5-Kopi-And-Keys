@@ -1,4 +1,4 @@
-"""Polite, cached fetcher for official HDB/CPF policy pages (Person 4, Day 1).
+"""Polite, cached fetcher for official HDB/CPF policy pages (Sandra, Day 1).
 
 Rules enforced here:
 - domain allowlist (hdb.gov.sg, cpf.gov.sg, mynicehome.gov.sg)
@@ -42,7 +42,7 @@ USER_AGENT = (
     "low-rate, public pages only)"
 )
 # hdb.gov.sg's WAF returns 403 to the plain research UA (robots.txt included).
-# Approved by Person 4 on 2026-10-15: use a browser-compatible UA for that domain
+# Approved by Sandra on 2026-10-15: use a browser-compatible UA for that domain
 # only, still naming the project. robots.txt, rate limit and fetch cap still apply,
 # and we stop (never solve) if a bot challenge / CAPTCHA page is served.
 BROWSER_COMPAT_UA = (
@@ -53,7 +53,7 @@ DOMAIN_UA = {"hdb.gov.sg": BROWSER_COMPAT_UA}
 CHALLENGE_MARKERS = ("captcha", "cf-challenge", "challenge-platform", "are you a robot",
                      "access denied", "request unsuccessful")
 MIN_DELAY_S = 3.0
-# Was 30 for Day 1. Raised 2026-10-15 by Person 4 for the agreed scope (see discover.py);
+# Was 30 for Day 1. Raised 2026-10-15 by Sandra for the agreed scope (see discover.py);
 # kept as a safety stop against runaway loops, not as a budget.
 FETCH_CAP = 200
 

@@ -1,6 +1,6 @@
 """Add in-scope URLs from the cached sitemaps to seeds.json (no network).
 
-Scope agreed with Person 4 on 2026-10-15:
+Scope agreed with Sandra on 2026-10-15:
 - every hdb.gov.sg page under /buying-a-flat/ (includes SC/SPR, non-citizen spouse,
   non-resident and EIP/SPR-quota rules, since the advisor serves non-Singaporeans too)
 - mynicehome.gov.sg /get-started/ guides

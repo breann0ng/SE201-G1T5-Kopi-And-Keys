@@ -1,7 +1,7 @@
 """Topic cards: the discovery cards (proposal Appendix B), as the graph sees them.
 
 The card format, loader and matcher live in `kopi_keys/topic_cards.py` (topic-card
-owner, Person 4); cards are in data/topic_cards/ (see its README). This module
+owner, Sandra); cards are in data/topic_cards/ (see its README). This module
 keeps the interface graph.py already calls:
 
 1. `TopicCard` / `load_cards`: load and validate cards at startup (schema, and

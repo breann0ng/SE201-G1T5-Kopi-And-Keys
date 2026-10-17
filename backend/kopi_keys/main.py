@@ -26,7 +26,7 @@ _ACTIVE = Path(__file__).resolve().parents[2] / "data" / "policy_snapshots" / "A
 
 
 class ResponseCache:
-    """Added 2026-10-17 (Sandra): repeated questions answered instantly.
+    """Added 2026-10-17: repeated questions answered instantly.
 
     Keyed on the whole request (message, profile, history, filters) plus the ACTIVE snapshot,
     so a different profile or a new snapshot never reuses an answer. In memory only: cleared on
@@ -96,7 +96,7 @@ def create_app(graph=None) -> FastAPI:
 
     @application.post("/chat/stream")
     def chat_stream(request: ChatRequest) -> StreamingResponse:
-        """Added 2026-10-17 (Sandra): the same answer as /chat, as newline-delimited JSON.
+        """Added 2026-10-17: the same answer as /chat, as newline-delimited JSON.
         One {"step": "<graph node>", "trace": [...]} line as each step finishes, then {"response": {...}}.
         Lets the UI show real progress during the 40-60 s model step."""
         key = cache.key(request)

@@ -2,7 +2,7 @@ import { Check, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 /**
- * Added 2026-10-17 (Sandra): real progress while an answer is being prepared.
+ * Added 2026-10-17: real progress while an answer is being prepared.
  * Each line appears when the backend reports that graph step finished (POST /chat/stream);
  * nothing here is simulated. The model step is the slow one, so it carries the time hint.
  */

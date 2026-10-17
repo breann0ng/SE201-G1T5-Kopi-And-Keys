@@ -36,7 +36,7 @@ class IncomeCheck:
     effective_from: str | None
     checked_on: str
     verified: bool                # False: figure not yet confirmed on an official page
-    # Added 2026-10-17 (Sandra): HDB's ceiling variants, verbatim (e.g. $24,000 for extended families).
+    # Added 2026-10-17: HDB's ceiling variants, verbatim (e.g. $24,000 for extended families).
     conditions: tuple[str, ...] = ()
 
     @property

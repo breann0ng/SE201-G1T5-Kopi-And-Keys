@@ -103,10 +103,10 @@ UI components come from [shadcn/ui](https://ui.shadcn.com) (Collapsible, Table, 
   snapshot's chunks, so this could move to an API endpoint.
 - **Later:** saved conversations, language options and more profile fields (see `data/topic_cards/README.md`).
 
-## Recent chats (added 2026-10-17, Sandra)
+## Recent chats (added 2026-10-17)
 
 `src/lib/history.ts` now keeps up to 20 conversations in this browser (`kk:chats`, 60 messages each) instead of one. They are listed under **Recent chats** in the sidebar, where you can reopen or delete them; **New chat** starts a fresh one and keeps the old one in the list. A chat saved by the earlier single-chat version (`kk:chat`) is moved into the list automatically. Only the open chat's last 12 turns go to the backend, as before. Nothing is stored on the server.
 
-## Progress while answering (added 2026-10-17, Sandra)
+## Progress while answering (added 2026-10-17)
 
 The chat calls `POST /api/chat/stream` (`streamChat` in `src/lib/api.ts`). The backend sends one JSON line per finished graph step, then the answer. `src/components/Progress.tsx` ticks each finished step, names the current one, and counts seconds. Nothing is simulated: a step appears only when the backend reports it. Against an older backend without the endpoint, the chat falls back to `POST /api/chat`.

@@ -56,7 +56,7 @@ _GENERIC_WEIGHT = 0.2
 _HEADING_BONUS = 0.6          # per query word that also appears in the section heading
 _TIER_WEIGHT = {1: 1.0, 2: 0.85, 3: 0.7}  # official scheme pages first (decision D7)
 _LOW_PRIORITY_WEIGHT = 0.3    # thin pages and "recommended reads" link lists
-# Added 2026-10-17 (Sandra): HDB's worked examples ("Details of Mr B, Mr C, and Mr D") describe a
+# Added 2026-10-17: HDB's worked examples ("Details of Mr B, Mr C, and Mr D") describe a
 # fictional household, not a rule. They outranked the rules for eligibility questions, and the model
 # stitched their cells into an invented quote. Ranked down unless the question asks for an example.
 _WORKED_EXAMPLE = re.compile(r"\|\s*Details of (?:Mr|Mrs|Ms|Mdm|Miss)\b")

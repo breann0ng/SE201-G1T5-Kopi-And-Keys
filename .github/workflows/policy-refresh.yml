@@ -1,4 +1,4 @@
-# Monthly re-snapshot of official HDB/CPF policy pages (owner: Person 4).
+# Monthly re-snapshot of official HDB/CPF policy pages (owner: Sandra).
 #
 # 1. Runs scripts/scraping/refresh.py, which writes data/policy_snapshots/<date>/
 #    and a diff report against the ACTIVE snapshot (the one the advisor serves).

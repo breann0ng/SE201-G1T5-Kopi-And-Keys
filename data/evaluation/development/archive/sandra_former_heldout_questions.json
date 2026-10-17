@@ -1,6 +1,6 @@
 {
   "status": "PRIVATE held-out set: do not commit, do not use while tuning. DRAFT v0.1 — labels need a second team member's review before held-out results are reported",
-  "drafted_by": "Person 4",
+  "drafted_by": "Sandra",
   "drafted_on": "2026-10-16",
   "snapshot_date": "2026-10-15",
   "notes": [
@@ -8,7 +8,7 @@
     "expected_answer quotes the source exactly; never paraphrase a figure here.",
     "Price ground truth is not stored: it is computed at evaluation time by an independent SQL query on the same filters.",
     "split: 30 dev / 20 heldout, stratified by category. Do not tune on heldout questions.",
-    "Person 1's 15-question development set is not in the repo yet; merge it here with new ids when available."
+    "Breann's development set is not in the repo yet; merge it here with new ids when available."
   ],
   "questions": [
     {"id": "POL-03", "category": "policy", "split": "heldout", "question": "How close to my parents do I need to live to get the PHG for living near them?", "profile": {}, "expected_route": "policy", "expected_answer": "within 4km", "evidence": [{"source": "^hdb-grant-family-phg$", "quote": "within 4km"}], "should_abstain": false},

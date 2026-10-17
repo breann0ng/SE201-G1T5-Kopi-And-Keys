@@ -30,7 +30,7 @@ export function toHistory(earlier: readonly ThreadMessage[]): HistoryTurn[] {
 }
 
 // ---- Saving conversations in this browser (survive reloads; listed under "Recent chats") ----
-// Added 2026-10-17 (Sandra): several conversations are kept, not just the current one.
+// Added 2026-10-17: several conversations are kept, not just the current one.
 // Each is stored whole; nothing here is sent to the backend except the recent turns above.
 
 export type SavedChat = { id: string; title: string; updated: number; messages: ThreadMessageLike[] };

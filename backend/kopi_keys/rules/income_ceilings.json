@@ -12,7 +12,7 @@
       "source_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/cpf-housing-grants",
       "checked_on": "2026-10-15",
       "verified": true,
-      "note": "Verified 2026-10-16 (Person 4) against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-family-cpf-housing-grants.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. Was $14,000 before the August 2026 income ceiling changes. Secondary source only. Conditions added 2026-10-17 (Sandra): HDB's own wording of the ceiling variants, verbatim from the same page; the headline ceiling is the default case.",
+      "note": "Verified 2026-10-16 against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-family-cpf-housing-grants.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. Was $14,000 before the August 2026 income ceiling changes. Secondary source only. Conditions added 2026-10-17: HDB's own wording of the ceiling variants, verbatim from the same page; the headline ceiling is the default case.",
       "conditions": [
         "Your average gross monthly household income must not exceed: $16,000",
         "$24,000 if purchasing with an extended or multi-generation family (refer to the guide for more details)"
@@ -27,7 +27,7 @@
       "source_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/cpf-housing-grant",
       "checked_on": "2026-10-15",
       "verified": true,
-      "note": "Verified 2026-10-16 (Person 4) against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-singles-cpf-housing-grant.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. Was $7,000 before the August 2026 changes. Conditions added 2026-10-17 (Sandra): HDB's own wording of the ceiling variants, verbatim from the same page; the headline ceiling is the default case.",
+      "note": "Verified 2026-10-16 against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-singles-cpf-housing-grant.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. Was $7,000 before the August 2026 changes. Conditions added 2026-10-17: HDB's own wording of the ceiling variants, verbatim from the same page; the headline ceiling is the default case.",
       "conditions": [
         "$8,000 if purchasing a flat on your own",
         "$16,000 if purchasing a flat with your family or other singles"
@@ -42,7 +42,7 @@
       "source_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant",
       "checked_on": "2026-10-15",
       "verified": true,
-      "note": "Verified 2026-10-16 (Person 4) against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-family-ehg.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. No change reported in August 2026. Conditions added 2026-10-17 (Sandra): HDB's own wording of the ceiling variants, verbatim from the same page; the headline ceiling is the default case.",
+      "note": "Verified 2026-10-16 against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-family-ehg.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. No change reported in August 2026. Conditions added 2026-10-17: HDB's own wording of the ceiling variants, verbatim from the same page; the headline ceiling is the default case.",
       "conditions": [
         "For first-timer households: The average gross monthly household income (all applicants and occupiers) for the months worked during the 12-month period must not exceed $9,000",
         "For first-timer and second-timer applicants: Half of the average gross monthly household income (all applicants and occupiers) for the months worked during the 12-month period must not exceed $4,500"
@@ -57,7 +57,7 @@
       "source_url": "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/singles/enhanced-cpf-housing-grant",
       "checked_on": "2026-10-15",
       "verified": true,
-      "note": "Verified 2026-10-16 (Person 4) against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-singles-ehg.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. Conditions added 2026-10-17 (Sandra): HDB's own wording of the ceiling variants, verbatim from the same page; the headline ceiling is the default case.",
+      "note": "Verified 2026-10-16 against HDB policy snapshot 2026-10-15, data/policy_snapshots/2026-10-15/clean/hdb-grant-singles-ehg.md. Previously cited https://propertykakis.sg/blog/hdb-resale-grants-explained-2026/. Conditions added 2026-10-17: HDB's own wording of the ceiling variants, verbatim from the same page; the headline ceiling is the default case.",
       "conditions": [
         "$4,500 if you are buying a flat on your own",
         "$9,000 if you are buying a flat with other singles or a resale flat with your parents",

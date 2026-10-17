@@ -1,9 +1,9 @@
 # Policy snapshot — 2026-10-15 (SGT)
 
 Official HDB/CPF housing-policy pages for the Kopi & Keys advisor. The snapshot is committed to git so
-teammates don't need to re-scrape. Owner: Person 4. Status: **awaiting review**. This is the ACTIVE snapshot (see `../ACTIVE`). Do not chunk until approved.
+teammates don't need to re-scrape. Owner: Sandra. Status: **awaiting review**. This is the ACTIVE snapshot (see `../ACTIVE`). Do not chunk until approved.
 
-## Scope (agreed by Person 4, 2026-10-15)
+## Scope (agreed by Sandra, 2026-10-15)
 
 | Area | What | Sources |
 |---|---|---|
@@ -33,7 +33,7 @@ No page captured here states rules for foreigners buying on their own. Don't inf
 ## Source tiers
 
 Tiers are set in `scripts/scraping/extract.py` (`SOURCE_TIERS`) by URL prefix. When sources disagree,
-prefer the lower number. This ranking was decided by Person 4 on 2026-10-15.
+prefer the lower number. This ranking was decided by Sandra on 2026-10-15.
 
 | Tier | Sources | Count |
 |---|---|---|
@@ -56,10 +56,10 @@ date, **not** a policy effective date. HDB pages print none, and their CMS `publ
 Rerun: `cd scripts/scraping && .venv/Scripts/python fetch.py seeds && .venv/Scripts/python extract.py && .venv/Scripts/python verify.py`.
 A rerun on the same date re-fetches nothing. A run on a new date writes a new snapshot folder.
 
-**Fetch cap.** It was 30 for the first pass. Person 4 raised it to **200** on 2026-10-15. It is now a safety stop
+**Fetch cap.** It was 30 for the first pass. Sandra raised it to **200** on 2026-10-15. It is now a safety stop
 against runaway loops, not a budget.
 
-**hdb.gov.sg access (approved by Person 4, 2026-10-15).** The plain research User-Agent got HTTP 403 on
+**hdb.gov.sg access (approved by Sandra, 2026-10-15).** The plain research User-Agent got HTTP 403 on
 robots.txt; that attempt is kept in `fetch_log.json` → `robots_history`. hdb.gov.sg requests then used a
 browser-compatible User-Agent that still names the project: `... (compatible; SMU-SE201-StudentResearch/0.1 ...)`.
 The other rules still applied:
@@ -95,7 +95,7 @@ Navigation components (Cards, AdvisoryBanner, etc.) are skipped and named in eac
   - "aged35/55" on hdb-flat-grant-and-loan-eligibility comes from navigation-card summaries.
 - **Size:** about 25 MB in total, of which `raw/` is 22 MB. One rendered CPF page is about 6 MB.
 
-## Decisions for Day 2 (Person 4, 2026-10-15)
+## Decisions for Day 2 (Sandra, 2026-10-15)
 
 - **Thin pages:** chunk them, but mark them low priority (`low_priority: true`) so they rank below content chunks.
 - **Source differences:** cite **HDB (tier 1)** for all three: the Family Grant SC/SC vs SC/SPR split, the

@@ -103,7 +103,7 @@ def test_one_reply_can_answer_several_requested_numbers():
 
 
 def test_worked_examples_are_recognised():
-    """Added 2026-10-17 (Sandra): HDB's fictional households are ranked below the rules."""
+    """Added 2026-10-17: HDB's fictional households are ranked below the rules."""
     import json
     from pathlib import Path
     from kopi_keys.components.policy_retrieval import is_worked_example

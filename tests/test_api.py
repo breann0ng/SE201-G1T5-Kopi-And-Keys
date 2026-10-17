@@ -49,7 +49,7 @@ def test_structured_price_filters_reach_price_tool():
 
 
 def test_stream_reports_each_step_then_the_same_answer():
-    """Added 2026-10-17 (Sandra): /chat/stream for progress in the UI."""
+    """Added 2026-10-17: /chat/stream for progress in the UI."""
     import json
 
     with client() as c:

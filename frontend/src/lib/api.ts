@@ -117,7 +117,7 @@ export async function postChat(
 export type StreamEvent = { step: string; trace?: string[] } | { response: ChatResponse };
 
 /**
- * Added 2026-10-17 (Sandra): the same answer as postChat, plus each graph step as it finishes,
+ * Added 2026-10-17: the same answer as postChat, plus each graph step as it finishes,
  * so the UI can show real progress during the ~40-60 s model step. Falls back to /chat on an
  * older backend without the stream endpoint.
  */

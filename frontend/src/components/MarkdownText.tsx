@@ -13,7 +13,7 @@ function tidy(text: string): string {
     .replace(/<sup>\s*(.*?)\s*<\/sup>/gi, "$1") // footnote markers: "Prime<sup>[1]</sup>" -> "Prime[1]"
     .replace(/<br\s*\/?>/gi, " ")
     // Leftover download-link labels from the official pages, e.g. "(PDF, 198KB)"; the link itself
-    // was not captured (added 2026-10-17, Sandra). Display only; the verifier checks the original.
+    // was not captured (added 2026-10-17). Display only; the verifier checks the original.
     .replace(/\s*\((?:PDF|DOCX?|XLSX?)\s*,\s*[\d.]+\s*[KM]B\)/gi, "")
     .replace(/<\/?[a-z][^>]*>/gi, "") // any other stray tag
     .replace(/\n{3,}/g, "\n\n");
@@ -48,7 +48,7 @@ const components: Components = {
   ),
 };
 
-/** The same rendering for any official text, e.g. related passages (added 2026-10-17, Sandra). */
+/** The same rendering for any official text, e.g. related passages (added 2026-10-17). */
 export function SourceMarkdown({ text }: { text: string }) {
   return (
     <Markdown remarkPlugins={[remarkGfm]} components={components}>
