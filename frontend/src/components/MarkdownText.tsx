@@ -1,6 +1,7 @@
 import type { TextMessagePartComponent } from "@assistant-ui/react";
 import Markdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { joinBrokenTableRows } from "../lib/sourceContent";
 
 /**
  * Renders an answer's Markdown (bold, lists, headings, tables) as formatted text.
@@ -8,9 +9,12 @@ import remarkGfm from "remark-gfm";
  * policy pages carry into quoted text (<sup>…</sup>, <br>) are flattened first.
  */
 function tidy(text: string): string {
-  return text
+  return joinBrokenTableRows(text)
     .replace(/<sup>\s*(.*?)\s*<\/sup>/gi, "$1") // footnote markers: "Prime<sup>[1]</sup>" -> "Prime[1]"
     .replace(/<br\s*\/?>/gi, " ")
+    // Leftover download-link labels from the official pages, e.g. "(PDF, 198KB)"; the link itself
+    // was not captured (added 2026-10-17, Sandra). Display only; the verifier checks the original.
+    .replace(/\s*\((?:PDF|DOCX?|XLSX?)\s*,\s*[\d.]+\s*[KM]B\)/gi, "")
     .replace(/<\/?[a-z][^>]*>/gi, "") // any other stray tag
     .replace(/\n{3,}/g, "\n\n");
 }
@@ -43,6 +47,15 @@ const components: Components = {
     <code className="rounded bg-slate-100 px-1 py-0.5 text-[0.9em] dark:bg-slate-800">{children}</code>
   ),
 };
+
+/** The same rendering for any official text, e.g. related passages (added 2026-10-17, Sandra). */
+export function SourceMarkdown({ text }: { text: string }) {
+  return (
+    <Markdown remarkPlugins={[remarkGfm]} components={components}>
+      {tidy(text)}
+    </Markdown>
+  );
+}
 
 export const MarkdownText: TextMessagePartComponent = ({ text }) => (
   <div className="leading-relaxed">

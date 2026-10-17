@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { createAdvisorAdapter } from "../lib/adapter";
 import { ChatContext } from "../lib/chat";
-import { clearChat, loadChat, saveChat } from "../lib/history";
+import { currentChatId, deleteChat, loadChat, openChat, saveChat, startNewChat, summaries, type ChatSummary } from "../lib/history";
 import { useProfile } from "../lib/profile";
 import { Logo, LogoIcon } from "./Logo";
 import { useTheme, type Theme } from "../lib/theme";
@@ -29,8 +29,21 @@ export function Layout() {
   const [initialMessages] = useState(loadChat);
   const runtime = useLocalRuntime(adapter, { initialMessages });
 
+  // Saved conversations listed under "Recent chats"; refreshed whenever the thread changes.
+  const [chats, setChats] = useState<ChatSummary[]>(summaries);
+  const [activeId, setActiveId] = useState(currentChatId);
+  const refresh = () => {
+    const next = summaries();
+    setChats((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
+    setActiveId(currentChatId());
+  };
+
   useEffect(
-    () => runtime.thread.subscribe(() => saveChat(runtime.thread.getState().messages)),
+    () =>
+      runtime.thread.subscribe(() => {
+        saveChat(runtime.thread.getState().messages);
+        refresh();
+      }),
     [runtime],
   );
 
@@ -38,8 +51,9 @@ export function Layout() {
     () => ({
       runtime,
       newChat: () => {
+        startNewChat();
         runtime.thread.reset();
-        clearChat();
+        refresh();
       },
     }),
     [runtime],
@@ -77,6 +91,46 @@ export function Layout() {
           </NavLink>
         ))}
       </nav>
+      {chats.length > 0 && (
+        <div className="-mt-3">
+          <h2 className="px-3 pb-1 text-xs font-semibold tracking-wide text-slate-500 uppercase">Recent chats</h2>
+          <ul className="flex max-h-56 flex-col gap-0.5 overflow-y-auto">
+            {chats.map((c) => (
+              <li key={c.id} className="group flex items-center">
+                <button
+                  title={c.title}
+                  onClick={() => {
+                    if (runtime.thread.getState().isRunning) return;
+                    runtime.thread.reset(openChat(c.id));
+                    refresh();
+                    setMenuOpen(false);
+                    navigate("/");
+                  }}
+                  className={`min-w-0 flex-1 truncate rounded-lg px-3 py-1.5 text-left text-sm ${
+                    c.id === activeId
+                      ? "bg-brand-50 font-medium text-brand-700 dark:bg-slate-800 dark:text-brand-100"
+                      : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  {c.title}
+                </button>
+                <button
+                  aria-label={`Delete chat: ${c.title}`}
+                  onClick={() => {
+                    const wasActive = c.id === activeId;
+                    deleteChat(c.id);
+                    if (wasActive) runtime.thread.reset();
+                    refresh();
+                  }}
+                  className="p-1 text-slate-400 opacity-0 group-hover:opacity-100 hover:text-coral-500 focus:opacity-100"
+                >
+                  <X size={14} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="border-t border-slate-200 pt-4 dark:border-slate-800">
         <ProfilePanel />
       </div>

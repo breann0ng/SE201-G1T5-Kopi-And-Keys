@@ -7,7 +7,8 @@ import {
 } from "@assistant-ui/react";
 import { ArrowUp, Check, Copy, Square, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useState } from "react";
-import type { AdvisorMeta } from "../lib/adapter";
+import type { AdvisorMeta, ProgressMeta } from "../lib/adapter";
+import { Progress } from "./Progress";
 import { load, save } from "../lib/storage";
 import { AnswerExtras, StatusBadge } from "./AnswerExtras";
 import { Logo } from "./Logo";
@@ -112,6 +113,7 @@ function UserMessage() {
 
 function AssistantMessage() {
   const custom = useAuiState((s) => s.message.metadata.custom) as Partial<AdvisorMeta> | undefined;
+  const progress = (custom as Partial<ProgressMeta> | undefined)?.kind === "progress" ? (custom as unknown as ProgressMeta) : undefined;
   // metadata.custom is {} while the request is in flight, so check it is complete.
   const meta =
     custom?.kind === "response" || custom?.kind === "error" ? (custom as AdvisorMeta) : undefined;
@@ -130,7 +132,11 @@ function AssistantMessage() {
     <MessagePrimitive.Root className="py-3">
       <div className={`rounded-2xl border px-4 py-3 ${tone}`}>
         {running && !meta ? (
-          <p className="animate-pulse text-slate-500">Checking official sources…</p>
+          progress ? (
+            <Progress steps={progress.steps} started={progress.started} />
+          ) : (
+            <p className="animate-pulse text-slate-500">Checking official sources…</p>
+          )
         ) : (
           <>
             <StatusBadge meta={meta} />

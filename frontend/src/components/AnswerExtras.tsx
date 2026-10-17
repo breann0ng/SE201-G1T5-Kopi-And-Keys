@@ -3,6 +3,8 @@ import type { AdvisorMeta } from "../lib/adapter";
 import type { ChatResponse, PolicyPassage, PriceResult } from "../lib/api";
 import { usePrefs } from "../lib/prefs";
 import { AnswerTrace } from "./AnswerTrace";
+import { IncomeNotes, OverviewTable, RelatedPassages } from "./Overview";
+import { SourceMaterial } from "./SourceMaterial";
 
 export function StatusBadge({ meta }: { meta: AdvisorMeta | undefined }) {
   if (!meta) return null;
@@ -38,9 +40,19 @@ function Badge({ className, children }: { className: string; children: React.Rea
 
 export function AnswerExtras({ response }: { response: ChatResponse }) {
   const { devDetails } = usePrefs();
+  const numberOf = (id: string) => response.citations.findIndex((c) => c.id === id) + 1;
   return (
     <>
       {response.price_result && <PriceCard price={response.price_result} />}
+      {response.overview?.length ? <OverviewTable items={response.overview} numberOf={numberOf} /> : null}
+      <IncomeNotes notes={response.income_notes ?? []} />
+      {response.profile_hint && (
+        <p className="mt-3 rounded-lg border border-dashed border-slate-300 px-3 py-2 text-xs text-slate-600 dark:border-slate-600 dark:text-slate-300">
+          Fill in <strong>Your situation</strong> for suggestions tailored to you.
+        </p>
+      )}
+      {response.citations.length > 0 && <SourceMaterial passages={response.citations} numberOf={numberOf} />}
+      <RelatedPassages passages={response.related ?? []} />
       {response.citations.length > 0 && <Citations citations={response.citations} />}
       {response.status === "abstained" && (
         <p className="mt-3 text-sm">
