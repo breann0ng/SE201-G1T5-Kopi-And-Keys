@@ -13,7 +13,7 @@ from pydantic import Field, model_validator
 
 from .schemas import (
     ChatRequest, ChatResponse, Contract, DataOrigin, Draft, Intent, PolicyPassage,
-    PriceResult, Route, RouterStatus,
+    IncomeNote, OverviewItem, Suggestion, PriceResult, Route, RouterStatus,
     HistoryTurn,
 )
 
@@ -50,6 +50,10 @@ class GraphState(Contract):
 
     # Topic cards (matched in code by components/topic_cards.py, worded by the Synthesiser)
     candidate_card_ids: list[str] = Field(default_factory=list)
+    overview: list[OverviewItem] = Field(default_factory=list)
+    suggestion_seeds: list[Suggestion] = Field(default_factory=list)
+    income_notes: list[IncomeNote] = Field(default_factory=list)
+    profile_hint: bool = False
 
     # Synthesiser Agent
     draft: Draft | None = None
@@ -98,6 +102,18 @@ def _reply_fields(message: str, previous_reply: str = "") -> dict:
             fields["first_timer"] = message.strip().lower() == "yes"
         elif requested.startswith("household type") and message.strip().lower() == "single":
             fields["household_type"] = "single"
+        # Added 2026-10-17 (Sandra): one reply answering several requested numbers in order,
+        # e.g. "22, 50000" to "Please provide: age, household income." used to be ignored.
+        numeric = [f for f in (part.strip() for part in requested.rstrip(".").split(","))
+                   if f.startswith(("age", "household income"))]
+        numbers = re.findall(r"(?:SGD\s*|\$)?(\d[\d,]*(?:\.\d{1,2})?)\s*([kK])?\b", message)
+        if len(numeric) > 1 and len(numbers) == len(numeric):
+            for name, (value, k) in zip(numeric, numbers):
+                amount = Decimal(value.replace(",", "")) * (1000 if k else 1)
+                if name.startswith("age") and fields["user_age"] is None and amount <= 120:
+                    fields["user_age"] = int(amount)
+                elif name.startswith("household income") and fields["income"] is None:
+                    fields["income"] = amount
     return fields
 
 

@@ -94,6 +94,12 @@ def verify_generated_numbers(text: str, sql: PriceResult) -> NumericVerification
     return NumericVerification(not errors, tuple(errors))
 
 
+def _comparable(text: str) -> str:
+    """Text for verbatim comparison: whitespace collapsed, and a word split across lines after a
+    hyphen (HDB PDFs: "first-\ntimer") joined back, on both the quote and the source."""
+    return re.sub(r"-\s+(?=\w)", "-", " ".join(text.split()))
+
+
 def _citation_errors(citation_ids: list[str], sources: dict, what: str) -> list[str]:
     errors = []
     if not citation_ids:
@@ -127,10 +133,13 @@ def verify(state: GraphState) -> list[str]:
     for claim in draft.claims:
         errors.extend(_citation_errors(claim.citation_ids, sources, "policy claim"))
         if claim.supporting_quote is not None:
-            quote = " ".join(claim.supporting_quote.split())
+            quote = _comparable(claim.supporting_quote)
             cited = [sources[c] for c in claim.citation_ids if c in sources]
-            if not any(quote in " ".join(p.text.split()) for p in cited):
+            if not any(quote in _comparable(p.text) for p in cited):
                 errors.append("A policy supporting quote is not present in its cited source.")
+            if quote.rstrip().endswith(":"):
+                # Lead-ins such as "... is calculated as follows:" never state the condition itself.
+                errors.append("A supporting quote ends with ':' (an introduction); quote the condition that follows it.")
             numbers = {Decimal(n.replace(",", "")) for n in re.findall(r"\b\d[\d,]*(?:\.\d+)?\b", claim.text)}
             supported = {Decimal(n.replace(",", "")) for n in re.findall(r"\b\d[\d,]*(?:\.\d+)?\b", quote)}
             if claim.source_scope is not None:
@@ -172,6 +181,13 @@ def verify(state: GraphState) -> list[str]:
             errors.append("Price result does not match the requested month range.")
     elif draft.price_text:
         errors.append("Price figures were drafted without an executed price result.")
+
+    for item in state.overview:
+        source = sources.get(item.citation_id)
+        if source is None or source.superseded:
+            errors.append(f"Overview row {item.card_id} cites a missing or superseded source.")
+        elif item.quote not in source.text:
+            errors.append(f"Overview row {item.card_id} is not verbatim in its source.")
 
     allowed_cards = set(state.candidate_card_ids)
     for suggestion in draft.suggestions:

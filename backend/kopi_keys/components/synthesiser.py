@@ -11,7 +11,8 @@ What is real today and what is a placeholder:
 - Policy answer: bounded LLM summary with citations and verbatim supporting quotes.
   Personal eligibility requests first collect the topic card's required fields.
   PR-couple citizenship-table answers use scoped source cells without inference.
-- Discovery suggestions: wording remains unimplemented; cards are matched in code.
+- Discovery suggestions: up to three matched topic cards, chosen in code by the topic-cards
+  step (state.suggestion_seeds), each cited to the card's verbatim overview chunk.
 
 On a retry, `state.verification_errors` holds the Verifier's feedback.
 """
@@ -132,4 +133,5 @@ class Synthesiser:
                 return SynthesisResult(None, generations=generations, error=str(error), model_calls=len(generations) + 1)
             generations.append(generation)
             price_text = generation.text
-        return SynthesisResult(Draft(kind="answer", claims=claims, price_text=price_text), generations)
+        return SynthesisResult(Draft(kind="answer", claims=claims, price_text=price_text,
+                                     suggestions=state.suggestion_seeds), generations)
