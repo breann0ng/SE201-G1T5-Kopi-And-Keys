@@ -4,6 +4,8 @@ import type { ChatResponse, PolicyPassage, PriceResult } from "../lib/api";
 import { usePrefs } from "../lib/prefs";
 import { AnswerTrace } from "./AnswerTrace";
 import { IncomeNotes, OverviewTable, RelatedPassages } from "./Overview";
+import { BandTables, NarrowItDown, RecentSales } from "./PriceRefine";
+import { bandLabels } from "../lib/priceBands";
 import { SourceMaterial } from "./SourceMaterial";
 
 export function StatusBadge({ meta }: { meta: AdvisorMeta | undefined }) {
@@ -101,8 +103,9 @@ function PriceCard({ price }: { price: PriceResult }) {
   return (
     <div className="mt-3 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
       <p className="text-xs text-slate-500">
-        {flatLabel(f.flat_type)} resale flats in {townLabel(f.town)} · {period} · {price.volume.toLocaleString("en-SG")}{" "}
-        {price.volume === 1 ? "sale" : "sales"}
+        {flatLabel(f.flat_type)} resale flats in {townLabel(f.town)}
+        {Object.values(bandLabels(f)).filter(Boolean).map((label) => ` · ${label}`)} · {period} ·{" "}
+        {price.volume.toLocaleString("en-SG")} {price.volume === 1 ? "sale" : "sales"}
       </p>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
         {[
@@ -121,9 +124,12 @@ function PriceCard({ price }: { price: PriceResult }) {
       <PriceRange price={price} />
       {price.volume > 0 && price.volume < 10 && (
         <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
-          Only {price.volume} sales: treat these figures with caution.
+          Only {price.volume} sales: treat these figures with caution, or widen the filters.
         </p>
       )}
+      <BandTables price={price} />
+      <RecentSales price={price} />
+      <NarrowItDown price={price} />
     </div>
   );
 }

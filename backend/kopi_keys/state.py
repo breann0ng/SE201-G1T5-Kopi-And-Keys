@@ -12,6 +12,7 @@ from typing import Annotated
 from pydantic import Field, model_validator
 
 from .schemas import (
+    LeaseBand, StoreyBand,
     ChatRequest, ChatResponse, Contract, DataOrigin, Draft, Intent, PolicyPassage,
     IncomeNote, OverviewItem, Suggestion, PriceResult, Route, RouterStatus,
     HistoryTurn,
@@ -32,6 +33,8 @@ class GraphState(Contract):
     flat_type: str | None = None
     start_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     end_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+    lease_band: LeaseBand | None = None
+    storey_band: StoreyBand | None = None
     data_origin: DataOrigin = "database"
 
     # Query Router
@@ -167,6 +170,8 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
         flat_type=filters.flat_type if filters else remembered.get("flat_type"),
         start_month=filters.start_month if filters else None,
         end_month=filters.end_month if filters else None,
+        lease_band=filters.lease_band if filters else None,
+        storey_band=filters.storey_band if filters else None,
         data_origin=data_origin,
     ).model_dump(exclude_defaults=True)
 

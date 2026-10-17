@@ -1,6 +1,7 @@
 import type { ChatModelAdapter } from "@assistant-ui/react";
 import { ApiError, streamChat, type BuyerProfile, type ChatResponse } from "./api";
 import { SEND_HISTORY, toHistory } from "./history";
+import { takePendingPriceFilters } from "./pendingPriceFilters";
 
 /** What the assistant message carries in metadata.custom, read by AssistantMessage. */
 export type AdvisorMeta =
@@ -35,11 +36,12 @@ export function createAdvisorAdapter(getProfile: () => BuyerProfile): ChatModelA
         .trim();
       try {
         const history = SEND_HISTORY ? toHistory(messages.slice(0, -1)) : null;
+        const priceFilters = takePendingPriceFilters();
         const started = Date.now();
         const steps: string[] = [];
         let response: ChatResponse | null = null;
         yield { metadata: { custom: { kind: "progress", steps: [], started } satisfies ProgressMeta } };
-        for await (const event of streamChat(text, getProfile(), history, abortSignal)) {
+        for await (const event of streamChat(text, getProfile(), history, abortSignal, priceFilters)) {
           if ("step" in event) {
             steps.push(event.trace?.[0] ?? event.step);
             yield { metadata: { custom: { kind: "progress", steps: [...steps], started } satisfies ProgressMeta } };

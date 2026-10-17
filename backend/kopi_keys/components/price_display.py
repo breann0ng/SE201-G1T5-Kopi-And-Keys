@@ -53,6 +53,37 @@ def town_label(town: str) -> str:
     return re.sub(r"[A-Za-z]+", lambda m: m.group(0).capitalize(), town.strip().lower())
 
 
+LEASE_LABELS = {"under_60": "under 60 years", "60_79": "60 to 79 years", "80_plus": "80+ years"}
+STOREY_LABELS = {"low": "low floors (1 to 6)", "mid": "middle floors (7 to 12)", "high": "high floors (13+)"}
+
+
+def subject_label(filters: PriceFilters) -> str:
+    """'5-room flats in Toa Payoh with 80+ years of lease left, on high floors (13+)'."""
+    text = f"{flat_label(filters.flat_type)} flats in {town_label(filters.town)}"
+    extras = []
+    if filters.lease_band:
+        extras.append(f"with {LEASE_LABELS[filters.lease_band]} of lease left")
+    if filters.storey_band:
+        extras.append(f"on {STOREY_LABELS[filters.storey_band]}")
+    return text + (" " + ", ".join(extras) if extras else "")
+
+
+def lease_note(price: PriceResult) -> str | None:
+    """One line on how much remaining lease matters, when the user has not picked a lease band."""
+    if price.filters.lease_band:
+        return None
+    bands = [b for b in price.breakdown if b.dimension == "lease" and b.volume >= 5 and b.median is not None]
+    if len(bands) < 2:
+        return None
+    low = min(bands, key=lambda b: b.median)
+    high = max(bands, key=lambda b: b.median)
+    if high.median < low.median * Decimal("1.1"):
+        return None
+    return (f"Remaining lease matters here: the median ranges from {money(str(low.median))} "
+            f"({LEASE_LABELS[low.band]} left) to {money(str(high.median))} ({LEASE_LABELS[high.band]} left). "
+            "Use **Narrow it down** below to compare like with like.")
+
+
 def _parse(price_text: str) -> dict[str, tuple[str, ...]] | None:
     found: dict[str, tuple[str, ...]] = {}
     for line in price_text.strip().splitlines():
@@ -69,7 +100,7 @@ def _parse(price_text: str) -> dict[str, tuple[str, ...]] | None:
 def price_answer(price_text: str, price: PriceResult) -> str:
     """The verified figures as a short answer: median first, then spread, range and source."""
     f = price.filters
-    subject = f"{flat_label(f.flat_type)} flats in {town_label(f.town)}"
+    subject = subject_label(f)
     period = period_label(f)
     parsed = _parse(price_text)
     if parsed is None:  # Unexpected layout: show the verified lines as they are.
@@ -77,11 +108,13 @@ def price_answer(price_text: str, price: PriceResult) -> str:
         return f"**{subject}**, {period}\n\n{lines}"
     sales = int(parsed["volume"][0].replace(",", ""))
     low, high = parsed["range"]
+    note = lease_note(price)
     return (
         f"**{subject}** sold for a median of **{money(parsed['median'][0])}** "
         f"({period}, {sales:,} {'sale' if sales == 1 else 'sales'}).\n\n"
         f"- Average (mean): {money(parsed['mean'][0])}\n"
         f"- Middle 50% of prices fall within a {money(parsed['iqr'][0])} band\n"
         f"- Lowest to highest: {money(low)} to {money(high)}\n\n"
-        "*Source: HDB resale flat prices (data.gov.sg). Past sales only, not a valuation of any particular flat.*"
+        + (f"{note}\n\n" if note else "")
+        + "*Source: HDB resale flat prices (data.gov.sg). Past sales only, not a valuation of any particular flat.*"
     )

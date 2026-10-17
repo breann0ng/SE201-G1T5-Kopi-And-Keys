@@ -32,7 +32,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 from typing import Protocol
 
-from ..schemas import CENT, PriceFilters, PriceResult
+from ..schemas import CENT, BandStat, PriceFilters, PriceResult, RecentSale
 
 
 # Assumption: when the user gives no date range, benchmark the last 12 months.
@@ -43,6 +43,18 @@ DEFAULT_DB = ROOT / "data/processed/hdb_prices.db"
 DB_ENV_VAR = "KOPI_RESALE_DB"
 # Fewer matching sales than this: still report them, but flag as a thin sample.
 MIN_RELIABLE_VOLUME = 10
+RECENT_SALES = 5
+
+# Refinement bands, checked against the Nov 2025 to Oct 2026 data (24,353 sales):
+# - Remaining lease at sale, in months, [low, high). Across town/flat-type pairs with enough
+#   sales, the 80+ band's median is about 1.57x the under-60 band's (never below 1.10x), and
+#   each band usually has 10+ sales. Not every band exists for every flat type (e.g. no
+#   Executive flat has 80+ years left), so the UI only offers bands with sales.
+# - Floor band from the lower storey in storey_range ("13 TO 15" -> 13). Low 1-6, mid 7-12,
+#   high 13+ splits sales about 9.6k / 9.6k / 5.1k; "16+" would leave many towns with too
+#   few high-floor sales. High floors sell for a median of about 1.24x low floors.
+LEASE_BANDS = {"under_60": (0, 60 * 12), "60_79": (60 * 12, 80 * 12), "80_plus": (80 * 12, 100 * 12)}
+STOREY_BANDS = {"low": (1, 6), "mid": (7, 12), "high": (13, 99)}
 
 
 class ToolUnavailableError(RuntimeError):
@@ -82,6 +94,8 @@ def filters_from_state(state, today: date | None = None) -> PriceFilters:
         flat_type=state.flat_type,
         start_month=state.start_month or start,
         end_month=state.end_month or end,
+        lease_band=getattr(state, "lease_band", None),
+        storey_band=getattr(state, "storey_band", None),
     )
 
 
@@ -128,11 +142,12 @@ def is_low_volume(result: PriceResult) -> bool:
 class SqlitePriceTool:
     """Read-only benchmark over the database built by scripts/build_resale_db.py."""
 
-    QUERY_VERSION = "price-v2"
+    QUERY_VERSION = "price-v3"
     _SQL = (
-        "SELECT resale_price FROM transactions "
-        "WHERE town = ? AND flat_type = ? AND month BETWEEN ? AND ? "
-        "ORDER BY resale_price"
+        "SELECT resale_price, remaining_lease_months, CAST(substr(storey_range, 1, 2) AS INTEGER), "
+        "month, block, street_name, storey_range, floor_area_sqm, remaining_lease "
+        "FROM transactions WHERE town = ? AND flat_type = ? AND month BETWEEN ? AND ? "
+        "ORDER BY month DESC, id DESC"
     )
 
     def __init__(self, db_path: str | Path | None = None):
@@ -186,29 +201,60 @@ class SqlitePriceTool:
         return town, flat_type, filters.start_month, filters.end_month
 
     def query(self, filters: PriceFilters) -> PriceResult:
-        """Statistics for one town / flat type / month range.
+        """Statistics for one town / flat type / month range, optionally one lease and floor band.
 
-        ``filters`` in the result are the normalised dataset values (e.g.
-        TAMPINES, 4 ROOM), so answers display them as they appear in the data.
+        ``filters`` in the result are the normalised dataset values (e.g. TAMPINES,
+        4 ROOM), so answers display them as they appear in the data. ``breakdown``
+        gives the median per lease band (with the floor band applied) and per floor band
+        (with the lease band applied); ``recent_sales`` lists the latest matching sales.
         """
+        filters = PriceFilters.model_validate(filters)
         params = self._normalise(filters)
         try:
             with closing(self._connect()) as conn:
                 source = conn.execute("SELECT source_sha256 FROM import_metadata").fetchone()
-                prices = [_exact(row[0]) for row in conn.execute(self._SQL, params)]
+                rows = conn.execute(self._SQL, params).fetchall()
         except sqlite3.Error as error:
             raise ToolUnavailableError(f"The resale database could not be read: {error}") from error
         if source is None:
             raise ToolUnavailableError("The resale database has no import metadata; rebuild it.")
+        bands = (filters.lease_band, filters.storey_band)
         # Same source file + same normalised filters -> same ID, across rebuilds.
         fingerprint = json.dumps(
-            {"version": self.QUERY_VERSION, "source": source[0], "params": params}, sort_keys=True,
+            {"version": self.QUERY_VERSION, "source": source[0], "params": params, "bands": bands},
+            sort_keys=True,
         )
         query_id = "price-" + hashlib.sha256(fingerprint.encode()).hexdigest()[:12]
-        normalised = PriceFilters(town=params[0], flat_type=params[1],
-                                  start_month=params[2], end_month=params[3])
+        normalised = PriceFilters(town=params[0], flat_type=params[1], start_month=params[2],
+                                  end_month=params[3], lease_band=filters.lease_band,
+                                  storey_band=filters.storey_band)
+
+        def in_lease(row, band):
+            return band is None or LEASE_BANDS[band][0] <= row[1] < LEASE_BANDS[band][1]
+
+        def in_storey(row, band):
+            return band is None or STOREY_BANDS[band][0] <= row[2] <= STOREY_BANDS[band][1]
+
+        def median(selected):
+            prices = sorted(_exact(r[0]) for r in selected)
+            return _cents(_quantile(prices, Decimal("0.5"))) if prices else None
+
+        breakdown = []
+        for band in LEASE_BANDS:
+            selected = [r for r in rows if in_lease(r, band) and in_storey(r, filters.storey_band)]
+            breakdown.append(BandStat(dimension="lease", band=band, volume=len(selected), median=median(selected)))
+        for band in STOREY_BANDS:
+            selected = [r for r in rows if in_storey(r, band) and in_lease(r, filters.lease_band)]
+            breakdown.append(BandStat(dimension="storey", band=band, volume=len(selected), median=median(selected)))
+        matched = [r for r in rows if in_lease(r, filters.lease_band) and in_storey(r, filters.storey_band)]
+        recent = [
+            RecentSale(month=r[3], block=r[4], street_name=r[5], storey_range=r[6],
+                       floor_area_sqm=_exact(r[7]), remaining_lease=r[8], resale_price=_exact(r[0]))
+            for r in matched[:RECENT_SALES]  # rows are newest first
+        ]
+        prices = sorted(_exact(r[0]) for r in matched)
         if not prices:
-            return PriceResult(query_id=query_id, filters=normalised, volume=0)
+            return PriceResult(query_id=query_id, filters=normalised, volume=0, breakdown=breakdown)
         q1, q3 = _quantile(prices, Decimal("0.25")), _quantile(prices, Decimal("0.75"))
         return PriceResult(
             query_id=query_id,
@@ -219,6 +265,8 @@ class SqlitePriceTool:
             iqr=_cents(q3 - q1),
             minimum=prices[0],
             maximum=prices[-1],
+            breakdown=breakdown,
+            recent_sales=recent,
         )
 
 
