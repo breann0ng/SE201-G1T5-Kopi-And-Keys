@@ -140,10 +140,13 @@ midterm review, and write my AI-use log using the same structure as the
 other three team members' logs.
 
 ### How I checked it
+The checkpoint report records 225 automated tests on main, all passing
+(240 including the PR under review).
+
 Codex compared PR #8 with its base in a separate checkout. The first run
-passed 247 tests and skipped one requiring the missing vector index.
-After setting up EmbeddingGemma and building the complete index, all 248
-PR tests and all 241 main-branch tests passed, with no skips. Both frontend
+skipped a test requiring the missing vector index. After setting up
+EmbeddingGemma and building the complete index, the test suites passed
+on both branches, with no skips. Both frontend
 production builds passed; lint had no errors and four existing warnings.
 The snapshot validator passed all checks for 849 chunks and 12 topic
 cards. Dev routing stayed at 30/30 and hybrid Recall@5 stayed at 12/20.
