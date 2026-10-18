@@ -42,6 +42,15 @@ POLICY_WORDS = (
 BUY_ELIGIBILITY = re.compile(
     r"\b(?:can|may)\b.{0,70}\bbuy\b.{0,40}\b(?:resale|hdb|flat)\b", re.IGNORECASE,
 )
+# Added 2026-10-18: "how do I buy a resale flat?", "where do I start if I want to buy a resale
+# flat?" and "what sources should I look at ..." had no policy keyword and were declined as
+# unsupported. A question about how, where or what to start with when buying is discovery.
+BUYING_GUIDE = re.compile(
+    r"\b(?:how (?:do|can|should) (?:i|we)|how to|where (?:do|should) (?:i|we) (?:start|begin|look)|"
+    r"(?:start|begin)\w*|steps?|process|sources?|guide|what do (?:i|we) need)\b"
+    r".{0,60}\bbuy(?:ing)?\b.{0,30}\b(?:resale|hdb|flat)\b",
+    re.IGNORECASE,
+)
 DISCOVERY_WORDS = (
     "what can i afford", "where should i buy", "help me decide", "recommend",
     "what should i look into", "what should we look into", "where do we start",
@@ -84,7 +93,8 @@ def classify_intent(message: str) -> Intent:
     has_price = any(word in normalized for word in PRICE_WORDS)
     policy_text = ADDRESS_BLOCK.sub(" ", normalized)
     has_policy = any(word in policy_text for word in POLICY_WORDS) or bool(BUY_ELIGIBILITY.search(message))
-    is_discovery = any(phrase in normalized for phrase in DISCOVERY_WORDS)
+    is_discovery = any(phrase in normalized for phrase in DISCOVERY_WORDS) or (
+        bool(BUYING_GUIDE.search(message)) and not any(word in normalized for word in PRICE_WORDS))
     if is_discovery:
         return "discovery"
     has_price_context = has_price and (

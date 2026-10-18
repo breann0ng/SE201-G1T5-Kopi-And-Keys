@@ -65,6 +65,20 @@ _WORKED_EXAMPLE_WEIGHT = 0.3
 
 def is_worked_example(content: str) -> bool:
     return bool(_WORKED_EXAMPLE.match(content))
+
+
+# Added 2026-10-18: scheme focus. "What is the income ceiling for an HDB loan?" from a family
+# profile became "... loan families" and the grant pages for families outranked the loan page.
+# When a question names loans but not grants (or the reverse), the named scheme's chunks rank
+# higher and the other's lower. Questions naming both, or neither, are unchanged.
+_LOAN_WORDS = re.compile(r"\b(?:loans?|mortgage|financing|ltv|loan-to-value|borrow\w*|instal+ments?)\b", re.I)
+_GRANT_WORDS = re.compile(r"\b(?:grants?|ehg|phg|subsid\w*)\b", re.I)
+_FOCUS_WEIGHT, _OFF_FOCUS_WEIGHT = 1.5, 0.6
+
+
+def scheme_focus(query: str) -> str | None:
+    loan, grant = bool(_LOAN_WORDS.search(query)), bool(_GRANT_WORDS.search(query))
+    return "loan" if loan and not grant else "grant" if grant and not loan else None
 _SHORT_CHUNK_WORDS = 35       # very short chunks are usually intros, not conditions
 _SHORT_CHUNK_WEIGHT = 0.4
 
@@ -214,6 +228,7 @@ class HybridPolicyRetriever:
     def search(self, query: str, limit: int = TOP_K) -> list[PolicyPassage]:
         rankings = [(1.0, self.keyword.ranked_ids(query, CANDIDATES))]
         wants_example = bool(re.search(r"\bexamples?\b|\bworked\b|\billustrat", query, re.I))
+        focus = scheme_focus(query)
         if self.collection is not None:
             try:
                 rankings.append((DENSE_WEIGHT, self._dense(query)))
@@ -231,6 +246,11 @@ class HybridPolicyRetriever:
                 scores[chunk_id] *= _LOW_PRIORITY_WEIGHT
             if is_worked_example(c["content"]) and not wants_example:
                 scores[chunk_id] *= _WORKED_EXAMPLE_WEIGHT
+            if focus is not None:
+                name = c.get("policy_name", "").lower()
+                kind = "loan" if "loan" in name else "grant" if "grant" in name else None
+                if kind is not None:
+                    scores[chunk_id] *= _FOCUS_WEIGHT if kind == focus else _OFF_FOCUS_WEIGHT
         best, seen = [], set()
         for chunk_id in sorted(scores, key=scores.get, reverse=True):
             fingerprint = _fingerprint(self.keyword.by_id[chunk_id]["content"])
