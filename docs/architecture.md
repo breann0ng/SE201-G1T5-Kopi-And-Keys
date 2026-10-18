@@ -1,64 +1,94 @@
 # Architecture
 
-The system is one LangGraph graph (`backend/kopi_keys/graph.py`). Every box on
-the proposal's architecture diagram is one node and one module under
-`backend/kopi_keys/components/`. All nodes read and write a single
-`GraphState` (`state.py`).
+The backend uses one LangGraph workflow (`backend/kopi_keys/graph.py`) and one
+shared `GraphState` (`state.py`). FastAPI calls that graph; the React frontend
+uses its streaming endpoint. This describes the implementation after PR #8,
+not every feature originally proposed for the final system.
 
-## Design change from the proposal
+## Changes from the proposal
 
-The proposal described three LLM stages: Query Router, Discovery Agent and
-Synthesiser Agent. We merged the Discovery Agent into the Synthesiser Agent.
-Discovery relevance is still decided in code (topic-card matching). Only the
-wording and selection of up to three suggestions moved into the Synthesiser's
-single model call. This saves one model call per turn on a CPU-bound local
-model, and Discovery precision and recall are still scored against
-pre-labelled card IDs.
+Discovery is merged into the Synthesiser rather than a separate LLM agent.
+The query router and topic-card matching are currently rules and regex. Code
+chooses up to three cited suggestions, and the output node renders them. The
+model selects policy excerpts and formats already-computed price statistics.
 
-## Box, file, owner and status
+The verifier permits one synthesis repair. It does not trigger a new retrieval
+query, so iterative retrieval/backtracking is not implemented.
 
-| Diagram box | File | Owner | Status |
+## Components and ownership
+
+Python module paths are relative to `backend/kopi_keys/`. Paths beginning with
+`data/`, `scripts/` or `frontend/` are relative to the repository root.
+
+| Component | File | Owner | Current implementation |
 | --- | --- | --- | --- |
-| Query Router (LLM) | `components/query_router.py` | Breann | Rule-based baseline; passes all 30 dev-set labels. LLM classifier not built. |
-| Discovery (merged) | `components/topic_cards.py`, `data/topic_cards/` | Sandra | Placeholder: schema and loader only; matching returns nothing. |
-| Policy Retrieval Tool | `components/policy_retrieval.py` | TBC | `HybridPolicyRetriever`: keyword ranker (`KeywordPolicyRetriever`) fused with EmbeddingGemma vectors in ChromaDB (`components/policy_index.py`, built by `scripts/build_policy_index.py`); keyword-only fallback without the index. Fictional test passages live in `tests/fakes.py`, never in the app. Each retriever declares `mode` (`snapshot` or `demo`), stamped on every `ChatResponse` and on `/health`; the UI warns about fictional evidence only for `demo`. |
-| Price Query Tool | `components/price_query.py` | Tasha | Interface and contract only. SQLite not connected. |
-| Synthesiser Agent (LLM) | `components/synthesiser.py` | Nisha | Price summary uses a real CPU model. Policy answers are an extractive placeholder. Suggestions not built. |
-| Verifier | `components/verifier.py` | Nisha | Numeric checks, citation checks, superseded sources, price provenance and topic-card IDs. |
-| Abstention Output | `components/abstention.py` | Breann | Fixed messages per reason. |
-| Harness | `graph.py`, `state.py` | Breann | One graph; one retry, then abstain. |
-| Evaluation | `evaluation/` | Sandra | Dev set loader, metrics and runner (`python -m kopi_keys.evaluation.run_eval`); answer-level baselines still TODO. See its README. |
-| Tracing | `trace` field on every response | Breann | Node-level trace only; LangSmith not connected. |
+| Query Router | `components/query_router.py` | Breann; price rules by Tasha | Rules/regex, extraction, dates and required-field gate. Passes 30 dev routing labels. LLM classifier not built. |
+| Discovery/topic cards | `components/topic_cards.py`, `topic_cards.py`, `data/topic_cards/` | Sandra | 12 cards, matching, profile hints, overviews, cited suggestions and grant income notes. Some inputs are not collected yet. |
+| Policy retrieval/index | `components/policy_retrieval.py`, `components/policy_index.py` | Sandra; initial policy integration by Nisha | Keyword ranking plus EmbeddingGemma/ChromaDB vectors, scheme focus, deduplication and keyword fallback. Index built locally with `scripts/build_policy_index.py`. |
+| Price Query Tool | `components/price_query.py`, `scripts/build_resale_db.py` | Tasha | Connected read-only SQLite tool, Decimal statistics, lease/floor refinements and recent transactions. |
+| Income rules | `rules/`, `components/topic_cards.py` | Tasha and Sandra | Pure Python boundary checks with verified source data/conditions; notes rather than eligibility verdicts. |
+| Synthesiser | `components/synthesiser.py`, `components/policy_synthesis.py`, `llm.py` | Nisha; later tuning by Sandra | Qwen2.5:3b selects structured quotes and formats prices. Clarifications and scoped citizenship-table facts can use code directly. |
+| Verifier | `components/verifier.py` | Nisha; later grounding fixes by Sandra | Named numeric checks, citations, verbatim quotes, table scope, superseded sources and topic-card checks. Can retain independently verified claims. |
+| Output/abstention | `graph.py`, `components/price_display.py`, `components/abstention.py` | Breann; price wording by Tasha | Verified messages or fixed abstention. Fewer than five sales are listed instead of a median summary. |
+| Harness | `graph.py`, `state.py` | Breann; team integration | One graph, bounded retry and immediate abstention on model-engine failure. |
+| API | `main.py` | Team | `/health`, `/chat`, `/chat/stream`, in-memory cache and model warm-up. |
+| Frontend | `frontend/` | Sandra; price UI by Tasha, profile/history integration by Nisha | React chat, sources, profile, progress, recent chats, price refinement and local feedback. |
+| Evaluation | `evaluation/` | Sandra | Dev loader, metrics and runner. No-tools and naive-RAG answer baselines remain TODO. |
+| Tracing | Response `trace` and `@traceable` in `llm.py` | Breann; APAC setup by Nisha | Node traces in responses; optional LangSmith graph/model tracing with credentials and matching region. |
 
 ## Flow
 
-1. `query_router` classifies and extracts town, flat type, age, income and
-   citizenship. Missing required fields go to `synthesiser` as a clarifying
-   question. Out-of-scope questions go to `abstention`.
-2. Policy, discovery and mixed routes call `policy_retrieval`. Price and mixed
-   routes call `price_query`. Mixed questions run retrieval first, then price.
-3. `topic_cards` records which cards the Synthesiser may suggest.
-4. If no tool produced usable evidence, the graph abstains before any model call.
-5. `synthesiser` drafts the answer. `verifier` checks it. One failure sends the
-   errors back for a single retry, and a second failure abstains. A model engine
-   error abstains immediately.
-6. `output` builds the user-facing message from verified parts only. Price
-   headers come from the SQL result, not from the model.
+```mermaid
+flowchart TD
+    U[User message and optional profile/history] --> R[query_router]
+    R -->|clarify| S[synthesiser]
+    R -->|unsupported| A[abstention]
+    R -->|policy / discovery / mixed| P[policy_retrieval]
+    R -->|price| Q[price_query]
+    P -->|mixed| Q
+    P -->|policy / discovery| T[topic_cards]
+    Q --> T
+    T -->|usable evidence or profile clarification| S
+    T -->|no usable evidence| A
+    S --> V[verifier]
+    V -->|pass| O[output]
+    V -->|first failure| S
+    V -->|second failure or engine error| A
+```
 
-## Assumptions to review
+1. The router extracts profile/filter values and chooses the route. Missing
+   required inputs produce a clarification; unsupported requests abstain.
+   Recognised clarification replies can resume an earlier goal.
+2. Policy/discovery routes retrieve evidence. Mixed requests retrieve policy
+   then query prices. Price-only requests query SQLite directly.
+3. Cards can request missing personal EHG/loan inputs, supply overviews and
+   suggestions, and attach verified income notes. Discovery requests generally
+   receive a sidebar hint instead of being blocked by a profile question.
+4. With no usable evidence, the graph abstains before generation. The default
+   app uses snapshot evidence; fictional test retrievers report `demo`.
+5. Synthesis uses up to three policy passages and 800 source words by default,
+   or formats price values. Table facts retain source row/column context.
+6. The verifier may retain independently valid claims if the resulting draft
+   passes all checks. Otherwise, one repair is allowed, followed by abstention
+   on another failure. Model errors abstain immediately. Output uses verified
+   parts only.
 
-- When a price question gives no date range, the price tool uses the last 12
-  months (`DEFAULT_LOOKBACK_MONTHS` in `price_query.py`).
-- A mixed question whose price data is unavailable still answers the policy
-  part and states that the price benchmark is unavailable.
-- The required-field gate is hard-coded in `query_router.py`. It should be
-  driven by the topic cards' required fields once they exist.
+## Assumptions and boundaries
 
-## Boundaries to preserve
+- Price requests without dates use the last 12 months relative to the current
+  month. Named dates are parsed; coverage is limited to the dataset snapshot.
+- SQLite selects transactions; Python Decimal code computes statistics
+  deterministically. The LLM does not calculate or choose the figures.
+- Mixed requests can answer supported policy when prices are unavailable.
+- The router has a price required-field gate. Personal EHG/loan requests also use
+  topic-card requirements; collecting those inputs is not a complete assessment.
+- The API accepts client-owned history for bounded clarification handling.
+  Chats stay in the browser; there is no server conversation database. An
+  in-memory response cache and optional LangSmith traces are separate features.
+- Source and numeric checks do not establish complete relevance, policy coverage
+  or final eligibility. An in-scope request can still abstain.
+- Fresh held-out data stays outside the repo and is not used for tuning.
+  Previously exposed archived questions are retired, not unseen evaluation data.
 
-- The model never calculates or invents a statistic. Every figure comes from an
-  executed query and is checked against it to the cent.
-- Citation checks are structural. Whether a claim faithfully reflects its
-  source still needs manual review.
-- The API is stateless. There is no conversation memory yet.
-- The held-out set must not be used while tuning.
+See [the root README](../README.md) for current checks and known limitations,
+and [the evaluation guide](../backend/kopi_keys/evaluation/README.md) for metrics.

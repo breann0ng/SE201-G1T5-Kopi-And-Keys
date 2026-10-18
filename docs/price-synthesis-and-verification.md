@@ -36,7 +36,8 @@ py -m venv .venv
 # Inspect installed and currently loaded models.
 .\.venv\Scripts\python.exe -m kopi_keys.cli --check-engine
 
-# Run offline automated tests; no model or network is required.
+# Run tests; the vector-retrieval check needs the index and embedding service.
+# Most other tests use offline fixtures.
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
@@ -46,7 +47,8 @@ hidden server on loopback port 11434. It does not change PATH, register a startu
 service or change persistent user environment variables. The initial downloads
 are about 1.4 GB for the portable runtime and 1.9 GB for the model, plus extracted
 runtime space. A server started by the script remains running until stopped or
-Windows restarts. Loaded models expire after five minutes of inactivity.
+Windows restarts. Generation requests keep the model loaded for 30 minutes by
+default, configurable with `KOPI_OLLAMA_KEEP_ALIVE`.
 
 To stop only the project server, check its saved process ID and executable first:
 
@@ -182,8 +184,9 @@ $env:KOPI_OLLAMA_TIMEOUT = '180'
 ```
 
 The client also supports `KOPI_OLLAMA_BASE_URL`; its default is the local server.
-PowerShell environment variables configure the wrapper; `.env` is not loaded
-automatically. CPU offload remains disabled for every generation request.
+PowerShell environment variables configure the wrapper. The API, CLI and
+synthetic-case runner also load the local `.env`; existing process environment
+variables take precedence. GPU offload remains disabled for every generation request.
 
 On 15 October 2026, one real local smoke test of the synthetic fixture:
 

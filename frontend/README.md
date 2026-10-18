@@ -1,112 +1,108 @@
 # Kopi & Keys — frontend
 
-React 19, Vite, Tailwind CSS v4 and [assistant-ui](https://github.com/assistant-ui/assistant-ui).
-There is no login: the buyer profile, feedback and theme are stored only in the browser.
+React 19, Vite, Tailwind CSS v4 and assistant-ui. There is no login. Profile,
+conversations, feedback and theme preferences are saved in this browser.
 
-## Run (development)
+## Run locally
 
-You need two terminals.
+Complete the [root setup](../README.md#first-time-setup) first: Python dependencies,
+Ollama models, SQLite database, vector index and `npm ci`. Use Node.js 22 or newer.
+
+Two terminals are needed while Ollama is running:
 
 ```powershell
-# 1. Backend, from the repo root
-.\.venv\Scripts\python.exe -m uvicorn kopi_keys.main:app --port 8000 --app-dir backend
-
-# 2. Frontend
-cd frontend
-npm install
-npm run dev        # http://localhost:5173
+# Terminal 1: repository root
+.\.venv\Scripts\python.exe -m uvicorn kopi_keys.main:app --app-dir backend --host 127.0.0.1 --port 8000 --reload
 ```
 
-Vite proxies `/api/*` to the backend on `:8000`, so the backend needs no CORS change in
-development. Production hosting is not set up yet.
+Use `.venv/bin/python` on macOS/Linux.
+
+```sh
+# Terminal 2
+cd frontend
+npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
+```
+
+Open http://127.0.0.1:5173. Vite proxies `/api/*` to the backend on port 8000.
+The backend is Python; there is no `backend/package.json`. Production hosting
+is not configured; `npm run build` checks and builds frontend assets.
 
 ## Pages
 
-| Route | What |
-|---|---|
-| `/` | **Chat** (core). The sidebar profile (citizenship, age, income, first-timer) is sent with every question as `BuyerProfile` |
-| `/sources` | Sources and methodology: the ACTIVE snapshot date and every captured page, grouped by source tier |
-| `/settings` | Theme (system, light or dark) and "Clear my data" |
+| Route | Purpose |
+| --- | --- |
+| `/` | Chat, profile sidebar, recent conversations and price refinements. |
+| `/sources` | ACTIVE policy snapshot and captured pages, read at build time. |
+| `/settings` | Theme, developer details and clearing browser data. |
 
-## How chat maps to the API
+## Requests and responses
 
-- `src/lib/adapter.ts` sends the latest message plus the profile to `POST /chat`.
-- **Conversation memory (frontend half, built):**
-  - **History:** each request carries the last 12 turns as `{role, content}`, oldest first.
-    The backend accepts these as clarification context, never as policy evidence.
-    Set `VITE_SEND_HISTORY=false` in `frontend/.env.local` to disable sending history.
-  - **Saved chat:** the conversation is saved in this browser (`kk:chat`, last 60 messages), so it
-    survives a reload. **New chat** and Settings → **Clear my data** wipe it.
-- **Quick replies:** when a clarifying reply includes `asking_for` (e.g. `"citizenship"`), buttons
-  appear under it. Tapping one fills in the sidebar profile and sends the answer as a message.
-  The backend returns `asking_for` for profile clarifications. Household type is also
-  available in the sidebar.
+`src/lib/adapter.ts` sends the latest question, current profile, optional price
+filters and recent history through `streamChat` in `src/lib/api.ts`.
 
-### Backend conversation contract
-```python
-class HistoryTurn(Contract):
-    role: Literal["user", "assistant"]
-    content: str = Field(max_length=12000)
+- Primary endpoint: `POST /api/chat/stream`. The backend returns one JSON line per
+  finished graph node and a final `response`. `Progress.tsx` displays completed
+  steps and elapsed time. A missing stream endpoint falls back to `POST /api/chat`.
+- Profile: `citizenship`, `age`, `household_income`, `first_timer` and
+  `household_type`. Clarification buttons can also request `flat_type`.
+- History: up to 12 previous user/assistant turns, each capped at 12,000
+  characters. Set `VITE_SEND_HISTORY=false` in `frontend/.env.local` to disable it.
+  History is clarification context, not policy evidence.
+- Price refinements: town, flat type, dates and optional lease/floor bands are
+  sent as `price_filters`. **Narrow it down** submits updated filters with
+  **Update figures**; it does not produce an individual-flat valuation.
+- `ChatResponse` includes status, mode, route, message, citations, price result,
+  suggestions, trace and optional overview/income/progress-related UI fields.
+  Keep `src/lib/api.ts` aligned with `backend/kopi_keys/schemas.py`.
 
-class ChatRequest(Contract):
-    ...
-    history: list[HistoryTurn] = Field(default_factory=list, max_length=12)
+The adapter numbers citations for display and attaches the backend response as
+message metadata. `Thread.tsx` and `AnswerExtras.tsx` render it. Clarifications
+and abstentions get status badges; `mode: "demo"` shows the fictional-evidence
+footer. The real snapshot app reports `snapshot`.
 
-class ChatResponse(Contract):
-    ...
-    asking_for: Literal["citizenship", "age", "household_income", "first_timer", "household_type"] | None = None
+## Saved conversations and privacy
+
+`src/lib/history.ts` stores up to 20 conversations in `kk:chats`, each with up to
+60 completed messages. **Recent chats** can reopen or delete them. **New chat**
+keeps the old conversation and starts another. An older `kk:chat` conversation
+is migrated automatically. Settings can clear local data.
+
+Only the active conversation's last 12 turns are included in chat requests.
+There is no server conversation database. The backend has an in-memory response
+cache; optional LangSmith tracing can record requests and outputs when enabled.
+Feedback buttons save locally and are not connected to an evaluation service.
+
+## Sources and price displays
+
+The UI uses source text and tool results, with display cleanup; it does not
+generate new policy figures.
+
+- Overview tables contain cited official sentences from topic cards.
+- Source tables and EHG income-band charts are extracted from cited passages.
+  The income highlight is a comparison with the published band, not eligibility.
+- Related retrieved passages can be expanded separately from cited claims.
+- Verified grant income-ceiling notes and cited suggestions are shown when
+  applicable; suggestions are included in the answer text.
+- Price cards show matching volume and the summary, with lease/floor breakdowns
+  and recent sales. Fewer than five matching sales hide median summaries and
+  list the transactions. The backend's verified text retains its numeric precision;
+  some compact UI figures are rounded for display.
+- Developer details expose route and graph trace when enabled.
+
+An in-scope question can still abstain after verification failure; passing the
+frontend build does not establish policy-answer relevance.
+
+## UI components and checks
+
+The UI uses copied shadcn-style Collapsible, Table and Chart components,
+recoloured to the project's palette. Parsing is in `src/lib/sourceContent.ts`;
+source Markdown is rendered by `MarkdownText.tsx`.
+
+```sh
+npm run build
+npm run lint
 ```
-History is context for the Advisor, **not evidence**. Policy claims must still cite passages retrieved
-for the current answer, and the verifier should keep enforcing that.
-- The response is attached to the message as `metadata.custom` and rendered by `Thread.tsx` and `AnswerExtras.tsx`:
-  - `status`: *answered* shows a normal reply; *clarifying* shows an amber "need more information" style;
-    *abstained* shows a grey "can't answer reliably" style with a link to HDB.
-  - `citations`: a numbered source list with "Verified on official site <verified_on>", the page's own
-    "last updated" line, and an effective date only when one is stated.
-  - `price_result`: a lowest / median / highest card.
-  It shows `volume` transactions; prices arrive as Decimal strings and are formatted as SGD.
-- `src/lib/api.ts` mirrors `backend/kopi_keys/schemas.py`. Update it when the contract changes.
-  It was last synced in the merge of `main` on 2026-10-16:
-  - `PriceResult` now has `volume` (was `count`) and gains `mean` and `iqr`;
-  - `ChatResponse` gains `route` and `suggestions`.
 
-  `suggestions` is typed but not shown in the UI yet.
-- Citizenship options come from `data/schema/vocab.json` (DRAFT).
-
-## Source material under answers
-
-Everything below is shown exactly as captured from the official pages; nothing is written by the AI.
-
-- **Overview table** (`components/Overview.tsx`): for broad questions ("What grants are there?") the
-  backend returns `overview`, one row per scheme with its verbatim official sentence and source number.
-- **Full source tables** (`components/SourceMaterial.tsx`): any table in a cited passage, collapsed
-  under "Show full table from source [n]". Tables missing the `|---|` line are still recognised.
-- **Grant-band charts:** HDB's EHG amount-by-income tables become a bar chart; the user's income band
-  is highlighted when the sidebar has an income, with a reminder that only the HFE letter confirms it.
-- **Related official passages:** retrieved passages the answer didn't quote (`related`), collapsed.
-- **Income ceilings:** for grant questions with an income in the sidebar, a highlighted note compares it with each
-  grant's HDB-verified ceiling (`income_notes`), linking to HDB; it never says the user qualifies.
-- **Suggestions:** matched topic cards appear in the answer text as "You may also want to look into", with sources.
-
-Adding more shadcn components: `npx shadcn add` produces classes using shadcn's own colour tokens
-(`bg-background`, `text-muted-foreground`, ...), which `index.css` does not define. Swap them for the palette
-classes used in `src/components/ui/` (slate, brand, coral), as was done for Collapsible, Table and Chart.
-
-UI components come from [shadcn/ui](https://ui.shadcn.com) (Collapsible, Table, Chart), copied into
-`src/components/ui/` and recoloured with the brand palette; charts use Recharts. Parsing lives in
-`src/lib/sourceContent.ts`.
-
-## Scaffolded, not finished
-
-- **Feedback:** 👍/👎 is saved in the browser only. It is meant to feed the evaluation dataset later.
-- **Sources page:** reads `data/policy_snapshots/` at build time. The backend's retriever now serves the
-  snapshot's chunks, so this could move to an API endpoint.
-- **Later:** saved conversations, language options and more profile fields (see `data/topic_cards/README.md`).
-
-## Recent chats (added 2026-10-17)
-
-`src/lib/history.ts` now keeps up to 20 conversations in this browser (`kk:chats`, 60 messages each) instead of one. They are listed under **Recent chats** in the sidebar, where you can reopen or delete them; **New chat** starts a fresh one and keeps the old one in the list. A chat saved by the earlier single-chat version (`kk:chat`) is moved into the list automatically. Only the open chat's last 12 turns go to the backend, as before. Nothing is stored on the server.
-
-## Progress while answering (added 2026-10-17)
-
-The chat calls `POST /api/chat/stream` (`streamChat` in `src/lib/api.ts`). The backend sends one JSON line per finished graph step, then the answer. `src/components/Progress.tsx` ticks each finished step, names the current one, and counts seconds. Nothing is simulated: a step appears only when the backend reports it. Against an older backend without the endpoint, the chat falls back to `POST /api/chat`.
+As checked on 18 October 2026, build passes. Lint reports no errors and four
+existing React Refresh warnings. The build reports a large-bundle warning.
+Language options and a server-side feedback workflow are not implemented.

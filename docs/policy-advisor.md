@@ -24,7 +24,7 @@ existing prompt and inference limits.
    Standard/unclassified and Plus/Prime columns directly, with separate citations
    and scopes. The app explains these published conditions; it does not issue a
    personal eligibility decision. Other policy questions send up to three complete
-   passages (at most 1,100 source words) to Ollama. Well-formed tables are passed as
+   passages (at most 800 source words by default) to Ollama. Well-formed tables are passed as
    explicit row/column/cell objects. It requests structured JSON selecting at most
    three short, self-contained source quotes with citations. Free-form model
    paraphrases are never displayed as policy facts. Its context is
@@ -77,6 +77,15 @@ Live examples to try after starting Ollama, the backend and the frontend:
 
 Policy excerpt selection uses real inference and can take much longer than the former
 copied-passage output. Record latency and verifier repairs when comparing models.
+
+Routing support is not a guarantee of a verified answer. In the live review on
+18 October 2026, `how do I buy a resale flat?` abstained on two runs after both
+allowed generation attempts. A raw-response diagnostic found that the model
+cited `CHUNK_RESALE_26` instead of the supplied `CHUNK_BTO_26`. The answer-level
+allowlist rejected the entire draft. That schema error currently becomes an
+empty claim list, so the retry receives a generic no-claims error rather than
+the invalid-citation detail. This limitation is unresolved; the verifier still
+withholds the draft. Automated routing tests do not establish end-to-end success.
 
 ## Model comparison and optional policy model
 

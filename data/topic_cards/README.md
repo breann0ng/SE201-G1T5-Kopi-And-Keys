@@ -23,27 +23,23 @@ Supporting chunks are selected by rule:
 | `CARD_RESALE_OTP_DEPOSIT` | Option to Purchase, Option Fee and Exercise Fee |
 | `CARD_STEPUP_GRANT` | Step-Up CPF Housing Grant (second-timers) |
 
-## How this fits the graph on `main` (note for the team, 2026-10-16)
+## How this fits the graph on `main`
 
-On `main`, `backend/kopi_keys/components/topic_cards.py` is a placeholder for the
-topic-card owner (Sandra) to fill in. Its example card format
-(`id` / `title` / `triggers` / `chunk_ids`) was marked "illustrative only; the card
-owner decides the real one". The 12 cards here use the real format above:
-`card_id` / `topic_name` / `trigger_conditions` / `supporting_chunk_ids`.
+`backend/kopi_keys/components/topic_cards.py` is the graph adapter over the
+loader and matcher in `backend/kopi_keys/topic_cards.py`. The 12 JSON cards use
+`card_id`, `topic_name`, `trigger_conditions` and `supporting_chunk_ids`, rather
+than the earlier illustrative placeholder schema.
 
-Why this changed: `graph.py` loads every card in this folder at startup, using the
-placeholder's `TopicCard` format. That model rejects unknown fields, so with these 12
-cards present, the graph would have failed to start. `test_graph_adapter_loads_repo_cards_and_maps_state_fields`
-(in `tests/test_topic_cards.py`) loads the real cards through the graph's path to catch this.
+`graph.py` loads the cards at startup through that adapter.
+`test_graph_adapter_loads_repo_cards_and_maps_state_fields` in
+`tests/test_topic_cards.py` checks this path and its field-name mapping.
 
-Done in the merge of `main` (2026-10-16): `components/topic_cards.py` is now a thin
-adapter over `backend/kopi_keys/topic_cards.py`, keeping the `load_cards`, `match_cards`
-and `required_fields` names graph.py calls. `profile_from_state` maps GraphState names
-onto the vocab: `user_age` becomes `age` and `income` becomes `household_income`.
-`match_cards` returns only fully matched IDs. Most cards also need fields the router
-doesn't collect yet (e.g. `household_type`), so `candidate_card_ids` stays mostly empty
-until those fields are added (question 1 below). `match_profile` gives the full result,
-including the blocked cards and `ask_next`.
+`profile_from_state` maps `user_age` to `age` and `income` to `household_income`.
+The graph uses matched cards for suggestions, overview quotes and verified grant
+income notes. Missing personal EHG/loan inputs can produce clarifications;
+discovery requests can receive a sidebar hint. `match_profile` also reports
+blocked cards and `ask_next`. Household type is now collected, but several other
+card inputs remain unsupported, so not every card can be fully matched.
 
 `CARD_INCOME_CEILING` and Tasha's `rules/income_ceilings.json` cite the same
 snapshot pages for the same figures (see `data/README.md`, "Income ceilings
@@ -55,20 +51,23 @@ verified against the policy snapshot"). If a ceiling changes, update both.
 |---|---|
 | `card_id`, `topic_name`, `snapshot_date` | |
 | `trigger_conditions` | `{field: [values]}`, any-of within a field and all-of across fields. Keys and values come from `data/schema/vocab.json`. `{}` means the card is selected by topic or intent, not by profile |
-| `required_fields` | Profile fields the advisor needs before answering |
+| `required_fields` | Fields needed to fully match the card. Personal EHG/loan requests also use them for clarification; general policy answers are not all gated by every card field |
 | `supporting_chunk_ids` | IDs from `data/policy_chunks/<date>/chunks.jsonl` |
 | `question_template` | Contains `{placeholders}` only. No policy figures, so it never needs editing when figures change |
 
 ## Questions for the team
 
 1. **New profile fields.** `required_fields` uses names that are not yet in `BuyerProfile`:
-   - `household_type`, `flat_type`, `remaining_lease`, `intends_to_use_cpf`, `loan_type`
+   - `flat_type`, `remaining_lease`, `intends_to_use_cpf`, `loan_type`
    - `lives_with_or_near_parents_or_child`, `distance_to_parents_or_child`
    - `spouse_pass_type`, `ethnic_group`, `town`, `block`
    - `scheme_of_interest`, `has_hfe_letter`, `stage_of_purchase`, `current_flat_type`
 
-   `BuyerProfile` currently has `citizenship`, `age`, `household_income` and `first_timer`.
+   `BuyerProfile` currently has `citizenship`, `age`, `household_income`,
+   `first_timer` and `household_type`. Town and flat type are also available as
+   price filters/graph state, rather than fields of `BuyerProfile`.
    **GraphState owner:** which of these become profile fields, and which are asked per question?
-2. **Matching semantics.** Are `trigger_conditions` matched any-of within a field and all-of across fields?
+2. **Matching semantics.** The implemented matcher uses any-of within a field
+   and all-of across fields. Changes should preserve or explicitly revise this contract.
 3. **`age` meaning.** In the templates `age` means the youngest or average applicant age, depending on the card.
    Should this be split into `youngest_applicant_age` and `average_applicant_age`?
