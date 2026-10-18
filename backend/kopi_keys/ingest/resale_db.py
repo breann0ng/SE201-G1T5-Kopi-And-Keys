@@ -1,9 +1,9 @@
 """Rebuild the resale SQLite database from the data.gov.sg CSV.
 
 Usage:
-    python scripts/build_resale_db.py --downloaded-on 2026-10-13
+    python scripts/build_resale_db.py --downloaded-on 2026-10-14
     python scripts/build_resale_db.py --csv data/raw/2017-onwards-resale-prices.csv \
-        --db data/processed/hdb_prices.db --downloaded-on 2026-10-13
+        --db data/processed/hdb_prices.db --downloaded-on 2026-10-14
 
 The whole file is validated before anything is written. Any invalid row rejects
 the import and leaves an existing database untouched. The database is a generated

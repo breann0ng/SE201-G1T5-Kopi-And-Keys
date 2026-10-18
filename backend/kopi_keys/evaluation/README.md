@@ -11,7 +11,7 @@ Scores the advisor against labelled questions. Owner: Sandra.
 
 ## Question sets
 
-- **Development (committed):** `data/evaluation/development/dev_set_questions.jsonl`, 30 questions
+- **Development (committed):** `data/evaluation-data/development/dev_set_questions.jsonl`, 30 questions
   combined from two earlier sets on 2026-10-17 (20 and 10; each records its
   `origin`). Stratified as the proposal says: policy 7, price 6, mixed 5, discovery 4,
   policy-changed 4, unanswerable 4. Each question carries the router labels (intent, route,

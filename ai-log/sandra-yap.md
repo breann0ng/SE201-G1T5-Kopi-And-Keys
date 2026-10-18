@@ -144,8 +144,9 @@ to 37 s with 8/8 still verified; 2 passages was faster but lost 3 answers. A
 repeated question returns in 0 s. Watched the progress steps in the browser.
 
 ### What I kept or changed
-Chose 8 threads and 3 passages / 800 words. Added live progress, a warm model and
-an answer cache rather than switching to a hosted model.
+Set 8 threads in my .env (default stays 4) and chose 3 passages / 800 words.
+Added live progress, a warm model and an answer cache rather than switching to
+a hosted model.
 
 ## 2026-10-17 · Income ceiling variants and recent chats
 - **Tool (model):** Claude Code (Claude Opus 5.5)
@@ -180,3 +181,43 @@ Checked the PR history against git. Corrected PR #4's author (Tasha, not Breann)
 ### What I kept or changed
 Dropped the status column, used names instead of "Person N" labels, and removed
 names from change notes in code. Kept owners and decisions named.
+
+## 2026-10-18 · Loan and how-to-buy questions
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** components/policy_retrieval.py, query_router.py,
+  frontend/src/components/MarkdownText.tsx, data/README.md,
+  tests/test_discovery_connections.py
+- **Outcome:** Kept
+
+### What I asked for
+Why loan questions got grant pages, and why "how do I buy a resale flat?"
+was declined.
+
+### How I checked it
+New tests for scheme focus and discovery routing. Router labels (30/30) and
+Recall@5 unchanged. Asked both questions again in the browser.
+
+### What I kept or changed
+Retrieval now favours the scheme a question names; "how to buy" questions
+route as discovery. Kept the list separator as a display-only change.
+
+## 2026-10-18 · Checkpoint review of docs and architecture diagram
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/evaluation/README.md,
+  backend/kopi_keys/ingest/resale_db.py
+- **Outcome:** Changed
+
+### What I asked for
+An explanation of checkpoint point 4 for our project, a check of our
+architecture diagram against the code, and an update of the README and
+architecture doc.
+
+### How I checked it
+It first described the price tool and policy answers from an outdated doc;
+I challenged this and it confirmed both against the code. It found the
+diagram's "LLM fallback" router label was wrong (the router is rule-based).
+
+### What I kept or changed
+Discarded its README/architecture rewrite because teammates had already
+updated both. Kept two small fixes it found when checking them: a stale
+dev-set path and an outdated download date.
