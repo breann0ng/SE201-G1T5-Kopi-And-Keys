@@ -1,0 +1,192 @@
+{
+  "split": "dev",
+  "questions": 30,
+  "snapshot": "2026-10-15",
+  "retriever": "kopi_keys.components.policy_retrieval:retrieve_chunk_ids",
+  "discovery": {
+    "precision": "75% (9/12)",
+    "recall": "100% (9/9)",
+    "ask_next_accuracy": "50% (2/4)",
+    "cases": [
+      {
+        "id": "DSC-01",
+        "suggested": [
+          "CARD_EHG",
+          "CARD_FAMILY_GRANT",
+          "CARD_LEASE_ELIGIBILITY",
+          "CARD_PHG"
+        ],
+        "expected": [
+          "CARD_EHG",
+          "CARD_FAMILY_GRANT",
+          "CARD_LEASE_ELIGIBILITY"
+        ],
+        "extra": [
+          "CARD_PHG"
+        ],
+        "missed": [],
+        "ask_next": "age",
+        "expected_ask": "household_income"
+      },
+      {
+        "id": "DSC-02",
+        "suggested": [
+          "CARD_EHG",
+          "CARD_PHG",
+          "CARD_SINGLES_GRANT"
+        ],
+        "expected": [
+          "CARD_EHG",
+          "CARD_PHG",
+          "CARD_SINGLES_GRANT"
+        ],
+        "extra": [],
+        "missed": [],
+        "ask_next": "household_income",
+        "expected_ask": "household_income"
+      },
+      {
+        "id": "DSC-04",
+        "suggested": [
+          "CARD_EIP_SPR_QUOTA",
+          "CARD_NON_CITIZEN_ELIGIBILITY",
+          "CARD_STEPUP_GRANT"
+        ],
+        "expected": [
+          "CARD_EIP_SPR_QUOTA",
+          "CARD_NON_CITIZEN_ELIGIBILITY"
+        ],
+        "extra": [
+          "CARD_STEPUP_GRANT"
+        ],
+        "missed": [],
+        "ask_next": "first_timer",
+        "expected_ask": "age"
+      },
+      {
+        "id": "DSC-06",
+        "suggested": [
+          "CARD_NON_CITIZEN_ELIGIBILITY",
+          "CARD_STEPUP_GRANT"
+        ],
+        "expected": [
+          "CARD_NON_CITIZEN_ELIGIBILITY"
+        ],
+        "extra": [
+          "CARD_STEPUP_GRANT"
+        ],
+        "missed": [],
+        "ask_next": "household_type",
+        "expected_ask": "household_type"
+      }
+    ]
+  },
+  "retrieval": {
+    "recall_at_5": "56% (9/16)",
+    "misses": [
+      {
+        "id": "POL-06",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_HFE_03",
+          "CHUNK_BTO_83",
+          "CHUNK_GENERAL_03",
+          "CHUNK_HFE_19",
+          "CHUNK_BTO_232"
+        ],
+        "expected": [
+          "CHUNK_HFE_23"
+        ]
+      },
+      {
+        "id": "POL-07",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_CPF_13",
+          "CHUNK_BTO_157",
+          "CHUNK_LEASE_03",
+          "CHUNK_LEASE_12",
+          "CHUNK_CPF_50"
+        ],
+        "expected": [
+          "CHUNK_LEASE_02",
+          "CHUNK_LEASE_11",
+          "CHUNK_LEASE_15"
+        ]
+      },
+      {
+        "id": "POL-09",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_BTO_254",
+          "CHUNK_GRANTS_15",
+          "CHUNK_BTO_31",
+          "CHUNK_LOAN_04",
+          "CHUNK_EHG_33"
+        ],
+        "expected": [
+          "CHUNK_ELIG_24",
+          "CHUNK_ELIG_35",
+          "CHUNK_ELIG_44",
+          "CHUNK_ELIG_52"
+        ]
+      },
+      {
+        "id": "MIX-01",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_BTO_100",
+          "CHUNK_GRANTS_10",
+          "CHUNK_BTO_99",
+          "CHUNK_CPF_14",
+          "CHUNK_EHG_13"
+        ],
+        "expected": [
+          "CHUNK_EHG_05"
+        ]
+      },
+      {
+        "id": "MIX-04",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_CPF_32",
+          "CHUNK_GRANTS_10",
+          "CHUNK_BTO_100",
+          "CHUNK_EHG_04",
+          "CHUNK_BTO_13"
+        ],
+        "expected": [
+          "CHUNK_SINGLES_01"
+        ]
+      },
+      {
+        "id": "MIX-06",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_BTO_253",
+          "CHUNK_BTO_252",
+          "CHUNK_BTO_248",
+          "CHUNK_CPF_14",
+          "CHUNK_ELIG_68"
+        ],
+        "expected": [
+          "CHUNK_LEASE_02"
+        ]
+      },
+      {
+        "id": "MIX-08",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_HFE_03",
+          "CHUNK_EHG_11",
+          "CHUNK_BTO_232",
+          "CHUNK_EHG_21",
+          "CHUNK_HFE_02"
+        ],
+        "expected": [
+          "CHUNK_HFE_23"
+        ]
+      }
+    ]
+  }
+}
