@@ -5,7 +5,7 @@ from pathlib import Path
 from kopi_keys.components.query_router import route_query
 
 
-LABELS = Path(__file__).resolve().parents[1] / "data" / "evaluation" / "development" / "stage1_gateway_labels.jsonl"
+LABELS = Path(__file__).resolve().parents[1] / "data" / "evaluation-data" / "development" / "stage1_gateway_labels.jsonl"
 VALID_ROUTES = {"policy", "price", "mixed", "discovery", "clarify", "abstain"}
 VALID_STATUSES = {"continue", "clarify", "abstain"}
 

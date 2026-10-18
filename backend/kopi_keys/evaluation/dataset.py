@@ -1,6 +1,6 @@
 """Load, validate and resolve the labelled question sets (proposal section 4.1).
 
-The development set lives in data/evaluation/development/dev_set_questions.jsonl,
+The development set lives in data/evaluation-data/development/dev_set_questions.jsonl,
 one question per line. Each question carries both kinds of label:
 
 - Stage 1 gateway labels (expected_intent, expected_route, expected_status,
@@ -34,7 +34,7 @@ from ..topic_cards import load_cards
 
 ROOT = Path(__file__).resolve().parents[3]
 DATA = ROOT / "data"
-DEV_DIR = DATA / "evaluation" / "development"
+DEV_DIR = DATA / "evaluation-data" / "development"
 DEV_FILE = DEV_DIR / "dev_set_questions.jsonl"
 LABELS_FILE = DEV_DIR / "stage1_gateway_labels.jsonl"
 HELDOUT_FILE_NAME = "heldout_questions.jsonl"

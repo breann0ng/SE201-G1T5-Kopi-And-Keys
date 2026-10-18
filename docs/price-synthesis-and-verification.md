@@ -28,10 +28,10 @@ py -m venv .venv
 .\scripts\setup_ollama.ps1
 
 # Run the provided synthetic fixture through real model inference.
-.\.venv\Scripts\python.exe -m kopi_keys.cli --input examples\price_sql_result.json
+.\.venv\Scripts\python.exe -m kopi_keys.cli --input tests\fixtures\price_sql_result.json
 
 # Save evidence of a live run (reports are ignored by Git).
-.\.venv\Scripts\python.exe -m kopi_keys.cli --input examples\price_sql_result.json --output .local\reports\price_cpu_smoke.json
+.\.venv\Scripts\python.exe -m kopi_keys.cli --input tests\fixtures\price_sql_result.json --output .local\reports\price_cpu_smoke.json
 
 # Inspect installed and currently loaded models.
 .\.venv\Scripts\python.exe -m kopi_keys.cli --check-engine
@@ -67,7 +67,7 @@ model with that installation and use its local API without running our setup.
 
 ## Files you own
 
-For extra manual model checks, see [the six synthetic SQL cases](../examples/price_cases/README.md).
+For extra manual model checks, see [the six synthetic SQL cases](../tests/fixtures/price_cases/README.md).
 Run them together with `.\.venv\Scripts\python.exe scripts\run_price_cases.py`.
 The runner saves a per-case report and counts intentional input rejections as
 passing checks. `--validate-only` checks the input contracts without inference.

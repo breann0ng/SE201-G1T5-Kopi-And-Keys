@@ -12,7 +12,7 @@ from kopi_keys.llm import OllamaEngine
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CASE_ROOT = PROJECT_ROOT / "examples" / "price_cases"
+CASE_ROOT = PROJECT_ROOT / "tests" / "fixtures" / "price_cases"
 CASES = (
     ("zero_transactions", "no_data", None),
     ("single_transaction", "answered", None),

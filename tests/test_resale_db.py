@@ -1,7 +1,6 @@
-"""Importer tests for scripts/build_resale_db.py."""
+"""Importer tests for kopi_keys.ingest.resale_db."""
 
 import csv
-import importlib.util
 import sqlite3
 from datetime import date
 from pathlib import Path
@@ -9,11 +8,7 @@ from pathlib import Path
 import pytest
 
 
-_spec = importlib.util.spec_from_file_location(
-    "build_resale_db", Path(__file__).resolve().parents[1] / "scripts/build_resale_db.py",
-)
-importer = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(importer)
+from kopi_keys.ingest import resale_db as importer
 
 TODAY = date(2026, 10, 13)
 GOOD = {

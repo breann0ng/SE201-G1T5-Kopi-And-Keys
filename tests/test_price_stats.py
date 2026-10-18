@@ -1,10 +1,8 @@
 """SqlitePriceTool: statistics, validation and fit with the graph and verifier."""
 
 import csv
-import importlib.util
 from datetime import date
 from decimal import Decimal
-from pathlib import Path
 
 import pytest
 
@@ -15,13 +13,8 @@ from kopi_keys.components.price_query import (
 from kopi_keys.components.synthesiser import Synthesiser
 from kopi_keys.components.verifier import verify_generated_numbers
 from kopi_keys.graph import build_graph, run_graph
+from kopi_keys.ingest import resale_db as importer
 from kopi_keys.schemas import ChatRequest, PriceFilters, PriceResult
-
-_spec = importlib.util.spec_from_file_location(
-    "build_resale_db", Path(__file__).resolve().parents[1] / "scripts/build_resale_db.py",
-)
-importer = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(importer)
 
 BASE = {
     "month": "2025-01", "town": "TAMPINES", "flat_type": "4 ROOM", "block": "101",

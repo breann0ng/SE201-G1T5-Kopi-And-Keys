@@ -1,10 +1,8 @@
 """Lease / floor refinements, band breakdown and recent sales from the price tool."""
 
 import csv
-import importlib.util
 from datetime import date
 from decimal import Decimal
-from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -12,13 +10,8 @@ from pydantic import ValidationError
 from kopi_keys.components.price_display import lease_note, subject_label
 from kopi_keys.components.price_query import SqlitePriceTool
 from kopi_keys.schemas import ChatRequest, PriceFilters
+from kopi_keys.ingest import resale_db as importer
 from kopi_keys.state import initial_state
-
-_spec = importlib.util.spec_from_file_location(
-    "build_resale_db", Path(__file__).resolve().parents[1] / "scripts/build_resale_db.py",
-)
-importer = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(importer)
 
 BASE = {
     "month": "2026-01", "town": "TOA PAYOH", "flat_type": "5 ROOM", "block": "1",

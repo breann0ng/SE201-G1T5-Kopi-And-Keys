@@ -11,7 +11,7 @@ from kopi_keys.llm import Generation, ModelEngineError, OllamaEngine, OllamaSett
 from kopi_keys.schemas import PriceResult
 
 
-FIXTURE = Path(__file__).resolve().parents[1] / "examples" / "price_sql_result.json"
+FIXTURE = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "price_sql_result.json"
 VALID_TEXT = """Mean: SGD 650,000.13
 Median: SGD 640,000.00
 IQR: SGD 80,000.00

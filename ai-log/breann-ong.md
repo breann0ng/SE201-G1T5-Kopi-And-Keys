@@ -93,3 +93,56 @@ appear there. All 62 tests still pass.
 
 ### What I kept or changed
 Kept all changes.
+
+## 2026-10-18 · Review of folder layout and project name
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** none changed (advice only; led to the refactor entry below)
+- **Outcome:** Changed
+
+### What I asked for
+Whether to move scripts/ into backend/kopi_keys/ and combine it with
+components/, and whether the name kopi_keys could be confused with
+key-value pairs.
+
+### How I checked it
+Checked its points against the files. scripts/scraping/ has its own
+requirements.txt and runs separately in the policy-refresh GitHub workflow,
+so merging it into components/ would add scraper packages to the app.
+Confirmed that three tests loaded scripts/build_resale_db.py by file path,
+and that evaluation files were spread over three folders.
+
+### What I kept or changed
+I did not merge scripts/ into components/. Instead I took three of its
+suggestions: put evaluation data in one folder, move the build logic into the package, and move examples/ into tests/fixtures/. I kept the name kopi_keys: users only see "Kopi & Keys" in the app, and renaming would touch every import and conflict with teammates' open branches. Its other suggestion, merging the two topic_cards.py files, is not done yet.
+
+## 2026-10-18 · Restructure evaluation data, build scripts and fixtures
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/ingest/ (new: resale_db.py, policy_index.py),
+  scripts/build_resale_db.py, scripts/build_policy_index.py,
+  scripts/run_price_cases.py, backend/kopi_keys/evaluation/dataset.py,
+  data/evaluation-data/ (from data/evaluation/ and evaluation/results/),
+  tests/fixtures/ (from examples/), tests/test_resale_db.py,
+  tests/test_price_stats.py, tests/test_price_refine.py,
+  tests/test_synthesiser_verifier.py, tests/test_development_set_contract.py,
+  README.md, docs/architecture.md, docs/price-synthesis-and-verification.md
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+Make the three layout changes and fix every import and path they affect.
+
+### How I checked it
+- All 247 tests pass (1 skipped), the same count as on main before the change.
+- The six synthetic price cases pass in validation-only mode from their new
+  folder, and scripts/build_resale_db.py --help still works.
+- During the session data/evaluation/ was renamed on disk to
+  data/evaluation-data/, which broke 5 evaluation tests. The AI stopped and
+  asked rather than guessing. I chose to keep the new name, and it pointed
+  the evaluation code and tests at it.
+- Checked that my held-out questions in data/evaluation-data/held-out/ are
+  still ignored by .gitignore and are not in the commit.
+- [Describe your own review: e.g. which diffs you read, and anything you
+  questioned or changed.]
+
+### What I kept or changed
+The AI left scripts/build_resale_db.py and scripts/build_policy_index.py as thin wrappers, so the commands in the README and docs work unchanged. The team needs to know that data/evaluation/ is now data/evaluation-data/ before merging, because open branches that touch the dev set will conflict.
+[Record anything you kept or changed.]

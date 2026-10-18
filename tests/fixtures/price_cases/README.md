@@ -36,7 +36,7 @@ response, verification errors, model-call count and timing; find them under
 ## Run and inspect one example yourself
 
 ```powershell
-.\.venv\Scripts\python.exe -m kopi_keys.cli --input examples\price_cases\decimal_rounding.json
+.\.venv\Scripts\python.exe -m kopi_keys.cli --input tests\fixtures\price_cases\decimal_rounding.json
 ```
 
 For valid non-empty results, look for `status: answered`,

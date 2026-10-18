@@ -184,7 +184,7 @@ fixtures and intentional rejections **without model inference**. Omit the flag
 for live model checks. The standalone price CLI is:
 
 ```powershell
-.\.venv\Scripts\python.exe -m kopi_keys.cli --input examples\price_sql_result.json
+.\.venv\Scripts\python.exe -m kopi_keys.cli --input tests\fixtures\price_sql_result.json
 ```
 
 Checks on **18 October 2026**: 248 tests passed with no skips, snapshot/card
