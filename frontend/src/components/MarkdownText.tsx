@@ -15,6 +15,11 @@ function tidy(text: string): string {
     // Leftover download-link labels from the official pages, e.g. "(PDF, 198KB)"; the link itself
     // was not captured (added 2026-10-17). Display only; the verifier checks the original.
     .replace(/\s*\((?:PDF|DOCX?|XLSX?)\s*,\s*[\d.]+\s*[KM]B\)/gi, "")
+    // Bulleted lists inside HDB table cells were flattened when captured, so separate amounts
+    // ran together ("exceed: $16,000 $24,000 if ..."). Put a separator back only where an item that
+    // starts with an amount runs into the next amount; "between $3,000 and $4,000" is left alone
+    // (added 2026-10-18). Display only.
+    .replace(/(\$\d[\d,]*(?:\.\d+)?(?:[^$:;.\n|]*[\w)])?)(?<!\b(?:and|or|to|than|from|between|of|by))\s+(?=\$\d)/g, "$1; ")
     .replace(/<\/?[a-z][^>]*>/gi, "") // any other stray tag
     .replace(/\n{3,}/g, "\n\n");
 }

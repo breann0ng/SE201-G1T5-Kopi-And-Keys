@@ -112,3 +112,29 @@ def test_worked_examples_are_recognised():
     found = sorted(c["chunk_id"] for c in map(json.loads, chunks.read_text(encoding="utf-8").splitlines())
                    if is_worked_example(c["content"]))
     assert found == ["CHUNK_EHG_12", "CHUNK_EHG_14", "CHUNK_EHG_23", "CHUNK_EHG_26"]
+
+
+@pytest.mark.parametrize("question", [
+    "what sources do I start looking at if I want to buy a resale flat?",
+    "how do I buy a resale flat?",
+    "where do I start if I want to buy a resale flat?",
+])
+def test_how_to_buy_questions_are_discovery_not_declined(question):
+    """Added 2026-10-18: questions about starting to buy had no policy keyword and were declined."""
+    from kopi_keys.components.query_router import route_query
+
+    routed = route_query(question)
+    assert (routed.intent, routed.route) == ("discovery", "policy")
+
+
+@pytest.mark.parametrize("query, focus", [
+    ("What is the income ceiling for an HDB loan? families", "loan"),
+    ("What is the income ceiling for the EHG? families", "grant"),
+    ("Can I use a grant to reduce my HDB loan?", None),
+    ("What is the income ceiling?", None),
+])
+def test_scheme_focus_follows_the_scheme_the_question_names(query, focus):
+    """Added 2026-10-18: a loan question from a family profile no longer ranks grant pages first."""
+    from kopi_keys.components.policy_retrieval import scheme_focus
+
+    assert scheme_focus(query) == focus
