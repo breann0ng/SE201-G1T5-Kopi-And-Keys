@@ -64,12 +64,12 @@ class OllamaEngine:
         self.settings = settings or OllamaSettings.from_env()
         self._client = client
 
-    def for_policy(self, schema: dict):
+    def for_policy(self, schema: dict, model_override: str | None = None):
         """Separate policy budgets; the strict price formatter keeps its limits."""
         settings = replace(
             self.settings, context_size=4096, max_output_tokens=850,
             response_format=schema,
-            model=os.getenv("KOPI_POLICY_MODEL", self.settings.model),
+            model=model_override or os.getenv("KOPI_POLICY_MODEL", self.settings.model),
         )
         return OllamaEngine(settings=settings, client=self._client)
 
@@ -109,6 +109,10 @@ class OllamaEngine:
                         "num_ctx": self.settings.context_size},
         })
 
+    def unload(self) -> None:
+        """Release this model between benchmark batches without stopping Ollama."""
+        self._request("POST", "/api/generate", {"model": self.settings.model, "keep_alive": 0})
+
     @traceable(run_type="llm", name="ollama_chat")
     def complete(self, messages: list[dict[str, str]]) -> Generation:
         started = perf_counter()
@@ -144,6 +148,9 @@ class OllamaEngine:
                 "prompt_tokens": data.get("prompt_eval_count"),
                 "output_tokens": data.get("eval_count"),
                 "num_gpu_requested": 0,
+                "load_seconds": round(data.get("load_duration", 0) / 1e9, 3),
+                "prompt_eval_seconds": round(data.get("prompt_eval_duration", 0) / 1e9, 3),
+                "generation_seconds": round(data.get("eval_duration", 0) / 1e9, 3),
             },
         )
 

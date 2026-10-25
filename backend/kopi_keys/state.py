@@ -62,12 +62,14 @@ class GraphState(Contract):
     # Synthesiser Agent
     draft: Draft | None = None
     generation_error: str | None = None
+    synthesis_errors: list[str] = Field(default_factory=list)
     model_calls: int = 0
     model_usage: list[dict] = Field(default_factory=list)
 
     # Verifier
     verification_errors: list[str] = Field(default_factory=list)
     verification_passed: bool = False
+    relevance_scores: list[dict] = Field(default_factory=list)
     repair_count: int = 0
 
     # Abstention / output

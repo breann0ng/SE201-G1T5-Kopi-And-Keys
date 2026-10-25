@@ -54,11 +54,13 @@ class SynthesisResult:
     """A draft plus model bookkeeping, returned to the graph node."""
 
     def __init__(self, draft: Draft | None, generations: list[Generation] | None = None,
-                 error: str | None = None, model_calls: int | None = None):
+                 error: str | None = None, model_calls: int | None = None,
+                 validation_errors: list[str] | None = None):
         self.draft = draft
         self.generations = generations or []
         self.error = error
         self.model_calls = len(self.generations) if model_calls is None else model_calls
+        self.validation_errors = validation_errors or []
 
 
 class SynthesiserAgent(Protocol):
@@ -113,13 +115,14 @@ class Synthesiser:
         claims = citizenship_conditions(state)
         price_text = None
         generations = []
+        validation_errors = []
         if state.passages and not claims:
             if self.policy is None:
                 # Offline/demo fixtures explicitly inject engine=None.
                 claims = extractive_policy_claims(state)
             else:
                 try:
-                    claims, generation = self.policy.generate(state)
+                    claims, generation, validation_errors = self.policy.generate(state)
                 except ModelEngineError as error:
                     return SynthesisResult(None, error=str(error), model_calls=1)
                 generations.append(generation)
@@ -134,4 +137,5 @@ class Synthesiser:
             generations.append(generation)
             price_text = generation.text
         return SynthesisResult(Draft(kind="answer", claims=claims, price_text=price_text,
-                                     suggestions=state.suggestion_seeds), generations)
+                                     suggestions=state.suggestion_seeds), generations,
+                               validation_errors=validation_errors)

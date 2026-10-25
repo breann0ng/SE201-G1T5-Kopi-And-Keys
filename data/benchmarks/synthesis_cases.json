@@ -1,0 +1,101 @@
+{
+  "name": "finals-synthesis-development-v1",
+  "purpose": "Development-only, fixed-evidence synthesis comparison. Not the team dev/held-out evaluation set.",
+  "snapshot_id": "2026-10-15",
+  "cases": [
+    {
+      "id": "SYN-01", "category": "family_grant_combination",
+      "question": "Can EHG and PHG be combined when a first-timer family buys a resale flat?",
+      "profile": {"household_type": "couple_family", "first_timer": true},
+      "chunk_ids": ["CHUNK_EHG_05", "CHUNK_PHG_01", "CHUNK_GRANTS_07"],
+      "expected": "answered",
+      "required_quote_groups": [["must first qualify"], ["Proximity Housing Grant"]]
+    },
+    {
+      "id": "SYN-02", "category": "three_grant_combination",
+      "question": "Can we combine EHG, the CPF Housing Grant for Resale Flats and PHG? Explain the prerequisite without adding maximum amounts together.",
+      "profile": {"household_type": "couple_family", "first_timer": true},
+      "chunk_ids": ["CHUNK_GRANTS_07", "CHUNK_GRANTS_11", "CHUNK_EHG_05"],
+      "expected": "answered",
+      "required_quote_groups": [["must first qualify"], ["Proximity Housing Grant"]]
+    },
+    {
+      "id": "SYN-03", "category": "single_grant_combination",
+      "question": "As a first-timer single buying resale, can I combine EHG and PHG?",
+      "profile": {"household_type": "single", "first_timer": true},
+      "chunk_ids": ["CHUNK_EHG_17", "CHUNK_PHG_06"],
+      "expected": "answered",
+      "required_quote_groups": [["must first qualify"], ["(Singles)"], ["Proximity Housing Grant"]]
+    },
+    {
+      "id": "SYN-04", "category": "new_vs_resale",
+      "question": "For a new flat from HDB, can I combine EHG and PHG?",
+      "profile": {},
+      "chunk_ids": ["CHUNK_GRANTS_07", "CHUNK_GRANTS_12"],
+      "expected": "answered",
+      "required_quote_groups": [["new flat from HDB"], ["only housing grant"], ["resale flat"]]
+    },
+    {
+      "id": "SYN-05", "category": "income_family",
+      "question": "What is the monthly household income ceiling for EHG for first-timer couples and families?",
+      "profile": {"household_type": "couple_family"},
+      "chunk_ids": ["CHUNK_GRANTS_04", "CHUNK_GRANTS_03"],
+      "expected": "answered",
+      "required_quote_groups": [["$9,000"], ["income ceiling"]]
+    },
+    {
+      "id": "SYN-06", "category": "income_single",
+      "question": "What is the EHG monthly household income ceiling for a first-timer single buying alone?",
+      "profile": {"household_type": "single"},
+      "chunk_ids": ["CHUNK_GRANTS_05", "CHUNK_EHG_17"],
+      "expected": "answered",
+      "required_quote_groups": [["$4,500"], ["income ceiling"]]
+    },
+    {
+      "id": "SYN-07", "category": "proximity_condition",
+      "question": "For PHG, how near must the resale flat be to my parents?",
+      "profile": {"household_type": "couple_family"},
+      "chunk_ids": ["CHUNK_GRANTS_13", "CHUNK_PHG_01"],
+      "expected": "answered",
+      "required_quote_groups": [["within 4 km", "within 4km"]]
+    },
+    {
+      "id": "SYN-08", "category": "loan_control",
+      "question": "What is the monthly household income ceiling for an HDB housing loan for families?",
+      "profile": {"household_type": "couple_family"},
+      "chunk_ids": ["CHUNK_LOAN_28", "CHUNK_LOAN_27"],
+      "expected": "answered",
+      "required_quote_groups": [["$16,000 for families"], ["$24,000 for extended families"], ["$8,000 for singles"]]
+    },
+    {
+      "id": "SYN-09", "category": "missing_combination_evidence",
+      "question": "Can EHG and PHG be combined?",
+      "profile": {},
+      "chunk_ids": ["CHUNK_GRANTS_03", "CHUNK_GRANTS_12"],
+      "expected": "abstained", "required_quote_groups": []
+    },
+    {
+      "id": "SYN-10", "category": "irrelevant_evidence",
+      "question": "What is the EHG income ceiling?",
+      "profile": {},
+      "chunk_ids": ["CHUNK_LOAN_35", "CHUNK_LOAN_02"],
+      "expected": "abstained", "required_quote_groups": []
+    },
+    {
+      "id": "SYN-11", "category": "grant_comparison",
+      "question": "Compare the purpose of EHG and PHG, without deciding whether I qualify.",
+      "profile": {},
+      "chunk_ids": ["CHUNK_GRANTS_03", "CHUNK_GRANTS_12"],
+      "expected": "answered",
+      "required_quote_groups": [["first-timer flat buyers"], ["live with or near their parents"]]
+    },
+    {
+      "id": "SYN-12", "category": "employment_condition",
+      "question": "What employment conditions apply to EHG for first-timer families?",
+      "profile": {"household_type": "couple_family"},
+      "chunk_ids": ["CHUNK_GRANTS_04", "CHUNK_GRANTS_03"],
+      "expected": "answered",
+      "required_quote_groups": [["12 months"], ["working at the time"]]
+    }
+  ]
+}
