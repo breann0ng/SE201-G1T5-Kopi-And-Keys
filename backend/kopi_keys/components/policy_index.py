@@ -22,7 +22,7 @@ import httpx
 DATA_DIR = Path(__file__).resolve().parents[3] / "data"
 INDEX_DIR = Path(os.getenv("KOPI_CHROMA_DIR", DATA_DIR / "chroma"))
 EMBED_MODEL = os.getenv("KOPI_EMBED_MODEL", "embeddinggemma")
-OLLAMA_URL = os.getenv("KOPI_OLLAMA_BASE_URL", "http://127.0.0.1:11434")
+OLLAMA_URL = os.getenv("KOPI_EMBED_BASE_URL", os.getenv("KOPI_OLLAMA_BASE_URL", "http://127.0.0.1:11434"))
 BATCH = 32
 
 

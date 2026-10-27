@@ -259,3 +259,57 @@ The inventory and model pages suggest larger candidates, including a quantized
 quality must be checked before claiming a fit or an improvement. The notebook
 URL token and password are not committed. CPU results remain historical CPU
 results; no GPU benchmark scores have been recorded yet.
+
+## 2026-10-27 - Run the allocated MIG GPU model and reconnect the app
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** `components/policy_index.py`, GPU regression tests,
+  `scripts/start_cluster_ollama.sh`, `.env.example`, `docs/gpu-cluster.md`,
+  `docs/finals-nisha.md`, `docs/benchmarks/2026-10-27-gpu-summary.json`
+- **Outcome:** Changed
+
+### What I asked for
+Use the available cluster GPU for a larger synthesis model, then resume the
+session after my laptop shut down and connect it to the application.
+
+### How I checked it
+The notebook showed a 24,192 MiB MIG slice of the 96 GB Blackwell card, four CPU
+cores and 32 GB allocated host RAM. Codex found the course-provided Ollama runtime
+and model pool and started a private loopback server inside the GPU allocation,
+preserving the scheduler's MIG identifier. No shared models were downloaded,
+deleted or changed. The provided `qwen3.8:latest` tag reported 27.3B Q4_K_M;
+its reported loaded size equalled its GPU-memory footprint at 4K context.
+
+The actual 12-case fixed-evidence development run passed 11/12 automatic
+outcome/coverage checks, answered all ten answerable cases, correctly withheld
+both insufficient-evidence cases, and had no engine errors. Median wall time
+was 2.825 seconds; the first case took 23.546 seconds. Three additional real
+application-graph questions answered and passed verification, including the
+multi-grant request that previously timed out on the laptop CPU.
+
+After the laptop restarted, Codex checked that the notebook kernel and private
+server survived, verified the compute-node SSH host fingerprint through the
+authenticated notebook, and confirmed the second SSH model tunnel responded.
+Local embeddings, backend and frontend were restarted. The complete Python suite
+passed 285 tests after the local embedding server was available, and the updated
+cluster launcher's Bash syntax passed. A first test run while that embedding
+server was stopped had one retrieval failure; it passed after restoring it.
+The multi-grant question then answered and verified in 12.637 seconds through
+the frontend's real HTTP proxy, backend and direct GPU tunnel. The remote server
+again reported the full loaded model footprint in GPU memory. This was an HTTP
+integration check, not a browser click-through.
+
+### What I kept or changed
+Added a separate embedding-server URL so generation can use the GPU while the
+existing EmbeddingGemma/Chroma index stays local. Added tests for default,
+inherited and separate embedding endpoints. The launcher can discover the
+approved shared binary and choose an unused loopback port. CPU remains the
+default, and cluster credentials, notebook tokens, raw outputs and session
+addresses stay outside committed artifacts.
+
+The GPU score is not held-out policy accuracy. Human quality review is pending,
+and hardware, model and runtime differ from the historical CPU comparison.
+SYN-08 asks only for the family loan-income ceiling but its gold also requires
+extended-family and singles ceilings; the model's family quote verified. This
+is recorded for label review without altering labels or upgrading the 11/12
+score. The provided model tag is recorded as reported, without claiming it is
+the newest upstream release. Shared filesystem free space is not personal quota.

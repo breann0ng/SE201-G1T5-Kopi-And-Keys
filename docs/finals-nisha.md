@@ -187,3 +187,23 @@ timed out after 181 seconds and safely abstained (`engine_unavailable`). Ollama'
 log showed CPU prompt processing still underway, not a verified policy answer.
 This is a material live-demo limitation. Fixed-evidence benchmark success does
 not guarantee low-latency end-to-end answers with retrieved context.
+
+## GPU follow-up, 27 October 2026
+
+The allocated Blackwell GPU was a 24,192 MiB MIG slice. The provided shared
+`qwen3.8:latest` tag reported 27.3B Q4_K_M and loaded fully into that slice at
+4K context. It passed 11/12 automatic outcome/coverage checks on the same fixed
+development cases, with a 2.825-second median in one repeat. All ten answerable
+cases were answered, and both insufficient-evidence cases were withheld. The
+remaining miss flags an overbroad family-income gold label for review; its score
+and the original labels remain unchanged.
+
+The real multi-grant application graph also answered and verified in 12.318
+seconds on this GPU session, instead of the historical CPU timeout described
+above. GPU timings include the authenticated Jupyter bridge. Hardware, runtime
+and model changed together, so this is an exploratory configuration comparison,
+not an isolated speedup or validated policy-accuracy result. CPU remains the
+portable default; allocated GPU inference is opt-in.
+
+See the [GPU setup and measured limitations](gpu-cluster.md) and the
+[curated result summary](benchmarks/2026-10-27-gpu-summary.json).

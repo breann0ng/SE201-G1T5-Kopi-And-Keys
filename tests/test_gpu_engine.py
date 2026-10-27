@@ -1,11 +1,37 @@
 """GPU is opt-in; GPU benchmark reports must reject silent CPU fallback."""
 
 import json
+import os
+import subprocess
+import sys
 
 import httpx
 import pytest
 
 from kopi_keys.llm import ModelEngineError, OllamaEngine, OllamaSettings
+
+
+@pytest.mark.parametrize("generation_url,embedding_url,expected", [
+    (None, None, "http://127.0.0.1:11434"),
+    ("http://127.0.0.1:11435", None, "http://127.0.0.1:11435"),
+    ("http://127.0.0.1:11435", "http://127.0.0.1:11434", "http://127.0.0.1:11434"),
+])
+def test_embedding_endpoint_can_stay_local_when_generation_moves_to_gpu(
+    generation_url, embedding_url, expected,
+):
+    # Configuration is read at import. A fresh process avoids reloading shared
+    # exception classes used by the retrieval tests.
+    env = os.environ.copy()
+    for key, value in (("KOPI_OLLAMA_BASE_URL", generation_url),
+                       ("KOPI_EMBED_BASE_URL", embedding_url)):
+        env.pop(key, None)
+        if value is not None:
+            env[key] = value
+    result = subprocess.run(
+        [sys.executable, "-c", "from kopi_keys.components.policy_index import OLLAMA_URL; print(OLLAMA_URL)"],
+        env=env, capture_output=True, text=True, check=True,
+    )
+    assert result.stdout.strip() == expected
 
 
 def test_gpu_mode_omits_cpu_override_for_load_and_chat():

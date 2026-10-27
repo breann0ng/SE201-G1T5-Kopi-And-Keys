@@ -1,0 +1,308 @@
+{
+  "benchmark": "finals-synthesis-development-v1",
+  "scope": "Development-only, fixed-evidence synthesis comparison. Not the team dev/held-out evaluation set.",
+  "created_at_utc": "20261027T071329Z",
+  "completed": true,
+  "repeats": 1,
+  "snapshot_id": "2026-10-15",
+  "cases_sha256": "a71a106095fb97c63ba1f33d34c96cee7606fec5fb8afb0eb63644818709c727",
+  "evidence_sha256": "0c232c49fef2744fd95508a8df470c874f71d11392e37a3eb92a31e40bc58515",
+  "method": "Production synthesis/verifier on Windows runner; actual Ollama HTTP inference forwarded through an authenticated Jupyter kernel on the allocated compute node.",
+  "runner_host": {
+    "os": "Windows-10-10.0.26300-SP0",
+    "cpu": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "logical_cpus": 16
+  },
+  "inference_host": {
+    "os": "Linux",
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+    "allocation": "MIG slice",
+    "allocated_vram_mib": 24192,
+    "host_ram_mib": 32768,
+    "cpu_cores": 4,
+    "driver_version": "610.57.04",
+    "cuda_umd_version": "13.3"
+  },
+  "ollama_version": "0.34.2",
+  "model": {
+    "tag": "qwen3.8:latest",
+    "digest": "22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643",
+    "reported_parameters": "27.3B",
+    "quantization": "Q4_K_M",
+    "loaded_bytes": 17278099782,
+    "loaded_vram_bytes": 17278099782,
+    "context_tokens": 4096,
+    "identity_note": "Shared course tag recorded as reported; not a claim about the newest upstream Qwen release."
+  },
+  "run_settings": {
+    "device": "gpu",
+    "num_threads": 4,
+    "policy_context_size": 4096,
+    "policy_output_token_cap": 850,
+    "timeout_seconds": 240.0,
+    "temperature": 0,
+    "seed": 42,
+    "max_repairs": 1,
+    "minimum_relevance": 0.2,
+    "warmup": "one unscored policy-budget load before each model batch"
+  },
+  "summary": {
+    "qwen3.8:latest": {
+      "cases": 12,
+      "quality_passes": 11,
+      "answered": 10,
+      "correct_abstentions": 2,
+      "engine_errors": 0,
+      "median_seconds": 2.825,
+      "p95_seconds": 23.546,
+      "model_calls": 14,
+      "first_attempt_verifier_passes": 10,
+      "raw_first_attempt_passes": 9,
+      "answers_after_claim_pruning": 1,
+      "answerable_cases": 10,
+      "over_abstentions": 0,
+      "output_tokens": 1465,
+      "human_quality_review": "pending; automatic quote coverage is not factual accuracy"
+    }
+  },
+  "case_results": [
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-01",
+      "category": "family_grant_combination",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "elapsed_seconds": 23.546,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ]
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-02",
+      "category": "three_grant_combination",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "elapsed_seconds": 4.356,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ]
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-03",
+      "category": "single_grant_combination",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "elapsed_seconds": 3.733,
+      "required_quote_groups_matched": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-04",
+      "category": "new_vs_resale",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "elapsed_seconds": 3.095,
+      "required_quote_groups_matched": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-05",
+      "category": "income_family",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "elapsed_seconds": 1.718,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ]
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-06",
+      "category": "income_single",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "elapsed_seconds": 1.78,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ]
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-07",
+      "category": "proximity_condition",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "elapsed_seconds": 2.658,
+      "required_quote_groups_matched": [
+        true
+      ]
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-08",
+      "category": "loan_control",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": false,
+      "elapsed_seconds": 2.538,
+      "required_quote_groups_matched": [
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-09",
+      "category": "missing_combination_evidence",
+      "expected": "abstained",
+      "status": "abstained",
+      "quality_pass": true,
+      "elapsed_seconds": 3.855,
+      "required_quote_groups_matched": []
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-10",
+      "category": "irrelevant_evidence",
+      "expected": "abstained",
+      "status": "abstained",
+      "quality_pass": true,
+      "elapsed_seconds": 2.821,
+      "required_quote_groups_matched": []
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-11",
+      "category": "grant_comparison",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "elapsed_seconds": 2.488,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ]
+    },
+    {
+      "model": "qwen3.8:latest",
+      "case_id": "SYN-12",
+      "category": "employment_condition",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "elapsed_seconds": 2.828,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ]
+    }
+  ],
+  "label_review": {
+    "case_id": "SYN-08",
+    "finding": "The family-income question was answered with the cited family condition. Existing gold also requires extended-family and singles ceilings. Review label scope before future evaluation.",
+    "score_changed": false,
+    "labels_changed": false
+  },
+  "application_graph_smoke": [
+    {
+      "question": "Can EHG and PHG be combined for first-timer families buying a resale flat?",
+      "status": "answered",
+      "elapsed_seconds": 12.318,
+      "trace": [
+        "query_router:policy",
+        "policy_retrieval:5 passages",
+        "topic_cards:1 matched",
+        "synthesiser:answer",
+        "verifier:passed",
+        "output"
+      ]
+    },
+    {
+      "question": "What is the monthly household income ceiling for an HDB loan for families?",
+      "status": "answered",
+      "elapsed_seconds": 3.363,
+      "trace": [
+        "query_router:policy",
+        "policy_retrieval:5 passages",
+        "topic_cards:1 matched",
+        "synthesiser:answer",
+        "verifier:passed",
+        "output"
+      ]
+    },
+    {
+      "question": "Can a Singapore PR couple buy a resale flat?",
+      "status": "answered",
+      "elapsed_seconds": 0.202,
+      "trace": [
+        "query_router:policy",
+        "policy_retrieval:5 passages",
+        "topic_cards:0 matched",
+        "synthesiser:answer",
+        "verifier:passed",
+        "output"
+      ]
+    }
+  ],
+  "limitations": [
+    "One repeat and 12 development cases; not held-out evaluation.",
+    "Human quality review is pending; automatic quote coverage is not factual accuracy.",
+    "Wall times include network and the Jupyter bridge.",
+    "Model, Ollama runtime and hardware differ from historical CPU results; not a controlled GPU speedup or model-size comparison.",
+    "Application checks exercise the real graph in process, not the browser interface.",
+    "Local regression tests do not measure GPU performance."
+  ],
+  "implementation_sha256": {
+    "backend/kopi_keys/llm.py": "61d0249d7cc39eec27062e9b53ac7c4a0482ebee8fe3bbc16c17c7ed77505e3c",
+    "backend/kopi_keys/components/policy_synthesis.py": "862ed5f007acaa4a019ede2ebfac3e1f0d53631ef54008938f3a2a07d19aec2b",
+    "backend/kopi_keys/components/policy_guardrails.py": "2636f297ec2092bbf07c10eb2ab06904d2f2f38c35f5b484a99bd23c81092ba4",
+    "backend/kopi_keys/components/verifier.py": "259f90ea8d76f0e08c32f94b6e0648215cd0f851f5358b54f3c32c4594e34ffc",
+    "backend/kopi_keys/evaluation/synthesis_benchmark.py": "ad086a2df8f984873b825ce94c18524d6ed53eea889c18eb63d2fe7f8aa07d8d"
+  },
+  "frontend_proxy_smoke": {
+    "transport": "HTTP via frontend Vite proxy to FastAPI backend to GPU SSH tunnel; local EmbeddingGemma retrieval",
+    "question": "Can EHG and PHG be combined for first-timer families buying a resale flat?",
+    "status": "answered",
+    "elapsed_seconds": 12.637,
+    "trace": [
+      "query_router:policy",
+      "policy_retrieval:5 passages",
+      "topic_cards:1 matched",
+      "synthesiser:answer",
+      "verifier:passed",
+      "output"
+    ],
+    "loaded_models": [
+      {
+        "name": "qwen3.8:latest",
+        "digest": "22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643",
+        "size": 17278099782,
+        "size_vram": 17278099782,
+        "context_length": 4096
+      }
+    ],
+    "scope": "HTTP frontend proxy and backend integration check; not a browser click-through or independent benchmark."
+  }
+}
