@@ -16,16 +16,19 @@ Checks:
 - Model-written policy summaries: their supporting quotes occur in the cited
   passages, and each written number occurs in the supporting quote.
 
-These are structural checks. Whether a claim's wording is faithful to its
-source still needs manual review (Citation Faithfulness metric).
+Relevance scores and multi-grant coverage add conservative checks on topic and
+scope. They are heuristics, not proof of policy correctness; citation faithfulness
+and eligibility interpretation still need manual review.
 """
 
 import re
+import os
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
 
 from ..schemas import CENT, PriceResult
 from ..state import GraphState
+from .policy_guardrails import grant_coverage_errors, household_scope_errors, normalized_policy_text, score_relevance
 
 
 # Reject malformed grouping, shorthand (600k), signs, percentages and exponents.
@@ -97,7 +100,7 @@ def verify_generated_numbers(text: str, sql: PriceResult) -> NumericVerification
 def _comparable(text: str) -> str:
     """Text for verbatim comparison: whitespace collapsed, and a word split across lines after a
     hyphen (HDB PDFs: "first-\ntimer") joined back, on both the quote and the source."""
-    return re.sub(r"-\s+(?=\w)", "-", " ".join(text.split()))
+    return normalized_policy_text(text)
 
 
 def _citation_errors(citation_ids: list[str], sources: dict, what: str) -> list[str]:
@@ -113,6 +116,42 @@ def _citation_errors(citation_ids: list[str], sources: dict, what: str) -> list[
     return errors
 
 
+def verified_claim_subset(state: GraphState):
+    """Share production's conservative claim salvage with the synthesis benchmark.
+
+    Every retained claim must pass on its own AND the trimmed answer must pass
+    in full. Completeness failures and explicit missing evidence cannot be hidden.
+    """
+    if state.draft is None or not state.draft.claims:
+        return None
+    kept = [claim for claim in state.draft.claims
+            if not verify(state.model_copy(update={"draft": state.draft.model_copy(update={"claims": [claim]})}))]
+    if kept and len(kept) < len(state.draft.claims):
+        trimmed = state.draft.model_copy(update={"claims": kept})
+        if not verify(state.model_copy(update={"draft": trimmed})):
+            return trimmed
+    return None
+
+
+def policy_relevance_scores(state: GraphState) -> list[dict]:
+    """Inspect the same per-claim scores used by verify; no extra model call."""
+    sources = {p.id: p for p in state.passages}
+    question = state.followup_question or state.message
+    scores = []
+    for index, claim in enumerate(state.draft.claims if state.draft else []):
+        if claim.supporting_quote is None:
+            continue  # Legacy/offline extractive fixtures have no model-selected quote.
+        cited = [sources[c] for c in claim.citation_ids if c in sources and not sources[c].superseded]
+        best = max((score_relevance(question, claim.supporting_quote, p.title,
+                                    claim.source_criterion or "") for p in cited),
+                   key=lambda s: s.score, default=score_relevance(question, claim.supporting_quote))
+        scores.append({"claim_index": index, "score": best.score, "reason": best.reason,
+                       "matched_terms": list(best.matched_terms),
+                       "requested_grants": list(best.requested_grants),
+                       "covered_grants": list(best.covered_grants)})
+    return scores
+
+
 def verify(state: GraphState) -> list[str]:
     draft = state.draft
     if draft is None:
@@ -120,7 +159,7 @@ def verify(state: GraphState) -> list[str]:
     if draft.kind == "clarify":
         return []
 
-    errors = []
+    errors = list(state.synthesis_errors)
     sources = {passage.id: passage for passage in state.passages}
     price = state.price_result
     has_price = price is not None and price.volume > 0
@@ -130,6 +169,16 @@ def verify(state: GraphState) -> list[str]:
         errors.append("The policy question requires a cited policy summary.")
 
     question = state.followup_question or state.message
+    minimum = float(os.getenv("KOPI_POLICY_MIN_RELEVANCE", "0.20"))
+    if not 0 < minimum <= 1:
+        raise ValueError("KOPI_POLICY_MIN_RELEVANCE must be greater than 0 and at most 1.")
+    for score in policy_relevance_scores(state):
+        if score["score"] < minimum:
+            errors.append(f"Low policy relevance for claim {score['claim_index'] + 1}: "
+                          f"{score['score']:.2f} < {minimum:.2f} ({score['reason']}). "
+                          "Select a quote addressing the question, or abstain if the evidence is missing.")
+    errors.extend(grant_coverage_errors(question, draft.claims, sources))
+    errors.extend(household_scope_errors(state, sources))
     for claim in draft.claims:
         errors.extend(_citation_errors(claim.citation_ids, sources, "policy claim"))
         if claim.supporting_quote is not None:

@@ -29,7 +29,7 @@ from .components.topic_cards import (
     personal_eligibility_fields, suggestion_cards,
 )
 from .topic_cards import OVERVIEW_TOPICS, overview_topic
-from .components.verifier import verify
+from .components.verifier import verify, policy_relevance_scores, verified_claim_subset
 from .llm import OllamaEngine
 from .schemas import ChatRequest, ChatResponse, DataOrigin, IncomeNote, OverviewItem, Suggestion
 from .state import GraphState, initial_state
@@ -155,6 +155,7 @@ def build_graph(
         return {
             "draft": result.draft,
             "generation_error": result.error,
+            "synthesis_errors": result.validation_errors,
             "model_calls": state.model_calls + result.model_calls,
             "model_usage": [*state.model_usage, *usage],
             "trace": ["synthesiser:error" if result.error else f"synthesiser:{result.draft.kind}"],
@@ -172,6 +173,7 @@ def build_graph(
         update = {
             "verification_errors": errors,
             "verification_passed": not errors,
+            "relevance_scores": policy_relevance_scores(state),
             "trace": ["verifier:failed" if errors else "verifier:passed"],
         }
         if errors:
@@ -179,18 +181,15 @@ def build_graph(
             # trimmed answer then passes in full, instead of a ~60 s repair or declining everything.
             # E.g. a genuine EHG quote was lost because a second quote stitched worked-example table
             # cells into a sentence that is not in the source. A repair still runs when no quote passes.
-            if state.draft is not None and state.draft.claims:
-                kept = [c for c in state.draft.claims
-                        if not verify(state.model_copy(update={"draft": state.draft.model_copy(update={"claims": [c]})}))]
-                if kept and len(kept) < len(state.draft.claims):
-                    trimmed = state.draft.model_copy(update={"claims": kept})
-                    if not verify(state.model_copy(update={"draft": trimmed})):
-                        return {
-                            "draft": trimmed,
-                            "verification_errors": [],
-                            "verification_passed": True,
-                            "trace": [f"verifier:passed after dropping {len(state.draft.claims) - len(kept)} unverified quote(s)"],
-                        }
+            trimmed = verified_claim_subset(state)
+            if trimmed is not None:
+                return {
+                    "draft": trimmed,
+                    "verification_errors": [],
+                    "verification_passed": True,
+                    "relevance_scores": policy_relevance_scores(state.model_copy(update={"draft": trimmed})),
+                    "trace": [f"verifier:passed after dropping {len(state.draft.claims) - len(trimmed.claims)} unverified quote(s)"],
+                }
             if state.repair_count >= max_repairs:
                 update["abstain_reason"] = "verification_failed"
             else:

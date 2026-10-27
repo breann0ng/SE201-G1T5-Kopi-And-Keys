@@ -1,8 +1,8 @@
 # Policy advisor and conversation handling
 
 The API uses the ACTIVE official policy snapshot and local CPU Ollama. The model
-remains `qwen2.5:3b`; these changes fix routing and integration before comparing
-larger models. The resale price formatter and its numeric verifier retain their
+remains `qwen2.5:3b`. The finals synthesis benchmark can compare it with larger
+local models. The resale price formatter and its numeric verifier retain their
 existing prompt and inference limits.
 
 ## What happens for a policy question
@@ -26,18 +26,24 @@ existing prompt and inference limits.
    personal eligibility decision. Other policy questions send up to three complete
    passages (at most 800 source words by default) to Ollama. Well-formed tables are passed as
    explicit row/column/cell objects. It requests structured JSON selecting at most
-   three short, self-contained source quotes with citations. Free-form model
+   three short, self-contained source quotes with citations for ordinary questions.
+   Questions naming multiple grants can use five passages / 1,200 words and six
+   claims, with explicit grant coverage and prerequisite instructions. Each request's
+   JSON schema enumerates only its supplied citation IDs. Free-form model
    paraphrases are never displayed as policy facts. Its context is
    4,096 tokens and output limit is 850 tokens; CPU-only inference is retained.
 5. Deterministic checks reject unknown/superseded citations, invented supporting
    quotes and numbers absent from the supporting quote. A selected table cell is
    rendered from the source together with its row condition and column scope,
    instead of using a potentially misleading model paraphrase. A PR resale answer
-   must cover both relevant citizenship columns. A failed draft gets one
+   must cover both relevant citizenship columns. Finals checks also score quote
+   relevance, reject clearly opposite household scopes, and require the requested
+   grants, a supported combination/exclusion rule, and supplied resale prerequisites.
+   A failed draft gets one
    repair attempt. A second failure or model-engine error abstains.
 
-Source wording prevents invented paraphrases but does not establish relevance or
-completeness. A model can still select an unrelated or incomplete excerpt, and a
+Source wording and the relevance heuristic do not establish full relevance or
+completeness. A model can still select an incomplete excerpt, and a
 malformed source table may have lost context during scraping. Review household
 scope and answer relevance separately. The corpus itself also needs review;
 these changes do not rewrite or certify scraped policy text.
@@ -82,10 +88,10 @@ Routing support is not a guarantee of a verified answer. In the live review on
 18 October 2026, `how do I buy a resale flat?` abstained on two runs after both
 allowed generation attempts. A raw-response diagnostic found that the model
 cited `CHUNK_RESALE_26` instead of the supplied `CHUNK_BTO_26`. The answer-level
-allowlist rejected the entire draft. That schema error currently becomes an
-empty claim list, so the retry receives a generic no-claims error rather than
-the invalid-citation detail. This limitation is unresolved; the verifier still
-withholds the draft. Automated routing tests do not establish end-to-end success.
+allowlist rejected the entire draft. The finals changes now restrict IDs during
+decoding and pass the actual JSON validation error into the repair prompt.
+This fixes the error-feedback gap; it does not guarantee every buying-guide
+question will be answered. Automated routing tests do not establish end-to-end success.
 
 ## Model comparison and optional policy model
 
@@ -94,6 +100,10 @@ and 4B misinterpreted the columns; 4B was slower and its drafts were rejected by
 the verifier. This single diagnostic case is not a general model benchmark.
 The default remains Qwen2.5:3b. Critical citizenship-table facts use the deterministic path
 above rather than relying on either model to interpret columns.
+
+For the repeatable finals benchmark and guardrail details, see
+[Nisha's finals implementation](finals-nisha.md). This benchmark isolates synthesis
+with fixed evidence; it does not measure the retriever or use held-out questions.
 
 To experiment with a separate policy model, without changing the price model:
 

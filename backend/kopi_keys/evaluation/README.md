@@ -8,6 +8,7 @@ Scores the advisor against labelled questions. Owner: Sandra.
 | `metrics.py` | Router accuracy, discovery precision/recall and ask-next, Recall@5, and end-to-end checks (routing, unsafe answering, over-abstention, uncited answers, staleness) |
 | `baselines.py` | Retrievers to score (`bm25`, `hybrid`, or `module:function`). The answer-level baselines (same LLM without tools, naive single-call RAG) are still TODO |
 | `run_eval.py` | The command below; reports go to `.local/reports/` (gitignored) |
+| `synthesis_benchmark.py` | Nisha's fixed-evidence CPU synthesis comparison; independent of the team dev/held-out splits. See [the finals guide](../../../docs/finals-nisha.md). |
 
 ## Question sets
 

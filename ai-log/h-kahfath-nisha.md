@@ -181,3 +181,47 @@ The archive was checked for readable contents and excludes local credentials,
 installed dependencies, generated databases and model files. No fresh
 held-out set was used. The package has not been uploaded to a submission
 portal, and no PR approval or merge was posted by Codex.
+
+## 2026-10-26 · Finals policy synthesis, verifier and CPU benchmark
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** `components/policy_synthesis.py`, `policy_guardrails.py`,
+  `synthesiser.py`, `verifier.py`, `graph.py`, `state.py`, `llm.py`,
+  `evaluation/synthesis_benchmark.py`, `data/benchmarks/synthesis_cases.json`,
+  focused tests, `.env.example`, README and finals documentation
+- **Outcome:** Changed
+
+### What I asked for
+Complete my finals tasks on a separate branch: multi-grant policy synthesis,
+verifier relevance checks and abstention, and CPU synthesis benchmarking of
+Qwen2.5:3b against a larger local model.
+
+### How I checked it
+Codex checked the current implementation and created
+`feat/nisha-finals-policy-guardrails`. The existing test suite passed before
+changes. New regression cases exercise complete and incomplete grant combinations,
+missing prerequisites, irrelevant but genuine quotes, household scope, a bounded
+repair loop, request-specific citation IDs and independent benchmark coverage.
+The full suite passes with the vector index and Ollama available. Live comparison
+uses the installed Qwen2.5:3b and Qwen3:4b with the same evidence, CPU settings
+and generation limits; results and limitations are recorded in the finals guide.
+The completed fixed-evidence comparison passed the expected outcome and quote
+coverage checks on 10/12 cases for 3B and 9/12 for 4B. The larger model timed out
+once; an extra diagnostic also timed out and was stopped. Memory pressure affected
+timings, so these are exploratory results. A PR-couple application request passed;
+the actual multi-grant application request timed out during CPU prompt processing
+and safely abstained. I do not treat that request as a successful live demo.
+
+### What I kept or changed
+Kept source-excerpt policy answers, deterministic SQL numeric checks, and the
+single repair before abstaining. Added explicit grant coverage and combination
+requirements, lexical relevance scoring, household-scope checks, and actual JSON
+validation details in the repair prompt. Formatting-only emphasis can be omitted
+without treating changed words, numbers or stitched lists as supported quotes.
+
+The synthesis benchmark has 12 labelled development cases with fixed official
+snapshot evidence. It is separate from the team's expanded evaluation set and
+does not read fresh held-out questions. Its automatic checks measure outcome and
+quote coverage, not legal correctness or independently reviewed writing quality.
+The relevance threshold is a development heuristic, not a calibrated probability.
+These changes do not replace the team's router, backtracking, RAG optimisation,
+price-tool, topic-card or UI work. The default model remains Qwen2.5:3b.

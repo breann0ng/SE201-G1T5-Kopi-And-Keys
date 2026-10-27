@@ -9,6 +9,7 @@ from pydantic import Field, ValidationError, ValidationInfo, model_validator
 from ..llm import Generation, ModelEngineError, OllamaEngine, TextEngine
 from ..schemas import Contract, Claim
 from ..state import GraphState
+from .policy_guardrails import mentioned_grants, normalized_policy_text, requested_grants, combination_question, score_relevance
 
 
 class PolicyClaim(Contract):
@@ -19,13 +20,18 @@ class PolicyClaim(Contract):
 
 
 class PolicyAnswer(Contract):
-    claims: list[PolicyClaim] = Field(min_length=1, max_length=3)
+    claims: list[PolicyClaim] = Field(default_factory=list, max_length=6)
+    missing_evidence: list[str] = Field(default_factory=list, max_length=6)
 
     @model_validator(mode="after")
     def citations_were_supplied(self, info: ValidationInfo):
         allowed = (info.context or {}).get("allowed_ids")
-        if allowed is not None and any(c.citation_id not in allowed for c in self.claims):
-            raise ValueError("A citation was not supplied in the model evidence.")
+        unknown = sorted({c.citation_id for c in self.claims} - set(allowed or ()))
+        if allowed is not None and unknown:
+            raise ValueError("A citation was not supplied in the model evidence. Unknown IDs: " + ", ".join(unknown))
+        maximum = (info.context or {}).get("max_claims", 6)
+        if len(self.claims) > maximum:
+            raise ValueError(f"Use at most {maximum} policy claims for this question.")
         return self
 
 
@@ -53,6 +59,18 @@ For a PR-only resale purchase question, include BOTH citizenship requirements:
 the Standard/unclassified column, and the separate Plus/Prime/new-flat column.
 If the evidence is insufficient, say what cannot be established alongside the
 supported information; never guess. Do not cite conversation history as evidence.
+For multiple grants, cover EVERY requested grant. Include a source excerpt that
+explicitly connects the grants when asked whether they can be combined. Separate
+grant descriptions do not prove that they can be stacked. Preserve prerequisites,
+especially any requirement to first qualify for another grant. Keep new-flat and
+resale-flat rules, singles and families, first-timers and second-timers separate.
+Do not add maximum grant amounts together or promise the user the maximum.
+Do not infer a personal grant amount from an income band without the complete
+household and lease conditions. Use up to 6 short claims for complex questions.
+Prefer one complete source paragraph covering the grant relationship and its
+prerequisite, then add only essential non-duplicate conditions.
+If required rules are absent, return missing_evidence with a short description
+of the missing rule. Return claims=[] when nothing answers the question.
 """
 
 
@@ -110,7 +128,7 @@ def table_claim(passage, quote: str, question: str) -> Claim | None:
     than trusting a paraphrase that may silently move a rule to another column.
     """
     rows = model_evidence(passage, question).get("table_rows", [])
-    matches = [r for r in rows if " ".join(quote.split()) in " ".join(r["requirement"].split())]
+    matches = [r for r in rows if normalized_policy_text(quote) in normalized_policy_text(r["requirement"])]
     if len(matches) != 1:
         return None
     row = matches[0]
@@ -160,26 +178,47 @@ MAX_WORDS = int(os.getenv("KOPI_POLICY_MAX_WORDS", "800"))
 
 
 class PolicySummariser:
-    def __init__(self, engine: TextEngine):
-        self.engine = engine.for_policy(PolicyAnswer.model_json_schema()) if isinstance(engine, OllamaEngine) else engine
+    def __init__(self, engine: TextEngine, model_override: str | None = None):
+        self.engine = engine
+        self.model_override = model_override
 
-    def generate(self, state: GraphState) -> tuple[list[Claim], Generation]:
+    def generate(self, state: GraphState) -> tuple[list[Claim], Generation, list[str]]:
+        question = state.followup_question or state.message
+        needed = requested_grants(question)
+        complex_question = len(needed) > 1
+        max_passages = max(MAX_PASSAGES, 5) if complex_question else MAX_PASSAGES
+        max_words = max(MAX_WORDS, 1200) if complex_question else MAX_WORDS
+        # Prioritise cross-grant evidence among the existing results; this does not perform
+        # another search or change the retriever (owned by the orchestration/RAG tasks).
+        ranked = list(state.passages)
+        if complex_question:
+            ranked.sort(key=lambda p: (
+                -int(combination_question(question) and needed <= mentioned_grants(p.text)),
+                -score_relevance(question, p.text, p.title).score,
+            ))
         passages = []
         words = 0
         headings = set()
-        for passage in state.passages:
+        for passage in ranked:
             size = len(passage.text.split())
-            heading_key = (passage.source_url, passage.title)
-            if passage.superseded or words + size > MAX_WORDS or heading_key in headings:
+            # Distinct chunks under one heading can hold interlocking conditions.
+            # Ordinary questions retain the midpoint heading de-duplication.
+            heading_key = (passage.source_url, passage.title, passage.id if complex_question else "")
+            if passage.superseded or words + size > max_words or heading_key in headings:
                 continue
             passages.append(passage)
             headings.add(heading_key)
             words += size
-            if len(passages) == MAX_PASSAGES:
+            if len(passages) == max_passages:
                 break
         if not passages:
             raise ModelEngineError("No policy evidence fits the model context budget.")
-        question = state.followup_question or state.message
+        allowed_ids = [p.id for p in passages]
+        schema = PolicyAnswer.model_json_schema()
+        maximum_claims = 6 if complex_question else 3
+        schema["properties"]["claims"]["maxItems"] = maximum_claims
+        schema["$defs"]["PolicyClaim"]["properties"]["citation_id"]["enum"] = allowed_ids
+        engine = self.engine.for_policy(schema, model_override=self.model_override) if isinstance(self.engine, OllamaEngine) else self.engine
         context = {
             "question": question,
             "latest_message": state.message,
@@ -187,20 +226,31 @@ class PolicySummariser:
                         "household_type": state.household_type, "first_timer": state.first_timer,
                         "household_income": str(state.income) if state.income is not None else None},
             "evidence": [model_evidence(p, question) for p in passages],
+            "allowed_citation_ids": allowed_ids,
+            "answer_requirements": {
+                "requested_grants": sorted(needed),
+                "combination_rule_required": combination_question(question),
+                "preserve_prerequisites": True,
+                "do_not_compute_grant_totals": True,
+            },
         }
         if state.verification_errors:
             context["previous_verification_errors"] = state.verification_errors
-        generation = self.engine.complete([
+        generation = engine.complete([
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
         ])
         try:
-            answer = PolicyAnswer.model_validate_json(generation.text, context={"allowed_ids": {p.id for p in passages}})
-        except ValidationError:
+            answer = PolicyAnswer.model_validate_json(generation.text, context={"allowed_ids": {p.id for p in passages},
+                                                                               "max_claims": maximum_claims})
+        except ValidationError as error:
             # Let the graph's single verifier-repair loop handle malformed JSON.
-            return [], generation
+            details = [f"Policy JSON {'.'.join(map(str, item['loc'])) or 'answer'}: {item['msg']}"
+                       for item in error.errors(include_input=False, include_url=False)]
+            return [], generation, details
         sources = {p.id: p for p in passages}
         claims = [table_claim(sources[c.citation_id], c.supporting_quote, question)
                   or Claim(text=scope_label(c.supporting_quote), citation_ids=[c.citation_id], supporting_quote=c.supporting_quote)
                   for c in answer.claims]
-        return claims, generation
+        errors = ["Missing policy evidence: " + item for item in answer.missing_evidence]
+        return claims, generation, errors

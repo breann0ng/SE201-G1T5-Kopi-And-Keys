@@ -207,14 +207,22 @@ See [the evaluation guide](backend/kopi_keys/evaluation/README.md) for previous
 end-to-end runs and limitations. A fresh held-out set stays outside the repo;
 archived, previously exposed questions are retired, not an unseen test set.
 
+Nisha's finals work adds multi-grant synthesis requirements, deterministic quote
+relevance checks and a fixed-evidence CPU model benchmark. See the
+[implementation and benchmark guide](docs/finals-nisha.md) for commands, scope and
+limitations. These development cases are separate from the team's evaluation set.
+
 ## Current limitations
 
 - Correct routing does not guarantee an answer. In the 18 October live review,
   `how do I buy a resale flat?` reached retrieval but abstained after invalid
-  model citation IDs. Schema validation currently gives the repair step only a
-  generic no-claims error for this failure. The strict verifier remains in place.
-- A verified quote can still be incomplete or irrelevant. Household scope,
-  retrieval relevance and source-table quality need review.
+  model citation IDs. The finals changes constrain citation IDs in the JSON schema
+  and give the repair step the validation details. The strict verifier remains in place.
+- Quote relevance, grant coverage and household scope now have heuristic checks.
+  Passing them still requires source-table quality and policy interpretation review.
+- CPU policy answers can time out with larger contexts. The 26 October multi-grant
+  application smoke test safely abstained after the 180-second model timeout;
+  see [the finals guide](docs/finals-nisha.md) for the benchmark and limitations.
 - Retrieval recall and discovery precision remain below target. The answer-level
   no-tools and naive-RAG baselines are not implemented yet.
 - Clarification history is bounded and some topic-card inputs are unsupported.
