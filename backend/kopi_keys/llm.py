@@ -1,9 +1,9 @@
-"""Local LLM engine (Ollama over HTTP), shared by every LLM component. CPU only."""
+"""Ollama over HTTP, with CPU by default and opt-in allocated GPU inference."""
 
 import os
 from dataclasses import dataclass, field, replace
 from time import perf_counter
-from typing import Protocol
+from typing import Literal, Protocol
 
 import httpx
 from langsmith import traceable
@@ -25,6 +25,7 @@ class OllamaSettings:
     # Added 2026-10-17: how long Ollama keeps the model in memory after a request.
     # Reloading it costs 10-20 s on a laptop CPU; "-1" keeps it until Ollama stops.
     keep_alive: str = "30m"
+    device: Literal["cpu", "gpu"] = "cpu"
 
     def __post_init__(self):
         url = httpx.URL(self.base_url)
@@ -34,6 +35,8 @@ class OllamaSettings:
             raise ValueError("Ollama base URL must not contain credentials, a query or a fragment.")
         if not self.model.strip():
             raise ValueError("A model name is required.")
+        if self.device not in {"cpu", "gpu"}:
+            raise ValueError("Ollama device must be cpu or gpu.")
         if self.timeout_seconds <= 0 or min(self.num_threads, self.context_size, self.max_output_tokens) < 1:
             raise ValueError("Timeout and inference limits must be positive.")
 
@@ -45,6 +48,7 @@ class OllamaSettings:
             timeout_seconds=float(os.getenv("KOPI_OLLAMA_TIMEOUT", "180")),
             num_threads=int(os.getenv("KOPI_OLLAMA_NUM_THREADS", "4")),
             keep_alive=os.getenv("KOPI_OLLAMA_KEEP_ALIVE", "30m"),
+            device=os.getenv("KOPI_OLLAMA_DEVICE", "cpu").strip().lower(),
         )
 
 
@@ -105,9 +109,29 @@ class OllamaEngine:
         prompt). Called once at startup so the first question doesn't pay the load time."""
         self._request("POST", "/api/generate", {
             "model": self.settings.model, "keep_alive": self.settings.keep_alive,
-            "options": {"num_gpu": 0, "num_thread": self.settings.num_threads,
-                        "num_ctx": self.settings.context_size},
+            "options": self._hardware_options(),
         })
+
+    def _hardware_options(self) -> dict:
+        options = {"num_thread": self.settings.num_threads, "num_ctx": self.settings.context_size}
+        if self.settings.device == "cpu":
+            options["num_gpu"] = 0
+        # Omitting num_gpu lets Ollama offload onto scheduler-visible GPUs.
+        # Do not change CUDA_VISIBLE_DEVICES or expose unallocated devices.
+        return options
+
+    def verify_gpu_loaded(self) -> dict:
+        """Reject CPU fallback before calling a timed GPU benchmark a GPU result.
+
+        Positive VRAM proves some offload, not that the whole model fits. Keep
+        the full loading record so partial offload can be reviewed separately.
+        """
+        models = self._request("GET", "/api/ps").get("models", [])
+        model = next((m for m in models if m.get("name") == self.settings.model
+                      or m.get("model") == self.settings.model), None)
+        if model is None or not isinstance(model.get("size_vram"), (int, float)) or model["size_vram"] <= 0:
+            raise ModelEngineError("GPU mode was requested, but the selected model has no reported GPU offload. Check the allocation, drivers and ollama ps.")
+        return model
 
     def unload(self) -> None:
         """Release this model between benchmark batches without stopping Ollama."""
@@ -122,9 +146,7 @@ class OllamaEngine:
             "stream": False,
             "keep_alive": self.settings.keep_alive,
             "options": {
-                "num_gpu": 0,
-                "num_thread": self.settings.num_threads,
-                "num_ctx": self.settings.context_size,
+                **self._hardware_options(),
                 "num_predict": self.settings.max_output_tokens,
                 "temperature": 0,
                 "seed": 42,
@@ -147,7 +169,8 @@ class OllamaEngine:
                 "elapsed_seconds": round(perf_counter() - started, 3),
                 "prompt_tokens": data.get("prompt_eval_count"),
                 "output_tokens": data.get("eval_count"),
-                "num_gpu_requested": 0,
+                "num_gpu_requested": 0 if self.settings.device == "cpu" else None,
+                "device_requested": self.settings.device,
                 "load_seconds": round(data.get("load_duration", 0) / 1e9, 3),
                 "prompt_eval_seconds": round(data.get("prompt_eval_duration", 0) / 1e9, 3),
                 "generation_seconds": round(data.get("eval_duration", 0) / 1e9, 3),

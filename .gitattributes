@@ -5,3 +5,6 @@ data/policy_snapshots/**/raw/** -text
 # Shared resale CSV: keep bytes exact so its sha256 (stored in hdb_prices.db and
 # used in price query IDs) is identical on every machine.
 data/raw/2017-onwards-resale-prices.csv -text
+
+# The cluster launcher runs in Linux Bash, including after a Windows checkout.
+scripts/start_cluster_ollama.sh text eol=lf

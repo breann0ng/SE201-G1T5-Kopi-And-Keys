@@ -1,4 +1,4 @@
-"""CPU model comparison with fixed evidence; never reads the held-out dataset.
+"""CPU/GPU model comparison with fixed evidence; never reads the held-out dataset.
 
 python -m kopi_keys.evaluation.synthesis_benchmark --models qwen2.5:3b qwen3:4b
 """
@@ -129,6 +129,7 @@ def main(argv=None):
     parser.add_argument("--case-ids", nargs="+")
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--threads", type=int, default=4)
+    parser.add_argument("--device", choices=["cpu", "gpu"], help="Override KOPI_OLLAMA_DEVICE; CPU remains the default.")
     parser.add_argument("--timeout", type=float, default=240)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--validate-only", action="store_true")
@@ -145,7 +146,9 @@ def main(argv=None):
         return 0
     # Benchmark prompts/evidence should remain local unless tracing is explicitly
     # enabled by the caller; do not load a developer's .env or hidden test data.
-    settings = replace(OllamaSettings.from_env(), num_threads=args.threads, timeout_seconds=args.timeout)
+    settings = OllamaSettings.from_env()
+    settings = replace(settings, num_threads=args.threads, timeout_seconds=args.timeout,
+                       device=args.device or settings.device)
     inspector = OllamaEngine(settings)
     try:
         installation = inspector.inspect()
@@ -167,11 +170,12 @@ def main(argv=None):
               "host": {"os": platform.platform(), "cpu": platform.processor(), "logical_cpus": os.cpu_count()},
               "settings": {**asdict(settings), "response_format": "request-specific citation enum",
                            "policy_context_size": 4096, "policy_output_token_cap": 850,
-                           "num_gpu": 0, "temperature": 0, "seed": 42, "max_repairs": 1,
+                           "num_gpu": 0 if settings.device == "cpu" else "automatic offload",
+                           "temperature": 0, "seed": 42, "max_repairs": 1,
                            "minimum_relevance": float(os.getenv("KOPI_POLICY_MIN_RELEVANCE", "0.20")),
                            "memory_policy": "other compared models unloaded before each batch; active model unloaded after batch",
                            "warmup": "one unscored policy-budget load before each model batch"},
-              "ollama_version": installation["version"], "records": records, "summary": {}}
+              "ollama_version": installation["version"], "gpu_load_checks": [], "records": records, "summary": {}}
     output.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     for repeat in range(args.repeats):
         # Reverse model order on alternate repeats to reduce order effects.
@@ -182,8 +186,21 @@ def main(argv=None):
                 OllamaEngine(replace(settings, model=other)).unload()
             engine = OllamaEngine(replace(settings, model=model))
             summariser = PolicySummariser(engine, model_override=model)
-            print(f"Loading {model} on CPU ({args.threads} threads)...", flush=True)
-            engine.for_policy({}, model_override=model).warm_up()
+            print(f"Loading {model} on {settings.device.upper()} ({args.threads} CPU threads)...", flush=True)
+            try:
+                engine.for_policy({}, model_override=model).warm_up()
+                if settings.device == "gpu":
+                    report["gpu_load_checks"].append({"model": model, "repeat": repeat + 1,
+                                                      "loaded_model": engine.verify_gpu_loaded()})
+            except ModelEngineError as error:
+                report["setup_error"] = str(error)
+                try:
+                    engine.unload()
+                except ModelEngineError as cleanup_error:
+                    report["cleanup_error"] = str(cleanup_error)
+                output.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                print(f"Setup failed: {error}", flush=True)
+                return 1
             for row, state in cases:
                 print(f"{model} / {row['id']} ...", flush=True)
                 result = {"model": model, "repeat": repeat + 1, **run_case(row, state, summariser)}

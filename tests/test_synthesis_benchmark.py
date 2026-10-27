@@ -90,3 +90,39 @@ def test_cli_records_planned_runs_and_unloads_models_between_batches(monkeypatch
     assert len(report["records"]) == 2 and all(r["quality_pass"] for r in report["records"])
     assert events[:2] == [("unload", "qwen3:4b"), ("warm", "qwen2.5:3b")]
     assert events[-1] == ("unload", "qwen3:4b")
+
+
+def test_gpu_benchmark_stops_before_generation_when_runtime_falls_back_to_cpu(monkeypatch, tmp_path):
+    from kopi_keys.evaluation import synthesis_benchmark as benchmark
+    class CpuFallback:
+        def __init__(self, settings): self.settings = settings
+        def inspect(self): return {"installed_models": ["qwen2.5:3b"], "version": "fixture"}
+        def for_policy(self, schema, model_override=None): return self
+        def warm_up(self): pass
+        def verify_gpu_loaded(self): raise ModelEngineError("No allocated GPU")
+        def unload(self): pass
+        def complete(self, messages): pytest.fail("GPU timing must not silently run on CPU")
+    monkeypatch.setattr(benchmark, "OllamaEngine", CpuFallback)
+    path = tmp_path / "gpu.json"
+    assert main(["--models", "qwen2.5:3b", "--device", "gpu", "--output", str(path)]) == 1
+    report = json.loads(path.read_text(encoding="utf-8"))
+    assert not report["completed"] and report["setup_error"] == "No allocated GPU"
+    assert report["records"] == []
+
+
+def test_gpu_benchmark_records_real_offload_preflight(monkeypatch, tmp_path):
+    from kopi_keys.evaluation import synthesis_benchmark as benchmark
+    class Gpu:
+        def __init__(self, settings): self.settings = settings
+        def inspect(self): return {"installed_models": ["qwen2.5:3b"], "version": "fixture"}
+        def for_policy(self, schema, model_override=None): return self
+        def warm_up(self): pass
+        def unload(self): pass
+        def verify_gpu_loaded(self): return {"name": "qwen2.5:3b", "size_vram": 2000, "size": 2100}
+        def complete(self, messages): return Generation('{"claims": []}', self.settings.model)
+    monkeypatch.setattr(benchmark, "OllamaEngine", Gpu)
+    path = tmp_path / "gpu.json"
+    assert main(["--models", "qwen2.5:3b", "--device", "gpu", "--case-ids", "SYN-09", "--output", str(path)]) == 0
+    report = json.loads(path.read_text(encoding="utf-8"))
+    assert report["completed"] and report["settings"]["device"] == "gpu"
+    assert report["gpu_load_checks"][0]["loaded_model"]["size_vram"] == 2000
