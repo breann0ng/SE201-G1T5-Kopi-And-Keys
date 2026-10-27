@@ -212,6 +212,10 @@ relevance checks and a fixed-evidence CPU model benchmark. See the
 [implementation and benchmark guide](docs/finals-nisha.md) for commands, scope and
 limitations. These development cases are separate from the team's evaluation set.
 
+For an allocated SCIS GPU, see the [GPU cluster guide](docs/gpu-cluster.md).
+GPU inference is opt-in; CPU remains the default. GPU benchmark runs check actual
+model offload and stop if Ollama falls back to CPU.
+
 ## Current limitations
 
 - Correct routing does not guarantee an answer. In the 18 October live review,

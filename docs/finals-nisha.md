@@ -87,14 +87,14 @@ With Ollama running and the models installed:
 .\.venv\Scripts\python.exe -m kopi_keys.evaluation.synthesis_benchmark --validate-only
 $env:LANGSMITH_TRACING = 'false'
 $env:LANGCHAIN_TRACING_V2 = 'false'
-.\.venv\Scripts\python.exe -m kopi_keys.evaluation.synthesis_benchmark --models qwen2.5:3b qwen3:4b --threads 8 --repeats 1
+.\.venv\Scripts\python.exe -m kopi_keys.evaluation.synthesis_benchmark --device cpu --models qwen2.5:3b qwen3:4b --threads 8 --repeats 1
 ```
 
 For a model not installed yet, use the existing setup script before running:
 
 ```powershell
 .\scripts\setup_ollama.ps1 -Model qwen2.5:7b
-.\.venv\Scripts\python.exe -m kopi_keys.evaluation.synthesis_benchmark --models qwen2.5:3b qwen2.5:7b --threads 8 --repeats 3
+.\.venv\Scripts\python.exe -m kopi_keys.evaluation.synthesis_benchmark --device cpu --models qwen2.5:3b qwen2.5:7b --threads 8 --repeats 3
 ```
 
 Larger models require more local disk and memory. The benchmark does not download
@@ -104,6 +104,9 @@ the same evidence and limits. Each model batch has an unscored policy-budget war
 other compared models are unloaded between batches to avoid memory pressure, and
 alternating repeats reverse model order. Generation logs retain load time, prompt
 evaluation time, output tokens, generation time, repairs and total answer latency.
+
+The later [GPU cluster setup](gpu-cluster.md) adds opt-in GPU runs using
+`--device gpu`. Keep CPU and GPU results separate and verify actual offload.
 
 Reports are saved after each case under `.local/reports/`. They include dataset
 and evidence hashes, settings, hardware description, raw outputs, scores and errors.
@@ -184,3 +187,23 @@ timed out after 181 seconds and safely abstained (`engine_unavailable`). Ollama'
 log showed CPU prompt processing still underway, not a verified policy answer.
 This is a material live-demo limitation. Fixed-evidence benchmark success does
 not guarantee low-latency end-to-end answers with retrieved context.
+
+## GPU follow-up, 27 October 2026
+
+The allocated Blackwell GPU was a 24,192 MiB MIG slice. The provided shared
+`qwen3.8:latest` tag reported 27.3B Q4_K_M and loaded fully into that slice at
+4K context. It passed 11/12 automatic outcome/coverage checks on the same fixed
+development cases, with a 2.825-second median in one repeat. All ten answerable
+cases were answered, and both insufficient-evidence cases were withheld. The
+remaining miss flags an overbroad family-income gold label for review; its score
+and the original labels remain unchanged.
+
+The real multi-grant application graph also answered and verified in 12.318
+seconds on this GPU session, instead of the historical CPU timeout described
+above. GPU timings include the authenticated Jupyter bridge. Hardware, runtime
+and model changed together, so this is an exploratory configuration comparison,
+not an isolated speedup or validated policy-accuracy result. CPU remains the
+portable default; allocated GPU inference is opt-in.
+
+See the [GPU setup and measured limitations](gpu-cluster.md) and the
+[curated result summary](benchmarks/2026-10-27-gpu-summary.json).
