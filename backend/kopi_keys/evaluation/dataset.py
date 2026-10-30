@@ -25,6 +25,7 @@ import json
 import os
 import re
 from collections import Counter
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Literal
 
@@ -39,8 +40,13 @@ DEV_FILE = DEV_DIR / "dev_set_questions.jsonl"
 LABELS_FILE = DEV_DIR / "stage1_gateway_labels.jsonl"
 HELDOUT_FILE_NAME = "heldout_questions.jsonl"
 
-# Proposal section 4.1: 50 questions, split 30:20 and stratified by category.
-DEV_COUNTS = {"policy": 7, "price": 6, "mixed": 5, "discovery": 4, "policy_changed": 4, "unanswerable": 4}
+# Stratified by category (proposal section 4.1). Expanded on 2026-10-31 from 30 to 50 dev
+# questions; the held-out set is 40 questions, kept outside the repository.
+DEV_COUNTS = {"policy": 7, "price": 13, "mixed": 8, "discovery": 7, "policy_changed": 7, "unanswerable": 8}
+# Relative periods in the labels ("past 6 months", "this year") are resolved as of this month;
+# the evaluation pins the router's date to it. Default windows end at the database's latest
+# month instead (price_query.default_window), so refresh both labels when the data is rebuilt.
+AS_OF = "2026-10"
 STAGE1_FIELDS = ("expected_intent", "expected_route", "expected_extraction",
                  "expected_missing_fields", "expected_status", "turns")
 
@@ -61,6 +67,16 @@ class PriceFilters(BaseModel):
     flat_type: str
     start_month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     end_month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+    # Refinements the question asks for ("newer flats", "high floor"); see price_query.LEASE_BANDS.
+    lease_band: Literal["under_60", "60_79", "80_plus"] | None = None
+    storey_band: Literal["low", "mid", "high"] | None = None
+
+
+class ExpectedPrice(BaseModel):
+    """Figures computed with plain SQL on hdb_prices.db (not through the app) for price_filters."""
+    model_config = ConfigDict(extra="forbid")
+    volume: int = Field(ge=0)
+    median: Decimal | None = None
 
 
 class Question(BaseModel):
@@ -82,6 +98,7 @@ class Question(BaseModel):
     expected_answer: str | None = None
     evidence: list[Evidence] = []
     price_filters: PriceFilters | None = None
+    expected_price: ExpectedPrice | None = None
     topics: list[str] = []
     expected_cards: list[str] = []
     expected_ask: str | None = None
@@ -148,6 +165,8 @@ def load_questions(split: Literal["dev", "heldout"] = "dev", *, strict_counts: b
             problems.append(f"{q.id}: price_filters not in vocab db_form values")
         if q.category in ("policy", "mixed", "policy_changed") and not ids:
             problems.append(f"{q.id}: policy question without evidence")
+        if q.expected_price and not q.price_filters:
+            problems.append(f"{q.id}: expected_price without price_filters")
         if q.category in ("price", "mixed") and not q.price_filters:
             problems.append(f"{q.id}: price question without price_filters")
         if q.category == "discovery" and not q.expected_cards:

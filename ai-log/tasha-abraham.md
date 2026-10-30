@@ -114,3 +114,34 @@ team.
 ### What I kept or changed
 It first gave a cause for the DSC-02 failure that we had not confirmed;
 changed to "not yet diagnosed". Fixes still in review are marked as such.
+
+## 2026-10-31 · Dev set expansion (30 to 50), price scoring and held-out guide
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/components/price_query.py, graph.py (one line),
+  backend/kopi_keys/evaluation/ (dataset.py, metrics.py, run_eval.py, README.md),
+  data/evaluation-data/development/, data/evaluation-data/question_template.jsonl,
+  docs/heldout-guide.md, .gitignore, tests/test_price_stats.py,
+  tests/test_eval_routes.py, tests/test_development_set_contract.py
+- **Outcome:** Changed
+
+### What I asked for
+A summary of how the dev set labels price questions and what run_eval scores,
+then 20 new dev questions aimed at known weak spots, with price figures
+computed by SQL straight on the database and policy quotes copied word for
+word from the ACTIVE snapshot. Also price-filter and price-figure checks in the
+evaluation, a fix to my default price window and impossible-period handling,
+and a guide and template for the 40-question held-out set kept outside the repo.
+
+### How I checked it
+(To fill in.)
+
+### What I kept or changed
+It found that run_eval checked neither price filters nor figures, and that 9
+existing labels used a different period from the app. I kept the app's
+convention, fixed those labels, and had my default window anchored to the
+latest month in the database. I replaced its two new-flat (BTO) policy-change
+questions with resale ones, reworded MIX-08, added the owned 2-room to DSC-06,
+swapped OOS-06 for a "next year" forecast, and narrowed CHG-06's superseded
+value to "initial payment is 20%". The router was not tuned: MIX-07, DSC-06,
+OOS-06 and OOS-07 are listed as known router gaps, and the `_cap` future-year
+bug goes to Breann.

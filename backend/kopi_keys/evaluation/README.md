@@ -5,22 +5,30 @@ Scores the advisor against labelled questions. Owner: Sandra.
 | File | What it does |
 |---|---|
 | `dataset.py` | Loads and validates the question sets, resolves every evidence quote **word for word** to chunk IDs in the ACTIVE snapshot (fails otherwise), and regenerates `stage1_gateway_labels.jsonl` |
-| `metrics.py` | Router accuracy, discovery precision/recall and ask-next, Recall@5, and end-to-end checks (routing, unsafe answering, over-abstention, uncited answers, staleness) |
+| `metrics.py` | Router accuracy, discovery precision/recall and ask-next, Recall@5, price checks, and end-to-end checks (routing, unsafe answering, over-abstention, uncited answers, staleness, price figures) |
+
+**Price checks** (no model needed): `price_filters` compares the filters the app would query
+(router with its date pinned to `dataset.AS_OF`, default window ending at the database's latest
+month) with each question's `price_filters`, including `lease_band` / `storey_band`.
+`price_figures` runs the price tool on those filters and compares volume and median with
+`expected_price`, which is computed separately with plain SQL on `hdb_prices.db`. End to end,
+answered price questions are also checked against `expected_price`.
 | `baselines.py` | Retrievers to score (`bm25`, `hybrid`, or `module:function`). The answer-level baselines (same LLM without tools, naive single-call RAG) are still TODO |
 | `run_eval.py` | The command below; reports go to `.local/reports/` (gitignored) |
 | `synthesis_benchmark.py` | Nisha's fixed-evidence CPU synthesis comparison; independent of the team dev/held-out splits. See [the finals guide](../../../docs/finals-nisha.md). |
 
 ## Question sets
 
-- **Development (committed):** `data/evaluation-data/development/dev_set_questions.jsonl`, 30 questions
-  combined from two earlier sets on 2026-10-17 (20 and 10; each records its
-  `origin`). Stratified as the proposal says: policy 7, price 6, mixed 5, discovery 4,
-  policy-changed 4, unanswerable 4. Each question carries the router labels (intent, route,
+- **Development (committed):** `data/evaluation-data/development/dev_set_questions.jsonl`, 50 questions:
+  30 combined from two earlier sets on 2026-10-17 (20 and 10), plus 20 added on 2026-10-31
+  (each records its `origin`). Stratified: policy 7, price 13, mixed 8, discovery 7,
+  policy-changed 7, unanswerable 8. Each question carries the router labels (intent, route,
   status, extracted fields, missing fields, turns) and answer labels (verbatim evidence, price
   filters, expected cards, current vs superseded values). The previous sets are kept in
   `archive/`.
-- **Held-out (never committed):** 20 fresh questions, written outside the repo by someone who
-  hasn't tuned the system, with the same schema. Run once, for the final reported numbers:
+- **Held-out (never committed):** 40 fresh questions, written outside the repo by people who
+  haven't tuned the areas they write for, with the same schema (see
+  [the held-out guide](../../../docs/heldout-guide.md)). Run once, for the final reported numbers:
   set `KOPI_HELDOUT_DIR` to the folder holding `heldout_questions.jsonl`, then add
   `--split heldout --final`.
 

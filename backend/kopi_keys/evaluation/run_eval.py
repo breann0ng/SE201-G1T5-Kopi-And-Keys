@@ -20,7 +20,8 @@ import json
 from datetime import datetime, timezone
 
 from . import baselines, metrics
-from .dataset import ROOT, EvalError, active_snapshot, load_questions
+from ..components.price_query import SqlitePriceTool, ToolUnavailableError, latest_month
+from .dataset import AS_OF, ROOT, EvalError, active_snapshot, load_questions
 
 REPORTS = ROOT / ".local" / "reports"
 
@@ -64,12 +65,19 @@ def main() -> int:
     except EvalError as error:
         raise SystemExit(str(error))
     search, retriever_name = baselines.retriever(args.retriever)
+    price_tool = SqlitePriceTool()
+    try:
+        data_month = latest_month(price_tool)
+    except ToolUnavailableError:
+        data_month = None  # no database: price_figures reports n/a
     report = {
         "split": args.split, "questions": len(questions), "snapshot": active_snapshot(),
         "retriever": retriever_name,
         "stage1": metrics.stage1_routing(questions),
         "discovery": metrics.discovery(questions),
         "retrieval": metrics.retrieval_recall_at_k(questions, search, k=5),
+        "price_filters": metrics.price_filters(questions, AS_OF, data_month),
+        "price_figures": metrics.price_figures(questions, price_tool, AS_OF),
     }
     if args.local or args.api:
         e2e = metrics.end_to_end(questions, chat_responses(questions, args.api))
@@ -87,11 +95,13 @@ def main() -> int:
     print(f"Stage 1     routing (router only) {s['routing_accuracy']}")
     print(f"Discovery   precision {d['precision']}  recall {d['recall']}  ask-next {d['ask_next_accuracy']}")
     print(f"Retrieval   Recall@5 {r['recall_at_5']}  ({retriever_name})")
+    print(f"Price       filters {report['price_filters']['accuracy']}  (router as of {AS_OF}, data to {data_month})")
+    print(f"Price       figures {report['price_figures']['accuracy']}  (tool vs SQL expected_price)")
     if "end_to_end" in report:
         e = report["end_to_end"]
         print(f"End-to-end  routing {e['routing_accuracy']}  unsafe {e['unsafe_answering']}  "
               f"over-abstain {e['over_abstention']}  uncited {e['uncited_answers']}  "
-              f"stale {e['staleness_errors']}  errors {e['errors']}")
+              f"stale {e['staleness_errors']}  price {e['price_figures']}  errors {e['errors']}")
     print(f"Report: {stem.with_suffix('.json').relative_to(ROOT)}")
     return 0
 
