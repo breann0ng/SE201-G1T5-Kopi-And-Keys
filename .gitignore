@@ -26,3 +26,9 @@ logs/
 
 # Folder under data. Held-out evaluation questions/data must not be committed
 held-out/
+
+# Safety net: no file named *heldout* is committed (held-out questions live outside the
+# repo; see docs/heldout-guide.md). Already-tracked files, such as the retired draft in
+# data/evaluation-data/development/archive/, are not affected.
+*heldout*
+!docs/heldout-guide.md
