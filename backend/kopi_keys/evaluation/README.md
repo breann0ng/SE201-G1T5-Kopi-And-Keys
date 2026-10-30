@@ -5,7 +5,14 @@ Scores the advisor against labelled questions. Owner: Sandra.
 | File | What it does |
 |---|---|
 | `dataset.py` | Loads and validates the question sets, resolves every evidence quote **word for word** to chunk IDs in the ACTIVE snapshot (fails otherwise), and regenerates `stage1_gateway_labels.jsonl` |
-| `metrics.py` | Router accuracy, discovery precision/recall and ask-next, Recall@5, and end-to-end checks (routing, unsafe answering, over-abstention, uncited answers, staleness) |
+| `metrics.py` | Router accuracy, discovery precision/recall and ask-next, Recall@5, price checks, and end-to-end checks (routing, unsafe answering, over-abstention, uncited answers, staleness, price figures) |
+
+**Price checks** (no model needed): `price_filters` compares the filters the app would query
+(router with its date pinned to `dataset.AS_OF`, default window ending at the database's latest
+month) with each question's `price_filters`, including `lease_band` / `storey_band`.
+`price_figures` runs the price tool on those filters and compares volume and median with
+`expected_price`, which is computed separately with plain SQL on `hdb_prices.db`. End to end,
+answered price questions are also checked against `expected_price`.
 | `baselines.py` | Retrievers to score (`bm25`, `hybrid`, or `module:function`). The answer-level baselines (same LLM without tools, naive single-call RAG) are still TODO |
 | `run_eval.py` | The command below; reports go to `.local/reports/` (gitignored) |
 | `synthesis_benchmark.py` | Nisha's fixed-evidence CPU synthesis comparison; independent of the team dev/held-out splits. See [the finals guide](../../../docs/finals-nisha.md). |
