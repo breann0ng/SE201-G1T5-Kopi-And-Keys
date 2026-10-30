@@ -8,7 +8,7 @@ from kopi_keys.schemas import Route
 
 def test_dev_set_is_valid_stratified_and_resolved():
     questions = dataset.load_questions("dev")  # raises if a quote isn't verbatim in the snapshot
-    assert len(questions) == 30
+    assert len(questions) == 50
     assert all(q["expected_route"] in get_args(Route) for q in questions)
     policy = [q for q in questions if q["category"] in ("policy", "mixed", "policy_changed")]
     assert all(q["expected_chunk_ids"] for q in policy)

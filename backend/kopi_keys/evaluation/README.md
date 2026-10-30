@@ -19,15 +19,16 @@ answered price questions are also checked against `expected_price`.
 
 ## Question sets
 
-- **Development (committed):** `data/evaluation-data/development/dev_set_questions.jsonl`, 30 questions
-  combined from two earlier sets on 2026-10-17 (20 and 10; each records its
-  `origin`). Stratified as the proposal says: policy 7, price 6, mixed 5, discovery 4,
-  policy-changed 4, unanswerable 4. Each question carries the router labels (intent, route,
+- **Development (committed):** `data/evaluation-data/development/dev_set_questions.jsonl`, 50 questions:
+  30 combined from two earlier sets on 2026-10-17 (20 and 10), plus 20 added on 2026-10-31
+  (each records its `origin`). Stratified: policy 7, price 13, mixed 8, discovery 7,
+  policy-changed 7, unanswerable 8. Each question carries the router labels (intent, route,
   status, extracted fields, missing fields, turns) and answer labels (verbatim evidence, price
   filters, expected cards, current vs superseded values). The previous sets are kept in
   `archive/`.
-- **Held-out (never committed):** 20 fresh questions, written outside the repo by someone who
-  hasn't tuned the system, with the same schema. Run once, for the final reported numbers:
+- **Held-out (never committed):** 40 fresh questions, written outside the repo by people who
+  haven't tuned the areas they write for, with the same schema (see
+  [the held-out guide](../../../docs/heldout-guide.md)). Run once, for the final reported numbers:
   set `KOPI_HELDOUT_DIR` to the folder holding `heldout_questions.jsonl`, then add
   `--split heldout --final`.
 

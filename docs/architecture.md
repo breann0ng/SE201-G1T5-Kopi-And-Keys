@@ -22,7 +22,7 @@ Python module paths are relative to `backend/kopi_keys/`. Paths beginning with
 
 | Component | File | Owner | Current implementation |
 | --- | --- | --- | --- |
-| Query Router | `components/query_router.py` | Breann; price rules by Tasha | Rules/regex, extraction, dates and required-field gate. Passes 30 dev routing labels. LLM classifier not built. |
+| Query Router | `components/query_router.py` | Breann; price rules by Tasha | Rules/regex, extraction, dates and required-field gate. Dev routing labels: 50; known gaps are listed in `tests/test_development_set_contract.py`. LLM classifier not built. |
 | Discovery/topic cards | `components/topic_cards.py`, `topic_cards.py`, `data/topic_cards/` | Sandra | 12 cards, matching, profile hints, overviews, cited suggestions and grant income notes. Some inputs are not collected yet. |
 | Policy retrieval/index | `components/policy_retrieval.py`, `components/policy_index.py` | Sandra; initial policy integration by Nisha | Keyword ranking plus EmbeddingGemma/ChromaDB vectors, scheme focus, deduplication and keyword fallback. Index built locally with `scripts/build_policy_index.py`. |
 | Price Query Tool | `components/price_query.py`, `ingest/resale_db.py` | Tasha | Connected read-only SQLite tool, Decimal statistics, lease/floor refinements and recent transactions. |

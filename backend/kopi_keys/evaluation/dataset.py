@@ -40,8 +40,9 @@ DEV_FILE = DEV_DIR / "dev_set_questions.jsonl"
 LABELS_FILE = DEV_DIR / "stage1_gateway_labels.jsonl"
 HELDOUT_FILE_NAME = "heldout_questions.jsonl"
 
-# Proposal section 4.1: 50 questions, split 30:20 and stratified by category.
-DEV_COUNTS = {"policy": 7, "price": 6, "mixed": 5, "discovery": 4, "policy_changed": 4, "unanswerable": 4}
+# Stratified by category (proposal section 4.1). Expanded on 2026-10-31 from 30 to 50 dev
+# questions; the held-out set is 40 questions, kept outside the repository.
+DEV_COUNTS = {"policy": 7, "price": 13, "mixed": 8, "discovery": 7, "policy_changed": 7, "unanswerable": 8}
 # Relative periods in the labels ("past 6 months", "this year") are resolved as of this month;
 # the evaluation pins the router's date to it. Default windows end at the database's latest
 # month instead (price_query.default_window), so refresh both labels when the data is rebuilt.

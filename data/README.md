@@ -45,8 +45,8 @@ reads them from here, and every answer cites where they came from.
 | `chroma/` | Vector index of the ACTIVE chunks (EmbeddingGemma) | No (generated) | `scripts/build_policy_index.py` | `HybridPolicyRetriever` |
 | `raw/2017-onwards-resale-prices.csv` | data.gov.sg resale transactions | Yes (PR #4) | Downloaded | `build_resale_db.py` |
 | `processed/hdb_prices.db` | SQLite database of 242,737 sales | No (generated) | `scripts/build_resale_db.py` | `SqlitePriceTool` |
-| `evaluation/development/` | 30 dev questions and generated router labels; `archive/` holds the earlier sets | Yes | By hand; labels by `python -m kopi_keys.evaluation.dataset` | Evaluation harness, `test_development_set_contract.py` |
-| held-out questions | 20 final-evaluation questions | **Never** (outside the repository) | A teammate who hasn't tuned the system | `run_eval --split heldout --final` |
+| `evaluation/development/` | 50 dev questions and generated router labels; `archive/` holds the earlier sets | Yes | By hand; labels by `python -m kopi_keys.evaluation.dataset` | Evaluation harness, `test_development_set_contract.py` |
+| held-out questions | 40 final-evaluation questions | **Never** (outside the repository) | A teammate who hasn't tuned the system | `run_eval --split heldout --final` |
 
 Generated files (`chroma/`, `processed/`) are rebuilt on each machine from what *is* committed, so the
 repository stays small and every machine builds the same data. Git ignore rules only prevent accidental
