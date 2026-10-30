@@ -103,7 +103,7 @@ def effective_price_filters(q: dict, as_of: str, latest_month: str | None):
     A clarification is answered with the next user turn, routed with the first turn's
     values as `known` and the first question as context (graph.query_router).
     """
-    from ..components.price_query import filters_from_state
+    from ..components.price_query import PriceOutOfRangeError, filters_from_state
     from ..components.query_router import EXTRACTED_FIELDS, route_query
 
     users = [t["user"] for t in q["turns"] if "user" in t]
@@ -112,7 +112,12 @@ def effective_price_filters(q: dict, as_of: str, latest_month: str | None):
         if state.status == "clarify" and len(users) > 1:
             known = {f: getattr(state, f) for f in (*EXTRACTED_FIELDS, "start_month", "end_month")}
             state = route_query(users[1], known, context_question=users[0])
-    return filters_from_state(state, latest_month=latest_month)
+    try:
+        return filters_from_state(state, latest_month=latest_month)
+    except PriceOutOfRangeError as error:  # e.g. "in 2012": score the period as asked
+        if error.filters is None:
+            raise
+        return error.filters
 
 
 def price_filters(questions: Iterable[dict], as_of: str, latest_month: str | None) -> dict:

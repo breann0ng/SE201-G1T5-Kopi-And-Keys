@@ -35,10 +35,13 @@ from typing import Protocol
 from pydantic import ValidationError
 
 from ..schemas import CENT, BandStat, PriceFilters, PriceResult, RecentSale
+from .price_display import month_label
 
 
 # Assumption: when the user gives no date range, benchmark the last 12 months.
 DEFAULT_LOOKBACK_MONTHS = 12
+# First month of the data.gov.sg "2017 onwards" resale dataset.
+DATA_START_MONTH = "2017-01"
 
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_DB = ROOT / "data/processed/hdb_prices.db"
@@ -69,6 +72,18 @@ class InvalidPriceFilterError(ToolUnavailableError):
     Subclasses ToolUnavailableError so the graph records it as ``price_error``
     instead of crashing; the message includes suggestions where possible.
     """
+
+
+class PriceOutOfRangeError(InvalidPriceFilterError):
+    """The period asked for has no sales in the data: before it starts or after its latest month.
+
+    The message is shown to the user as it is. ``filters`` holds the period as asked when it
+    forms valid filters (None for one that ends before it starts, such as "in 2028").
+    """
+
+    def __init__(self, message: str, filters: PriceFilters | None = None):
+        super().__init__(message)
+        self.filters = filters
 
 
 class PriceQueryTool(Protocol):
@@ -106,13 +121,19 @@ def latest_month(tool) -> str | None:
 def filters_from_state(state, today: date | None = None, latest_month: str | None = None) -> PriceFilters:
     """Build validated filters from router output, defaulting the date window.
 
-    An impossible period (e.g. "in 2028", which the router caps to start 2028-01, end at
-    the current month) raises InvalidPriceFilterError, so the graph abstains cleanly.
+    A period with no sales in the data (before DATA_START_MONTH, or after `latest_month`,
+    e.g. "in 2028", which the router caps to start 2028-01, end at the current month)
+    raises PriceOutOfRangeError with a plain-English message for the user, so the graph
+    abstains cleanly. Messages use month labels, never YYYY-MM codes or field names.
     """
     start, end = default_window(today, latest_month)
     start_month, end_month = state.start_month or start, state.end_month or end
+    covered = f"Our records cover sales from {month_label(DATA_START_MONTH)} " + (
+        f"to {month_label(latest_month)}" if latest_month else "onwards")
+    future = (f"{covered}, so there are no sales for {month_label(start_month)} onwards. "
+              "Past sales can't tell you what future prices will be.")
     try:
-        return PriceFilters(
+        filters = PriceFilters(
             town=state.town,
             flat_type=state.flat_type,
             start_month=start_month,
@@ -120,11 +141,15 @@ def filters_from_state(state, today: date | None = None, latest_month: str | Non
             lease_band=getattr(state, "lease_band", None),
             storey_band=getattr(state, "storey_band", None),
         )
-    except ValidationError as error:
-        problem = error.errors()[0]["msg"].removeprefix("Value error, ")
-        raise InvalidPriceFilterError(
-            f"No sales can match {start_month} to {end_month}: {problem}."
-        ) from None
+    except ValidationError:
+        if start_month > end_month:
+            raise PriceOutOfRangeError(future) from None
+        raise InvalidPriceFilterError("I couldn't work out which sales to look up for this question.") from None
+    if latest_month and start_month > latest_month:
+        raise PriceOutOfRangeError(future, filters)
+    if end_month < DATA_START_MONTH:
+        raise PriceOutOfRangeError(f"{covered}, so there are no sales before {month_label(DATA_START_MONTH)}.", filters)
+    return filters
 
 
 # --- SQLite adapter ----------------------------------------------------------

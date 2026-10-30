@@ -20,7 +20,8 @@ from .components.abstention import abstention_message
 from .components.policy_retrieval import TOP_K, PolicyRetriever, KeywordPolicyRetriever
 from .components.price_display import price_answer
 from .components.price_query import (
-    PriceQueryTool, ToolUnavailableError, UnconfiguredPriceTool, filters_from_state, latest_month,
+    PriceOutOfRangeError, PriceQueryTool, ToolUnavailableError, UnconfiguredPriceTool, filters_from_state,
+    latest_month,
 )
 from .components.query_router import EXTRACTED_FIELDS, route_query
 from .components.synthesiser import Synthesiser, SynthesiserAgent
@@ -48,7 +49,7 @@ def evidence_problem(state: GraphState) -> tuple[str, str | None] | None:
         return None
     if state.route in PRICE_ROUTES:
         if state.price_error:
-            return "no_evidence", state.price_error
+            return ("price_out_of_range" if state.price_out_of_range else "no_evidence"), state.price_error
         if state.price_result is not None:
             return "no_transactions", None
     return "no_evidence", None
@@ -95,6 +96,8 @@ def build_graph(
     def price_query(state: GraphState):
         try:
             result = price_tool.query(filters_from_state(state, latest_month=latest_month(price_tool)))
+        except PriceOutOfRangeError as error:
+            return {"price_error": str(error), "price_out_of_range": True, "trace": ["price_query:out_of_range"]}
         except (ToolUnavailableError, ValidationError) as error:
             return {"price_error": str(error), "trace": ["price_query:unavailable"]}
         return {"price_result": result, "trace": [f"price_query:{result.volume} transactions"]}

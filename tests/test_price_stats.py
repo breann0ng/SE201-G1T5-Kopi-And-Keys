@@ -1,15 +1,18 @@
 """SqlitePriceTool: statistics, validation and fit with the graph and verifier."""
 
 import csv
+import re
 from datetime import date
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 
 from fakes import FictionalRetriever
+from kopi_keys.components.abstention import abstention_message
 from kopi_keys.components.price_query import (
-    InvalidPriceFilterError, SqlitePriceTool, ToolUnavailableError, _cents, _quantile, default_window,
-    filters_from_state, is_low_volume,
+    InvalidPriceFilterError, PriceOutOfRangeError, SqlitePriceTool, ToolUnavailableError, _cents, _quantile,
+    default_window, filters_from_state, is_low_volume,
 )
 from kopi_keys.components.query_router import route_query
 from kopi_keys.components.synthesiser import Synthesiser
@@ -172,13 +175,55 @@ def test_graph_default_window_ends_at_the_latest_month_in_the_database(tool):
     assert state.price_result.volume == 7
 
 
-def test_impossible_period_raises_invalid_price_filter_error():
+FUTURE_2028 = ("Our records cover sales from Jan 2017 to Oct 2026, so there are no sales for Jan 2028 onwards. "
+               "Past sales can't tell you what future prices will be.")
+
+
+def _no_codes(message):
+    """User-facing text: month labels only, no YYYY-MM codes or field names."""
+    return not re.search(r"\b\d{4}-\d{2}\b|start_month|end_month", message)
+
+
+def test_future_period_gets_a_plain_message():
     state = route_query("How much did 4-room flats in Tampines sell for in 2028?")
-    with pytest.raises(InvalidPriceFilterError, match="2028-01"):
+    with pytest.raises(PriceOutOfRangeError) as error:
         filters_from_state(state, latest_month="2026-10")
+    assert str(error.value) == FUTURE_2028 and error.value.filters is None
 
 
-def test_graph_records_impossible_period_as_price_error(tool):
-    state = run_graph(_graph(tool), ChatRequest(message="How much did 4-room flats in Tampines sell for in 2028?"))
-    assert state.price_result is None
-    assert "No sales can match 2028-01" in state.price_error
+def test_valid_period_after_the_latest_data_month_gets_the_same_message():
+    # E.g. asked in December 2026 about "Nov to Dec 2026" before the data is refreshed.
+    state = SimpleNamespace(town="TAMPINES", flat_type="4 ROOM", start_month="2026-11", end_month="2026-12")
+    with pytest.raises(PriceOutOfRangeError) as error:
+        filters_from_state(state, latest_month="2026-10")
+    assert str(error.value).startswith("Our records cover sales from Jan 2017 to Oct 2026, "
+                                       "so there are no sales for Nov 2026 onwards.")
+    assert error.value.filters.start_month == "2026-11"
+
+
+def test_out_of_range_abstention_shows_only_the_plain_message():
+    assert abstention_message("price_out_of_range", FUTURE_2028) == FUTURE_2028
+    assert abstention_message("no_evidence", "x").endswith("(x)")
+
+
+def test_period_before_2017_gets_a_plain_message_and_keeps_the_filters():
+    state = route_query("What did 4-room flats in Tampines sell for in 2012?")
+    with pytest.raises(PriceOutOfRangeError) as error:
+        filters_from_state(state, latest_month="2026-10")
+    assert str(error.value) == "Our records cover sales from Jan 2017 to Oct 2026, so there are no sales before Jan 2017."
+    assert (error.value.filters.start_month, error.value.filters.end_month) == ("2012-01", "2012-12")
+
+
+def test_graph_abstains_with_only_the_plain_message_for_an_impossible_period(tool):
+    state = run_graph(_graph(tool), ChatRequest(message="What were 4-room flats in Tampines selling for in 2028?"))
+    assert state.price_result is None and state.abstain_reason == "price_out_of_range"
+    # The fixture data ends in Jul 2025.
+    assert state.response.message == FUTURE_2028.replace("Oct 2026", "Jul 2025")
+    assert _no_codes(state.response.message)
+
+
+def test_graph_abstains_with_only_the_plain_message_before_2017(tool):
+    state = run_graph(_graph(tool), ChatRequest(message="What did 4-room flats in Tampines sell for in 2012?"))
+    assert state.abstain_reason == "price_out_of_range"
+    assert state.response.message == ("Our records cover sales from Jan 2017 to Jul 2025, "
+                                      "so there are no sales before Jan 2017.")

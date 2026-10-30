@@ -51,6 +51,7 @@ class GraphState(Contract):
     # Price Query Tool
     price_result: PriceResult | None = None
     price_error: str | None = None
+    price_out_of_range: bool = False  # price_error is a plain message: no sales in that period
 
     # Topic cards (matched in code by components/topic_cards.py, worded by the Synthesiser)
     candidate_card_ids: list[str] = Field(default_factory=list)

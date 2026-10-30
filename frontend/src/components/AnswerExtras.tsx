@@ -56,20 +56,7 @@ export function AnswerExtras({ response }: { response: ChatResponse }) {
       {response.citations.length > 0 && <SourceMaterial passages={response.citations} numberOf={numberOf} />}
       <RelatedPassages passages={response.related ?? []} />
       {response.citations.length > 0 && <Citations citations={response.citations} />}
-      {response.status === "abstained" && (
-        <p className="mt-3 text-sm">
-          Please check{" "}
-          <a
-            className="text-brand-600 underline dark:text-brand-100"
-            href="https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility"
-            target="_blank"
-            rel="noreferrer"
-          >
-            HDB's eligibility pages
-          </a>{" "}
-          or contact HDB directly.
-        </p>
-      )}
+      {response.status === "abstained" && <HelpLinks route={response.route} />}
       {devDetails && <AnswerTrace response={response} />}
       {response.mode === "demo" && (
         <p className="mt-3 text-xs text-slate-400">
@@ -77,6 +64,30 @@ export function AnswerExtras({ response }: { response: ChatResponse }) {
         </p>
       )}
     </>
+  );
+}
+
+// HDB's own resale page links "Check the recent transacted prices of resale flats" here.
+const PRICES_LINK = { href: "https://services2.hdb.gov.sg/webapp/BB33RTIS/BB33PReslTrans.jsp", label: "HDB's resale flat prices" };
+const ELIGIBILITY_LINK = { href: "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility", label: "HDB's eligibility pages" };
+
+/** Where to look instead after a decline: prices for price questions, both for mixed, else eligibility. */
+function HelpLinks({ route }: { route: ChatResponse["route"] }) {
+  const links =
+    route === "price" ? [PRICES_LINK] : route === "mixed" ? [PRICES_LINK, ELIGIBILITY_LINK] : [ELIGIBILITY_LINK];
+  return (
+    <p className="mt-3 text-sm">
+      Please check{" "}
+      {links.map((link, i) => (
+        <span key={link.href}>
+          {i > 0 && " and "}
+          <a className="text-brand-600 underline dark:text-brand-100" href={link.href} target="_blank" rel="noreferrer">
+            {link.label}
+          </a>
+        </span>
+      ))}{" "}
+      or contact HDB directly.
+    </p>
   );
 }
 
