@@ -32,6 +32,8 @@ from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 from typing import Protocol
 
+from pydantic import ValidationError
+
 from ..schemas import CENT, BandStat, PriceFilters, PriceResult, RecentSale
 
 
@@ -80,23 +82,49 @@ class UnconfiguredPriceTool:
         )
 
 
-def default_window(today: date | None = None) -> tuple[str, str]:
-    today = today or date.today()
-    months = today.year * 12 + today.month - 1 - (DEFAULT_LOOKBACK_MONTHS - 1)
-    return f"{months // 12:04d}-{months % 12 + 1:02d}", f"{today.year:04d}-{today.month:02d}"
+def default_window(today: date | None = None, latest_month: str | None = None) -> tuple[str, str]:
+    """The last 12 months, ending at `latest_month` (the newest month in the data) if given.
+
+    Anchoring to the data keeps default answers stable once the calendar moves past the
+    last import; without it, the window ends at today's month.
+    """
+    if latest_month:
+        year, month = map(int, latest_month.split("-"))
+    else:
+        today = today or date.today()
+        year, month = today.year, today.month
+    months = year * 12 + month - 1 - (DEFAULT_LOOKBACK_MONTHS - 1)
+    return f"{months // 12:04d}-{months % 12 + 1:02d}", f"{year:04d}-{month:02d}"
 
 
-def filters_from_state(state, today: date | None = None) -> PriceFilters:
-    """Build validated filters from router output, defaulting the date window."""
-    start, end = default_window(today)
-    return PriceFilters(
-        town=state.town,
-        flat_type=state.flat_type,
-        start_month=state.start_month or start,
-        end_month=state.end_month or end,
-        lease_band=getattr(state, "lease_band", None),
-        storey_band=getattr(state, "storey_band", None),
-    )
+def latest_month(tool) -> str | None:
+    """The newest month a tool's data covers, or None if the tool does not say."""
+    info = getattr(tool, "info", None)
+    return info().max_month if info else None
+
+
+def filters_from_state(state, today: date | None = None, latest_month: str | None = None) -> PriceFilters:
+    """Build validated filters from router output, defaulting the date window.
+
+    An impossible period (e.g. "in 2028", which the router caps to start 2028-01, end at
+    the current month) raises InvalidPriceFilterError, so the graph abstains cleanly.
+    """
+    start, end = default_window(today, latest_month)
+    start_month, end_month = state.start_month or start, state.end_month or end
+    try:
+        return PriceFilters(
+            town=state.town,
+            flat_type=state.flat_type,
+            start_month=start_month,
+            end_month=end_month,
+            lease_band=getattr(state, "lease_band", None),
+            storey_band=getattr(state, "storey_band", None),
+        )
+    except ValidationError as error:
+        problem = error.errors()[0]["msg"].removeprefix("Value error, ")
+        raise InvalidPriceFilterError(
+            f"No sales can match {start_month} to {end_month}: {problem}."
+        ) from None
 
 
 # --- SQLite adapter ----------------------------------------------------------
@@ -282,9 +310,9 @@ def main() -> None:
                         help="Write a case file for `python -m kopi_keys.cli --input <file>`")
     args = parser.parse_args()
 
-    default_start, default_end = default_window()
     tool = SqlitePriceTool(args.db)
     try:
+        default_start, default_end = default_window(latest_month=latest_month(tool))
         filters = PriceFilters(town=args.town, flat_type=args.flat_type,
                                start_month=args.start or default_start,
                                end_month=args.end or default_end)

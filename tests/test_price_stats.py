@@ -8,8 +8,10 @@ import pytest
 
 from fakes import FictionalRetriever
 from kopi_keys.components.price_query import (
-    InvalidPriceFilterError, SqlitePriceTool, ToolUnavailableError, _cents, _quantile, is_low_volume,
+    InvalidPriceFilterError, SqlitePriceTool, ToolUnavailableError, _cents, _quantile, default_window,
+    filters_from_state, is_low_volume,
 )
+from kopi_keys.components.query_router import route_query
 from kopi_keys.components.synthesiser import Synthesiser
 from kopi_keys.components.verifier import verify_generated_numbers
 from kopi_keys.graph import build_graph, run_graph
@@ -152,3 +154,31 @@ def test_graph_records_misspelt_town_as_price_error_instead_of_crashing(tool):
     state = run_graph(_graph(tool), request)
     assert state.price_result is None
     assert "Did you mean: TAMPINES" in state.price_error
+
+
+# --- default window and impossible periods ----------------------------------
+
+def test_default_window_is_anchored_to_the_latest_data_month_not_today():
+    assert default_window(today=date(2027, 3, 1), latest_month="2026-10") == ("2025-11", "2026-10")
+    assert default_window(latest_month="2026-01") == ("2025-02", "2026-01")
+    assert default_window(today=date(2026, 10, 31)) == ("2025-11", "2026-10")
+
+
+def test_graph_default_window_ends_at_the_latest_month_in_the_database(tool):
+    # The fixture data ends in 2025-07; a window ending at today's month would miss it entirely.
+    state = run_graph(_graph(tool), ChatRequest(message="What is the resale price for a 4-room flat in Tampines?"))
+    assert state.price_error is None
+    assert (state.price_result.filters.start_month, state.price_result.filters.end_month) == ("2024-08", "2025-07")
+    assert state.price_result.volume == 7
+
+
+def test_impossible_period_raises_invalid_price_filter_error():
+    state = route_query("How much did 4-room flats in Tampines sell for in 2028?")
+    with pytest.raises(InvalidPriceFilterError, match="2028-01"):
+        filters_from_state(state, latest_month="2026-10")
+
+
+def test_graph_records_impossible_period_as_price_error(tool):
+    state = run_graph(_graph(tool), ChatRequest(message="How much did 4-room flats in Tampines sell for in 2028?"))
+    assert state.price_result is None
+    assert "No sales can match 2028-01" in state.price_error
