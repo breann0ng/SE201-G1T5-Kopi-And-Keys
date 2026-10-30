@@ -124,6 +124,44 @@ def _reply_fields(message: str, previous_reply: str = "") -> dict:
     return fields
 
 
+# Added 2026-10-31: "what about sales in 2015" after a price question was declined as
+# unsupported, because only replies to "Please provide:" carried the question over.
+_FOLLOWUP_OPENER = re.compile(r"^\s*(?:what about|how about|and)\b", re.IGNORECASE)
+# Forecasts and valuations never carry a price question over ("what about next year?").
+_FOLLOWUP_BLOCKED = re.compile(r"\b(?:next|coming|future|will|worth|forecast|predict|expect)\b", re.IGNORECASE)
+_FOLLOWUP_FILLER = re.compile(
+    r"\b(?:in|at|for|during|from|to|of|the|a|an|flats?|units?|sales?|then|instead|only|"
+    r"past|last|this|year|months?|half|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*|\d{1,2})\b",
+    re.IGNORECASE,
+)
+
+
+def _price_followup(message: str, previous_question: str | None) -> bool:
+    """A reply that only makes sense as a variation on the previous price question.
+
+    True when the message is unsupported on its own and either starts with "what about",
+    "how about" or "and", or names only a period, town or flat type, and the previous
+    question was price or mixed. Forecast/valuation wording and the router's abstain
+    patterns always win.
+    """
+    from .components.query_router import (
+        BARE_TOWN_PATTERN, FLAT_PATTERN, MAISONETTE, UNANSWERABLE_PATTERNS, classify_intent,
+    )
+
+    if not previous_question or classify_intent(previous_question) not in ("price", "mixed"):
+        return False
+    if classify_intent(message) != "unanswerable":
+        return False
+    if _FOLLOWUP_BLOCKED.search(message) or any(p in message.casefold() for p in UNANSWERABLE_PATTERNS):
+        return False
+    if _FOLLOWUP_OPENER.search(message):
+        return True
+    rest = message
+    for pattern in (BARE_TOWN_PATTERN, FLAT_PATTERN, MAISONETTE, re.compile(r"\b(?:19|20)\d{2}\b")):
+        rest = pattern.sub(" ", rest)
+    return rest != message and not re.sub(r"[\W_]+", "", _FOLLOWUP_FILLER.sub(" ", rest))
+
+
 def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") -> dict:
     """Convert an API request into graph input. Router extraction fills any gaps."""
     profile = request.profile
@@ -159,6 +197,8 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
             and any(v is not None for v in current.values())):
         remembered.update({k: v for k, v in current.items() if v is not None})
         followup_question = previous_question
+    elif _price_followup(request.message, previous_question):
+        followup_question = previous_question  # the router lets this message's period/town/flat win
     else:
         followup_question = None
     return GraphState(
