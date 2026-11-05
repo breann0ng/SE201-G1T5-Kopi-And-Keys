@@ -162,7 +162,7 @@ CI workflow for the team (pytest without Ollama, frontend lint and build,
 report-only dependency audits, gitleaks), not to be merged without agreement.
 
 ### How I checked it
-(To fill in.)
+Ran the full suite and the mutation script myself (66.4% → 95.9%). Checked the lease and floor boundary tests by hand (720/960 months, storeys 6/7 and 12/13, the 4-vs-5 sales rule). Read the reasons for the 15 equivalent mutants. Decided to reject storey 00 at import rather than test around it. Reviewed the CI workflow’s permissions (read-only, no secrets, no held-out).
 
 ### What I kept or changed
 It used a small standard-library AST script instead of mutmut, which does not
