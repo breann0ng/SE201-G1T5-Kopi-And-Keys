@@ -15,7 +15,7 @@ or a **missing test**.
 |---|---|---|---|
 | Before (main at `7a73847`) | 390 | 259 | **66.4%** |
 | After (two new test files) | 390 | 374 | **95.9%** |
-| After, excluding the 15 equivalent mutants | 375 | 374 | 99.7% |
+| After, excluding the 16 equivalent mutants | 374 | 374 | 100% |
 
 By module after: `price_query.py` 239/247, `price_display.py` 135/143.
 
@@ -38,25 +38,20 @@ arithmetic (`+`/`-`, `*`/`/`, `//`→`/`, `%`→`*`), `and`/`or`, dropping `not`
 the `main()` CLI, exception classes, the `Protocol` stub, and float/`Decimal` literals other than
 by their string (e.g. the `difflib` cutoff `0.6` is not varied).
 
-## The 15 equivalent survivors (ignore)
+## The 16 equivalent survivors (ignore)
 
 | # | Line | Change | Why no output can differ |
 |---|---|---|---|
 | 17 | price_query.py:61 | under_60 lower bound `0` → `-1` | Lease months are never negative (the importer's pattern only accepts digits). |
 | 39 | price_query.py:61 | 80_plus upper `100*12` → `101*12` | The importer rejects leases over 99 years (1,188 months), so 1,200 and 1,212 exclude the same nothing. |
 | 41 | price_query.py:61 | 80_plus upper `100*12` → `100*13` | Same: 1,300 > 1,188. |
+| 47 | price_query.py:62 | low floor band `(1, 6)` → `(0, 6)` | The importer rejects a storey range starting `00` (team decision, 2026-11-05; `test_storey_00_is_rejected_naming_the_row`), so no stored sale has lower storey 0. Rebuilding from the current CSV still gives 242,737 rows, identical to before. |
 | 56 | price_query.py:62 | high floor upper `99` → `100` | Storey ranges are `NN TO NN`, so the lower storey is at most 99. |
 | 136, 139 | price_query.py:226, 228 | `r[0]` → `r[-1]` on `SELECT DISTINCT town` / `flat_type` | One-column rows: the first and last element are the same. |
 | 178 | price_query.py:277 | `source[0]` → `source[-1]` | `SELECT source_sha256` returns a one-column row. |
 | 316 | price_display.py:79 | `len(bands) < 2` → `< 1` | With exactly one band, low and high are the same band, so `high < low × 1.1` holds and the note is still hidden. It would only show if the median were 0, but prices are at least $10,000 (importer bound). |
 | 337, 368, 381, 385 | price_display.py:112, 125, 127, 128 | `groups[0]` → `groups[-1]` for volume, median, mean, IQR | Each of those regexes has one group. |
 | 374, 375, 376 | price_display.py:126 | `'sale' if sales == 1` → `== 2` / `== 0` / `'XXsaleXX'` | Dead branch: this line only runs with 5+ sales, so `sales == 1` is never true. (Could be simplified to `sales`, but that's a code change, not a test.) |
-
-## The 1 non-equivalent survivor left untested (needs a decision)
-
-| # | Line | Change | Why it's left open |
-|---|---|---|---|
-| 47 | price_query.py:62 | low floor band `(1, 6)` → `(0, 6)` | A sale with storey range `00 TO 02` would join the low band. The importer accepts `00`, and today such a sale is in **no** floor band (it still counts in the overall figures). No HDB flat has storey 00 and the snapshot has none, so the right behaviour is a choice: reject `00` at import, or start the low band at 0. Pinning today's accidental behaviour in a test seemed wrong. |
 
 ## The 115 survivors killed by new tests, and what each test pins
 

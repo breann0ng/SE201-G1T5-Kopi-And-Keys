@@ -144,6 +144,9 @@ def parse_row(record: dict, today: date) -> tuple:
         raise ValueError(f"unknown flat_type {values['flat_type']!r}")
     if not STOREY_PATTERN.match(values["storey_range"]):
         raise ValueError(f"storey_range must be 'NN TO NN': {values['storey_range']!r}")
+    # No HDB flat is on storey 00, and the price tool's floor bands start at storey 1.
+    if values["storey_range"].startswith("00"):
+        raise ValueError(f"storey_range cannot start at storey 00: {values['storey_range']!r}")
 
     area = bounded_number(values["floor_area_sqm"], "floor_area_sqm", *FLOOR_AREA_RANGE)
     price = bounded_number(values["resale_price"], "resale_price", *PRICE_RANGE)
