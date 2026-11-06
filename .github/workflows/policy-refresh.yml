@@ -2,7 +2,7 @@
 #
 # 1. Runs scripts/scraping/refresh.py, which writes data/policy_snapshots/<date>/
 #    and a diff report against the ACTIVE snapshot (the one the advisor serves).
-# 2. Commits and pushes the new folder straight to main. Old folders are never edited.
+# 2. Only a ready snapshot is committed/pushed. Access blocks retain the old data.
 # 3. If anything changed, opens a GitHub Issue linking the diff report.
 #
 # Going live is manual: after reviewing, a person changes data/policy_snapshots/ACTIVE
@@ -27,9 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -38,12 +38,26 @@ jobs:
       - name: Install scraping dependencies
         run: pip install -r scripts/scraping/requirements.txt
 
-      # Any failure (block, CAPTCHA, network error) stops here; nothing is pushed.
+      # An explicit source block is handled with a notice; other errors still fail.
       - name: Re-snapshot, extract, verify and diff
+        id: refresh
         working-directory: scripts/scraping
-        run: python refresh.py
+        run: python refresh.py --github-actions
+
+      - name: Save refresh diagnostics
+        if: always() && steps.refresh.outputs.date != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: policy-refresh-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          # The explicitly named status report lives under the hidden .local directory.
+          include-hidden-files: true
+          path: |
+            .local/reports/policy-refresh-status.json
+            data/policy_snapshots/${{ steps.refresh.outputs.date }}/fetch_log.json
 
       - name: Commit and push the new snapshot to main
+        if: steps.refresh.outputs.outcome == 'ready'
         id: push
         run: |
           DATE=$(TZ=Asia/Singapore date +%F)

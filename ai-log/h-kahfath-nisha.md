@@ -313,3 +313,41 @@ extended-family and singles ceilings; the model's family quote verified. This
 is recorded for label review without altering labels or upgrading the 11/12
 score. The provided model tag is recorded as reported, without claiming it is
 the newest upstream release. Shared filesystem free space is not personal quota.
+
+## 2026-11-01 - Policy refresh deprecation and blocked-source handling
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** `.github/workflows/policy-refresh.yml`, `scripts/scraping/fetch.py`,
+  `scripts/scraping/refresh.py`, `tests/test_policy_refresh.py`, `data/README.md`
+- **Outcome:** Changed
+
+### What I asked for
+Investigate the failed scheduled policy refresh, then address both the deprecated
+GitHub Actions warning and HDB access-denied handling on a separate branch.
+
+### How I checked it
+Codex read job 124800881060 in run 41290607456. HDB robots.txt returned HTTP 403,
+and the sitemap step stopped before any snapshot commit or review issue. The
+Node.js and Ubuntu notices were separate from the failure. The official action
+definitions confirm Node24 for checkout v5, setup-python v6 and upload-artifact v6.
+
+The new regression tests simulate inaccessible robots, explicit disallow rules,
+challenge pages, ordinary network failures, incomplete block diagnostics, stale
+block records and successful completion without fetching live policy websites.
+All 21 refresh tests passed within the full suite: 372 passed and 4 expected
+failures. The first full run had one unrelated retrieval failure while local
+EmbeddingGemma was stopped; it passed after restoring that dependency. Workflow
+YAML, publication conditions and extracted shell syntax were also checked.
+
+### What I kept or changed
+Created `fix/policy-refresh-node24`, upgraded the actions, and introduced explicit
+ready, blocked and failed outcomes. Fetcher access blocks have a dedicated exit
+code and structured reason. GitHub mode handles a confirmed block with a notice,
+a job summary and a diagnostic artifact; it skips publication and retains ACTIVE.
+Local mode still exits nonzero for a block. Other errors continue to fail the job.
+Only ready can reach the existing commit/push step. Diagnostics contain the
+explicitly named status and fetch-log JSON files, with 14-day artifact retention.
+
+No access restrictions were bypassed, no policy snapshot was refreshed or
+activated, and the old failed run was not rerun. This handles a blocked refresh
+honestly; it does not restore HDB access or make the existing data newly verified.
+Publishing and activation still require a complete run and the existing review.
