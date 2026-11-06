@@ -103,8 +103,18 @@ newest folder". Only a person changes it, after review; to roll back, set it to 
 1. **Re-snapshot (automatic).** `.github/workflows/policy-refresh.yml` runs `scripts/scraping/refresh.py`
    at 10:00 SGT on the 1st of each month and pushes the new folder straight to `main`, **not live**. Run it
    manually from the Actions tab after an announced policy change (Budget, National Day Rally, a BTO launch).
-   If the run fails (e.g. a site blocks it), nothing is pushed; run `python refresh.py` locally and commit.
-   After the 1st, run `git pull` before pushing, because the bot will have added a commit.
+   A source access denial, rate limit, challenge or robots restriction records **blocked**, retains
+   ACTIVE and skips publication. GitHub shows a notice and a diagnostic artifact rather than a red
+   script failure. A green job with `outcome=blocked` does **not** mean the data was refreshed.
+   Unexpected script, extraction and network errors still fail the job. Only `outcome=ready` can
+   reach the commit/push step; the workflow never activates the candidate automatically.
+   `python refresh.py` locally exits 0 for ready, 2 for blocked, or 1 for an unexpected error;
+   `.local/reports/policy-refresh-status.json` records the result. `--github-actions` handles only
+   confirmed source blocks without failing the job. Do not bypass robots or a challenge: use an
+   approved environment where access is permitted, or review the current official pages manually.
+   Same-day local reruns reuse the cached responses, including a blocked robots response; they do
+   not retry it automatically. A fresh Actions run has no unpublished blocked snapshot to reuse.
+   After an automatic ready run, run `git pull` before pushing, because the bot may have added a commit.
 2. **Alert (automatic).** `diff.py` compares the new snapshot with ACTIVE and writes
    `changes_since_<ACTIVE date>.md`, listing pages whose dollar, year or age figures changed first. If
    anything changed, the workflow opens a GitHub Issue with a review checklist.
