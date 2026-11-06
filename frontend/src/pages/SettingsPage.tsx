@@ -65,10 +65,12 @@ export function SettingsPage() {
         <section>
           <h2 className="font-semibold">Your data</h2>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-            There are no accounts. Your conversation, details, feedback and preferences are stored
-            only in this browser. Your details (and, once conversation memory is switched on, your
-            recent messages) are sent to our advisor service with each question and are not stored
-            on the server.
+            There are no accounts. Saved conversations, details, feedback and preferences are kept
+            in this browser. Your question, details and any enabled conversation context are sent
+            to the advisor and its configured model service. Answers may be cached temporarily by
+            the advisor. If monitoring is enabled, timing and usage information is sent to LangSmith;
+            our model-call traces exclude message and answer text. Clearing this browser does not
+            delete service caches or previously collected monitoring data.
           </p>
           <button
             onClick={clearData}

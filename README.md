@@ -133,6 +133,7 @@ For an APAC LangSmith account:
 ```dotenv
 LANGCHAIN_API_KEY=your-own-key
 LANGCHAIN_TRACING_V2=true
+LANGSMITH_TRACING=true
 LANGCHAIN_PROJECT=kopi-and-keys
 LANGSMITH_ENDPOINT=https://apac.api.smith.langchain.com
 ```
@@ -141,6 +142,12 @@ Never commit the real `.env`. Tracing needs network access when enabled; tests
 disable it. Settings include `KOPI_OLLAMA_MODEL` (default `qwen2.5:3b`),
 `KOPI_OLLAMA_NUM_THREADS` (default 4), `KOPI_POLICY_MODEL` (optional separate
 policy model), warm-up and response caching.
+
+The Ollama trace span records message count and timing/token usage, with message,
+profile, evidence and answer contents removed before tracing. Other integrations,
+caller-supplied metadata, errors and historical traces require separate review.
+Keep tracing opt-in; see the [responsible-AI record](docs/responsible-ai.md) for
+data handling, limitations and the development safety checks.
 
 ## API and examples
 

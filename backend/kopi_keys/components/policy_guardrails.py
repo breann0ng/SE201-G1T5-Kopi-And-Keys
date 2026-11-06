@@ -27,6 +27,21 @@ _FACETS = {
     "amount": r"\bamount\b|\bhow much\b|\bmaximum\b|\bup to\b|\$\s*\d",
 }
 
+# Narrow checks for instructions aimed at the assistant, rather than housing
+# conditions such as "you must apply for an HFE letter". This is a containment
+# heuristic, not a general prompt-injection or source-authenticity detector.
+_META_INSTRUCTIONS = re.compile(
+    r"\b(?:ignore|disregard|override)\b.{0,60}\b(?:instructions?|system|developer|rules?)\b"
+    r"|\[(?:system|developer)\]|<\|(?:im_start|start_header_id)\|>"
+    r"|\b(?:reveal|print|expose|send|upload)\b.{0,80}\b(?:system prompt|api[ _-]?key|password|secret|environment variable)\b",
+    re.I | re.S,
+)
+
+
+def contains_model_instruction(text: str) -> bool:
+    """Recognise explicit model overrides or credential-exfiltration instructions."""
+    return bool(_META_INSTRUCTIONS.search(normalized_policy_text(text)))
+
 
 def mentioned_grants(text: str) -> set[str]:
     text = re.sub(r"</?(?:strong|b|em|i|u)>", "", text, flags=re.I).replace("**", "")
