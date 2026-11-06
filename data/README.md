@@ -93,37 +93,42 @@ app. See its README.
 
 ## 4. Reference
 
-### 4.1 Policy snapshots and the refresh process (DRAFT, to be agreed with the team)
+### 4.1 Policy snapshots and the reviewed watcher
 
 Snapshots are committed so teammates never re-scrape. Each folder has its own README describing scope and
 rules, and folders are append-only: a new snapshot is a new folder; old ones are never edited.
 **`policy_snapshots/ACTIVE`** names the snapshot the advisor serves. Code must read this file, never "the
 newest folder". Only a person changes it, after review; to roll back, set it to an earlier date.
 
-1. **Re-snapshot (automatic).** `.github/workflows/policy-refresh.yml` runs `scripts/scraping/refresh.py`
-   at 10:00 SGT on the 1st of each month and pushes the new folder straight to `main`, **not live**. Run it
-   manually from the Actions tab after an announced policy change (Budget, National Day Rally, a BTO launch).
+1. **Check (automatic or maintainer-triggered).** `.github/workflows/policy-refresh.yml` runs
+   `scripts/scraping/refresh.py` weekly, approximately Monday 10:17 SGT. Run it manually from the
+   Actions tab after an announced policy change. `scripts/policy_watch.py` checks collection
+   completeness and the diff, records changed/unchanged/blocked/incomplete/failed states, and
+   prepares a **draft PR** for a complete changed candidate. It never pushes directly to main.
    A source access denial, rate limit, challenge or robots restriction records **blocked**, retains
-   ACTIVE and skips publication. GitHub shows a notice and a diagnostic artifact rather than a red
-   script failure. A green job with `outcome=blocked` does **not** mean the data was refreshed.
+   ACTIVE and skips candidate publication. GitHub shows a notice, evidence artifact and a deduplicated
+   attention issue. A green job with `outcome=blocked` does **not** mean the data was refreshed.
    Unexpected script, extraction and network errors still fail the job. Only `outcome=ready` can
-   reach the commit/push step; the workflow never activates the candidate automatically.
+   reach candidate inspection; the workflow never activates the candidate automatically.
    `python refresh.py` locally exits 0 for ready, 2 for blocked, or 1 for an unexpected error;
    `.local/reports/policy-refresh-status.json` records the result. `--github-actions` handles only
    confirmed source blocks without failing the job. Do not bypass robots or a challenge: use an
    approved environment where access is permitted, or review the current official pages manually.
    Same-day local reruns reuse the cached responses, including a blocked robots response; they do
    not retry it automatically. A fresh Actions run has no unpublished blocked snapshot to reuse.
-   After an automatic ready run, run `git pull` before pushing, because the bot may have added a commit.
+   The watcher refuses to refresh ACTIVE or an older dated snapshot.
 2. **Alert (automatic).** `diff.py` compares the new snapshot with ACTIVE and writes
    `changes_since_<ACTIVE date>.md`, listing pages whose dollar, year or age figures changed first. If
-   anything changed, the workflow opens a GitHub Issue with a review checklist.
-3. **Review.** A person checks each change against the live page; for each real change, mark the old
-   chunks `superseded: true` and re-check any topic card citing them. The verifier rejects superseded sources.
-4. **Go live.** Set ACTIVE to the new date, then rebuild:
-   `cd scripts/scraping && python chunk.py && python build_cards.py && python validate.py`, then
-   `python scripts/build_policy_index.py`. Note the review outcome in the snapshot's README, push, and close
-   the issue. If the snapshot looks broken, leave ACTIVE unchanged and close the issue with a note.
+   complete changed candidates open a draft PR with a review checklist. A pending candidate is not
+   overwritten; its review issue links the newest run's evidence. Unchanged checks do not commit data.
+3. **Review.** Check wording, conditions, table relationships, dates and original official sources;
+   numeric comparisons alone do not establish correctness. Missing pages or extracted figures hold
+   publication for investigation. Record the reviewer and findings in the candidate README.
+4. **Go live (separate reviewed change).** Merging the candidate does not change ACTIVE. After the
+   evaluation freeze, prepare new chunks/cards, validate, build the index and run regression checks in
+   an isolated checkout before activating. Each running backend needs its local index rebuilt and a
+   restart. See [the watcher guide](../docs/policy-watcher.md) for exact commands, GitHub permissions,
+   CI approval, review and rollback requirements. Never rewrite old snapshot evidence just to mark it obsolete.
 
 ### 4.2 Freshness fields
 

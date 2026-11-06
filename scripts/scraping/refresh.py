@@ -31,6 +31,7 @@ import os
 import subprocess
 import sys
 import traceback
+from datetime import datetime, timezone
 from pathlib import Path
 
 import fetch
@@ -69,9 +70,12 @@ def pipeline() -> None:
 def main(*, github_actions: bool = False) -> int:
     active = (fetch.ROOT / "data" / "policy_snapshots" / "ACTIVE").read_text(encoding="utf-8").strip()
     report = {"date": fetch.SNAPSHOT_DATE, "active_snapshot": active,
-              "outcome": "failed", "snapshot_ready": False}
+              "outcome": "failed", "snapshot_ready": False,
+              "started_at": datetime.now(timezone.utc).isoformat()}
     exit_code = 1
     try:
+        if fetch.SNAPSHOT_DATE <= active:
+            raise ValueError("Refusing to refresh the active or an older dated snapshot")
         pipeline()
     except subprocess.CalledProcessError as error:
         # Exit 2 is reserved by fetch.cli for an explicitly recorded source block.
@@ -94,6 +98,7 @@ def main(*, github_actions: bool = False) -> int:
         report.update(outcome="ready", snapshot_ready=True)
         exit_code = 0
 
+    report["checked_at"] = datetime.now(timezone.utc).isoformat()
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(f"\nPolicy refresh: {report['outcome']}; active snapshot remains {active}.")

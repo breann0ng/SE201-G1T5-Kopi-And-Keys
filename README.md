@@ -32,6 +32,9 @@ confirm personal eligibility or value an individual flat.
 See [the architecture guide](docs/architecture.md) for the component map and
 [the data guide](data/README.md) for sources and provenance.
 
+The [policy watcher](docs/policy-watcher.md) checks official sources weekly and prepares inactive
+snapshot review PRs. It never activates policy data automatically.
+
 ## Requirements
 
 - Python **3.11 or newer**.

@@ -177,3 +177,13 @@ def test_completed_pipeline_is_the_only_publishable_outcome(snapshot, monkeypatc
     assert report["snapshot_ready"] is True
     assert "outcome=ready" in (snapshot / "outputs").read_text()
     assert (snapshot / "data/policy_snapshots/ACTIVE").read_text() == "2026-10-15\n"
+
+
+def test_active_snapshot_cannot_be_refetched_on_its_activation_date(snapshot, monkeypatch):
+    monkeypatch.setattr(fetch, "SNAPSHOT_DATE", "2026-10-15")
+    monkeypatch.setattr(refresh, "pipeline", lambda: pytest.fail("Must not touch active evidence"))
+    assert refresh.main(github_actions=True) == 1
+    report = json.loads(refresh.REPORT_PATH.read_text())
+    assert report["outcome"] == "failed"
+    assert "Refusing to refresh" in report["error"]
+    assert report["started_at"] <= report["checked_at"]

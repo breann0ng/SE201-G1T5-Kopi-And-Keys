@@ -459,3 +459,53 @@ No access restrictions were bypassed, no policy snapshot was refreshed or
 activated, and the old failed run was not rerun. This handles a blocked refresh
 honestly; it does not restore HDB access or make the existing data newly verified.
 Publishing and activation still require a complete run and the existing review.
+
+## 2026-11-07 - Reviewed policy website watcher
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** `.github/workflows/policy-refresh.yml`, `scripts/policy_watch.py`,
+  `scripts/scraping/refresh.py`, `scripts/scraping/verify.py`,
+  `tests/test_policy_watch.py`, `tests/test_policy_refresh.py`,
+  `docs/policy-watcher.md`, `data/README.md`, `README.md`
+- **Outcome:** Changed on `feat/nisha-policy-watcher`
+
+### What I asked for
+Look into a watcher for changes on our HDB/CPF policy sources, using the team call
+as context, then implement it alongside Tasha's separate user-feedback workflow.
+
+### How I checked it
+Codex inspected the existing monthly refresh and diff scripts before extending
+them. The watcher/refresh checks pass: 54 tests, including a real text diff with
+changed household conditions but identical dollar-amount sets. Temporary snapshots
+exercise missing pages/PDFs, failed extraction, missing figures, unsafe/mismatched
+dates, blocked access, pending PRs, duplicate alerts and GitHub permissions errors.
+A real Git commit/push test uses only a temporary local bare repository; GitHub
+responses are simulated. It checks the published branch contains inactive data
+and excludes unrelated files, with no push to main or change to ACTIVE.
+The final full suite passed: 493 passed, 1 skipped (the isolated checkout has no
+vector index), and 4 expected failures. No held-out evaluation was run.
+
+The Windows sandbox initially blocked Git's local transport process in that test;
+the test passed with the process restriction lifted. A regex-only diff test also
+exposed an unnecessary eager BeautifulSoup import; that import now occurs only
+when the HTML verifier runs. This keeps offline CI checks independent of scraping
+dependencies. Workflow YAML parsing and whitespace checks were performed too.
+
+### What I kept or changed
+Created an isolated worktree from current main so unfinished profile/chat changes
+remain untouched. Changed polling to Monday 10:17 SGT plus maintainer-triggered
+runs on the default branch. The watcher records changed, unchanged, blocked,
+incomplete and failed states, and source-check/report-analysis timestamps.
+Complete changes prepare a draft snapshot PR instead of pushing directly to main.
+Repeated problems update one attention issue. An existing candidate is preserved;
+new evidence stays in the workflow artifacts rather than overwriting its review.
+Missing pages/figures hold candidate publication for investigation. Refreshing the
+active or an older dated snapshot is refused before fetching.
+
+ACTIVE, chunks, topic cards, deterministic income rules, prices, model settings,
+the vector index and held-out data were not changed. Activation remains a separate
+review with regeneration, validation, index building and backend restart. The guide
+explains GitHub PR permissions/CI approval, monitoring limitations and the frozen
+evaluation boundary. No live scrape, issue, PR, external push or activation was run
+for implementation testing. A hosted run is still needed to verify actual GitHub
+permissions and current website accessibility. Feedback collection and LangSmith
+annotation remain Tasha's work; existing privacy filters were not relaxed.

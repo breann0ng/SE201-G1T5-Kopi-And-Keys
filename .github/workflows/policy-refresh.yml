@@ -1,22 +1,15 @@
-# Monthly re-snapshot of official HDB/CPF policy pages (owner: Sandra).
-#
-# 1. Runs scripts/scraping/refresh.py, which writes data/policy_snapshots/<date>/
-#    and a diff report against the ACTIVE snapshot (the one the advisor serves).
-# 2. Only a ready snapshot is committed/pushed. Access blocks retain the old data.
-# 3. If anything changed, opens a GitHub Issue linking the diff report.
-#
-# Going live is manual: after reviewing, a person changes data/policy_snapshots/ACTIVE
-# to the new date. See data/README.md.
+# Change detection only. A candidate PR never changes ACTIVE, chunks or the index.
 name: Policy refresh
 
 on:
   schedule:
-    - cron: "0 2 1 * *"   # 02:00 UTC on the 1st of each month = 10:00 SGT
-  workflow_dispatch:       # manual "Run workflow" button, e.g. after a policy announcement
+    - cron: "17 2 * * 1"  # Monday 10:17 SGT; scheduled runs may be delayed.
+  workflow_dispatch:
 
 permissions:
   contents: write
   issues: write
+  pull-requests: write
 
 concurrency:
   group: policy-refresh
@@ -24,6 +17,8 @@ concurrency:
 
 jobs:
   refresh:
+    # Manual runs must also use the default branch, never unreviewed branch code.
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -38,72 +33,37 @@ jobs:
       - name: Install scraping dependencies
         run: pip install -r scripts/scraping/requirements.txt
 
-      # An explicit source block is handled with a notice; other errors still fail.
       - name: Re-snapshot, extract, verify and diff
         id: refresh
         working-directory: scripts/scraping
         run: python refresh.py --github-actions
 
-      - name: Save refresh diagnostics
+      - name: Save refresh evidence
         if: always() && steps.refresh.outputs.date != ''
         uses: actions/upload-artifact@v6
         with:
-          name: policy-refresh-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
-          retention-days: 14
-          # The explicitly named status report lives under the hidden .local directory.
+          name: policy-refresh-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 30
           include-hidden-files: true
           path: |
             .local/reports/policy-refresh-status.json
-            data/policy_snapshots/${{ steps.refresh.outputs.date }}/fetch_log.json
+            data/policy_snapshots/${{ steps.refresh.outputs.date }}/
+            scripts/scraping/seeds.json
 
-      - name: Commit and push the new snapshot to main
-        if: steps.refresh.outputs.outcome == 'ready'
-        id: push
-        run: |
-          DATE=$(TZ=Asia/Singapore date +%F)
-          echo "date=$DATE" >> "$GITHUB_OUTPUT"
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "data/policy_snapshots/$DATE" scripts/scraping/seeds.json
-          if git diff --cached --quiet; then
-            echo "Nothing new to commit."
-            echo "pushed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          git commit -m "data: policy snapshot $DATE (not active until reviewed)"
-          # Teammates may have pushed meanwhile; our commit only adds a new folder.
-          git pull --rebase origin main
-          git push origin HEAD:main
-          echo "pushed=true" >> "$GITHUB_OUTPUT"
-
-      - name: Open a review issue if anything changed
-        if: steps.push.outputs.pushed == 'true'
+      # Still report after fetch/extraction failure. Unexpected errors remain red.
+      - name: Report status and prepare a draft review PR
+        if: always() && steps.refresh.outcome != 'skipped'
         env:
           GH_TOKEN: ${{ github.token }}
-          DATE: ${{ steps.push.outputs.date }}
-        run: |
-          REPORT=$(ls data/policy_snapshots/$DATE/changes_since_*.json 2>/dev/null | head -1)
-          if [ -z "$REPORT" ]; then echo "No diff report (first snapshot)."; exit 0; fi
-          python - "$REPORT" > issue.env <<'EOF'
-          import json, sys
-          r = json.load(open(sys.argv[1], encoding="utf-8"))
-          fig = sum(1 for c in r["changed"] if c["figures_removed"] or c["figures_added"])
-          n = len(r["changed"]) + len(r["added"]) + len(r["removed"]) + len(r["status_changed"])
-          print(f"TOTAL={n}\nFIGS={fig}\nOLD={r['old']}")
-          EOF
-          . ./issue.env
-          if [ "$TOTAL" = "0" ]; then echo "No changes since $OLD."; exit 0; fi
-          URL="${{ github.server_url }}/${{ github.repository }}/blob/main/data/policy_snapshots/$DATE/changes_since_$OLD.md"
-          gh issue create \
-            --title "Policy snapshot $DATE: $FIGS page(s) with figure changes, $TOTAL change(s) since $OLD" \
-            --body "A new policy snapshot was pushed to \`data/policy_snapshots/$DATE/\`. It is **not live yet**: the advisor still serves \`$OLD\`.
+          POLICY_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: python scripts/policy_watch.py --publish
 
-          **Diff report:** $URL
-
-          **To review**
-          - [ ] Check each changed page against the live site. Pages with figure changes are listed first.
-          - [ ] For real changes: mark the old chunks \`superseded: true\` and re-check the topic cards that cite them.
-          - [ ] Note anything unresolved in \`data/policy_snapshots/$DATE/README.md\`.
-          - [ ] Go live: change \`data/policy_snapshots/ACTIVE\` to \`$DATE\` and push.
-
-          If the snapshot looks broken (e.g. pages missing), leave \`ACTIVE\` unchanged and close this issue."
+      - name: Save watcher report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: policy-watch-status-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 30
+          include-hidden-files: true
+          path: .local/reports/policy-watch-status.json
+          if-no-files-found: warn
