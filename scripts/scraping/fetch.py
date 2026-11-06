@@ -60,6 +60,14 @@ FETCH_CAP = 200
 _last_hit: dict[str, float] = {}
 
 
+class FetchBlocked(RuntimeError):
+    """Expected source-access restriction; never a successfully refreshed page."""
+
+    def __init__(self, url: str, reason: str, status: int | None = None):
+        self.url, self.reason, self.status = url, reason, status
+        super().__init__(f"{reason}: {url}" + (f" (HTTP {status})" if status is not None else ""))
+
+
 def now_sgt() -> str:
     return datetime.now(SGT).isoformat(timespec="seconds")
 
@@ -98,8 +106,8 @@ def check_not_challenge(resp: httpx.Response) -> None:
     """Abort rather than work around a WAF challenge."""
     head = resp.text[:20000].lower() if "html" in resp.headers.get("content-type", "") else ""
     if resp.status_code in (401, 403, 429) or any(m in head for m in CHALLENGE_MARKERS):
-        raise SystemExit(f"Blocked/challenge page from {resp.url} (HTTP {resp.status_code}); "
-                         "stopping without retrying.")
+        raise FetchBlocked(str(resp.url), "Access denied, rate limited or challenge page; stopping without retrying",
+                           resp.status_code)
 
 
 def _count(log: dict, url: str, kind: str) -> None:
@@ -146,14 +154,22 @@ def robots_allowed(url: str, log: dict) -> bool | None:
     d = domain_of(url)
     info = log["robots"].get(d)
     path = SNAP_DIR / "robots" / f"{d}.txt"
-    if not info or not path.exists():
+    if not info:
         return None
-    if info["status"] in (401, 403):
-        return False  # conservative: treat access-denied robots as disallow-all
-    if info["status"] and info["status"] >= 400:
-        return True  # standard: missing robots.txt means no restrictions
+    status = info["status"]
+    if status in (401, 403, 429):
+        raise FetchBlocked(info["url"], "Cannot read robots.txt; access denied or rate limited", status)
+    if status in (404, 410):
+        return True  # Missing robots.txt is different from an inaccessible one.
+    if status != 200:
+        raise RuntimeError(f"Cannot verify robots.txt for {d}: HTTP {status}; stopping")
+    if not path.exists():
+        raise RuntimeError(f"Cached robots.txt is missing for {d}; stopping")
+    body = path.read_text(encoding="utf-8")
+    if "<html" in body.lower() and any(m in body.lower() for m in CHALLENGE_MARKERS):
+        raise FetchBlocked(info["url"], "robots.txt returned an HTML challenge page", status)
     rp = urllib.robotparser.RobotFileParser()
-    rp.parse(path.read_text(encoding="utf-8").splitlines())
+    rp.parse(body.splitlines())
     # Check both our own token and the generic rules.
     return rp.can_fetch(USER_AGENT, url) and rp.can_fetch(ua_for(url), url)
 
@@ -172,10 +188,10 @@ def fetch_page(slug: str, url: str, log: dict) -> None:
         entry.update(http_status=None, method=None, notes="blocked by robots.txt; not fetched")
         log["pages"][slug] = entry
         save_log(log)
-        print(f"BLOCKED by robots: {slug} {url}")
-        return
+        raise FetchBlocked(url, "Disallowed by robots.txt")
     r = get(url, log, "page")
     check_not_challenge(r)
+    r.raise_for_status()
     body = r.content
     dest.write_bytes(body)
     entry.update(final_url=str(r.url), http_status=r.status_code, fetched_at=now_sgt(),
@@ -232,8 +248,10 @@ def fetch_pdf(slug: str, url: str, log: dict) -> None:
         print(f"cached pdf: {slug}")
         return
     if not robots_allowed(url, log):
-        raise SystemExit(f"robots disallows {url}")
+        raise FetchBlocked(url, "Disallowed by robots.txt")
     r = get(url, log, "pdf")
+    check_not_challenge(r)
+    r.raise_for_status()
     dest.write_bytes(r.content)
     log["pages"][slug] = {"slug": slug, "requested_url": url, "final_url": str(r.url),
                           "http_status": r.status_code, "fetched_at": now_sgt(), "method": "pdf",
@@ -250,8 +268,10 @@ def sitemap(url: str, log: dict) -> None:
         print(f"cached sitemap: {dest.name}")
         return
     if not robots_allowed(url, log):
-        raise SystemExit(f"robots disallows {url}")
+        raise FetchBlocked(url, "Disallowed by robots.txt")
     r = get(url, log, "sitemap")
+    check_not_challenge(r)
+    r.raise_for_status()
     dest.write_bytes(r.content)
     print(f"sitemap {url}: {r.status_code} ({len(r.content)} bytes)")
 
@@ -277,5 +297,24 @@ def main(argv: list[str]) -> None:
     print(f"total fetches used: {log['fetch_count']}/{FETCH_CAP}")
 
 
+def cli(argv: list[str]) -> int:
+    # A previous same-day denial is not evidence that this command was blocked.
+    # Keep cached robots responses, but require a new typed block record per call.
+    log = load_log()
+    if "blocked" in log:
+        del log["blocked"]
+        save_log(log)
+    try:
+        main(argv)
+    except FetchBlocked as error:
+        log = load_log()
+        log["blocked"] = {"url": error.url, "reason": error.reason,
+                          "http_status": error.status, "at": now_sgt()}
+        save_log(log)
+        print(f"Refresh blocked: {error}", file=sys.stderr)
+        return 2
+    return 0
+
+
 if __name__ == "__main__":
-    main(sys.argv)
+    sys.exit(cli(sys.argv))
