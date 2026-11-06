@@ -1,4 +1,4 @@
-"""Build topic cards (data/topic_cards/*.json) from chunks.jsonl (no network).
+"""Build topic cards (data/topic_cards/<YYYY-MM-DD>/*.json) from chunks.jsonl (no network).
 
 Usage: python build_cards.py [YYYY-MM-DD]   (default: date in data/policy_snapshots/ACTIVE)
 
@@ -30,6 +30,8 @@ CARDS = {
         "trigger_conditions": {"first_timer": ["true"],
                                "citizenship": ["SC/SC", "SC/SPR", "SC/NR", "SC_single"]},
         "required_fields": ["citizenship", "household_type", "first_timer", "age", "household_income"],
+        "income_schemes": {"family": "enhanced_cpf_housing_grant_family",
+                           "single": "enhanced_cpf_housing_grant_single"},
         "sources": [r"^hdb-grant-(family|singles)-ehg$", r"^hdb-pdf-ehg-amount-"],
         "must": r"income|EHG amount|Not more than",
         "question_template": ("For a {household_type} household with citizenship {citizenship}, first-timer status "
@@ -43,6 +45,7 @@ CARDS = {
         "trigger_conditions": {"household_type": ["couple_family", "fiance"],
                                "citizenship": ["SC/SC", "SC/SPR"]},
         "required_fields": ["citizenship", "household_type", "first_timer", "household_income", "flat_type"],
+        "income_schemes": {"family": "cpf_housing_grant_family"},
         "sources": [r"^hdb-grant-family-cpf-housing-grants$"],
         "must": r"\$|income|SC/ ?S",
         "question_template": ("For a {household_type} household with citizenship {citizenship}, first-timer status "
@@ -90,6 +93,7 @@ CARDS = {
         "topic_name": "CPF Housing Grant for Resale Flats (Singles)",
         "trigger_conditions": {"household_type": ["single"], "citizenship": ["SC_single", "SC/NR"]},
         "required_fields": ["citizenship", "age", "first_timer", "household_income", "flat_type"],
+        "income_schemes": {"single": "cpf_housing_grant_single"},
         "sources": [r"^hdb-grant-singles-cpf-housing-grant$"],
         "must": r"\$|income|aged",
         "question_template": ("For a single applicant with citizenship {citizenship}, aged {age}, first-timer status "
@@ -163,7 +167,8 @@ CARDS = {
 
 # One verbatim sentence per card for the overview table shown on broad questions
 # ("what grants are there?"). Hand-picked for being the clearest official summary;
-# each quote must appear word for word in its chunk, or the build stops.
+# each quote must appear word for word in a current chunk, or the build stops. The chunk
+# ID is a preference: after a re-chunk the quote is found in whichever chunk now holds it.
 OVERVIEW = {
     "CARD_EHG": ("CHUNK_EHG_05", "From 20 August 2024, first-timer families may qualify for an EHG of up to "
                  "$120,000, while a couple comprising a first-timer and second-timer may qualify for an EHG "
@@ -186,7 +191,7 @@ OVERVIEW = {
                                "purchase and/ or paying monthly mortgage instalments will depend on the extent "
                                "the remaining lease of the flat can cover the youngest buyer up to the age of 95."),
     "CARD_HFE_LETTER": ("CHUNK_HFE_01", "You need an HFE letter before you can buy an HDB flat."),
-    "CARD_NON_CITIZEN_ELIGIBILITY": ("CHUNK_ELIG_62", "Long Term Visit Pass or Work Pass of at least 6 months"),
+    "CARD_NON_CITIZEN_ELIGIBILITY": ("CHUNK_ELIG_127","Long Term Visit Pass or Work Pass of at least 6 months"),
     "CARD_EIP_SPR_QUOTA": ("CHUNK_EIP_01", "When buying an HDB resale flat, you must ensure your household is "
                            "within the EIP quota for the block and neighbourhood, and if applicable, the SPR "
                            "quota as well."),
@@ -199,7 +204,8 @@ def main() -> None:
     date = sys.argv[1] if len(sys.argv) > 1 else (SNAPS / "ACTIVE").read_text(encoding="utf-8").strip()
     rows = [json.loads(ln) for ln in (ROOT / "data" / "policy_chunks" / date / "chunks.jsonl")
             .read_text(encoding="utf-8").splitlines()]
-    out_dir = ROOT / "data" / "topic_cards"
+    # One folder per snapshot: building a candidate never replaces the cards being served.
+    out_dir = ROOT / "data" / "topic_cards" / date
     out_dir.mkdir(parents=True, exist_ok=True)
     for card_id, spec in CARDS.items():
         picked = [r for r in rows
@@ -231,12 +237,15 @@ def main() -> None:
             "question_template": spec["question_template"],
             "snapshot_date": date,
         }
+        if spec.get("income_schemes"):
+            card["income_schemes"] = spec["income_schemes"]
         if card_id in OVERVIEW:
-            chunk_id, quote = OVERVIEW[card_id]
-            source = next((r for r in rows if r["chunk_id"] == chunk_id and not r["superseded"]), None)
-            if source is None or quote not in source["content"]:
-                raise SystemExit(f"{card_id}: overview quote not found verbatim in {chunk_id}")
-            card["overview"] = {"chunk_id": chunk_id, "quote": quote}
+            preferred, quote = OVERVIEW[card_id]
+            holding = [r for r in rows if not r["superseded"] and quote in r["content"]]
+            source = next((r for r in holding if r["chunk_id"] == preferred), holding[0] if holding else None)
+            if source is None:
+                raise SystemExit(f"{card_id}: overview quote not found verbatim in any current chunk")
+            card["overview"] = {"chunk_id": source["chunk_id"], "quote": quote}
         path = out_dir / f"{card_id.lower()}.json"
         path.write_text(json.dumps(card, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"{card_id}: {len(picked)} matching chunks, kept {len(chosen)}: "

@@ -94,6 +94,7 @@ def main() -> int:
     print(f"split={args.split}  questions={len(questions)}  snapshot={report['snapshot']}")
     print(f"Stage 1     routing (router only) {s['routing_accuracy']}")
     print(f"Discovery   precision {d['precision']}  recall {d['recall']}  ask-next {d['ask_next_accuracy']}")
+    print(f"Discovery   shown only: precision {d['precision_shown']}  recall {d['recall_shown']}")
     print(f"Retrieval   Recall@5 {r['recall_at_5']}  ({retriever_name})")
     print(f"Price       filters {report['price_filters']['accuracy']}  (router as of {AS_OF}, data to {data_month})")
     print(f"Price       figures {report['price_figures']['accuracy']}  (tool vs SQL expected_price)")
