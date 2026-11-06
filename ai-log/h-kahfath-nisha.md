@@ -376,6 +376,52 @@ the full grant name to exercise synthesis, and the gap is documented for Breann.
 The team's held-out questions were not read or run. Independent human review,
 branch protection/audit triage and the frozen final held-out evaluation remain
 team activities; the development pass count is not general safety or accuracy.
+
+## 2026-11-06 - Chat editing, source copying and cancellation follow-up
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** chat components/adapter/API, `answerText.ts`, cancellation context,
+  model engine, streaming endpoint, policy evidence selection, focused tests,
+  frontend CI test step and `docs/chat-ux.md`
+- **Outcome:** Changed
+
+### What I asked for
+Check the slow/failed grant answers, add editing and resending after stopping a
+response, and include sources when copying an answer. I clarified that old saved
+questions were welcome, and asked who added saved chats. Git history attributes
+that feature to Sandra's `1fa9f84`; Codex preserved the existing saved history.
+
+### How I checked it
+Codex created `fix/chat-edit-copy-and-responsiveness` from the safety-evaluation
+branch. All 440 backend tests passed with four existing expected router failures.
+Five new frontend clipboard tests passed; lint/build passed with existing warnings.
+Cancellation tests cover both prefill and partial tokens, complete-draft assembly,
+timeout, per-request isolation and prevention of partial-response caching.
+
+A new HTTP request using my multiline first-timer EHG/PHG combination question
+answered and passed verification in 26.903 seconds, using a fictional profile
+and real dated retrieval. Both reported query variants route to policy in the
+current code. A stopped HTTP stream closed after 0.214 seconds, followed by an
+answered deterministic PR-couple request in 0.149 seconds. These are individual
+observations, not controlled model-latency comparisons.
+
+Visual browser automation was attempted. The browser host was unavailable, and
+native Edge app access timed out. The feature has build/API/unit verification;
+manual Stop/Edit/Copy click-through remains explicitly pending.
+
+### What I kept or changed
+Added the assistant-ui edit composer and a clear stopped-response message.
+Copy now includes numbered sources, URLs, dates, overview/income notes and demo
+warnings. A disconnected streamed request cancels its internal model HTTP call,
+including while waiting for headers; tokens remain private until the complete
+draft is verified. Interrupted responses are not cached. The runtime controls
+how quickly its compute stops after HTTP cancellation.
+
+Narrow stacking questions can use a single complete source that states the grant
+relationship and prerequisite, subject to household-scope checks. Broader amount,
+income, eligibility and new-flat questions retain their wider evidence. Tests
+cover those boundaries, and explicit missing-evidence errors still force repair
+or abstention. No policy facts, snapshots, numeric-price logic or stored chats
+were rewritten. The loading message now reflects possible multi-minute CPU work.
 ## 2026-11-01 - Policy refresh deprecation and blocked-source handling
 - **Tool (model):** OpenAI Codex (GPT-6)
 - **Files:** `.github/workflows/policy-refresh.yml`, `scripts/scraping/fetch.py`,

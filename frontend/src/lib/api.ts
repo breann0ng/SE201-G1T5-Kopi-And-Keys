@@ -194,13 +194,20 @@ export async function* streamChat(
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
-  for (;;) {
-    const { done, value } = await reader.read();
-    buffer += decoder.decode(value, { stream: !done });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
-    for (const line of lines) if (line.trim()) yield JSON.parse(line) as StreamEvent;
-    if (done) break;
+  try {
+    for (;;) {
+      signal?.throwIfAborted();
+      const { done, value } = await reader.read();
+      buffer += decoder.decode(value, { stream: !done });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      for (const line of lines) if (line.trim()) yield JSON.parse(line) as StreamEvent;
+      if (done) break;
+    }
+    signal?.throwIfAborted();
+    if (buffer.trim()) yield JSON.parse(buffer) as StreamEvent;
+  } finally {
+    await reader.cancel().catch(() => {});
+    reader.releaseLock();
   }
-  if (buffer.trim()) yield JSON.parse(buffer) as StreamEvent;
 }

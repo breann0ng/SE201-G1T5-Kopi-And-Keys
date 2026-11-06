@@ -2,7 +2,7 @@
 #
 # - backend:  Python 3.12, `pip install -e ".[dev]"`, full pytest. No Ollama, no built SQLite
 #             database and no Chroma index on the runner; every test uses fakes or temp data.
-# - frontend: Node 22, npm ci, lint, build.
+# - frontend: Node 22, npm ci, lint, clipboard-format tests, build.
 # - audit:    pip-audit and npm audit (high+). Report only for now: never fails the build.
 # - secrets:  gitleaks over the commits in the PR (or the pushed commits on main).
 #
@@ -71,6 +71,7 @@ jobs:
 
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
 
   audit:

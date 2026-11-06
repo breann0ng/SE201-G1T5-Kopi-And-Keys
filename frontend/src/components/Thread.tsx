@@ -5,9 +5,11 @@ import {
   ThreadPrimitive,
   useAuiState,
 } from "@assistant-ui/react";
-import { ArrowUp, Check, Copy, Square, ThumbsDown, ThumbsUp } from "lucide-react";
-import { useState } from "react";
+import { ArrowUp, Check, Copy, Pencil, Square, ThumbsDown, ThumbsUp } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { AdvisorMeta, ProgressMeta } from "../lib/adapter";
+import type { ChatResponse } from "../lib/api";
+import { answerForClipboard } from "../lib/answerText";
 import { Progress } from "./Progress";
 import { load, save } from "../lib/storage";
 import { AnswerExtras, StatusBadge } from "./AnswerExtras";
@@ -30,7 +32,7 @@ export function Thread() {
           <ThreadPrimitive.Empty>
             <Welcome />
           </ThreadPrimitive.Empty>
-          <ThreadPrimitive.Messages components={{ UserMessage, AssistantMessage }} />
+          <ThreadPrimitive.Messages components={{ UserMessage, AssistantMessage, EditComposer }} />
           <div className="min-h-8 grow" />
         </div>
         <ThreadPrimitive.ViewportFooter className="sticky bottom-0 mx-auto w-full max-w-3xl bg-white pb-4 dark:bg-slate-950">
@@ -103,11 +105,36 @@ function Composer() {
 
 function UserMessage() {
   return (
-    <MessagePrimitive.Root className="flex justify-end py-3">
+    <MessagePrimitive.Root className="flex flex-col items-end gap-1 py-3">
       <div className="max-w-[85%] rounded-2xl bg-brand-50 px-4 py-2.5 whitespace-pre-wrap text-slate-900 dark:bg-slate-800 dark:text-slate-100">
         <MessagePrimitive.Parts />
       </div>
+      <ThreadPrimitive.If running={false}>
+        <ActionBarPrimitive.Root>
+          <ActionBarPrimitive.Edit aria-label="Edit message" title="Edit this message and send it again"
+            className="flex items-center gap-1 rounded px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <Pencil size={12} /> Edit
+          </ActionBarPrimitive.Edit>
+        </ActionBarPrimitive.Root>
+      </ThreadPrimitive.If>
     </MessagePrimitive.Root>
+  );
+}
+
+function EditComposer() {
+  return (
+    <ComposerPrimitive.Root className="my-3 ml-auto w-full max-w-[85%] rounded-2xl border border-brand-300 p-3 dark:border-slate-600">
+      <ComposerPrimitive.Input aria-label="Edit your message" rows={3} autoFocus
+        className="w-full resize-y bg-transparent outline-none" />
+      <div className="mt-2 flex justify-end gap-2">
+        <ComposerPrimitive.Cancel className="rounded-lg px-3 py-1.5 text-sm hover:bg-slate-100 dark:hover:bg-slate-800">
+          Cancel edit
+        </ComposerPrimitive.Cancel>
+        <ComposerPrimitive.Send className="rounded-lg bg-brand-500 px-3 py-1.5 text-sm text-white disabled:opacity-40">
+          Save and send
+        </ComposerPrimitive.Send>
+      </div>
+    </ComposerPrimitive.Root>
   );
 }
 
@@ -131,7 +158,9 @@ function AssistantMessage() {
   return (
     <MessagePrimitive.Root className="py-3">
       <div className={`rounded-2xl border px-4 py-3 ${tone}`}>
-        {running && !meta ? (
+        {!running && !meta && progress ? (
+          <p className="text-sm text-slate-500" role="status">Response stopped. You can edit your question or send a new one.</p>
+        ) : running && !meta ? (
           progress ? (
             <Progress steps={progress.steps} started={progress.started} />
           ) : (
@@ -152,15 +181,31 @@ function AssistantMessage() {
           </>
         )}
       </div>
-      {meta?.kind === "response" && <AssistantActions />}
+      {meta?.kind === "response" && <AssistantActions response={meta.response} />}
     </MessagePrimitive.Root>
   );
 }
 
-function AssistantActions() {
+function AssistantActions({ response }: { response: ChatResponse }) {
   const id = useAuiState((s) => s.message.id);
   // Feedback is kept in this browser only for now (scaffold for the evaluation dataset).
   const [vote, setVote] = useState<"up" | "down" | null>(() => load(`kk:feedback:${id}`, null));
+  const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+  const copyAnswer = async () => {
+    try {
+      await navigator.clipboard.writeText(answerForClipboard(response));
+      setCopied(true);
+      setCopyError(false);
+    } catch {
+      setCopyError(true);
+    }
+  };
   const choose = (v: "up" | "down") => {
     const next = vote === v ? null : v;
     setVote(next);
@@ -169,16 +214,11 @@ function AssistantActions() {
   const btn = "rounded-md p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800";
   return (
     <div className="mt-1 flex gap-1 pl-2">
-      <ActionBarPrimitive.Root className="flex">
-        <ActionBarPrimitive.Copy aria-label="Copy answer" className={btn}>
-          <MessagePrimitive.If copied>
-            <Check size={15} />
-          </MessagePrimitive.If>
-          <MessagePrimitive.If copied={false}>
-            <Copy size={15} />
-          </MessagePrimitive.If>
-        </ActionBarPrimitive.Copy>
-      </ActionBarPrimitive.Root>
+      <button aria-label="Copy answer and sources" title="Copy answer, income notes and sources" className={btn} onClick={copyAnswer}>
+        {copied ? <Check size={15} /> : <Copy size={15} />}
+      </button>
+      <span className="sr-only" role="status">{copied ? "Answer and sources copied." : ""}</span>
+      {copyError && <span role="status" className="text-xs text-red-600">Copy unavailable. Select and copy the answer and sources.</span>}
       <button
         aria-label="Helpful"
         aria-pressed={vote === "up"}

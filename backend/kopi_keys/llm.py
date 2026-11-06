@@ -1,6 +1,9 @@
 """Ollama over HTTP, with CPU by default and opt-in allocated GPU inference."""
 
 import os
+import asyncio
+import json
+from contextlib import suppress
 from dataclasses import dataclass, field, replace
 from time import perf_counter
 from typing import Literal, Protocol
@@ -8,9 +11,15 @@ from typing import Literal, Protocol
 import httpx
 from langsmith import traceable
 
+from .cancellation import request_cancelled
+
 
 class ModelEngineError(RuntimeError):
     """Expected local runtime, HTTP or model-output failure."""
+
+
+class GenerationCancelled(ModelEngineError):
+    """The client stopped its request; partial model text must not be shown."""
 
 
 @dataclass(frozen=True)
@@ -121,6 +130,61 @@ class OllamaEngine:
         except ValueError as error:
             raise ModelEngineError("Ollama did not return valid JSON.") from error
 
+    async def _cancelable_chat(self, payload: dict, cancelled) -> dict:
+        """Consume tokens privately; close HTTP even when stopped during prefill.
+
+        Token streaming is internal only. The graph still verifies the complete
+        draft before sending any answer text to the UI.
+        """
+        async def consume():
+            async with httpx.AsyncClient(trust_env=False, timeout=self.settings.timeout_seconds) as client:
+                async with client.stream("POST", f"{self.settings.base_url.rstrip('/')}/api/chat",
+                                         json={**payload, "stream": True}) as response:
+                    response.raise_for_status()
+                    parts = []
+                    async for line in response.aiter_lines():
+                        if not line.strip():
+                            continue
+                        data = json.loads(line)
+                        if not isinstance(data, dict) or data.get("error"):
+                            raise ModelEngineError("Ollama returned a failed streamed response.")
+                        message = data.get("message") or {}
+                        if not isinstance(message, dict):
+                            raise ModelEngineError("Ollama returned an invalid streamed message.")
+                        if isinstance(message.get("content"), str):
+                            parts.append(message["content"])
+                        if data.get("done") is True:
+                            return {**data, "message": {"content": "".join(parts)}}
+            raise ModelEngineError("Ollama returned no completed streamed response.")
+
+        async def wait_for_stop():
+            while not cancelled.is_set():
+                await asyncio.sleep(0.05)
+
+        if cancelled.is_set():
+            raise GenerationCancelled("Generation stopped by the client.")
+        generation = asyncio.create_task(consume())
+        stopping = asyncio.create_task(wait_for_stop())
+        try:
+            done, _ = await asyncio.wait({generation, stopping}, timeout=self.settings.timeout_seconds,
+                                         return_when=asyncio.FIRST_COMPLETED)
+            if stopping in done or cancelled.is_set():
+                raise GenerationCancelled("Generation stopped by the client.")
+            if generation not in done:
+                raise ModelEngineError("Ollama timed out before completing the response.")
+            return await generation
+        except httpx.TimeoutException as error:
+            raise ModelEngineError("Ollama timed out before completing the response.") from error
+        except httpx.HTTPError as error:
+            raise ModelEngineError("Ollama request failed. Check the local server and model installation.") from error
+        except ValueError as error:
+            raise ModelEngineError("Ollama did not return valid streamed JSON.") from error
+        finally:
+            for task in (generation, stopping):
+                task.cancel()
+                with suppress(asyncio.CancelledError, ModelEngineError, httpx.HTTPError, ValueError):
+                    await task
+
     def warm_up(self) -> None:
         """Load the model into memory without generating anything (Ollama: a request with no
         prompt). Called once at startup so the first question doesn't pay the load time."""
@@ -173,7 +237,9 @@ class OllamaEngine:
             payload["format"] = self.settings.response_format
         if self.settings.model.startswith("qwen3"):
             payload["think"] = False
-        data = self._request("POST", "/api/chat", payload)
+        cancelled = request_cancelled.get()
+        data = (asyncio.run(self._cancelable_chat(payload, cancelled)) if cancelled is not None
+                else self._request("POST", "/api/chat", payload))
         message = data.get("message")
         text = message.get("content") if isinstance(message, dict) else None
         if data.get("done") is not True or not isinstance(text, str) or not text.strip():
