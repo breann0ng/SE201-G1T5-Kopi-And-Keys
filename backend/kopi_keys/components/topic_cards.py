@@ -1,7 +1,7 @@
 """Topic cards: the discovery cards (proposal Appendix B), as the graph sees them.
 
 The card format, loader and matcher live in `kopi_keys/topic_cards.py` (topic-card
-owner, Sandra); cards are in data/topic_cards/ (see its README). This module
+owner, Sandra); cards are in data/topic_cards/<ACTIVE snapshot>/ (see its README). This module
 keeps the interface graph.py already calls:
 
 1. `TopicCard` / `load_cards`: load and validate cards at startup (schema, and
@@ -20,14 +20,15 @@ Merge note (2026-10-16): the placeholder format here (`id` / `title` /
 (`card_id` / `topic_name` / `trigger_conditions` / `supporting_chunk_ids`).
 """
 
+import warnings
 from collections.abc import Iterable
 
 from ..state import GraphState
-from ..topic_cards import DATA_DIR, MatchResult, TopicCard, load_cards as _load_cards
+from ..topic_cards import MatchResult, TopicCard, load_cards as _load_cards, snapshot_cards_dir
 from ..topic_cards import match_cards as _match_cards
 
 
-CARD_DIR = DATA_DIR / "topic_cards"
+CARD_DIR = snapshot_cards_dir()  # data/topic_cards/<ACTIVE snapshot>/
 
 __all__ = ["CARD_DIR", "TopicCard", "load_cards", "match_cards", "match_profile",
            "profile_from_state", "required_fields"]
@@ -36,6 +37,8 @@ __all__ = ["CARD_DIR", "TopicCard", "load_cards", "match_cards", "match_profile"
 def load_cards(directory=CARD_DIR) -> list[TopicCard]:
     """Load every *.json card; raises TopicCardError on an invalid card."""
     if not directory.exists():
+        # e.g. ACTIVE was switched before the new snapshot's cards were built
+        warnings.warn(f"No topic cards in {directory}; run scripts/scraping/build_cards.py", stacklevel=2)
         return []
     return _load_cards(cards_dir=directory)
 

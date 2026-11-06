@@ -10,11 +10,11 @@
   ],
   "supporting_chunk_ids": [
     "CHUNK_LOAN_26",
-    "CHUNK_LOAN_28",
-    "CHUNK_LOAN_29",
-    "CHUNK_LOAN_30",
-    "CHUNK_LOAN_31",
-    "CHUNK_LOAN_32"
+    "CHUNK_LOAN_49",
+    "CHUNK_LOAN_50",
+    "CHUNK_LOAN_52",
+    "CHUNK_LOAN_54",
+    "CHUNK_LOAN_30"
   ],
   "question_template": "For a {household_type} household with citizenship {citizenship}, average gross monthly household income of {household_income} and average applicant age {age}, is the household eligible for an HDB housing loan, and what loan tenure and amount rules apply?",
   "snapshot_date": "2026-10-15",

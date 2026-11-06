@@ -3,6 +3,7 @@
 # 1. Runs scripts/scraping/refresh.py, which writes data/policy_snapshots/<date>/
 #    and a diff report against the ACTIVE snapshot (the one the advisor serves).
 # 2. Only a ready snapshot is committed/pushed. Access blocks retain the old data.
+#    A ready snapshot's chunks and topic cards are pre-built into their own date folders.
 # 3. If anything changed, opens a GitHub Issue linking the diff report.
 #
 # Going live is manual: after reviewing, a person changes data/policy_snapshots/ACTIVE
@@ -56,15 +57,36 @@ jobs:
             .local/reports/policy-refresh-status.json
             data/policy_snapshots/${{ steps.refresh.outputs.date }}/fetch_log.json
 
+      # Pre-build the candidate's chunks and topic cards into their own date folders
+      # (data/policy_chunks/<date>/, data/topic_cards/<date>/), so the reviewer sees whether
+      # they build and validate. ACTIVE, and the chunks and cards it serves, are unchanged.
+      # A failure here does not stop publication; the review issue says to rebuild locally.
+      - name: Pre-build candidate chunks and topic cards
+        if: steps.refresh.outputs.outcome == 'ready'
+        id: candidate
+        continue-on-error: true
+        working-directory: scripts/scraping
+        env:
+          DATE: ${{ steps.refresh.outputs.date }}
+        run: |
+          python chunk.py "$DATE"
+          python build_cards.py "$DATE"
+          python validate.py "$DATE"
+
       - name: Commit and push the new snapshot to main
         if: steps.refresh.outputs.outcome == 'ready'
         id: push
+        env:
+          CANDIDATE: ${{ steps.candidate.outcome }}
         run: |
           DATE=$(TZ=Asia/Singapore date +%F)
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "data/policy_snapshots/$DATE" scripts/scraping/seeds.json
+          if [ "$CANDIDATE" = "success" ]; then
+            git add "data/policy_chunks/$DATE" "data/topic_cards/$DATE" data/policy_chunks/chunk_id_registry.json
+          fi
           if git diff --cached --quiet; then
             echo "Nothing new to commit."
             echo "pushed=false" >> "$GITHUB_OUTPUT"
@@ -81,7 +103,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           DATE: ${{ steps.push.outputs.date }}
+          CANDIDATE: ${{ steps.candidate.outcome }}
         run: |
+          if [ "$CANDIDATE" = "success" ]; then
+            BUILD="Candidate chunks and topic cards were built into \`data/policy_chunks/$DATE/\` and \`data/topic_cards/$DATE/\` and passed \`validate.py\`."
+          else
+            BUILD="**The candidate chunks/cards did not build or validate.** Rebuild locally: \`cd scripts/scraping && python chunk.py $DATE && python build_cards.py $DATE && python validate.py $DATE\` (see the job log)."
+          fi
           REPORT=$(ls data/policy_snapshots/$DATE/changes_since_*.json 2>/dev/null | head -1)
           if [ -z "$REPORT" ]; then echo "No diff report (first snapshot)."; exit 0; fi
           python - "$REPORT" > issue.env <<'EOF'
@@ -99,6 +127,8 @@ jobs:
             --body "A new policy snapshot was pushed to \`data/policy_snapshots/$DATE/\`. It is **not live yet**: the advisor still serves \`$OLD\`.
 
           **Diff report:** $URL
+
+          $BUILD
 
           **To review**
           - [ ] Check each changed page against the live site. Pages with figure changes are listed first.

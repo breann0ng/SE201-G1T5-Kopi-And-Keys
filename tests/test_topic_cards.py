@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from kopi_keys.topic_cards import TopicCardError, load_cards, match_cards
+from kopi_keys.topic_cards import TopicCardError, load_cards, match_cards, snapshot_cards_dir
 
 
 @pytest.fixture(scope="module")
@@ -85,7 +85,7 @@ def test_ask_next_is_the_field_unblocking_most_cards(cards):
 
 
 def test_loader_rejects_values_outside_vocab(tmp_path):
-    card = json.loads((load_cards.__defaults__[0] / "card_ehg.json").read_text(encoding="utf-8"))
+    card = json.loads((snapshot_cards_dir() / "card_ehg.json").read_text(encoding="utf-8"))
     card["trigger_conditions"] = {"citizenship": ["Martian"]}
     (tmp_path / "card_bad.json").write_text(json.dumps(card), encoding="utf-8")
     with pytest.raises(TopicCardError, match="not in vocab"):
@@ -93,7 +93,7 @@ def test_loader_rejects_values_outside_vocab(tmp_path):
 
 
 def test_graph_adapter_loads_repo_cards_and_maps_state_fields():
-    # graph.py loads data/topic_cards/ through components/topic_cards.py at startup.
+    # graph.py loads data/topic_cards/<ACTIVE>/ through components/topic_cards.py at startup.
     from kopi_keys.components import topic_cards as adapter
     from kopi_keys.state import GraphState
 
@@ -104,3 +104,63 @@ def test_graph_adapter_loads_repo_cards_and_maps_state_fields():
     assert result.ask_next == "household_type"  # not collected by the router yet
     assert adapter.match_cards(state, repo_cards) == result.matched_ids
     assert "household_income" in adapter.required_fields(["CARD_EHG"], repo_cards)
+
+
+# --- Income-aware matching (income_schemes -> rules/income_ceilings.json) ---
+
+FIRST_TIMER_FAMILY = {"citizenship": "SC/SC", "household_type": "couple_family", "first_timer": True, "age": 30}
+
+
+def ruled_out(result):
+    return {r.card.card_id: r.reason for r in result.ruled_out}
+
+
+def test_income_above_every_ehg_ceiling_rules_ehg_out_with_a_reason(cards):
+    result = match_cards({**FIRST_TIMER_FAMILY, "household_income": 11000}, cards)
+    assert "CARD_EHG" in ruled_out(result)
+    assert "$9,000" in ruled_out(result)["CARD_EHG"]
+    assert "CARD_EHG" not in result.matched_ids and "CARD_EHG" not in by_id(result)
+    # The Family Grant's ceiling is higher ($16,000), so it stays.
+    assert "CARD_FAMILY_GRANT" not in ruled_out(result)
+
+
+def test_income_at_the_ceiling_keeps_the_card(cards):
+    result = match_cards({**FIRST_TIMER_FAMILY, "household_income": 9000}, cards)
+    assert "CARD_EHG" in result.matched_ids
+
+
+def test_income_near_the_ceiling_keeps_the_card(cards):
+    # Within 5% above $9,000: HDB's own assessment decides, so the card is not ruled out.
+    result = match_cards({**FIRST_TIMER_FAMILY, "household_income": 9400}, cards)
+    assert "CARD_EHG" not in ruled_out(result)
+
+
+def test_a_higher_variant_ceiling_keeps_the_card(cards):
+    # $20,000 is above the Family Grant's $16,000 but within its $24,000 extended-family variant.
+    result = match_cards({**FIRST_TIMER_FAMILY, "household_income": 20000}, cards)
+    assert "CARD_FAMILY_GRANT" not in ruled_out(result)
+    assert "CARD_EHG" in ruled_out(result)
+
+
+def test_income_above_every_variant_rules_the_family_grant_out(cards):
+    result = match_cards({**FIRST_TIMER_FAMILY, "household_income": 30000}, cards)
+    assert "CARD_FAMILY_GRANT" in ruled_out(result)
+
+
+def test_unknown_or_invalid_income_never_rules_a_card_out(cards):
+    for income in (None, "", "not a number"):
+        assert ruled_out(match_cards({**FIRST_TIMER_FAMILY, "household_income": income}, cards)) == {}
+
+
+def test_card_without_a_verified_ceiling_is_never_ruled_out_by_income(cards):
+    # PHG has no income_schemes (its ceiling is unverified), so a high income does not rule it out.
+    result = match_cards({**FIRST_TIMER_FAMILY, "household_income": 50000}, cards)
+    assert "CARD_PHG" not in ruled_out(result)
+
+
+def test_graph_income_notes_use_the_same_schemes_as_the_cards(cards):
+    from kopi_keys.components.topic_cards import _CEILING_SCHEMES
+
+    by = {c.card_id: c for c in cards}
+    for card_id, schemes in _CEILING_SCHEMES.items():
+        assert by[card_id].income_schemes == schemes, card_id

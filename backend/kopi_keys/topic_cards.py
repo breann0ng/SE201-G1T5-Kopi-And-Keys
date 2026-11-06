@@ -10,6 +10,10 @@ Appendix B). Rules, matching data/topic_cards/README.md:
   alone; pass them in `topics`.
 - ask_next is the one missing field that unblocks the most cards (one
   question per turn), ties broken by FIELD_PRIORITY.
+- income_schemes: a known household income above every ceiling the card's
+  schemes state (rules/income_ceilings.json, including HDB's variants such as
+  $24,000 for extended families) rules the card out, with a reason. Within the
+  near-boundary margin, or with an unverified ceiling, the card is kept.
 
 Profile values are compared as strings from data/schema/vocab.json, so a
 boolean first_timer becomes "true"/"false".
@@ -22,12 +26,24 @@ from collections import Counter
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .rules import IncomeRuleError, check_income_ceiling
+from .rules.income import NEAR_BOUNDARY_FRACTION
+
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+
+
+def snapshot_cards_dir(snapshot: str | None = None, data_dir: Path = DATA_DIR) -> Path:
+    """data/topic_cards/<snapshot>/: one folder per policy snapshot, so cards built for a
+    candidate snapshot never replace the cards the advisor serves. Default: ACTIVE."""
+    if snapshot is None:
+        snapshot = (data_dir / "policy_snapshots" / "ACTIVE").read_text(encoding="utf-8").strip()
+    return data_dir / "topic_cards" / snapshot
 
 # Order in which to ask when several missing fields unblock the same number of cards.
 FIELD_PRIORITY = (
@@ -60,6 +76,8 @@ class TopicCard(BaseModel):
     question_template: str = Field(min_length=1)
     snapshot_date: date
     overview: OverviewQuote | None = None
+    # Household ("family" / "single") -> scheme in rules/income_ceilings.json.
+    income_schemes: dict[Literal["family", "single"], str] = Field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -69,10 +87,17 @@ class BlockedCard:
 
 
 @dataclass(frozen=True)
+class RuledOutCard:
+    card: TopicCard
+    reason: str
+
+
+@dataclass(frozen=True)
 class MatchResult:
     matched: list[TopicCard] = field(default_factory=list)
     blocked: list[BlockedCard] = field(default_factory=list)
     ask_next: str | None = None
+    ruled_out: list[RuledOutCard] = field(default_factory=list)
 
     @property
     def matched_ids(self) -> list[str]:
@@ -84,10 +109,14 @@ class TopicCardError(ValueError):
 
 
 def load_cards(
-    cards_dir: Path = DATA_DIR / "topic_cards",
+    cards_dir: Path | None = None,
     vocab_path: Path = DATA_DIR / "schema" / "vocab.json",
 ) -> list[TopicCard]:
-    """Load and validate every card, failing fast on schema or vocabulary errors."""
+    """Load and validate every card, failing fast on schema or vocabulary errors.
+
+    cards_dir defaults to the ACTIVE snapshot's folder (snapshot_cards_dir()).
+    """
+    cards_dir = snapshot_cards_dir() if cards_dir is None else cards_dir
     vocab = json.loads(vocab_path.read_text(encoding="utf-8"))["fields"]
     cards = []
     for path in sorted(cards_dir.glob("*.json")):
@@ -117,6 +146,32 @@ def _value(profile: Mapping[str, Any], name: str) -> str | None:
     return str(value)
 
 
+_AMOUNT = re.compile(r"\$([\d,]+)")
+
+
+def income_rule_out(card: TopicCard, income: Any) -> str | None:
+    """Why this household income rules the card out, or None.
+
+    Conservative: only when the income is above the highest amount any of the card's
+    ceilings states, variants included, and outside the near-boundary margin. An
+    unknown scheme, an unverified ceiling or an invalid income never rules a card out.
+    """
+    highest, label, amount = None, "", None
+    for scheme in card.income_schemes.values():
+        try:
+            check = check_income_ceiling(scheme, income)
+        except IncomeRuleError:
+            return None
+        if not check.verified or check.ceiling is None:
+            return None
+        stated = [check.ceiling] + [Decimal(a.replace(",", "")) for c in check.conditions for a in _AMOUNT.findall(c)]
+        if highest is None or max(stated) > highest:
+            highest, label, amount = max(stated), check.label, check.income
+    if highest is None or amount <= highest * (1 + NEAR_BOUNDARY_FRACTION):
+        return None
+    return f"income of ${amount:,.0f} is above the highest {label} ceiling of ${highest:,.0f}"
+
+
 def match_cards(
     profile: Mapping[str, Any],
     cards: Iterable[TopicCard],
@@ -134,6 +189,8 @@ def match_cards(
     topics, exclude = set(topics), set(exclude)
     matched: list[TopicCard] = []
     blocked: list[BlockedCard] = []
+    ruled_out_by_income: list[RuledOutCard] = []
+    income = _value(profile, "household_income")
     for card in cards:
         if card.card_id in exclude:
             continue
@@ -150,7 +207,11 @@ def match_cards(
                 break
         if ruled_out:
             continue
-        missing += [f for f in card.required_fields if _value(profile, f) is None and f not in missing]
+        reason = income_rule_out(card, income) if card.income_schemes and income is not None else None
+        if reason is not None:
+            ruled_out_by_income.append(RuledOutCard(card, reason))
+            continue
+        missing +=[f for f in card.required_fields if _value(profile, f) is None and f not in missing]
         if missing:
             blocked.append(BlockedCard(card, tuple(missing)))
         else:
@@ -161,7 +222,7 @@ def match_cards(
         counts = Counter(f for b in blocked for f in b.missing_fields)
         rank = {f: i for i, f in enumerate(FIELD_PRIORITY)}
         ask_next = min(counts, key=lambda f: (-counts[f], rank.get(f, len(rank)), f))
-    return MatchResult(matched=matched, blocked=blocked, ask_next=ask_next)
+    return MatchResult(matched=matched, blocked=blocked, ask_next=ask_next, ruled_out=ruled_out_by_income)
 
 
 # --- Overview answers for broad questions ---------------------------------
