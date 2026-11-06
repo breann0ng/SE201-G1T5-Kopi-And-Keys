@@ -314,11 +314,18 @@ def build_graph(
     return compiled
 
 
-def run_graph(graph, request: ChatRequest, data_origin: DataOrigin = "database") -> GraphState:
-    """Run one request and return the full final state (for tests and evaluation)."""
-    result = graph.invoke(initial_state(request, data_origin), config={"recursion_limit": 50})
+def run_graph(graph, request: ChatRequest, data_origin: DataOrigin = "database",
+              run_id: str | None = None) -> GraphState:
+    """Run one request and return the full final state (for tests and evaluation).
+
+    run_id (optional) only names the root trace run, so feedback can be attached to it in LangSmith.
+    """
+    config = {"recursion_limit": 50}
+    if run_id is not None:
+        config["run_id"] = run_id
+    result = graph.invoke(initial_state(request, data_origin), config=config)
     return GraphState.model_validate(result)
 
 
-def run_chat(graph, request: ChatRequest) -> ChatResponse:
-    return run_graph(graph, request).response
+def run_chat(graph, request: ChatRequest, run_id: str | None = None) -> ChatResponse:
+    return run_graph(graph, request, run_id=run_id).response
