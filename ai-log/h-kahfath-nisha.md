@@ -314,6 +314,68 @@ is recorded for label review without altering labels or upgrading the 11/12
 score. The provided model tag is recorded as reported, without claiming it is
 the newest upstream release. Shared filesystem free space is not personal quota.
 
+## 2026-11-06 - Finals adversarial policy checks and responsible-AI record
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** policy verifier/guardrails, `llm.py`, `evaluation/policy_safety.py`,
+  `data/benchmarks/policy_safety_cases.json`, safety tests, `.env.example`,
+  Settings privacy wording, README, finals guide, responsible-AI record and
+  curated live-result summary
+- **Outcome:** Changed
+
+### What I asked for
+Finish my policy/verifier responsible-AI work after discussing MCP, mutation
+testing, feedback, privacy and system evaluation with the team. Codex created
+`feat/nisha-finals-safety-evaluation` from the latest merged main, including
+Tasha's CI changes. The separate policy-refresh fix is not part of this branch.
+
+### How I checked it
+The full suite passed 429 tests with four existing expected router failures.
+Thirty-four focused safety/oracle tests require no Ollama or external tracing.
+They exercise malicious quoted instructions, changed nonnumeric eligibility
+wording, empty quotes, invented citations, malformed drafts, bounded repair,
+safe claim pruning, outage detection and positive controls. A real local SDK
+span checks content redaction; network calls are prohibited in that test. The
+benchmark's selected model also wins over an unrelated application environment
+override, preventing misleading model labels.
+
+The actual CPU Qwen2.5:3b run used 16 fictional development cases through the
+production graph: 16/16 automatic checks passed, all eight answerable cases were
+answered, the other eight abstained, and all three clean positive controls passed.
+There were no engine outages. Eight CPU threads, 4K context, 850 output tokens,
+temperature zero, seed 42 and at most one repair were used. Median case time was
+9.692 seconds, including two no-inference preflight cases, with 21 model calls.
+Raw outputs stay in `.local/reports/`; the curated summary records the model
+digest, case hash, per-case outcomes and pending independent human review.
+
+Frontend lint passed with four pre-existing fast-refresh warnings. The production
+build passed with the existing large-bundle warning. Stored-generation replay
+across 36 historical records gave zero outcome differences between baseline-main
+and the new verifier. Five already need an unrecorded repair on baseline with
+current evidence, so this does not reproduce old benchmark accuracy scores.
+
+### What I kept or changed
+Added narrowly targeted detection of assistant-control and credential-disclosure
+instructions in displayed claims, even when those words appear in retrieved
+evidence. Non-table model-selected text must preserve its supporting quote;
+table output retains canonical source-cell validation. Recognised injection
+patterns are a containment heuristic, not complete protection against poisoned
+facts, obfuscation or all adversarial prompts.
+
+Ollama trace inputs/outputs now exclude prompts, profiles, passages and answer
+text while retaining counts and typed usage/timing data. The example configuration
+starts with both tracing flags disabled; existing real .env files are untouched.
+The Settings notice now covers configured model services, temporary answer caches
+and optional monitoring. It does not promise that browser clearing removes cloud
+traces or service caches. Other integrations, metadata and errors still need review.
+
+The responsible-AI record describes controls, ownership, feedback limitations,
+privacy, evaluation scope and deployment follow-up. Browser votes do not train
+the model. No MCP server, shell tool or scraper activation permission was added
+to chat. Bare "Explain PHG conditions." exposed a current router gap; SAFE-16 uses
+the full grant name to exercise synthesis, and the gap is documented for Breann.
+The team's held-out questions were not read or run. Independent human review,
+branch protection/audit triage and the frozen final held-out evaluation remain
+team activities; the development pass count is not general safety or accuracy.
 ## 2026-11-01 - Policy refresh deprecation and blocked-source handling
 - **Tool (model):** OpenAI Codex (GPT-6)
 - **Files:** `.github/workflows/policy-refresh.yml`, `scripts/scraping/fetch.py`,

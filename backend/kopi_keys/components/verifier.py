@@ -28,7 +28,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 from ..schemas import CENT, PriceResult
 from ..state import GraphState
-from .policy_guardrails import grant_coverage_errors, household_scope_errors, normalized_policy_text, score_relevance
+from .policy_guardrails import contains_model_instruction, grant_coverage_errors, household_scope_errors, normalized_policy_text, score_relevance
 
 
 # Reject malformed grouping, shorthand (600k), signs, percentages and exponents.
@@ -181,8 +181,12 @@ def verify(state: GraphState) -> list[str]:
     errors.extend(household_scope_errors(state, sources))
     for claim in draft.claims:
         errors.extend(_citation_errors(claim.citation_ids, sources, "policy claim"))
+        if contains_model_instruction(claim.text) or contains_model_instruction(claim.supporting_quote or ""):
+            errors.append("A policy claim contains assistant-control or credential-disclosure instructions; do not display it as policy.")
         if claim.supporting_quote is not None:
             quote = _comparable(claim.supporting_quote)
+            if not quote:
+                errors.append("A policy supporting quote must contain source wording.")
             cited = [sources[c] for c in claim.citation_ids if c in sources]
             if not any(quote in _comparable(p.text) for p in cited):
                 errors.append("A policy supporting quote is not present in its cited source.")
@@ -201,6 +205,11 @@ def verify(state: GraphState) -> list[str]:
                 else:
                     context = claim.source_scope + " " + (claim.source_criterion or "")
                     supported |= {Decimal(n.replace(",", "")) for n in re.findall(r"\b\d[\d,]*(?:\.\d+)?\b", context)}
+            else:
+                from .policy_synthesis import scope_label
+
+                if _comparable(claim.text) != _comparable(scope_label(claim.supporting_quote)):
+                    errors.append("A displayed policy claim changes its supporting quote; use the verified source wording.")
             if numbers - supported:
                 errors.append("A policy claim contains numbers absent from its supporting quote.")
 

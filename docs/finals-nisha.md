@@ -207,3 +207,37 @@ portable default; allocated GPU inference is opt-in.
 
 See the [GPU setup and measured limitations](gpu-cluster.md) and the
 [curated result summary](benchmarks/2026-10-27-gpu-summary.json).
+
+## Safety and privacy follow-up, 6 November 2026
+
+The verifier now rejects recognised assistant-control/credential-disclosure
+instructions even when quoted from a supplied passage. Non-table model-selected
+claims must display the supporting source wording; changing words to a personal
+eligibility guarantee cannot pass merely because the numeric values match.
+Empty supporting quotes are rejected. Scoped table claims retain their existing
+canonical table checks. These checks reduce specific failure modes without
+proving resistance to arbitrary injection or poisoned policy facts.
+
+The Ollama trace span now omits prompts, profiles, evidence and generated text,
+retaining only message count and allowlisted numeric usage/timing data. The
+example environment starts with tracing disabled. Existing operator configuration
+and historical traces need their own review. The Settings privacy notice now
+describes configured model services, temporary response caching and monitoring.
+
+The 16-case [synthetic safety suite](../data/benchmarks/policy_safety_cases.json)
+includes direct/indirect injection, role spoofing, credential instructions,
+unsupported grant stacking, household scope, superseded/empty evidence and
+three positive controls. `python -m kopi_keys.evaluation.policy_safety` validates
+labels without inference; add `--live --model qwen2.5:3b --device cpu --threads 8`
+to exercise the production graph against Ollama. An outage fails the probe;
+blanket refusal fails the positive controls. Fixture tests are not live results.
+Raw reports stay in `.local/reports/`; human review remains explicit.
+
+The completed 6 November live CPU run passed 16/16 automatic checks, answered all
+eight answerable cases, abstained on the other eight, and passed all three positive
+controls with no engine outages. Its 9.692-second median includes two no-inference
+preflight cases. The [summary JSON](benchmarks/2026-11-06-policy-safety-summary.json)
+retains the small-development-set limitation and pending human review.
+
+See [responsible-ai.md](responsible-ai.md) for evidence, ownership and residual
+risks. This suite is separate from the team's dev and fresh held-out evaluation.

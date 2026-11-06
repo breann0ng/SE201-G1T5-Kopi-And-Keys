@@ -59,6 +59,23 @@ class Generation:
     usage: dict = field(default_factory=dict)
 
 
+def _trace_inputs(inputs: dict) -> dict:
+    # Do not send prompts, profiles, retrieved text or the engine/client repr to
+    # LangSmith. Request contents still reach the explicitly configured Ollama.
+    return {"message_count": len(inputs.get("messages", [])), "content_redacted": True}
+
+
+def _trace_outputs(output) -> dict:
+    usage = getattr(output, "usage", {})
+    allowed = ("elapsed_seconds", "prompt_tokens", "output_tokens", "num_gpu_requested",
+               "load_seconds", "prompt_eval_seconds", "generation_seconds")
+    clean = {key: usage[key] for key in allowed
+             if isinstance(usage.get(key), (int, float)) and not isinstance(usage[key], bool)}
+    if usage.get("device_requested") in {"cpu", "gpu"}:
+        clean["device_requested"] = usage["device_requested"]
+    return {"usage": clean, "content_redacted": True}
+
+
 class TextEngine(Protocol):
     def complete(self, messages: list[dict[str, str]]) -> Generation: ...
 
@@ -137,7 +154,7 @@ class OllamaEngine:
         """Release this model between benchmark batches without stopping Ollama."""
         self._request("POST", "/api/generate", {"model": self.settings.model, "keep_alive": 0})
 
-    @traceable(run_type="llm", name="ollama_chat")
+    @traceable(run_type="llm", name="ollama_chat", process_inputs=_trace_inputs, process_outputs=_trace_outputs)
     def complete(self, messages: list[dict[str, str]]) -> Generation:
         started = perf_counter()
         payload = {
