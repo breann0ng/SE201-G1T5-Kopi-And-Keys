@@ -146,3 +146,58 @@ Make the three layout changes and fix every import and path they affect.
 ### What I kept or changed
 The AI left scripts/build_resale_db.py and scripts/build_policy_index.py as thin wrappers, so the commands in the README and docs work unchanged. The team needs to know that data/evaluation/ is now data/evaluation-data/ before merging, because open branches that touch the dev set will conflict.
 [Record anything you kept or changed.]
+
+## 2026-11-06 · LangSmith evaluators and dev-set experiments
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/evaluation/langsmith_eval.py (new), pyproject.toml
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+Whether LangSmith's built-in evaluators suit our app, how to set one up on
+live traces, and a way to run the dev set as LangSmith experiments.
+
+### How I checked it
+- It mapped each evaluator against our existing metrics: most (hallucination,
+  exact match, tool selection) are already covered more strictly by the
+  verifier and run_eval; answer relevance was the gap.
+- Set up an Answer Relevance evaluator on the kopi-and-keys project; the AI
+  confirmed through the LangSmith API that the filter and project were right
+  and explained the auto-created "Alignment" rule.
+- Uploaded the 50 dev questions as the kopi-dev-set dataset (held-out set
+  never uploaded) and ran 3-question experiments. Per-question scores reuse
+  metrics.end_to_end, so they match run_eval --local.
+- The LLM-judge option (--judge) has not been run yet.
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]
+
+## 2026-11-06 · Router scope guard and no-rule-match tracing
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/components/query_router.py, graph.py, state.py,
+  tests/test_query_router.py, tests/test_graph.py, tests/test_api.py,
+  tests/test_development_set_contract.py
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+How to make the rule-based router send more questions to the right place
+instead of declining them, using a rules + LLM hybrid. This entry covers the
+first two steps (rules only); the LLM fallback is not built yet.
+
+### How I checked it
+- The LangSmith smoke test showed OOS-06 (forecast) and OOS-07 (guarantee)
+  being answered. A new scope guard now declines forecasts, future prices and
+  guarantees before any other rule.
+- Its first version also declined "How much will a 4-room in Bishan cost?"
+  and "...? We're buying next year." The AI caught this by testing questions
+  that should still be answered, and tightened the rules; both are now tests.
+- Routes for all 50 dev questions were saved before and after: only OOS-06
+  and OOS-07 changed. Router routing is 50/50; 412 tests pass (2 known
+  flat-type gaps remain).
+- Traces now show query_router:abstain:no_rule_match when no rule fired, to
+  measure what an LLM fallback would see. I checked this in the frontend with
+  questions with no keywords and with questions that should be declined.
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]
