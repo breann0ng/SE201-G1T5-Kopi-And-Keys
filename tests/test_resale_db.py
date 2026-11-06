@@ -100,6 +100,16 @@ def test_invalid_values_reject_the_whole_import(tmp_path, field, value):
     assert not (tmp_path / "resale.db.tmp").exists()
 
 
+def test_storey_00_is_rejected_naming_the_row(tmp_path):
+    # Line 1 is the header, so the third data row is line 4. Storey 01 is still fine.
+    rows = [row(storey_range="01 TO 03"), row(), row(storey_range="00 TO 02")]
+    with pytest.raises(importer.DataValidationError) as error:
+        build(tmp_path, rows)
+    assert str(error.value) == ("1 invalid rows; nothing written:\n"
+                                "  line 4: storey_range cannot start at storey 00: '00 TO 02'")
+    assert not (tmp_path / "resale.db").exists()
+
+
 def test_missing_columns_are_rejected(tmp_path):
     path = tmp_path / "resale.csv"
     path.write_text("month,town\n2025-01,TAMPINES\n", encoding="utf-8")

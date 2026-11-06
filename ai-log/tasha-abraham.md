@@ -133,7 +133,7 @@ evaluation, a fix to my default price window and impossible-period handling,
 and a guide and template for the 40-question held-out set kept outside the repo.
 
 ### How I checked it
-(To fill in.)
+Ran the test suite (338 passed, 4 expected router-gap failures) and the bm25 evaluation myself. Checked four price answers in the app against the expected figures, including that the default period ends at Oct 2026 and that “in 2028” is declined. Read a sample of the new labels and confirmed the EHG row on HDB’s PDF. Made the decisions on the period convention, the CHG questions and the MIX-08/DSC-06 rewording.
 
 ### What I kept or changed
 It found that run_eval checked neither price filters nor figures, and that 9
@@ -145,3 +145,32 @@ swapped OOS-06 for a "next year" forecast, and narrowed CHG-06's superseded
 value to "initial payment is 20%". The router was not tuned: MIX-07, DSC-06,
 OOS-06 and OOS-07 are listed as known router gaps, and the `_cap` future-year
 bug goes to Breann.
+
+## 2026-11-05 · Mutation testing on the price tool and a draft CI workflow
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** scripts/mutation_test.py, tests/test_price_boundaries.py,
+  tests/test_price_wording.py, docs/testing-price-tool.md,
+  .github/workflows/ci.yml, backend/kopi_keys/ingest/resale_db.py,
+  tests/test_resale_db.py
+- **Outcome:** Changed
+
+### What I asked for
+Mutation testing limited to my price modules (price_query.py, price_display.py)
+and their tests, with every surviving mutant marked equivalent or not, and a
+test with hand-checkable literal values for each one that is not. Also a draft
+CI workflow for the team (pytest without Ollama, frontend lint and build,
+report-only dependency audits, gitleaks), not to be merged without agreement.
+
+### How I checked it
+Ran the full suite and the mutation script myself (66.4% → 95.9%). Checked the lease and floor boundary tests by hand (720/960 months, storeys 6/7 and 12/13, the 4-vs-5 sales rule). Read the reasons for the 15 equivalent mutants. Decided to reject storey 00 at import rather than test around it. Reviewed the CI workflow’s permissions (read-only, no secrets, no held-out).
+
+### What I kept or changed
+It used a small standard-library AST script instead of mutmut, which does not
+fit our backend/ layout and skips the module-level band constants. The score
+went from 66.4% (259/390) to 95.9% (374/390). It marked 15 of the 16 survivors
+as equivalent and left one for me to decide: a sale on storey 00 fell in no
+floor band. I decided the importer should reject storey 00, which makes that
+mutant equivalent too; the rebuilt database is unchanged at 242,737 rows. In the
+draft CI workflow I changed setup-python from v7.1.0 (two weeks old) to v7.0.0
+and kept the gitleaks step as it was. The workflow stays a draft on this branch
+until the team agrees.
