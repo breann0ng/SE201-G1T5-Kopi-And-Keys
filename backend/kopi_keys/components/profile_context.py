@@ -12,6 +12,11 @@ def profile_issue(state) -> tuple[str, str] | None:
     question = state.followup_question or state.message
     if not personal_question(question):
         return None
+    from .query_router import classify_intent
+
+    # Pure transaction-price queries do not need household eligibility details.
+    if classify_intent(question) in {"price", "unanswerable"}:
+        return None
     if state.citizenship == "SC_single" and state.household_type in {"couple_family", "fiance", "extended_family"}:
         return "clarify", ("Your profile combines Single Singapore Citizen with a family household. "
                            "Please correct Household citizenship or Household type in Your situation, then resend your question.")

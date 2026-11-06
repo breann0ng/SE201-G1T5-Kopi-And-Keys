@@ -140,7 +140,7 @@ export function Layout() {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
      <ChatContext.Provider value={chat}>
-      <div className="flex h-full">
+      <div className="flex h-dvh min-h-0 overflow-hidden">
         <aside className="hidden w-72 shrink-0 overflow-y-auto border-r border-slate-200 bg-slate-50 md:block dark:border-slate-800 dark:bg-slate-900/50">
           {sidebar}
         </aside>
@@ -161,8 +161,8 @@ export function Layout() {
           </div>
         )}
 
-        <main className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center gap-2 border-b border-slate-200 px-4 py-2 md:hidden dark:border-slate-800">
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <header className="flex shrink-0 items-center gap-2 border-b border-slate-200 px-4 py-2 md:hidden dark:border-slate-800">
             <button aria-label="Open menu" onClick={() => setMenuOpen(true)} className="p-1">
               <Menu size={20} />
             </button>
@@ -171,7 +171,7 @@ export function Layout() {
               Kopi <span className="text-coral-500">&amp;</span> Keys
             </span>
           </header>
-          <div className="min-h-0 flex-1">
+          <div className="min-h-0 flex-1 overflow-hidden">
             <Outlet context={{ theme, setTheme } satisfies LayoutContext} />
           </div>
         </main>

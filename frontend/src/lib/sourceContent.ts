@@ -3,7 +3,14 @@
 
 export type SourceTable = { header: string[]; rows: string[][] };
 export type IncomeBand = { label: string; low: number; high: number; amount: number; amountText: string };
-export type BandList = { title: string; bands: IncomeBand[] };
+export type BandList = {
+  title: string;
+  incomeBasis: "household" | "half_household" | "unknown";
+  scope: string | null;
+  sourceHeader: string;
+  sourceRows: string[];
+  bands: IncomeBand[];
+};
 
 const SEPARATOR = /^\|?[\s:|-]+\|?$/;
 
@@ -68,17 +75,45 @@ const num = (s: string) => Number(s.replace(/[$,]/g, ""));
 export function extractBands(text: string): BandList | null {
   const lines = text.split("\n").map((l) => l.trim());
   const bands: IncomeBand[] = [];
-  let first = -1;
-  lines.forEach((line, i) => {
+  const first = lines.findIndex((line) => BAND.test(line));
+  if (first < 0) return null;
+  const sourceRows: string[] = [];
+  let end = first;
+  for (; end < lines.length; end++) {
+    const line = lines[end];
+    if (!line) continue;
     const m = BAND.exec(line);
-    if (!m) return;
-    if (first < 0) first = i;
+    if (!m) break;
     const [low, high] = m[1] ? [0, num(m[1])] : [num(m[2]), num(m[3])];
-    const label = m[1] ? `Up to $${m[1]}` : `$${m[2]}–$${m[3]}`;
+    if (low > high || (bands.length && low <= bands[bands.length - 1].high)) return null;
+    const label = m[1] ? `Not more than $${m[1]}` : `$${m[2]} to $${m[3]}`;
     bands.push({ label, low, high, amount: num(m[4]), amountText: m[4] });
-  });
-  if (bands.length < 4) return null;
-  // The line just above the first band names the two columns, e.g. "Average monthly household income EHG amount".
-  const title = first > 0 && !BAND.test(lines[first - 1]) ? lines[first - 1] : "Amount by income band";
-  return { title, bands };
+    sourceRows.push(line);
+  }
+  // Do not combine separate tables or silently chart only part of a passage.
+  if (bands.length < 4 || lines.slice(end).some((line) => BAND.test(line))) return null;
+  const before = lines.slice(0, first).filter(Boolean);
+  const nearby = before.slice(-6);
+  let headerIndex = nearby.findIndex((line) => /^Half of (?:the )?average monthly household/i.test(line));
+  if (headerIndex < 0) headerIndex = nearby.findIndex((line) => /^Average monthly household income/i.test(line));
+  const sourceHeader = headerIndex < 0 ? "" : nearby.slice(headerIndex).join("\n");
+  const header = sourceHeader.replace(/\s+/g, " ");
+  const incomeBasis = /half of.*household.*income/i.test(header) ? "half_household" :
+    /average monthly household income/i.test(header) ? "household" : "unknown";
+  const title = incomeBasis === "half_household" ? "Half of average monthly household income" :
+    incomeBasis === "household" ? "Average monthly household income" : "Income band as stated in source";
+  const context = before.join(" ");
+  const scope = /non-resident spouse/i.test(context) ? "Applicant with non-resident spouse" :
+    /first-timer and second-timer/i.test(context) ? "Couple comprising a first-timer and second-timer" : null;
+  return { title, incomeBasis, scope, sourceHeader, sourceRows, bands };
+}
+
+export function bandTable(bands: BandList): SourceTable {
+  return { header: [bands.title, "Grant amount (SGD)"],
+    rows: bands.bands.map((band) => [band.label, band.amountText]) };
+}
+
+export function bandTableMarkdown(bands: BandList): string {
+  const table = bandTable(bands);
+  return [table.header, ["---", "---"], ...table.rows].map((row) => `| ${row.join(" | ")} |`).join("\n");
 }

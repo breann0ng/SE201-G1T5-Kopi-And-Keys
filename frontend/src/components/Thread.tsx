@@ -9,13 +9,13 @@ import { ArrowUp, Check, Copy, Pencil, Square, ThumbsDown, ThumbsUp } from "luci
 import { useEffect, useState } from "react";
 import type { AdvisorMeta, ProgressMeta } from "../lib/adapter";
 import type { ChatResponse } from "../lib/api";
-import { answerForClipboard } from "../lib/answerText";
+import { answerForClipboard, numberCitations } from "../lib/answerText";
 import { Progress } from "./Progress";
 import { load, save } from "../lib/storage";
 import { AnswerExtras, StatusBadge } from "./AnswerExtras";
 import { Logo } from "./Logo";
 import { QuickReplies } from "./QuickReplies";
-import { MarkdownText } from "./MarkdownText";
+import { MarkdownText, SourceMarkdown } from "./MarkdownText";
 
 const STARTERS = [
   "Am I eligible for the Enhanced CPF Housing Grant?",
@@ -26,16 +26,16 @@ const STARTERS = [
 
 export function Thread() {
   return (
-    <ThreadPrimitive.Root className="flex h-full flex-col">
-      <ThreadPrimitive.Viewport className="flex flex-1 flex-col overflow-y-auto px-4">
-        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
+    <ThreadPrimitive.Root className="flex h-full min-h-0 flex-col overflow-hidden">
+      <ThreadPrimitive.Viewport turnAnchor="bottom" className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-4">
+        <div className="mx-auto flex w-full max-w-3xl flex-1 shrink-0 flex-col">
           <ThreadPrimitive.Empty>
             <Welcome />
           </ThreadPrimitive.Empty>
           <ThreadPrimitive.Messages components={{ UserMessage, AssistantMessage, EditComposer }} />
-          <div className="min-h-8 grow" />
+          <div className="h-6 shrink-0" />
         </div>
-        <ThreadPrimitive.ViewportFooter className="sticky bottom-0 mx-auto w-full max-w-3xl bg-white pb-4 dark:bg-slate-950">
+        <ThreadPrimitive.ViewportFooter className="sticky bottom-0 mx-auto w-full max-w-3xl shrink-0 bg-white pb-4 dark:bg-slate-950">
           <Composer />
           <p className="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">
             Kopi &amp; Keys summarises official HDB/CPF pages. It is not financial or legal advice —
@@ -169,7 +169,9 @@ function AssistantMessage() {
         ) : (
           <>
             <StatusBadge meta={meta} />
-            <MessagePrimitive.Parts components={{ Text: MarkdownText }} />
+            {meta?.kind === "response" ? (
+              <div className="leading-relaxed"><SourceMarkdown text={numberCitations(meta.response)} /></div>
+            ) : <MessagePrimitive.Parts components={{ Text: MarkdownText }} />}
             {meta?.kind === "response" && <AnswerExtras response={meta.response} />}
             {meta?.kind === "response" &&
               meta.response.status === "clarifying" &&

@@ -85,7 +85,12 @@ def build_graph(
                     "trace": [f"query_router:{route}:profile_scope"]}
         known = {field: getattr(state, field) for field in (*EXTRACTED_FIELDS, "start_month", "end_month")}
         routed = route_query(state.message, known, context_question=state.followup_question)
-        return {**routed.model_dump(), "trace": [f"query_router:{routed.route}"]}
+        update = routed.model_dump()
+        # An explicit hypothetical cohort can differ from the sidebar. Do not send
+        # contradictory first-timer and subsidy-status values to the synthesiser.
+        if state.subsidy_status and routed.first_timer is not None and routed.first_timer != state.first_timer:
+            update["subsidy_status"] = None
+        return {**update, "trace": [f"query_router:{routed.route}"]}
 
     def policy_retrieval(state: GraphState):
         query = state.followup_question or state.message

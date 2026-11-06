@@ -1,8 +1,7 @@
 import { ChevronDown, Table2, TrendingDown } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 import type { PolicyPassage } from "../lib/api";
-import { useProfile } from "../lib/profile";
-import { extractBands, extractTables, type BandList, type SourceTable } from "../lib/sourceContent";
+import { bandTable, extractBands, extractTables, type BandList, type SourceTable } from "../lib/sourceContent";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "./ui/chart";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
@@ -23,7 +22,24 @@ export function SourceMaterial({ passages, numberOf }: { passages: PolicyPassage
     <div className="mt-3 space-y-2">
       {items.map(({ p, bands, tables }) => (
         <div key={p.id} className="space-y-2">
-          {bands && <BandChart bands={bands} passage={p} n={numberOf(p.id)} />}
+          {bands && (
+            <div className="space-y-2">
+              <p className="text-xs text-slate-500">
+                {bands.scope ? `Source scope: ${bands.scope}. ` : ""}
+                Source table for reference; this does not determine your eligibility or grant amount.
+              </p>
+              <TableExpander table={bandTable(bands)} passage={p} n={numberOf(p.id)} />
+              {bands.incomeBasis !== "unknown" && (
+                <Collapsible className="rounded-lg border border-slate-200 dark:border-slate-700">
+                  <CollapsibleTrigger className="group flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-slate-600 dark:text-slate-300">
+                    <TrendingDown size={14} /> View source chart [{numberOf(p.id)}]
+                    <ChevronDown size={14} className="ml-auto transition-transform group-data-[state=open]:rotate-180" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent><BandChart bands={bands} passage={p} n={numberOf(p.id)} /></CollapsibleContent>
+                </Collapsible>
+              )}
+            </div>
+          )}
           {tables.map((table, i) => (
             <TableExpander key={i} table={table} passage={p} n={numberOf(p.id)} />
           ))}
@@ -83,41 +99,30 @@ function TableExpander({ table, passage, n }: { table: SourceTable; passage: Pol
 
 const chartConfig = {
   amount: { label: "Grant amount", color: "var(--color-brand-200)" },
-  yours: { label: "Your band", color: "var(--color-coral-500)" },
 } satisfies ChartConfig;
 
 const sgd = (n: number) => `$${n.toLocaleString("en-SG")}`;
 
 function BandChart({ bands, passage, n }: { bands: BandList; passage: PolicyPassage; n: number }) {
-  const { profile } = useProfile();
-  const income = profile.household_income;
-  const yours = income === null ? -1 : bands.bands.findIndex((b) => income >= b.low && income <= b.high);
   return (
-    <figure className="rounded-lg border border-slate-200 p-3 dark:border-slate-700">
+    <figure className="p-3">
       <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
         <TrendingDown size={14} className="text-coral-500" /> {bands.title}
       </p>
-      <ChartContainer config={chartConfig} className="aspect-auto h-56 w-full">
-        <BarChart data={bands.bands} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-          <CartesianGrid vertical={false} />
-          <XAxis dataKey="label" tickLine={false} axisLine={false} interval="preserveStartEnd" minTickGap={12} />
-          <YAxis tickLine={false} axisLine={false} width={52} tickFormatter={(v: number) => `$${v / 1000}k`} />
+      <ChartContainer config={chartConfig} className="aspect-auto w-full" style={{ height: bands.bands.length * 28 + 40 }}>
+        <BarChart data={bands.bands} layout="vertical" margin={{ top: 4, right: 58, bottom: 0, left: 0 }}>
+          <CartesianGrid horizontal={false} />
+          <XAxis type="number" tickLine={false} axisLine={false} tickFormatter={(v: number) => `$${v / 1000}k`} />
+          <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} width={150} interval={0} />
           <ChartTooltip cursor content={<ChartTooltipContent formatter={(v) => sgd(Number(v))} />} />
-          <Bar dataKey="amount" radius={3}>
-            {bands.bands.map((b, i) => (
-              <Cell key={b.label} fill={i === yours ? "var(--color-yours)" : "var(--color-amount)"} />
-            ))}
+          <Bar dataKey="amount" fill="var(--color-amount)" radius={[0, 3, 3, 0]}>
+            <LabelList dataKey="amountText" position="right" fontSize={11} />
           </Bar>
         </BarChart>
       </ChartContainer>
       <figcaption className="mt-1 text-xs text-slate-500">
-        {yours >= 0 ? (
-          <>
-            Your stated income ({sgd(income as number)}) falls in the {bands.bands[yours].label} band:{" "}
-            <strong>{bands.bands[yours].amountText}</strong> in this table. Only HDB's HFE letter confirms what you
-            receive.{" "}
-          </>
-        ) : null}
+        {bands.incomeBasis === "half_household" && "Income bands represent half of average monthly household income, as stated in the source. "}
+        Grant amounts are in SGD. This chart is drawn from source data, not a personalised estimate.{" "}
         <SourceCaption passage={passage} n={n} />
       </figcaption>
     </figure>
