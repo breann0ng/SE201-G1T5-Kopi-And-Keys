@@ -30,7 +30,7 @@ function nextActivity(steps: string[]): string {
     case "price_query":
       return "Matching related topics…";
     case "topic_cards":
-      return "Choosing quotes from the official text… this step usually takes under a minute";
+      return "Choosing quotes from the official text… local CPU generation can take a few minutes. You can stop and edit your question.";
     case "synthesiser":
       return "Checking every quote against its source…";
     case "verifier":

@@ -2,6 +2,7 @@ import type { ChatModelAdapter } from "@assistant-ui/react";
 import { ApiError, streamChat, type BuyerProfile, type ChatResponse } from "./api";
 import { SEND_HISTORY, toHistory } from "./history";
 import { takePendingPriceFilters } from "./pendingPriceFilters";
+import { numberCitations } from "./answerText";
 
 /** What the assistant message carries in metadata.custom, read by AssistantMessage. */
 export type AdvisorMeta =
@@ -11,15 +12,6 @@ export type AdvisorMeta =
 /** While running: graph steps finished so far as trace entries ("verifier:failed"), from
  * /chat/stream, and when the request began. Replaced by AdvisorMeta when the answer arrives. */
 export type ProgressMeta = { kind: "progress"; steps: string[]; started: number };
-
-/** Display only: turn "[source-id]" markers into "[1]", "[2]" matching the Sources list. */
-function numberCitations(response: ChatResponse): string {
-  let text = response.message;
-  response.citations.forEach((c, i) => {
-    text = text.split(`[${c.id}]`).join(`[${i + 1}]`);
-  });
-  return text;
-}
 
 /**
  * Bridges assistant-ui to POST /chat/stream with the latest message and current profile,

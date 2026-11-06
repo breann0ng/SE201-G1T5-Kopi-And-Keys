@@ -135,7 +135,8 @@ def test_retry_receives_actual_json_validation_error_and_allowed_ids():
     assert final.response.status == "answered" and final.model_calls == 2
     context = json.loads(engine.calls[-1][-1]["content"])
     assert any("citation was not supplied" in e for e in context["previous_verification_errors"])
-    assert set(context["allowed_citation_ids"]) == {p.id for p in SOURCES}
+    assert set(context["allowed_citation_ids"]) == {p["id"] for p in context["evidence"]}
+    assert context["allowed_citation_ids"] == ["link"]
     assert context["answer_requirements"]["combination_rule_required"]
 
 
@@ -152,8 +153,8 @@ def test_low_score_triggers_one_repair_then_abstention():
 
 
 def test_explicit_missing_evidence_cannot_be_dropped_by_claim_salvage():
-    engine = Engine(output(("ehg", EHG), missing=["PHG combination rule"]),
-                    output(("ehg", EHG), missing=["PHG combination rule"]))
+    engine = Engine(output(("link", LINK + " " + DEPENDENCY), missing=["additional eligibility condition"]),
+                    output(("link", LINK + " " + DEPENDENCY), missing=["additional eligibility condition"]))
     final = run_graph(build_graph(retriever=Retriever(), synthesiser=Synthesiser(engine), cards=[]),
                       ChatRequest(message=QUESTION))
     assert final.response.status == "abstained"
@@ -206,3 +207,24 @@ def test_complex_question_retains_distinct_chunks_under_the_same_heading():
     context = json.loads(engine.calls[0][-1]["content"])
     assert {p["id"] for p in context["evidence"]} == {first.id, second.id}
     assert len(claims) == 2 and not errors
+
+
+def test_narrow_stacking_question_uses_one_complete_relationship_source():
+    engine = Engine(output(("link", LINK + " " + DEPENDENCY)))
+    PolicySummariser(engine).generate(state())
+    evidence = json.loads(engine.calls[0][-1]["content"])["evidence"]
+    assert [p["id"] for p in evidence] == ["link"]
+    assert DEPENDENCY in evidence[0]["text"]
+
+
+@pytest.mark.parametrize("question", [
+    "Can EHG and PHG be combined for a new flat?",
+    "Can EHG and PHG be combined for new flats?",
+    "Can EHG and PHG be combined and what income conditions apply?",
+    "Can EHG and PHG be combined and what is the maximum amount?",
+    "Can EHG and PHG be combined and what qualification requirements apply?",
+])
+def test_qualified_stacking_questions_keep_the_broader_evidence(question):
+    engine = Engine(output(("link", LINK + " " + DEPENDENCY)))
+    PolicySummariser(engine).generate(state(question=question))
+    assert len(json.loads(engine.calls[0][-1]["content"])["evidence"]) == 3

@@ -7,9 +7,11 @@ import html
 from pydantic import Field, ValidationError, ValidationInfo, model_validator
 
 from ..llm import Generation, ModelEngineError, OllamaEngine, TextEngine
-from ..schemas import Contract, Claim
+from ..schemas import Contract, Claim, Draft
 from ..state import GraphState
-from .policy_guardrails import mentioned_grants, normalized_policy_text, requested_grants, combination_question, score_relevance
+from .policy_guardrails import (mentioned_grants, normalized_policy_text, requested_grants,
+                                combination_question, score_relevance, has_combination_rule,
+                                prerequisite_sentences, household_scope_errors)
 
 
 class PolicyClaim(Contract):
@@ -177,6 +179,31 @@ MAX_PASSAGES = int(os.getenv("KOPI_POLICY_MAX_PASSAGES", "3"))
 MAX_WORDS = int(os.getenv("KOPI_POLICY_MAX_WORDS", "800"))
 
 
+def focused_combination_evidence(state: GraphState, ranked: list, question: str, needed: set[str]) -> list:
+    """A narrow stacking question can use one complete, self-contained source.
+
+    Keep broader evidence for amounts, eligibility details and new-flat rules.
+    No source text is shortened or rewritten, and the normal verifier still runs.
+    """
+    if not combination_question(question) or re.search(
+        r"\b(?:bto|new flats?|income|salary|earn\w*|employ\w*|work\w*|lease|distance|near|within|"
+        r"amounts?|maximum|eligible|eligibility|qualif\w*|requirements?|conditions|criteria)\b|how much", question, re.I,
+    ):
+        return ranked
+    dependencies = [s for p in ranked if not p.superseded for s in prerequisite_sentences(p.text)]
+    for p in ranked:
+        if p.superseded or len(p.text.split()) > 400 or not has_combination_rule(p.text, needed):
+            continue
+        if dependencies and not any(normalized_policy_text(s) in normalized_policy_text(p.text) for s in dependencies):
+            continue
+        candidate = state.model_copy(update={"passages": [p], "draft": Draft(kind="answer", claims=[
+            Claim(text=p.text, supporting_quote=p.text, citation_ids=[p.id]),
+        ])})
+        if not household_scope_errors(candidate, {p.id: p}):
+            return [p]
+    return ranked
+
+
 class PolicySummariser:
     def __init__(self, engine: TextEngine, model_override: str | None = None):
         self.engine = engine
@@ -196,6 +223,7 @@ class PolicySummariser:
                 -int(combination_question(question) and needed <= mentioned_grants(p.text)),
                 -score_relevance(question, p.text, p.title).score,
             ))
+            ranked = focused_combination_evidence(state, ranked, question, needed)
         passages = []
         words = 0
         headings = set()

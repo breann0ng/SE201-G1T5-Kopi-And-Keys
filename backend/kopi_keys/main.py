@@ -5,9 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import hashlib
+import asyncio
 import json
 import os
 import threading
+from contextlib import suppress
 from collections import OrderedDict
 from pathlib import Path
 
@@ -20,6 +22,7 @@ from .graph import build_graph, run_chat
 from .llm import OllamaEngine
 from .state import initial_state
 from .schemas import ChatRequest, ChatResponse
+from .cancellation import request_cancelled
 
 
 _ACTIVE = Path(__file__).resolve().parents[2] / "data" / "policy_snapshots" / "ACTIVE"
@@ -95,13 +98,50 @@ def create_app(graph=None) -> FastAPI:
         return response
 
     @application.post("/chat/stream")
-    def chat_stream(request: ChatRequest) -> StreamingResponse:
+    async def chat_stream(request: ChatRequest) -> StreamingResponse:
         """Added 2026-10-17: the same answer as /chat, as newline-delimited JSON.
         One {"step": "<graph node>", "trace": [...]} line as each step finishes, then {"response": {...}}.
         Lets the UI show real progress during the 40-60 s model step."""
         key = cache.key(request)
 
-        def lines():
+        async def lines():
+            cancelled = threading.Event()
+            queue = asyncio.Queue()
+            loop = asyncio.get_running_loop()
+
+            def send(item):
+                if not cancelled.is_set():
+                    loop.call_soon_threadsafe(queue.put_nowait, item)
+
+            def produce():
+                token = request_cancelled.set(cancelled)
+                try:
+                    for line in graph_lines(cancelled):
+                        if cancelled.is_set():
+                            break
+                        send(line)
+                except Exception as error:
+                    send(error)
+                finally:
+                    request_cancelled.reset(token)
+                    send(None)
+
+            worker = asyncio.create_task(asyncio.to_thread(produce))
+            try:
+                while True:
+                    item = await queue.get()
+                    if item is None:
+                        break
+                    if isinstance(item, Exception):
+                        raise item
+                    yield item
+            finally:
+                cancelled.set()
+                worker.cancel()
+                with suppress(asyncio.CancelledError):
+                    await worker
+
+        def graph_lines(cancelled):
             cached = cache.get(key)
             if cached is not None:
                 yield json.dumps({"step": "cache"}) + "\n"
@@ -110,12 +150,16 @@ def create_app(graph=None) -> FastAPI:
             final = None
             for update in graph.stream(initial_state(request), config={"recursion_limit": 50},
                                        stream_mode="updates"):
+                if cancelled.is_set():
+                    return
                 for node, values in update.items():
                     trace = values.get("trace", []) if isinstance(values, dict) else []
                     yield json.dumps({"step": node, "trace": trace}) + "\n"
                     if isinstance(values, dict) and values.get("response") is not None:
                         final = values["response"]
             response = final if isinstance(final, ChatResponse) else ChatResponse.model_validate(final)
+            if cancelled.is_set():
+                return
             cache.put(key, response)
             yield json.dumps({"response": response.model_dump(mode="json")}) + "\n"
 

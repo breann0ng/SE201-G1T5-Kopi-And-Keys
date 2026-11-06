@@ -121,6 +121,10 @@ Vite proxies `/api/*` to the backend on port 8000. The backend is Python, so
 running backend, use that instance or stop its terminal with Ctrl+C before
 starting another.
 
+User messages support **Edit** after generation stops, and **Copy answer and sources**
+retains citation URLs and dates. See [chat behaviour and checks](docs/chat-ux.md)
+for cancellation, saved-history behaviour and manual verification steps.
+
 ### Optional configuration and tracing
 
 Local use does not require LangSmith or `.env`. To configure model options or
