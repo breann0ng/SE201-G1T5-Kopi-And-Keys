@@ -74,6 +74,15 @@ def build_graph(
     # --- Nodes --------------------------------------------------------------
 
     def query_router(state: GraphState):
+        from .components.profile_context import profile_issue
+
+        issue = profile_issue(state)
+        if issue:
+            route, message = issue
+            return {"route": route, "status": "clarify" if route == "clarify" else "abstain",
+                    "missing_fields": ["profile"] if route == "clarify" else [],
+                    "router_note": message, "abstain_reason": "profile_scope" if route == "abstain" else None,
+                    "trace": [f"query_router:{route}:profile_scope"]}
         known = {field: getattr(state, field) for field in (*EXTRACTED_FIELDS, "start_month", "end_month")}
         routed = route_query(state.message, known, context_question=state.followup_question)
         return {**routed.model_dump(), "trace": [f"query_router:{routed.route}"]}
@@ -214,7 +223,7 @@ def build_graph(
                 status="abstained",
                 mode=mode,
                 route=state.route,
-                message=abstention_message(reason, detail),
+                message=state.router_note if reason == "profile_scope" else abstention_message(reason, detail),
                 retrieval_rounds=len(state.retrieval_queries),
                 trace=trace,
             ),

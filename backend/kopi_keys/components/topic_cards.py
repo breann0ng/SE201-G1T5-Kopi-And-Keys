@@ -82,7 +82,9 @@ def personal_eligibility_fields(state: GraphState, cards: list[TopicCard]) -> li
     import re
 
     query = (state.followup_question or state.message).casefold()
-    if not re.search(r"\b(?:am i|are we|do i qualify|do we qualify|can i|can we)\b", query):
+    from .profile_context import personal_question
+
+    if not personal_question(query):
         return []
     wanted = []
     if "ehg" in query or "enhanced cpf housing grant" in query:
@@ -158,7 +160,7 @@ def income_ceiling_checks(state: GraphState, card_ids: list[str], topic: str | N
     """Tasha's ceiling checks for the grants in play, verified ceilings only. Never a verdict."""
     from ..rules import IncomeRuleError, check_income_ceiling
 
-    if state.income is None:
+    if state.income is None or state.first_timer is False or state.subsidy_status == "mixed":
         return []
     question = (state.followup_question or state.message).casefold()
     matched_grants = [c for c in _CEILING_SCHEMES if c in card_ids]

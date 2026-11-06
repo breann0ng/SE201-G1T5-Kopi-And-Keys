@@ -171,7 +171,7 @@ def household_scope_errors(state, sources: dict) -> list[str]:
     family = bool(re.search(r"\bcouples?\b|\bfamil(?:y|ies)\b", question, re.I))
     if single and family:
         return []  # Explicit comparison, not a household-specific request.
-    if re.search(r"second[- ]timer|non[- ]resident spouse", question, re.I) or state.first_timer is False:
+    if re.search(r"second[- ]timer|non[- ]resident spouse", question, re.I) or state.subsidy_status == "mixed":
         return []
     expected = "single" if state.household_type == "single" or single else (
         "family" if state.household_type in {"couple_family", "fiance", "extended_family"} or family else None)

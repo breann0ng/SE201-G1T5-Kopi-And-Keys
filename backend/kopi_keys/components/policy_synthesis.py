@@ -252,6 +252,7 @@ class PolicySummariser:
             "latest_message": state.message,
             "profile": {"age": state.user_age, "citizenship": state.citizenship,
                         "household_type": state.household_type, "first_timer": state.first_timer,
+                        "subsidy_status": state.subsidy_status,
                         "household_income": str(state.income) if state.income is not None else None},
             "evidence": [model_evidence(p, question) for p in passages],
             "allowed_citation_ids": allowed_ids,
