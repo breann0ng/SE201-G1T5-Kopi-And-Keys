@@ -115,3 +115,39 @@ def test_town_anywhere_go_for_maisonettes_and_address_blocks():
     # A town in someone else's address is not read as the user's town for declined questions.
     assert route_query("There's a unit at Blk 201 Tampines St 21 asking $620k. "
                        "What will it actually sell for?", {}).town is None
+
+
+# Scope guard (2026-11-06). Questions written for these tests, not taken from the dev set.
+@pytest.mark.parametrize("question", [
+    "What will 4-room flats in Bedok cost next year?",
+    "Will HDB prices go up?",
+    "Are prices going to drop next year?",
+    "What will a 5-room in Sengkang be worth in 10 years?",
+    "Forecast resale prices in Woodlands",
+    "Can you guarantee my grant application will be approved?",
+    "Will my application be approved?",
+])
+def test_forecasts_and_guarantees_are_declined_even_with_price_or_policy_words(question):
+    routed = route_query(question, {})
+    assert (routed.route, routed.intent_source) == ("abstain", "rules"), question
+
+
+@pytest.mark.parametrize("question, route", [
+    ("How much will a 4-room flat in Bishan cost?", "price"),
+    ("What are the prices of 4-room flats in Tampines? We're buying next year.", "price"),
+    ("How have prices changed in the past 5 years for 4-room flats in Punggol?", "price"),
+    ("I plan to buy next year, what grants can I get?", "policy"),
+    ("Will I get the EHG if I earn $5,000?", "policy"),
+    ("Is a 99-year lease worth less after 30 years?", "policy"),
+])
+def test_future_wording_alone_does_not_trigger_the_scope_guard(question, route):
+    assert route_query(question, {}).route == route, question
+
+
+def test_no_rule_match_is_kept_apart_from_an_explicit_decline():
+    from kopi_keys.components.query_router import classify_intent, rule_intent
+    assert rule_intent("Tell me a joke.") is None
+    assert classify_intent("Tell me a joke.") == "unanswerable"  # follow-up logic relies on this
+    routed = route_query("Tell me a joke.", {})
+    assert (routed.route, routed.intent_source) == ("abstain", "no_match")
+    assert route_query("Should we buy now or wait?", {}).intent_source == "rules"

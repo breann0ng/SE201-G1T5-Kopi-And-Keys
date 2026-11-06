@@ -43,6 +43,7 @@ class GraphState(Contract):
     status: RouterStatus = "continue"
     missing_fields: list[str] = Field(default_factory=list)
     router_note: str | None = None
+    intent_source: str = "rules"  # "no_match": declined because no rule fired
 
     # Policy Retrieval Tool
     retrieval_queries: list[str] = Field(default_factory=list)

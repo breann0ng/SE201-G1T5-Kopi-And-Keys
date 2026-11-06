@@ -1,10 +1,12 @@
 """Query Router: classify the question, extract buyer/price filters, validate.
 
 Diagram box: "Query router (LLM)". The current implementation is rule-based
-(keywords + regex) and is the baseline for the dev-set routing labels. An LLM
-classifier should replace `classify_intent` and `extract_fields` behind the
-same `route_query` contract; its output must still pass `RouterOutput`
-validation before anything runs.
+(keywords + regex) and is the baseline for the dev-set routing labels.
+`rule_intent` returns None when no rule matches; `route_query` records that as
+intent_source="no_match" (still declined for now). That is the hook for an LLM
+fallback: only no-match questions would go to it, and it can never override a
+rule, least of all the scope guard (forecasts, guarantees). Field extraction
+stays in regex either way. Output must still pass `RouterOutput` validation.
 
 `missing_fields` is a temporary hard-coded gate. Per proposal Appendix B it
 should eventually be driven by the topic cards' required fields
@@ -17,7 +19,11 @@ from decimal import Decimal
 
 from pydantic import Field
 
+from typing import Literal
+
 from ..schemas import Contract, Intent, Route, RouterStatus
+
+IntentSource = Literal["rules", "no_match"]
 
 
 # --- Intent classification -------------------------------------------------
@@ -65,6 +71,37 @@ UNANSWERABLE_PATTERNS = (
     "confirm we are", "confirm i am", "confirm that we", "confirm that i", "definitely eligible",
     "guarantee we", "guarantee i",
 )
+# Added 2026-11-06: scope guard, checked before every other rule. OOS-06 ("What will 4-room
+# flats in Tampines cost next year?") was routed as price and answered with past prices, and
+# OOS-07 ("Can you guarantee my Family Grant application will be approved ...?") as policy.
+# A time phrase alone is not a forecast ("Can I sell my flat in 5 years?" is a MOP question,
+# "We're buying next year" is context), so it only counts right next to price/value wording in
+# the same sentence. "How much will a 4-room cost?" asks for today's prices, so "will" only
+# counts with wording about prices changing.
+FORECAST_WORDS = re.compile(r"\b(?:forecast\w*|predict\w*|projections?|projected)\b", re.IGNORECASE)
+_FUTURE = (r"(?:(?:next|coming)\s+(?:year|month|decade|few\s+(?:years|months)|\d+\s+years)"
+           r"|in\s+(?:\d+|a\s+few|few|two|three|five|ten)\s+years?|in\s+the\s+future|future)")
+_VALUE = r"(?:prices?|cost\w*|worth|value|sell\s+for|go\s+for|fetch|appreciat\w*|depreciat\w*)"
+FUTURE_VALUE = re.compile(
+    rf"\b{_VALUE}\b[^.?!]{{0,30}}\b{_FUTURE}\b|\b{_FUTURE}\b[^.?!]{{0,30}}\b{_VALUE}\b", re.IGNORECASE,
+)
+WILL_VALUE_CHANGE = re.compile(
+    r"\b(?:will|going\s+to|gonna)\b[^.?!]{0,50}\b(?:be\s+worth\s+(?:more|less)|go\s+(?:up|down)|"
+    r"rise|fall|drop|increase|decrease|appreciate|depreciate|crash)\b",
+    re.IGNORECASE,
+)
+GUARANTEE = re.compile(
+    r"\bguarantee\w*\b|\b(?:will|would)\s+(?:my|our|the)\b.{0,40}\b(?:application|appeal)\b.{0,20}"
+    r"\bbe\s+(?:approved|successful|accepted)\b",
+    re.IGNORECASE,
+)
+
+
+def out_of_scope(message: str) -> bool:
+    """Forecasts, valuations of the future and guarantees: always declined, whatever else matches."""
+    if any(pattern in message.casefold() for pattern in UNANSWERABLE_PATTERNS):
+        return True
+    return any(p.search(message) for p in (GUARANTEE, FORECAST_WORDS, WILL_VALUE_CHANGE, FUTURE_VALUE))
 
 
 # "How much is a flat in Toa Payoh?" names no flat type and no strong price word,
@@ -87,8 +124,14 @@ def _names_a_town(message: str) -> bool:
 
 
 def classify_intent(message: str) -> Intent:
+    """The rules' intent, with "no rule matched" counted as unanswerable (used by follow-ups)."""
+    return rule_intent(message) or "unanswerable"
+
+
+def rule_intent(message: str) -> Intent | None:
+    """Intent from the rules, or None when no rule matches (as opposed to an explicit decline)."""
     normalized = message.casefold()
-    if any(pattern in normalized for pattern in UNANSWERABLE_PATTERNS):
+    if out_of_scope(message):
         return "unanswerable"
     has_price = any(word in normalized for word in PRICE_WORDS)
     policy_text = ADDRESS_BLOCK.sub(" ", normalized)
@@ -123,7 +166,7 @@ def classify_intent(message: str) -> Intent:
         return "price"
     if has_policy:
         return "policy"
-    return "unanswerable"
+    return None
 
 
 def route_for_intent(intent: Intent) -> Route:
@@ -352,14 +395,17 @@ class RouterOutput(Contract):
     end_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     # An assumption the answer must state (e.g. maisonettes counted as Executive flats).
     router_note: str | None = None
+    # "no_match": no rule fired, so the question was declined by default, not by a rule.
+    intent_source: IntentSource = "rules"
 
 
 def route_query(message: str, known: dict | None = None, context_question: str | None = None) -> RouterOutput:
     """Classify and extract. Values found in the message win; `known` fills gaps."""
     known = known or {}
-    intent = classify_intent(message)
-    if context_question:
-        intent = classify_intent(context_question)
+    intent = rule_intent(context_question or message)
+    intent_source: IntentSource = "rules"
+    if intent is None:
+        intent, intent_source = "unanswerable", "no_match"
     extracted = extract_fields(message, bare_town=intent in ("price", "mixed"))
     values = {
         field: extracted[field] if extracted[field] is not None else known.get(field)
@@ -383,4 +429,4 @@ def route_query(message: str, known: dict | None = None, context_question: str |
         notes.append(BLOCK_NOTE)
     note = " ".join(notes) or None
     return RouterOutput(intent=intent, route=route, status=status, missing_fields=missing,
-                        router_note=note, **values)
+                        router_note=note, intent_source=intent_source, **values)

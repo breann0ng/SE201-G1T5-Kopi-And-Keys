@@ -76,7 +76,10 @@ def build_graph(
     def query_router(state: GraphState):
         known = {field: getattr(state, field) for field in (*EXTRACTED_FIELDS, "start_month", "end_month")}
         routed = route_query(state.message, known, context_question=state.followup_question)
-        return {**routed.model_dump(), "trace": [f"query_router:{routed.route}"]}
+        # ":no_rule_match" separates "no rule fired" from a rule's explicit decline in traces,
+        # so LangSmith can count how many questions an LLM fallback would see.
+        suffix = ":no_rule_match" if routed.intent_source == "no_match" else ""
+        return {**routed.model_dump(), "trace": [f"query_router:{routed.route}{suffix}"]}
 
     def policy_retrieval(state: GraphState):
         query = state.followup_question or state.message
