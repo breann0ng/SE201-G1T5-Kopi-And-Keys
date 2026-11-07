@@ -72,8 +72,10 @@ export function SettingsPage() {
             our model-call traces exclude message and answer text. When you rate an answer, the
             rating, any reason or comment you add, and that question and answer are recorded for
             the team to review (on the advisor's computer and, if monitoring is enabled, in
-            LangSmith). Ratings never change answers. Clearing this browser does not delete service
-            caches, recorded feedback or previously collected monitoring data.
+            LangSmith). Ratings never change answers. "Clear my data" only clears this browser.
+            Feedback you have already sent is kept for the team to review and can't be deleted from
+            the app. Clearing also does not delete service caches or previously collected
+            monitoring data.
           </p>
           <button
             onClick={clearData}
