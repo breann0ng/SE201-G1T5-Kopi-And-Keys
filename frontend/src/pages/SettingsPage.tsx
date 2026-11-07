@@ -13,7 +13,7 @@ export function SettingsPage() {
   const { devDetails, setDevDetails } = usePrefs();
 
   const clearData = () => {
-    if (!confirm("Clear your conversation, saved details, feedback and preferences from this browser?"))
+    if (!confirm("Clear your conversation, saved details and preferences from this browser?"))
       return;
     clearAll();
     newChat();
@@ -65,12 +65,17 @@ export function SettingsPage() {
         <section>
           <h2 className="font-semibold">Your data</h2>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-            There are no accounts. Saved conversations, details, feedback and preferences are kept
-            in this browser. Your question, details and any enabled conversation context are sent
-            to the advisor and its configured model service. Answers may be cached temporarily by
-            the advisor. If monitoring is enabled, timing and usage information is sent to LangSmith;
-            our model-call traces exclude message and answer text. Clearing this browser does not
-            delete service caches or previously collected monitoring data.
+            There are no accounts. Saved conversations, details and preferences are kept in this
+            browser. Your question, details and any enabled conversation context are sent to the
+            advisor and its configured model service. Answers may be cached temporarily by the
+            advisor. If monitoring is enabled, timing and usage information is sent to LangSmith;
+            our model-call traces exclude message and answer text. When you rate an answer, the
+            rating, any reason or comment you add, and that question and answer are recorded for
+            the team to review (on the advisor's computer and, if monitoring is enabled, in
+            LangSmith). Ratings never change answers. "Clear my data" only clears this browser.
+            Feedback you have already sent is kept for the team to review and can't be deleted from
+            the app. Clearing also does not delete service caches or previously collected
+            monitoring data.
           </p>
           <button
             onClick={clearData}
