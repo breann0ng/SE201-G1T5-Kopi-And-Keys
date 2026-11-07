@@ -18,6 +18,7 @@ import kopi_keys.feedback as feedback
 import kopi_keys.main as main
 from kopi_keys.components.synthesiser import Synthesiser
 from kopi_keys.graph import build_graph, run_chat
+from kopi_keys.llm import OllamaEngine
 from kopi_keys.main import create_app
 from kopi_keys.schemas import ChatRequest
 
@@ -39,8 +40,15 @@ class RecordingClient:
             raise ConnectionError("LangSmith is down")
 
 
+def _no_model(*args, **kwargs):
+    raise AssertionError("These tests must not call Ollama; use Synthesiser(engine=None).")
+
+
 @pytest.fixture(autouse=True)
 def isolated(monkeypatch, tmp_path):
+    # Deterministic and offline: answers come from the extractive fake synthesiser (engine=None)
+    # and FictionalRetriever; any real model call fails the test.
+    monkeypatch.setattr(OllamaEngine, "complete", _no_model)
     RecordingClient.calls, RecordingClient.raises = [], False
     monkeypatch.setattr(feedback, "Client", RecordingClient)
     db = tmp_path / "feedback.db"
