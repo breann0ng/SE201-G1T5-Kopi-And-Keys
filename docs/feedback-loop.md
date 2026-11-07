@@ -72,6 +72,11 @@ request. Feedback text and the API key are never logged at INFO or above. Feedba
 5. In the queue, mark each item **real bug** or **no action**, with a short note. A thumbs down is
    a lead, not proof. Check the answer against the cited official source before calling it a bug.
 
+**Review thumbs-downs before traces expire.** Feedback is sent with
+`extend_trace_retention=False`, so a trace is **not** kept longer because someone rated it. It is
+deleted when the project's normal trace retention period ends. After that only the local SQLite
+backup remains, with no node inputs/outputs. Review thumbs-downs well within that period.
+
 **Fallback: local backup** (when tracing was off, or LangSmith is unavailable):
 
 ```powershell
