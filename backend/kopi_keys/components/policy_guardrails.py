@@ -166,16 +166,34 @@ def household_scope_errors(state, sources: dict) -> list[str]:
     first/second-timer couples can use EHG (Singles), so that case is not treated
     as an ordinary all-first-timer family question.
     """
+    from .profile_context import personal_question
+
     question = state.followup_question or state.message
+    specialised_errors = []
+    # PDF page titles can retain the preceding page's generic "singles" heading.
+    # Check explicit opening qualifications before the broad household comparison.
+    if personal_question(question):
+        for claim in state.draft.claims if state.draft else []:
+            for cid in claim.citation_ids:
+                source = sources.get(cid)
+                if not source or source.superseded:
+                    continue
+                opening = re.sub(r"\s+", " ", source.text[:300])
+                if (re.search(r"amount for (?:an? )?applicant with non-resident spouse", opening, re.I)
+                        and state.citizenship not in {None, "SC/NR"}):
+                    specialised_errors.append("A policy amount table is for an applicant with a non-resident spouse, not the stated profile.")
+                if (re.search(r"comprising a first-timer and second-timer", opening, re.I)
+                        and state.subsidy_status != "mixed"):
+                    specialised_errors.append("A policy amount table is for a mixed first-/second-timer household, not the stated profile.")
     single = bool(re.search(r"\bsingles?\b", question, re.I))
     family = bool(re.search(r"\bcouples?\b|\bfamil(?:y|ies)\b", question, re.I))
     if single and family:
-        return []  # Explicit comparison, not a household-specific request.
-    if re.search(r"second[- ]timer|non[- ]resident spouse", question, re.I) or state.first_timer is False:
-        return []
+        return specialised_errors  # Explicit comparison, not a household-specific request.
+    if re.search(r"second[- ]timer|non[- ]resident spouse", question, re.I) or state.subsidy_status == "mixed":
+        return specialised_errors
     expected = "single" if state.household_type == "single" or single else (
         "family" if state.household_type in {"couple_family", "fiance", "extended_family"} or family else None)
-    errors = []
+    errors = specialised_errors
     for claim in state.draft.claims if state.draft else []:
         for cid in claim.citation_ids:
             source = sources.get(cid)

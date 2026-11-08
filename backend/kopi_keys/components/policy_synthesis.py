@@ -66,6 +66,8 @@ explicitly connects the grants when asked whether they can be combined. Separate
 grant descriptions do not prove that they can be stacked. Preserve prerequisites,
 especially any requirement to first qualify for another grant. Keep new-flat and
 resale-flat rules, singles and families, first-timers and second-timers separate.
+Profile subsidy_status distinguishes first-timer, second-timer and mixed households.
+Mixed means a first-/second-timer couple; it is not a first-timer household.
 Do not add maximum grant amounts together or promise the user the maximum.
 Do not infer a personal grant amount from an income band without the complete
 household and lease conditions. Use up to 6 short claims for complex questions.
@@ -252,6 +254,7 @@ class PolicySummariser:
             "latest_message": state.message,
             "profile": {"age": state.user_age, "citizenship": state.citizenship,
                         "household_type": state.household_type, "first_timer": state.first_timer,
+                        "subsidy_status": state.subsidy_status,
                         "household_income": str(state.income) if state.income is not None else None},
             "evidence": [model_evidence(p, question) for p in passages],
             "allowed_citation_ids": allowed_ids,

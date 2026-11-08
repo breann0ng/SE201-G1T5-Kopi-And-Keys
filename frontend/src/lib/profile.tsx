@@ -9,6 +9,7 @@ export const emptyProfile: BuyerProfile = {
   age: null,
   household_income: null,
   first_timer: null,
+  subsidy_status: null,
   household_type: null,
 };
 
@@ -22,11 +23,20 @@ type ProfileContextValue = {
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfile] = useState<BuyerProfile>(() => ({ ...emptyProfile, ...load(KEY, emptyProfile) }));
+  const [profile, updateProfile] = useState<BuyerProfile>(() => {
+    const saved = { ...emptyProfile, ...load(KEY, emptyProfile) };
+    if (!saved.subsidy_status && saved.first_timer !== null) {
+      saved.subsidy_status = saved.first_timer ? "first_timer" : "second_timer";
+    }
+    return saved;
+  });
   const profileRef = useRef(profile);
+  const setProfile = (next: BuyerProfile) => {
+    profileRef.current = next;
+    updateProfile(next);
+  };
 
   useEffect(() => {
-    profileRef.current = profile;
     save(KEY, profile);
   }, [profile]);
 

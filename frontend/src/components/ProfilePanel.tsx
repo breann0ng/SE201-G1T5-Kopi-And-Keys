@@ -17,7 +17,7 @@ export function ProfilePanel() {
         <UserRound size={16} /> Your situation
       </h2>
       <p className="text-xs text-slate-500 dark:text-slate-400">
-        Optional. Helps the advisor give specific answers. Stays in this browser.
+        Optional. Applied to your next question. Earlier answers keep their original context.
       </p>
 
       <label className="block text-xs font-medium">
@@ -79,19 +79,22 @@ export function ProfilePanel() {
       </label>
 
       <fieldset className="text-xs font-medium">
-        <legend>Bought or received a housing subsidy before?</legend>
-        <div className="mt-1 flex gap-3 font-normal">
+        <legend>Subsidy history of the buying household</legend>
+        <div className="mt-1 flex flex-col gap-2 font-normal">
           {[
-            ["First-timer", true],
-            ["Second-timer", false],
+            ["First-timer household", "first_timer"],
+            ["Second-timer household", "second_timer"],
+            ["Mixed first-/second-timer couple", "mixed"],
             ["Not sure", null],
           ].map(([label, value]) => (
             <label key={String(label)} className="flex items-center gap-1">
               <input
                 type="radio"
                 name="first_timer"
-                checked={profile.first_timer === value}
-                onChange={() => setProfile({ ...profile, first_timer: value as boolean | null })}
+                checked={profile.subsidy_status === value}
+                onChange={() => setProfile({ ...profile,
+                  subsidy_status: value as BuyerProfile["subsidy_status"],
+                  first_timer: value === null ? null : value === "first_timer" })}
               />
               {label}
             </label>

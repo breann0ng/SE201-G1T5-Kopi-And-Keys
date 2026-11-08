@@ -26,6 +26,7 @@ class GraphState(Contract):
     income: Decimal | None = Field(default=None, ge=0)
     citizenship: str | None = None
     first_timer: bool | None = None
+    subsidy_status: str | None = None
     household_type: str | None = None
     history: list[HistoryTurn] = Field(default_factory=list)
     followup_question: str | None = None
@@ -209,6 +210,7 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
         income=Decimal(str(profile.household_income)) if profile.household_income is not None else remembered.get("income"),
         citizenship=profile.citizenship or remembered.get("citizenship"),
         first_timer=profile.first_timer if profile.first_timer is not None else remembered.get("first_timer"),
+        subsidy_status=profile.subsidy_status,
         household_type=profile.household_type or remembered.get("household_type"),
         town=filters.town if filters else remembered.get("town"),
         flat_type=filters.flat_type if filters else remembered.get("flat_type"),

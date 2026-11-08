@@ -422,6 +422,61 @@ income, eligibility and new-flat questions retain their wider evidence. Tests
 cover those boundaries, and explicit missing-evidence errors still force repair
 or abstention. No policy facts, snapshots, numeric-price logic or stored chats
 were rewritten. The loading message now reflects possible multi-minute CPU work.
+## 2026-11-07 - Profile scope, source tables and scrolling follow-up
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** BuyerProfile/state/profile controls and `profile_context.py` from the saved
+  profile commit; follow-up changes in `graph.py`, `policy_synthesis.py`,
+  `policy_guardrails.py`, frontend layout/thread/source formatting, new regression
+  tests, and `docs/chat-ux.md`
+- **Outcome:** Changed on `fix/chat-edit-copy-and-responsiveness`
+
+### What I asked for
+Resume the second-timer profile, blank-space scrolling and grant chart/formatting
+fixes after the laptop shut down. Keep the policy watcher on its separate branch.
+
+### How I checked it
+Confirmed the profile edits survived in commit `eb73bbe`, despite its misleading
+"policy watching" message. Added 18 profile regressions, including a production
+graph check that a second-timer personal EHG request stops before retrieval/model
+execution, mixed-household distinctions, missing/contradictory inputs, current
+profile precedence over history, specialised PDF scope, and unrelated price queries.
+A real local HTTP request returned the second-timer scope explanation with no
+citations or model step. The frontend's 12 tests pass, including every range and
+amount from the actual committed non-resident-spouse PDF chunk, half-income labels,
+clipboard provenance and refusing to reconstruct partial/altered number lists.
+Lint passes with four existing React refresh warnings; production build passes
+with the existing large-bundle warning.
+
+The first full backend run found an unavailable local embedding dependency after
+shutdown. Restarted the existing local Ollama server, reran the affected retrieval
+test successfully, and completed full regression testing. No GPU cluster was used.
+Final backend result: 479 passed and 4 existing expected failures. This count is
+for the UI/profile branch; the isolated watcher branch has its own test additions.
+Tried browser inspection using the computer-use skill: the native helper worked,
+but user input interrupted the navigation; the separate browser host was unavailable.
+Visual scrolling/mobile/chart checks remain manual and are listed in the guide.
+No real personal profile or trace data was submitted for these tests.
+
+### What I kept or changed
+The profile distinguishes first-timer, second-timer and mixed households. Personal
+"like me" questions request required inputs or explain a source-scope limitation.
+First-timer ceiling comparisons are withheld for second/mixed profiles. The
+verifier checks specialised PDF opening qualifications even when page titles are
+generic. A general hypothetical cohort can differ from the sidebar without
+contradictory subsidy fields reaching the model. Pure price queries remain usable
+without fixing unrelated eligibility details.
+
+Replaced the live sidebar-based historical chart highlight with clearly labelled
+source tables and optional collapsed charts. Half-household-income tables retain
+that basis and explicit household scope, without implying a personal grant award.
+Complete verified source-band blocks are formatted as tables for display/copy;
+surrounding conditions, source values and citations remain. Historical response
+metadata is rendered through the same formatter without rewriting saved chats.
+Constrained outer page overflow and bounded the chat viewport/footer to address
+the blank-space scrolling. No policy facts, snapshot files, active version or
+price calculations were changed. Clarifications/charts are code; policy excerpts
+are selected by the LLM and verified against source text.
+
 ## 2026-11-01 - Policy refresh deprecation and blocked-source handling
 - **Tool (model):** OpenAI Codex (GPT-6)
 - **Files:** `.github/workflows/policy-refresh.yml`, `scripts/scraping/fetch.py`,

@@ -30,7 +30,17 @@ class BuyerProfile(Contract):
     age: int | None = Field(default=None, ge=0, le=120)
     household_income: float | None = Field(default=None, ge=0)
     first_timer: bool | None = None
+    subsidy_status: Literal["first_timer", "second_timer", "mixed"] | None = None
     household_type: Literal["single", "couple_family", "fiance", "extended_family", "senior"] | None = None
+
+    @model_validator(mode="after")
+    def consistent_subsidy_status(self):
+        if self.subsidy_status is not None:
+            expected = self.subsidy_status == "first_timer"
+            if self.first_timer is not None and self.first_timer != expected:
+                raise ValueError("first_timer and subsidy_status must describe the same profile")
+            self.first_timer = expected
+        return self
 
 
 class HistoryTurn(Contract):

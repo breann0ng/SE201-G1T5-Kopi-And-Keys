@@ -6,6 +6,7 @@ export type BuyerProfile = {
   age: number | null;
   household_income: number | null;
   first_timer: boolean | null;
+  subsidy_status?: "first_timer" | "second_timer" | "mixed" | null;
   household_type: "single" | "couple_family" | "fiance" | "extended_family" | "senior" | null;
 };
 
