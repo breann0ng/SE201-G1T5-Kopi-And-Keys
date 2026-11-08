@@ -81,7 +81,7 @@ def build_graph(
         known = {field: getattr(state, field) for field in (*EXTRACTED_FIELDS, "start_month", "end_month")}
         routed = route_query(state.message, known, context_question=state.followup_question)
         update = {}
-        if routed.intent_source == "no_match" and intent_classifier is not None:
+        if (routed.intent_source == "no_match" or routed.needs_confirmation) and intent_classifier is not None:
             decision = intent_classifier.classify(state.followup_question or state.message)
             routed = route_query(state.message, known, context_question=state.followup_question,
                                  fallback=decision)
@@ -89,9 +89,11 @@ def build_graph(
                 update = {"model_calls": state.model_calls + 1,
                           "model_usage": [*state.model_usage, {"model": decision.model, **decision.usage}]}
         # The suffix says how the intent was chosen, so LangSmith can count fallback use:
-        # no_rule_match (rules only, declined by default), llm, llm_unsure, llm_error.
+        # no_rule_match (rules only, declined by default), llm, llm_unsure, llm_error, and for
+        # weak rule matches llm_confirmed / llm_declined.
         suffix = {"no_match": ":no_rule_match", "llm": ":llm", "llm_unsure": ":llm_unsure",
-                  "llm_error": ":llm_error"}.get(routed.intent_source, "")
+                  "llm_error": ":llm_error", "rules_confirmed": ":llm_confirmed",
+                  "llm_declined": ":llm_declined"}.get(routed.intent_source, "")
         return {**routed.model_dump(), **update, "trace": [f"query_router:{routed.route}{suffix}"]}
 
     def policy_retrieval(state: GraphState):

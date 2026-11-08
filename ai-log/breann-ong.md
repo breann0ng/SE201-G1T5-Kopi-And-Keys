@@ -201,3 +201,35 @@ first two steps (rules only); the LLM fallback is not built yet.
 
 ### What I kept or changed
 [Record anything you kept or changed.]
+
+## 2026-11-08 · Router: request-type declines and weak-match confirmation
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/components/query_router.py, graph.py,
+  evaluation/fallback_eval.py, data/evaluation-data/fallback/fallback_questions.jsonl,
+  tests/test_query_router.py, tests/test_intent_fallback.py
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+How to stop patching the scope guard one case at a time. Three fresh questions
+("Recommend me a good mortgage broker", "Which bank gives the cheapest home
+loan right now?", "Can you write my appeal letter to HDB?") were answered as
+policy on "loan" / "hdb" alone.
+
+### How I checked it
+- Declines are now grouped by request type (predict, value one flat,
+  guarantee, recommend a provider, investment advice, do a task), so a new
+  provider or task is covered without a new rule.
+- When generic keywords alone ("hdb", "loan", "block", "how long", ...) make a
+  question policy, the LLM is asked to confirm. It can only veto (a confident
+  "unanswerable"), never switch the intent. Without the LLM nothing changes.
+- Routes for all 50 dev questions were saved before and after: none changed;
+  only POL-04 now gets the confirmation call (about 1 s).
+- Fixed "damage" counting as a price word on its own ("water damage").
+- Fallback set grew from 21 to 38 questions. With qwen2.5:3b: 37/38 (miss:
+  "What time does the HDB hub open on Saturday?" confirmed as policy). The AI
+  wrote these questions alongside the rules, so they are regression checks,
+  not an independent test. 528 tests pass (2 known flat-type gaps remain).
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]

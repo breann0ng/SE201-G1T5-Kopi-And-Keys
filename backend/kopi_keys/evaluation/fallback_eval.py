@@ -10,6 +10,8 @@ set because the router was tuned on the dev set. Groups:
   decline       out of scope, no rule matches: must still be declined
   vague         should get a clarifying question, not a decline
   rule_decline  declined by a rule: the fallback must never be asked
+  weak_keep     in scope, matched only by generic keywords: the LLM must not veto it
+  weak_decline  out of scope, matched only by generic keywords: the LLM should veto it
 
 Router only (no retrieval or answer), so a run takes about a minute on CPU.
 Report: .local/reports/<time>_fallback.json (gitignored).
@@ -42,7 +44,7 @@ def main() -> int:
     rows, by_group, seconds = [], defaultdict(list), []
     for q in questions:
         routed = route_query(q["question"], {})
-        called = classifier is not None and routed.intent_source == "no_match"
+        called = classifier is not None and (routed.intent_source == "no_match" or routed.needs_confirmation)
         if called:
             started = perf_counter()
             decision = classifier.classify(q["question"])
@@ -55,7 +57,7 @@ def main() -> int:
                "accept": q["accept_routes"], "ok": ok}
         rows.append(row)
         by_group[q["group"]].append(ok)
-        print(f"{'ok  ' if ok else 'FAIL'} {q['id']} {routed.route:8} {routed.intent_source:10} {q['question']}")
+        print(f"{'ok  ' if ok else 'FAIL'} {q['id']} {routed.route:8} {routed.intent_source:15} {q['question']}")
 
     summary = {group: pct(sum(oks), len(oks)) for group, oks in by_group.items()}
     report = {"mode": "rules-only" if args.rules_only else "hybrid", "summary": summary,

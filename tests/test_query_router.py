@@ -153,3 +153,55 @@ def test_no_rule_match_is_kept_apart_from_an_explicit_decline():
     routed = route_query("Tell me a joke.", {})
     assert (routed.route, routed.intent_source) == ("abstain", "no_match")
     assert route_query("Should we buy now or wait?", {}).intent_source == "rules"
+
+
+# --- Request-type declines and weak matches (2026-11-08) ----------------------
+
+@pytest.mark.parametrize("question, request_type", [
+    ("Recommend me a good mortgage broker", "recommend_provider"),
+    ("Which bank gives the cheapest home loan right now?", "recommend_provider"),
+    ("Who is a reliable lawyer for the conveyancing?", "recommend_provider"),
+    ("Which renovation contractor is the best?", "recommend_provider"),
+    ("Is a resale flat a better investment than stocks?", "investment_advice"),
+    ("Should I put my money in shares or a 4-room flat?", "investment_advice"),
+    ("Is now a good time to buy a 4-room in Bedok?", "investment_advice"),
+    ("Can you write my appeal letter to HDB?", "do_a_task"),
+    ("Could you please fill in the HFE form for me?", "do_a_task"),
+    ("Draft an email to the seller about the option fee", "do_a_task"),
+])
+def test_request_types_are_declined_whatever_the_topic(question, request_type):
+    from kopi_keys.components.query_router import SCOPE_GUARD
+    assert any(p.search(question) for p in SCOPE_GUARD[request_type]), question
+    routed = route_query(question, {})
+    assert (routed.route, routed.intent_source) == ("abstain", "rules"), question
+
+
+@pytest.mark.parametrize("question", [
+    "Can I use a bank loan for a resale flat?",
+    "Is the HDB loan interest rate lower than a bank loan?",
+    "Can you tell me how to submit my resale application?",
+    "What does the agent need to do after the OTP?",
+    "Which documents do I need for the HFE letter?",
+    "I'm single, turning 35 next year. Should I wait to buy or can I get anything now?",
+])
+def test_request_type_rules_leave_in_scope_questions_alone(question):
+    from kopi_keys.components.query_router import out_of_scope
+    assert not out_of_scope(question), question
+
+
+@pytest.mark.parametrize("question, weak", [
+    ("What time does the HDB hub open on Saturday?", True),       # "hdb" only
+    ("Can I get a car loan with my salary?", True),               # "loan" only
+    ("Is my block full for Indian buyers?", True),                # "block", "full"
+    ("If I take an HDB loan for a resale flat, how much do I pay upfront?", False),  # "hdb loan"
+    ("Can I use my CPF for a resale flat?", False),
+    ("What is the resale price of a 4-room flat in Yishun?", False),  # price rules are strong
+])
+def test_generic_keywords_alone_make_a_weak_match(question, weak):
+    routed = route_query(question, {})
+    assert routed.route != "abstain" and routed.needs_confirmation is weak, question
+
+
+def test_a_follow_up_is_never_sent_for_confirmation():
+    routed = route_query("and in 2020?", {}, context_question="Is my block full for Indian buyers?")
+    assert not routed.needs_confirmation

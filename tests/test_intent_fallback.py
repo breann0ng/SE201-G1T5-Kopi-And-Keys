@@ -148,3 +148,35 @@ def test_unreachable_model_asks_for_the_topic_and_records_no_model_call():
                       ChatRequest(message=NO_RULE))
     assert state.response.status == "clarifying" and state.trace[0] == "query_router:clarify:llm_error"
     assert state.model_calls == 0
+
+
+# --- Weak rule matches: the LLM may only veto ---------------------------------
+
+WEAK = "What time does the HDB hub open on Saturday?"
+
+
+@pytest.mark.parametrize("decision, route, source", [
+    (FallbackDecision(intent="unanswerable", confidence="high"), "abstain", "llm_declined"),
+    (FallbackDecision(intent="price", confidence="high"), "policy", "rules_confirmed"),  # never switches
+    (FallbackDecision(intent="unanswerable", confidence="low"), "policy", "rules_confirmed"),
+    (FallbackDecision(error="timed out"), "policy", "rules"),
+])
+def test_weak_match_can_only_be_vetoed(decision, route, source):
+    routed = route_query(WEAK, {}, fallback=decision)
+    assert (routed.route, routed.intent_source, routed.needs_confirmation) == (route, source, False)
+
+
+def test_graph_confirms_weak_matches_and_traces_the_outcome():
+    vetoed = FakeClassifier(FallbackDecision(intent="unanswerable", confidence="high", model="fake-router"))
+    state = run_graph(graph(vetoed), ChatRequest(message=WEAK))
+    assert vetoed.calls == [WEAK]
+    assert state.trace[:2] == ["query_router:abstain:llm_declined", "abstention:unsupported"]
+    kept = run_graph(graph(FakeClassifier(FallbackDecision(intent="policy", confidence="high"))),
+                     ChatRequest(message=WEAK))
+    assert kept.trace[0] == "query_router:policy:llm_confirmed"
+
+
+def test_strong_matches_are_not_sent_for_confirmation():
+    classifier = FakeClassifier(FallbackDecision(intent="unanswerable", confidence="high"))
+    state = run_graph(graph(classifier), ChatRequest(message="Can I use my CPF for a resale flat?"))
+    assert classifier.calls == [] and state.trace[0] == "query_router:policy"
