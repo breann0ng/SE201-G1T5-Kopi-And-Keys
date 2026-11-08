@@ -15,7 +15,9 @@
     "citizenship",
     "household_type",
     "first_timer",
-    "household_income",
+    "household_income"
+  ],
+  "amount_fields": [
     "flat_type"
   ],
   "supporting_chunk_ids": [
@@ -29,6 +31,18 @@
   "income_schemes": {
     "family": "cpf_housing_grant_family"
   },
+  "group": "grant",
+  "priority": 10,
+  "exclude_if": [
+    {
+      "field": "owns_private_property",
+      "values": [
+        "true"
+      ],
+      "reason": "owns private residential property: this grant needs no private property owned, or disposed of in the last 30 months",
+      "chunk_id": "CHUNK_FAMILY_08"
+    }
+  ],
   "overview": {
     "chunk_id": "CHUNK_FAMILY_01",
     "quote": "Under the CPF Housing Grant Scheme, you may qualify for a housing subsidy of up to $80,000 to help with the purchase of a resale flat."

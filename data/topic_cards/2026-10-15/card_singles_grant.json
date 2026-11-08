@@ -3,7 +3,8 @@
   "topic_name": "CPF Housing Grant for Resale Flats (Singles)",
   "trigger_conditions": {
     "household_type": [
-      "single"
+      "single",
+      "couple_family"
     ],
     "citizenship": [
       "SC_single",
@@ -14,7 +15,9 @@
     "citizenship",
     "age",
     "first_timer",
-    "household_income",
+    "household_income"
+  ],
+  "amount_fields": [
     "flat_type"
   ],
   "supporting_chunk_ids": [
@@ -26,6 +29,18 @@
   "income_schemes": {
     "single": "cpf_housing_grant_single"
   },
+  "group": "grant",
+  "priority": 10,
+  "exclude_if": [
+    {
+      "field": "owns_private_property",
+      "values": [
+        "true"
+      ],
+      "reason": "owns private residential property: this grant needs no private property owned, or disposed of in the last 30 months",
+      "chunk_id": "CHUNK_SINGLES_06"
+    }
+  ],
   "overview": {
     "chunk_id": "CHUNK_SINGLES_01",
     "quote": "If you are a first-timer Singapore Citizen (SC) and buying a resale flat on your own, you may qualify for a Singles Grant of $40,000 for the purchase of a 2- to 4- room resale flat or $25,000 for a 5-room resale flat."

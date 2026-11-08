@@ -50,6 +50,12 @@ _SYNONYMS = {
     "eip": ["ethnic", "integration"],
     "couple": ["family"], "married": ["family"], "spouse": ["family"],
     "mortgage": ["loan"], "financing": ["loan"],
+    # Added 2026-11-08: everyday words for HDB's terms. HDB writes "parents/ child",
+    # "private residential property" and "ethnic group"; buyers say mum, condo, Chinese.
+    **{w: ["parent"] for w in ("mum", "mom", "mother", "mummy", "mommy", "dad", "father", "daddy", "papa", "mama")},
+    **{w: ["private", "residential", "property"] for w in ("condo", "condominium")},
+    **{w: ["ethnic", "integration", "quota"] for w in ("chinese", "malay", "indian", "eurasian", "race", "racial",
+                                                         "ethnicity")},
 }
 # Words in almost every chunk: they shouldn't decide the ranking.
 _GENERIC = frozenset({"hdb", "flat", "resale", "buy", "buying", "singapore", "housing"})
@@ -246,13 +252,31 @@ class HybridPolicyRetriever:
                                      where={"superseded": False})
         return hits["ids"][0]
 
-    def search(self, query: str, limit: int = TOP_K) -> list[PolicyPassage]:
+    def require_dense(self) -> None:
+        """Raise IndexUnavailableError unless every current chunk is searchable by vector.
+
+        For evaluation: a score labelled "hybrid" must not come from keyword-only search.
+        """
+        if self.collection is None:
+            raise self._index.IndexUnavailableError(self.description)
+        missing = self._index.missing_from_index(self.collection, self.keyword.by_id)
+        if missing:
+            raise self._index.IndexUnavailableError(
+                f"the policy index lacks {len(missing)} current chunks; run scripts/build_policy_index.py")
+
+    def search(self, query: str, limit: int = TOP_K, *, strict: bool = False) -> list[PolicyPassage]:
+        """Fused top `limit`. The app falls back to keyword ranking when the index or Ollama
+        is unavailable; strict=True (evaluation) raises IndexUnavailableError instead."""
+        if strict and self.collection is None:
+            raise self._index.IndexUnavailableError(self.description)
         keyword = self.keyword.ranked_ids(query, CANDIDATES, heading_bonus=HYBRID_HEADING_BONUS)
         dense = None
         if self.collection is not None:
             try:
                 dense = self._dense(query)
             except self._index.IndexUnavailableError:
+                if strict:
+                    raise
                 pass  # Ollama down: keyword ranking alone for this query
         return self.keyword.get(fuse(self.keyword.by_id, query, keyword, dense, limit))
 

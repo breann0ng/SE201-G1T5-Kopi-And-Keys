@@ -33,6 +33,18 @@
     "family": "enhanced_cpf_housing_grant_family",
     "single": "enhanced_cpf_housing_grant_single"
   },
+  "group": "grant",
+  "priority": 20,
+  "exclude_if": [
+    {
+      "field": "owns_private_property",
+      "values": [
+        "true"
+      ],
+      "reason": "owns private residential property: this grant needs no private property owned, or disposed of in the last 30 months",
+      "chunk_id": "CHUNK_EHG_36"
+    }
+  ],
   "overview": {
     "chunk_id": "CHUNK_EHG_05",
     "quote": "From 20 August 2024, first-timer families may qualify for an EHG of up to $120,000, while a couple comprising a first-timer and second-timer may qualify for an EHG (Singles) of up to $60,000."

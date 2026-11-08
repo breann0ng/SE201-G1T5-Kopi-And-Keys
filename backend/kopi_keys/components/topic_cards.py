@@ -25,7 +25,7 @@ from collections.abc import Iterable
 
 from ..state import GraphState
 from ..topic_cards import MatchResult, TopicCard, load_cards as _load_cards, snapshot_cards_dir
-from ..topic_cards import match_cards as _match_cards
+from ..topic_cards import match_cards as _match_cards, owns_private_property
 
 
 CARD_DIR = snapshot_cards_dir()  # data/topic_cards/<ACTIVE snapshot>/
@@ -53,6 +53,9 @@ def profile_from_state(state: GraphState) -> dict:
         "household_income": state.income,
         "town": state.town,
         "flat_type": state.flat_type,
+        # Not a GraphState field yet: read from the user's own messages ("we have a condo").
+        "owns_private_property": owns_private_property(" ".join(
+            [t.content for t in state.history if t.role == "user"] + [state.message])),
     }
 
 
@@ -67,12 +70,15 @@ def match_cards(state: GraphState, cards: list[TopicCard]) -> list[str]:
 
 
 def required_fields(card_ids: list[str], cards: list[TopicCard]) -> list[str]:
-    """Fields the given cards need, in first-seen order, without duplicates."""
+    """Fields the given cards need, in first-seen order, without duplicates.
+
+    Includes amount_fields: a personal answer still needs them to state the amount,
+    even though they no longer block a card from being suggested."""
     wanted = set(card_ids)
     fields: list[str] = []
     for card in cards:
         if card.card_id in wanted:
-            fields += [f for f in card.required_fields if f not in fields]
+            fields += [f for f in (*card.required_fields, *card.amount_fields) if f not in fields]
     return fields
 
 
