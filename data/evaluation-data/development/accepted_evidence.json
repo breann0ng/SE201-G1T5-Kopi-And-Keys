@@ -1,0 +1,22 @@
+{
+  "rule": "Relaxed retrieval scoring only. An evidence item also counts as found when a retrieved current (not superseded) tier-1 HDB/CPF chunk states the same fact. Each accepted alternative is listed here with its own verbatim quote and the reason it states the same fact; the original labels in dev_set_questions.jsonl are unchanged and strict scores are always reported alongside. Alternatives are added only after reading the chunk, never because it ranked well, and this file is fixed before any held-out run.",
+  "written": "2026-11-08",
+  "items": {
+    "POL-02": [
+      {
+        "item": 0,
+        "source": "^hdb-grant-singles-cpf-housing-grant$",
+        "quote": "First-timer applicants aged 35 and above who are buying a resale flat",
+        "why": "Same fact as the gold quote 'Be at least 35 years old' (third-party guide): a single must be 35 to buy and get the Singles Grant. This is HDB's own page."
+      }
+    ],
+    "POL-04": [
+      {
+        "item": 0,
+        "source": "eip-and-spr-quota$",
+        "quote": "After your flat purchase, the number of households of your ethnic group remains within the block and neighbourhood limits",
+        "why": "Same fact as the gold quote 'your household is within the EIP quota for the block and neighbourhood': a block is 'full' when buying would exceed the ethnic group's block or neighbourhood limit."
+      }
+    ]
+  }
+}

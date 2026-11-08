@@ -110,7 +110,8 @@ class Synthesiser:
 
     def synthesise(self, state: GraphState) -> SynthesisResult:
         if state.route == "clarify":
-            return SynthesisResult(Draft(kind="clarify", message=clarifying_question(state.missing_fields)))
+            return SynthesisResult(Draft(kind="clarify", message=(state.router_note if state.missing_fields == ["profile"]
+                                                                  else clarifying_question(state.missing_fields))))
 
         claims = citizenship_conditions(state)
         price_text = None

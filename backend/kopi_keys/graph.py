@@ -78,23 +78,37 @@ def build_graph(
     # --- Nodes --------------------------------------------------------------
 
     def query_router(state: GraphState):
+        from .components.profile_context import profile_issue
+
+        issue = profile_issue(state)
+        if issue:
+            route, message = issue
+            return {"route": route, "status": "clarify" if route == "clarify" else "abstain",
+                    "missing_fields": ["profile"] if route == "clarify" else [],
+                    "router_note": message, "abstain_reason": "profile_scope" if route == "abstain" else None,
+                    "trace": [f"query_router:{route}:profile_scope"]}
         known = {field: getattr(state, field) for field in (*EXTRACTED_FIELDS, "start_month", "end_month")}
         routed = route_query(state.message, known, context_question=state.followup_question)
-        update = {}
+        usage = {}
         if (routed.intent_source == "no_match" or routed.needs_confirmation) and intent_classifier is not None:
             decision = intent_classifier.classify(state.followup_question or state.message)
             routed = route_query(state.message, known, context_question=state.followup_question,
                                  fallback=decision)
             if decision.model:  # the model was called (an unreachable engine records no call)
-                update = {"model_calls": state.model_calls + 1,
-                          "model_usage": [*state.model_usage, {"model": decision.model, **decision.usage}]}
+                usage = {"model_calls": state.model_calls + 1,
+                         "model_usage": [*state.model_usage, {"model": decision.model, **decision.usage}]}
+        update = {**routed.model_dump(), **usage}
+        # An explicit hypothetical cohort can differ from the sidebar. Do not send
+        # contradictory first-timer and subsidy-status values to the synthesiser.
+        if state.subsidy_status and routed.first_timer is not None and routed.first_timer != state.first_timer:
+            update["subsidy_status"] = None
         # The suffix says how the intent was chosen, so LangSmith can count fallback use:
         # no_rule_match (rules only, declined by default), llm, llm_unsure, llm_error, and for
         # weak rule matches llm_confirmed / llm_declined.
         suffix = {"no_match": ":no_rule_match", "llm": ":llm", "llm_unsure": ":llm_unsure",
                   "llm_error": ":llm_error", "rules_confirmed": ":llm_confirmed",
                   "llm_declined": ":llm_declined"}.get(routed.intent_source, "")
-        return {**routed.model_dump(), **update, "trace": [f"query_router:{routed.route}{suffix}"]}
+        return {**update, "trace": [f"query_router:{routed.route}{suffix}"]}
 
     def policy_retrieval(state: GraphState):
         query = state.followup_question or state.message
@@ -232,7 +246,7 @@ def build_graph(
                 status="abstained",
                 mode=mode,
                 route=state.route,
-                message=abstention_message(reason, detail),
+                message=state.router_note if reason == "profile_scope" else abstention_message(reason, detail),
                 retrieval_rounds=len(state.retrieval_queries),
                 trace=trace,
             ),
@@ -332,11 +346,18 @@ def build_graph(
     return compiled
 
 
-def run_graph(graph, request: ChatRequest, data_origin: DataOrigin = "database") -> GraphState:
-    """Run one request and return the full final state (for tests and evaluation)."""
-    result = graph.invoke(initial_state(request, data_origin), config={"recursion_limit": 50})
+def run_graph(graph, request: ChatRequest, data_origin: DataOrigin = "database",
+              run_id: str | None = None) -> GraphState:
+    """Run one request and return the full final state (for tests and evaluation).
+
+    run_id (optional) only names the root trace run, so feedback can be attached to it in LangSmith.
+    """
+    config = {"recursion_limit": 50}
+    if run_id is not None:
+        config["run_id"] = run_id
+    result = graph.invoke(initial_state(request, data_origin), config=config)
     return GraphState.model_validate(result)
 
 
-def run_chat(graph, request: ChatRequest) -> ChatResponse:
-    return run_graph(graph, request).response
+def run_chat(graph, request: ChatRequest, run_id: str | None = None) -> ChatResponse:
+    return run_graph(graph, request, run_id=run_id).response

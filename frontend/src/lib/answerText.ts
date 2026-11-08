@@ -1,7 +1,25 @@
 import type { ChatResponse } from "./api";
+import { bandTableMarkdown, extractBands } from "./sourceContent.ts";
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const flexibleText = (value: string) => value.trim().split(/\s+/).map(escapeRegex).join("[\\s;]+");
+
+/** Display only: reflow a complete, exact source-band block without dropping surrounding conditions. */
+function formatSourceBands(response: ChatResponse): string {
+  let text = response.message;
+  for (const source of response.citations) {
+    if (!text.includes(`[${source.id}]`)) continue;
+    const bands = extractBands(source.text);
+    if (!bands) continue;
+    const rows = flexibleText(bands.sourceRows.join("\n"));
+    const full = new RegExp(`${bands.sourceHeader ? `(?:${flexibleText(bands.sourceHeader)}[\\s;]+)?` : ""}${rows}(?![\\d,]|\\.\\d)`, "g");
+    text = text.replace(full, () => `\n\n${bandTableMarkdown(bands)}\n\n`);
+  }
+  return text;
+}
 
 export function numberCitations(response: ChatResponse): string {
-  let text = response.message;
+  let text = formatSourceBands(response);
   response.citations.forEach((source, index) => {
     text = text.split(`[${source.id}]`).join(`[${index + 1}]`);
   });

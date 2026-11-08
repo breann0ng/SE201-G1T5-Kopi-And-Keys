@@ -55,6 +55,13 @@ class Chunk(Strict):
     content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
+class ExcludeRule(Strict):
+    field: str
+    values: list[str] = Field(min_length=1)
+    reason: str = Field(min_length=1)
+    chunk_id: str
+
+
 class OverviewQuote(Strict):
     chunk_id: str
     quote: str = Field(min_length=10)
@@ -65,11 +72,15 @@ class Card(Strict):
     topic_name: str = Field(min_length=1)
     trigger_conditions: dict[str, list[str]]
     required_fields: list[str] = Field(min_length=1)
+    amount_fields: list[str] = []
     supporting_chunk_ids: list[str] = Field(min_length=1)
     question_template: str = Field(min_length=1)
     snapshot_date: date
     overview: OverviewQuote | None = None
     income_schemes: dict[Literal["family", "single"], str] = {}
+    group: Literal["grant", "eligibility", "loan", "buying"] | None = None
+    priority: int = 100
+    exclude_if: list[ExcludeRule] = []
 
 
 def main() -> int:
@@ -154,7 +165,7 @@ def main() -> int:
     check("cards parse + schema", card_parse)
     refs = []
     for card in cards:
-        for cid in card.supporting_chunk_ids:
+        for cid in [*card.supporting_chunk_ids, *(r.chunk_id for r in card.exclude_if)]:
             c = chunks.get(cid)
             if c is None:
                 refs.append(f"{card.card_id}: {cid} not in chunks.jsonl")

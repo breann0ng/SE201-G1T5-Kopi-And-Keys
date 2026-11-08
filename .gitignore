@@ -22,6 +22,8 @@ data/chroma/
 
 # Runtime output and local-only configuration
 logs/
+# Answer feedback backup (questions, answers, user comments): never committed
+data/feedback/
 .local/
 
 # Folder under data. Held-out evaluation questions/data must not be committed

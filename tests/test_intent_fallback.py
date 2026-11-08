@@ -180,3 +180,15 @@ def test_strong_matches_are_not_sent_for_confirmation():
     classifier = FakeClassifier(FallbackDecision(intent="unanswerable", confidence="high"))
     state = run_graph(graph(classifier), ChatRequest(message="Can I use my CPF for a resale flat?"))
     assert classifier.calls == [] and state.trace[0] == "query_router:policy"
+
+
+def test_llm_routed_question_still_drops_a_contradicting_subsidy_status():
+    # Merge of main's profile-scope fix with the fallback (2026-11-08): both must apply.
+    from kopi_keys.schemas import BuyerProfile
+    question = "As a first-timer, does my grandmother living with us change anything?"
+    profile = BuyerProfile(citizenship="SC/SC", household_type="couple_family", subsidy_status="second_timer")
+    classifier = FakeClassifier(FallbackDecision(intent="policy", confidence="high", model="fake-router"))
+    state = run_graph(graph(classifier), ChatRequest(message=question, profile=profile))
+    assert classifier.calls == [question]
+    assert state.trace[0] == "query_router:policy:llm"
+    assert state.first_timer is True and state.subsidy_status is None

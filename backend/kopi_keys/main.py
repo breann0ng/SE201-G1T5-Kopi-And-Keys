@@ -8,12 +8,14 @@ import hashlib
 import asyncio
 import json
 import os
+import sqlite3
 import threading
+import uuid
 from contextlib import suppress
 from collections import OrderedDict
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 
 from .components.intent_fallback import SCHEMA as INTENT_SCHEMA, LLMIntentClassifier
@@ -24,9 +26,19 @@ from .llm import OllamaEngine
 from .state import initial_state
 from .schemas import ChatRequest, ChatResponse
 from .cancellation import request_cancelled
+from .feedback import (
+    AnswerContext, ContextStore, FeedbackRequest, FeedbackStore, send_to_langsmith, tracing_enabled,
+)
 
 
 _ACTIVE = Path(__file__).resolve().parents[2] / "data" / "policy_snapshots" / "ACTIVE"
+
+
+def _active_snapshot() -> str:
+    try:
+        return _ACTIVE.read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
 
 
 class ResponseCache:
@@ -42,10 +54,7 @@ class ResponseCache:
 
     @staticmethod
     def key(request: ChatRequest) -> str:
-        try:
-            snapshot = _ACTIVE.read_text(encoding="utf-8").strip()
-        except OSError:
-            snapshot = ""
+        snapshot = _active_snapshot()
         return hashlib.sha256(f"{snapshot}\n{request.model_dump_json()}".encode()).hexdigest()
 
     def get(self, key: str) -> ChatResponse | None:
@@ -92,6 +101,27 @@ def create_app(graph=None) -> FastAPI:
         if os.getenv("KOPI_WARM_UP", "1") != "0":
             threading.Thread(target=_warm_up, daemon=True).start()
     cache = ResponseCache(int(os.getenv("KOPI_RESPONSE_CACHE", "200")))
+    # Feedback (added 2026-11-07) is recorded for human review only; it never reaches the graph.
+    contexts, feedback_store = ContextStore(), FeedbackStore()
+
+    def new_run_id() -> str:
+        return str(uuid.uuid4())
+
+    def stamp_new(response: ChatResponse, run_id: str) -> ChatResponse:
+        """A freshly generated answer: its message_id is the root trace run id."""
+        return response.model_copy(update={
+            "message_id": run_id, "langsmith_run_id": run_id if tracing_enabled() else None,
+        })
+
+    def deliver(request: ChatRequest, response: ChatResponse, cached: bool) -> ChatResponse:
+        """Cache hits get a new message_id but keep the original answer's trace id."""
+        if cached:
+            response = response.model_copy(update={"message_id": new_run_id()})
+        contexts.remember(response.message_id, AnswerContext(
+            question=request.message, answer=response.message, route=response.route,
+            snapshot=_active_snapshot() or None, langsmith_run_id=response.langsmith_run_id,
+        ))
+        return response
 
     @application.get("/health")
     def health():
@@ -101,10 +131,26 @@ def create_app(graph=None) -> FastAPI:
     def chat(request: ChatRequest) -> ChatResponse:
         key = cache.key(request)
         response = cache.get(key)
-        if response is None:
-            response = run_chat(graph, request)
-            cache.put(key, response)
-        return response
+        if response is not None:
+            return deliver(request, response, cached=True)
+        run_id = new_run_id()
+        response = stamp_new(run_chat(graph, request, run_id=run_id), run_id)
+        cache.put(key, response)
+        return deliver(request, response, cached=False)
+
+    @application.post("/feedback")
+    def feedback(item: FeedbackRequest, background: BackgroundTasks) -> dict:
+        """Write-only: records a rating for human review. There is no endpoint that reads it back."""
+        context = contexts.get(item.message_id)
+        # Prefer the server's own record of the trace id; the browser's copy is only a fallback
+        # after a restart.
+        run_id = context.langsmith_run_id if context else item.langsmith_run_id
+        try:
+            feedback_store.save(item, context, run_id)
+        except (OSError, sqlite3.Error):
+            raise HTTPException(status_code=503, detail="Feedback could not be recorded.") from None
+        background.add_task(send_to_langsmith, run_id, item.rating, item.reason, item.comment)
+        return {"status": "recorded"}
 
     @application.post("/chat/stream")
     async def chat_stream(request: ChatRequest) -> StreamingResponse:
@@ -154,10 +200,12 @@ def create_app(graph=None) -> FastAPI:
             cached = cache.get(key)
             if cached is not None:
                 yield json.dumps({"step": "cache"}) + "\n"
+                cached = deliver(request, cached, cached=True)
                 yield json.dumps({"response": cached.model_dump(mode="json")}) + "\n"
                 return
             final = None
-            for update in graph.stream(initial_state(request), config={"recursion_limit": 50},
+            run_id = new_run_id()
+            for update in graph.stream(initial_state(request), config={"recursion_limit": 50, "run_id": run_id},
                                        stream_mode="updates"):
                 if cancelled.is_set():
                     return
@@ -169,7 +217,9 @@ def create_app(graph=None) -> FastAPI:
             response = final if isinstance(final, ChatResponse) else ChatResponse.model_validate(final)
             if cancelled.is_set():
                 return
+            response = stamp_new(response, run_id)
             cache.put(key, response)
+            response = deliver(request, response, cached=False)
             yield json.dumps({"response": response.model_dump(mode="json")}) + "\n"
 
         return StreamingResponse(lines(), media_type="application/x-ndjson")
