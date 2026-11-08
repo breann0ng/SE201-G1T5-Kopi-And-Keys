@@ -45,12 +45,11 @@ Reason = Literal[
 
 
 class FeedbackRequest(BaseModel):
-    """What the browser sends. Question, answer, route and snapshot come from the server only."""
+    """What the browser sends. Question, answer, route, snapshot and trace id are server-side only."""
 
     model_config = ConfigDict(extra="forbid")
 
     message_id: str = Field(pattern=_UUID)
-    langsmith_run_id: str | None = Field(default=None, pattern=_UUID)
     rating: StrictInt = Field(description="1 for thumbs up, -1 for thumbs down")
     reason: Reason | None = None
     comment: str | None = Field(default=None, max_length=COMMENT_MAX)
@@ -158,10 +157,10 @@ class FeedbackStore:
     def path(self) -> Path:
         return self._path or db_path()
 
-    def save(self, item: FeedbackRequest, context: AnswerContext | None, run_id: str | None) -> None:
+    def save(self, item: FeedbackRequest, context: AnswerContext | None) -> None:
         row = {
             "message_id": item.message_id,
-            "langsmith_run_id": run_id,
+            "langsmith_run_id": context.langsmith_run_id if context else None,
             "rating": item.rating,
             "reason": item.reason,
             "comment": item.comment,

@@ -118,11 +118,10 @@ def test_unknown_reason_and_extra_fields_are_rejected():
         assert rate(c, str(uuid.uuid4()), -1, question="spoofed").status_code == 422
 
 
-def test_message_and_run_ids_must_be_uuids():
+def test_message_id_must_be_a_uuid():
     with TestClient(make_app()) as c:
         assert rate(c, "not-a-uuid", 1).status_code == 422
         assert rate(c, "", 1).status_code == 422
-        assert rate(c, str(uuid.uuid4()), 1, langsmith_run_id="x").status_code == 422
 
 
 def test_comment_over_500_characters_is_rejected(isolated):
@@ -195,12 +194,34 @@ def test_langsmith_receives_user_rating_on_the_answer_trace(monkeypatch):
     assert up["score"] == 1 and up["comment"] is None
 
 
-def test_server_trace_id_wins_over_the_browser_copy(monkeypatch):
+def test_request_that_includes_a_run_id_is_rejected(monkeypatch, isolated):
+    """A client-supplied trace id is never trusted: the whole request is refused."""
     tracing_on(monkeypatch)
     with TestClient(make_app()) as c:
         answer = ask(c)
-        rate(c, answer["message_id"], -1, langsmith_run_id=str(uuid.uuid4()))
-    assert RecordingClient.calls[0]["run_id"] == answer["langsmith_run_id"]
+        response = rate(c, answer["message_id"], -1, langsmith_run_id=str(uuid.uuid4()))
+    assert response.status_code == 422
+    assert RecordingClient.calls == [] and not isolated.exists()
+
+
+def test_unknown_message_is_saved_locally_and_never_reaches_langsmith(monkeypatch, isolated):
+    tracing_on(monkeypatch)
+    with TestClient(make_app()) as c:
+        assert rate(c, str(uuid.uuid4()), -1, reason="other").status_code == 200
+    assert RecordingClient.calls == []
+    [row] = rows(isolated)
+    assert row["context_missing"] == 1 and row["langsmith_run_id"] is None
+
+
+def test_known_message_uses_the_server_stored_run_id_including_on_a_cache_hit(monkeypatch, isolated):
+    tracing_on(monkeypatch)
+    with TestClient(make_app()) as c:
+        first, cached = ask(c), ask(c)
+        assert cached["message_id"] != first["message_id"]
+        rate(c, first["message_id"], -1)
+        rate(c, cached["message_id"], -1)
+    assert [call["run_id"] for call in RecordingClient.calls] == [first["langsmith_run_id"]] * 2
+    assert {row["langsmith_run_id"] for row in rows(isolated)} == {first["langsmith_run_id"]}
 
 
 def test_no_trace_id_when_tracing_is_off_and_nothing_is_sent(isolated):

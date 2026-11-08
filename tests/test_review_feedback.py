@@ -16,10 +16,10 @@ spec.loader.exec_module(review)
 def seed(db: Path) -> None:
     store = FeedbackStore(db)
     context = AnswerContext("What is the demo grant?", "The demo grant is $10,000.", "policy", "2026-10-15", None)
-    store.save(FeedbackRequest(message_id=str(uuid.uuid4()), rating=1), context, None)
+    store.save(FeedbackRequest(message_id=str(uuid.uuid4()), rating=1), context)
     store.save(FeedbackRequest(message_id=str(uuid.uuid4()), rating=-1, reason="wrong_numbers",
-                               comment="PRIVATE-COMMENT"), context, None)
-    store.save(FeedbackRequest(message_id=str(uuid.uuid4()), rating=-1), None, None)
+                               comment="PRIVATE-COMMENT"), context)
+    store.save(FeedbackRequest(message_id=str(uuid.uuid4()), rating=-1), None)
 
 
 def test_report_hides_comments_unless_full(tmp_path, capsys):
