@@ -231,3 +231,71 @@ def end_to_end(questions: list[dict], responses: dict[str, dict]) -> dict:
         "cases": rows,
         "ragas": ragas,
     }
+
+
+# --- Retrieval: Hit@5, Recall@5, Recall@20, MRR per gold item (added 2026-11-08) ----------
+# retrieval_recall_at_k above counts a question as found when ANY expected chunk is in the
+# top k: that is Hit@k. The functions below keep each evidence item separate, so a question
+# with three gold quotes and one found scores Recall@5 = 1/3 but Hit@5 = 1.
+# A gold item is found at rank r when the chunk at rank r comes from the item's source and
+# contains its quote verbatim (dataset.py's resolution rule, but every matching chunk counts,
+# not only the non-low-priority ones dataset.py prefers).
+
+DEEP_K = 20
+
+
+def gold_chunk_sets(q: dict, chunks: list[dict]) -> list[set[str]]:
+    """For each evidence item of a question, the IDs of every current chunk containing its quote."""
+    import re
+
+    return [{c["chunk_id"] for c in chunks if not c["superseded"]
+             and re.search(ev["source"], c["source_slug"]) and ev["quote"] in c["content"]}
+            for ev in q.get("evidence", [])]
+
+
+def retrieval_ranked(questions: Iterable[dict], search: Callable[[str, int], list[str]],
+                     chunks: list[dict], indexed: set[str] | None = None) -> dict:
+    """Hit@5, Recall@5, Recall@20 and MRR@20, overall and in three slices.
+
+    indexed: chunk IDs the searched index holds (None = all chunks). A gold item none of
+    whose chunks is indexed is NOT_IN_INDEX; dataset.load_questions already refuses a
+    quote that matches no chunk at all, so that case cannot pass silently.
+    """
+    rows = []
+    for q in questions:
+        golds = gold_chunk_sets(q, chunks)
+        if not golds:
+            continue
+        got = search(q["question"], DEEP_K)[:DEEP_K]
+        ranks = []  # best rank (1-based) per gold item, or None
+        for ids in golds:
+            ranks.append(next((r for r, cid in enumerate(got, 1) if cid in ids), None))
+        best = min((r for r in ranks if r), default=None)
+        not_indexed = indexed is not None and any(not (ids & indexed) for ids in golds)
+        if not golds or any(not ids for ids in golds) or (not_indexed and not best):
+            miss = "NOT_IN_INDEX"
+        elif best and best <= 5:
+            miss = "hit"
+        elif best:
+            miss = "rank_6_20"
+        else:
+            miss = "not_in_top20"
+        rows.append({"id": q["id"], "category": q["category"], "n_gold": len(golds),
+                     "found_at_5": sum(1 for r in ranks if r and r <= 5), "item_ranks": ranks,
+                     "best_rank": best, "miss_type": miss, "top5": got[:5]})
+
+    def summary(sel: list[dict]) -> dict:
+        n = len(sel)
+        if not n:
+            return {"n": 0}
+        return {"n": n,
+                "hit_at_5": round(sum(r["best_rank"] is not None and r["best_rank"] <= 5 for r in sel) / n, 3),
+                "recall_at_5": round(sum(r["found_at_5"] / r["n_gold"] for r in sel) / n, 3),
+                "recall_at_20": round(sum(sum(1 for x in r["item_ranks"] if x) / r["n_gold"] for r in sel) / n, 3),
+                "mrr_at_20": round(sum(1 / r["best_rank"] if r["best_rank"] else 0 for r in sel) / n, 3),
+                "not_in_index": sum(r["miss_type"] == "NOT_IN_INDEX" for r in sel)}
+
+    return {"all": summary(rows),
+            "policy_retrieval": summary([r for r in rows if r["category"] != "discovery"]),
+            "discovery": summary([r for r in rows if r["category"] == "discovery"]),
+            "cases": rows}
