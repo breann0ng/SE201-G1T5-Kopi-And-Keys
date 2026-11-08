@@ -35,14 +35,18 @@ Every chat response (from `/chat` and the final `/chat/stream` event) now carrie
 | `langsmith_run_id` | The answer's LangSmith trace id when tracing is on, otherwise `null`. A cached answer gets a new `message_id` but keeps the trace id of the run that produced it. |
 
 The browser sends `POST /api/feedback` (backend route `/feedback`) with only `message_id`,
-`langsmith_run_id`, `rating` (1 or -1), `reason` (one of the enum values or null) and `comment`
-(≤ 500 characters; control characters stripped). Extra fields are rejected.
+`rating` (1 or -1), `reason` (one of the enum values or null) and `comment` (≤ 500 characters;
+control characters stripped). Any other field is rejected, including `langsmith_run_id`: the
+backend never accepts a trace id from the browser.
 
-The **question, answer text, route and policy snapshot date come from the server**, from an
-in-memory map of the last 1000 delivered answers. The browser cannot supply them. If the map
-has no entry (backend restarted, or more than 1000 answers since), the row is stored with
-`context_missing = 1` and those four fields empty. The LangSmith trace still has them when tracing
-was on.
+The **question, answer text, route, policy snapshot date and trace id come from the server**,
+from an in-memory map of the last 1000 delivered answers. The browser cannot supply them. If the
+map has no entry (backend restarted, or more than 1000 answers since), the row is stored with
+`context_missing = 1` and those fields empty.
+
+**Feedback on answers from before a backend restart is saved locally only.** The server no longer
+knows which trace those answers belong to, so LangSmith is not called at all. Look for these in
+the local backup. Their original traces, if tracing was on, carry no rating.
 
 | Where | What | Who can see it |
 | --- | --- | --- |
