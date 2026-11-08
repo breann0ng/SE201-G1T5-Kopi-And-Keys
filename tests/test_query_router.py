@@ -205,3 +205,31 @@ def test_generic_keywords_alone_make_a_weak_match(question, weak):
 def test_a_follow_up_is_never_sent_for_confirmation():
     routed = route_query("and in 2020?", {}, context_question="Is my block full for Indian buyers?")
     assert not routed.needs_confirmation
+
+
+# Code review on PR #20: a provider word describing something else is not a request for a provider.
+@pytest.mark.parametrize("question", [
+    "Which bank loan documents are required for buying a resale flat?",
+    "Which bank documents do I need for the HDB loan?",
+    "Which lawyer fees can I pay with CPF for a resale flat?",
+    "Who pays the agent's commission when buying a resale flat?",
+    "What are good bank loan interest rates compared with the HDB loan?",
+])
+def test_provider_word_as_a_modifier_is_not_a_recommendation(question):
+    from kopi_keys.components.query_router import RECOMMEND_PROVIDER
+    assert not RECOMMEND_PROVIDER.search(question), question
+    routed = route_query(question, {})
+    # Never declined by a rule: routed as policy, or (no keyword) left to the LLM fallback.
+    assert routed.route == "policy" or routed.intent_source == "no_match", question
+
+
+@pytest.mark.parametrize("question", [
+    "Which bank gives the cheapest home loan right now?",
+    "Which bank should I go with for my mortgage?",
+    "Recommend me a good mortgage broker",
+    "Who is the best property agent in Tampines?",
+    "Which lawyers are good for resale conveyancing?",
+])
+def test_choosing_a_provider_is_still_declined(question):
+    routed = route_query(question, {})
+    assert (routed.route, routed.intent_source) == ("abstain", "rules"), question

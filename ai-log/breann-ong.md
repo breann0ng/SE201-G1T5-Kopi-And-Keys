@@ -266,3 +266,34 @@ check that a quote answers what was asked.
 
 ### What I kept or changed
 [Record anything you kept or changed.]
+
+## 2026-11-08 · PR review: provider rule declined valid questions; merge with main
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/components/query_router.py, graph.py (merge),
+  tests/test_query_router.py, tests/test_intent_fallback.py
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+Fixes for two review comments on the PR: a merge conflict in graph.py that
+had to keep both the profile/subsidy-status fix from main and the LLM
+fallback, and "Which bank loan documents are required for buying a resale
+flat?" being declined as a provider recommendation, with no LLM appeal.
+
+### How I checked it
+- Conflict resolved by keeping both: the subsidy-status check now runs on
+  the final routing, after any LLM decision. A new test sends an LLM-routed
+  question with a contradicting sidebar and checks both behaviours.
+- The rule fired on "which ... bank" even when "bank" only described
+  something else. It now requires the provider to be what is chosen: not
+  followed by a noun it modifies (loan, documents, fees, ...) or a
+  possessive ("the agent's commission"). One structural rule, not a list
+  of cases.
+- Regression tests: 5 such questions are no longer declined by a rule;
+  5 real provider requests still are. Routes for the dev set and fallback
+  set are unchanged. 676 tests pass (2 known flat-type gaps remain).
+- Found while testing, not fixed: "first-timers" (plural) is not extracted
+  as first_timer; only the singular is.
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]

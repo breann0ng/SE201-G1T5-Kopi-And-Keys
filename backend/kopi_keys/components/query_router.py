@@ -115,10 +115,19 @@ GUARANTEE = re.compile(
 # "Recommend me a good mortgage broker", "Which bank gives the cheapest home loan right now?",
 # "Can you write my appeal letter to HDB?".
 # Recommend a provider: a choosing word just before a kind of provider.
+# The provider must be what is being chosen, not a word describing something else: "Which bank
+# loan documents are required?" asks about documents (code review, PR #20), and "Who pays the
+# agent's commission?" about a fee. So the provider may not be followed by a noun it modifies
+# or by a possessive.
+_PROVIDER_AS_MODIFIER = (
+    r"(?!'s\b|’s\b|\s+(?:loans?|mortgages?|documents?|paperwork|statements?|accounts?|fees?|charges?|"
+    r"commissions?|rates?|interest|valuations?|letters?|approvals?|requirements?|terms|polic(?:y|ies)|"
+    r"forms?|processing|checks?|rules?)\b)"
+)
 RECOMMEND_PROVIDER = re.compile(
     r"\b(?:recommend|suggest|which|who|best|good|reliable|trusted|trustworthy|cheapest|top)\b[^.?!]{0,25}?"
     r"\b(?:agents?|agency|agencies|brokers?|banks?|lenders?|lawyers?|law\s+firms?|conveyancers?|"
-    r"contractors?|renovators?|interior\s+designers?|movers?|valuers?)\b"
+    r"contractors?|renovators?|interior\s+designers?|movers?|valuers?)\b" + _PROVIDER_AS_MODIFIER +
     r"|\b(?:best|cheapest|lowest[- ]interest)\s+(?:home\s+|bank\s+|mortgage\s+|housing\s+)?(?:loans?|mortgages?)\b",
     re.IGNORECASE,
 )
