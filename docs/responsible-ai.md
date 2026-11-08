@@ -49,9 +49,13 @@ prerequisite for RAG, refreshing sources or responsible AI.
 - **Evaluation:** safety profiles and passages are fictional. Live probes disable
   tracing and save reports under ignored `.local/reports/`. Curated public
   summaries must omit credentials, personal profiles and private endpoint details.
-- **Feedback:** current thumbs-up/down is browser-only. A future shared feedback
-  feature should store a minimal case ID, reason and relevant model/snapshot
-  version, then route to human review. A negative vote is not a training label by
+- **Feedback:** thumbs-up/down with an optional reason and comment is recorded
+  for human review only ([feedback-loop.md](feedback-loop.md)): on the answer's
+  LangSmith trace when tracing is on, and in a git-ignored local SQLite file with
+  the question, answer, route and snapshot date taken from the server. It is
+  write-only over HTTP, never logged at INFO or above, never placed in prompts or
+  retrieval queries, and no pipeline module imports it. The comment box asks users
+  not to include personal details. A negative vote is not a training label by
   itself. Do not automatically fine-tune or change policy from user votes.
 
 Nisha reviews policy/verifier failures; Breann owns routing/orchestration;

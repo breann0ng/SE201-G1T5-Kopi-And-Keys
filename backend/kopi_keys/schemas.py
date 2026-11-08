@@ -227,3 +227,7 @@ class ChatResponse(Contract):
     income_notes: list[IncomeNote] = Field(default_factory=list)
     # Discovery question where a missing "Your situation" detail would unlock more topic cards.
     profile_hint: bool = False
+    # Set by main.py when an answer is delivered, for POST /feedback. langsmith_run_id is null when
+    # tracing is off. Neither affects how the answer is produced.
+    message_id: str | None = None
+    langsmith_run_id: str | None = None
