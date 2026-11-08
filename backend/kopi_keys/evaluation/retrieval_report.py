@@ -10,6 +10,11 @@ is reported separately rather than mixed into the retrieval figure.
 
 Writes data/evaluation-data/results/<timestamp>_retrieval_<mode>_dev.json and
 prints a summary and the per-question miss table. Dev split only.
+
+Strict scores use the labels as written. The same search results are also scored
+"relaxed" (report["relaxed"]): evidence items also accept the alternatives in
+data/evaluation-data/development/accepted_evidence.json, which states its rule.
+Both are always reported.
 """
 
 from __future__ import annotations
@@ -54,13 +59,18 @@ def main() -> int:
     search, indexed = searcher(args.mode)
     times = []
 
-    def timed(query, k):
-        t = perf_counter()
-        out = search(query, k)
-        times.append(perf_counter() - t)
-        return out
+    cache: dict[str, list[str]] = {}
 
-    report = metrics.retrieval_ranked(questions, timed, load_chunks(), indexed)
+    def timed(query, k):
+        if query not in cache:  # searched once, scored strict and relaxed
+            t = perf_counter()
+            cache[query] = search(query, k)
+            times.append(perf_counter() - t)
+        return cache[query]
+
+    chunks = load_chunks()
+    report = metrics.retrieval_ranked(questions, timed, chunks, indexed)
+    report["relaxed"] = metrics.retrieval_ranked(questions, timed, chunks, indexed, accepted=metrics.load_accepted())
     report["mode"] = args.mode
     report["mean_latency_ms"] = round(1000 * sum(times) / len(times), 1) if times else None
     RESULTS.mkdir(parents=True, exist_ok=True)
@@ -70,10 +80,11 @@ def main() -> int:
 
     print(f"mode={args.mode}  latency {report['mean_latency_ms']} ms/query")
     print(f"{'slice':18} {'n':>3} {'Hit@5':>6} {'Rec@5':>6} {'Rec@20':>6} {'MRR@20':>6} {'NOT_IN_INDEX':>12}")
-    for name in ("all", "policy_retrieval", "discovery"):
-        s = report[name]
-        print(f"{name:18} {s['n']:>3} {s['hit_at_5']:>6.1%} {s['recall_at_5']:>6.1%} {s['recall_at_20']:>6.1%} "
-              f"{s['mrr_at_20']:>6.3f} {s['not_in_index']:>12}")
+    for label, rep in (("", report), (" relaxed", report["relaxed"])):
+        for name in ("all", "policy_retrieval", "discovery"):
+            s = rep[name]
+            print(f"{name + label:18} {s['n']:>3} {s['hit_at_5']:>6.1%} {s['recall_at_5']:>6.1%} "
+                  f"{s['recall_at_20']:>6.1%} {s['mrr_at_20']:>6.3f} {s['not_in_index']:>12}")
     print("\nqid      cat              n_gold found@5 best  miss_type")
     for r in report["cases"]:
         if r["miss_type"] != "hit" or r["found_at_5"] < r["n_gold"]:

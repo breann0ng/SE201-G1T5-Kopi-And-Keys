@@ -22,7 +22,7 @@ from datetime import date
 from decimal import Decimal
 from unittest.mock import patch
 
-from ..topic_cards import load_cards, match_cards
+from ..topic_cards import load_cards, match_cards, profile_with_message_facts
 
 PRICE_FILTER_FIELDS = ("town", "flat_type", "start_month", "end_month", "lease_band", "storey_band")
 
@@ -45,7 +45,9 @@ def discovery(questions: Iterable[dict]) -> dict:
     for q in questions:
         if q["category"] != "discovery":
             continue
-        result = match_cards(q["profile"], cards, topics=q.get("topics", []))
+        # Same facts the app reads from the user's words (e.g. "we have a condo").
+        words = " ".join(t["user"] for t in q.get("turns") or [] if "user" in t) or q["question"]
+        result = match_cards(profile_with_message_facts(q["profile"], words), cards, topics=q.get("topics", []))
         shown = set(result.matched_ids)
         suggested = shown | {b.card.card_id for b in result.blocked}
         expected = set(q["expected_cards"])
@@ -244,26 +246,48 @@ def end_to_end(questions: list[dict], responses: dict[str, dict]) -> dict:
 DEEP_K = 20
 
 
-def gold_chunk_sets(q: dict, chunks: list[dict]) -> list[set[str]]:
-    """For each evidence item of a question, the IDs of every current chunk containing its quote."""
+def gold_chunk_sets(q: dict, chunks: list[dict], accepted: dict | None = None) -> list[set[str]]:
+    """For each evidence item of a question, the IDs of every current chunk containing its quote.
+
+    accepted: the "items" of accepted_evidence.json (relaxed scoring). Each alternative
+    for this question adds the chunks holding its own verbatim quote to that item's set.
+    """
     import re
 
-    return [{c["chunk_id"] for c in chunks if not c["superseded"]
-             and re.search(ev["source"], c["source_slug"]) and ev["quote"] in c["content"]}
-            for ev in q.get("evidence", [])]
+    def holding(ev: dict) -> set[str]:
+        return {c["chunk_id"] for c in chunks if not c["superseded"]
+                and re.search(ev["source"], c["source_slug"]) and ev["quote"] in c["content"]}
+
+    sets = [holding(ev) for ev in q.get("evidence", [])]
+    for alt in (accepted or {}).get(q["id"], []):
+        found = holding(alt)
+        if not found:
+            raise ValueError(f"{q['id']}: accepted quote not in any current chunk: {alt['quote'][:60]!r}")
+        sets[alt["item"]] |= found
+    return sets
+
+
+def load_accepted(path=None) -> dict:
+    """The accepted alternatives (relaxed scoring), keyed by question ID."""
+    import json
+
+    from .dataset import DATA
+    path = path or DATA / "evaluation-data" / "development" / "accepted_evidence.json"
+    return json.loads(path.read_text(encoding="utf-8"))["items"]
 
 
 def retrieval_ranked(questions: Iterable[dict], search: Callable[[str, int], list[str]],
-                     chunks: list[dict], indexed: set[str] | None = None) -> dict:
+                     chunks: list[dict], indexed: set[str] | None = None, accepted: dict | None = None) -> dict:
     """Hit@5, Recall@5, Recall@20 and MRR@20, overall and in three slices.
 
     indexed: chunk IDs the searched index holds (None = all chunks). A gold item none of
     whose chunks is indexed is NOT_IN_INDEX; dataset.load_questions already refuses a
     quote that matches no chunk at all, so that case cannot pass silently.
+    accepted: relaxed scoring with accepted_evidence.json (see gold_chunk_sets).
     """
     rows = []
     for q in questions:
-        golds = gold_chunk_sets(q, chunks)
+        golds = gold_chunk_sets(q, chunks, accepted)
         if not golds:
             continue
         got = search(q["question"], DEEP_K)[:DEEP_K]
