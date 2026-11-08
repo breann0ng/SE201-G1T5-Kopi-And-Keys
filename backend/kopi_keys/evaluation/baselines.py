@@ -5,15 +5,21 @@ Retrievers for Recall@5 (`retriever(name)` returns fn(query, k) -> [chunk_id]):
 - "hybrid": HybridPolicyRetriever, BM25 + EmbeddingGemma vectors (needs the index).
 - "module:function": any other function with the same signature.
 
-Still to build (TODO, team): the two answer-level baselines below. Both should
-return a ChatResponse-like dict so metrics.end_to_end can score them alongside
-the full graph.
+Answer-level baselines (`run_eval --system no-tools|naive-rag`), each returning a
+ChatResponse-like dict so metrics.end_to_end scores them alongside the full graph:
+- no_tools_llm: the same model, no retrieval, SQL or verifier.
+- naive_rag:    one hybrid retrieval call plus one model call, no router or verifier.
 """
 
 from __future__ import annotations
 
 import importlib
+import json
+import re
 from collections.abc import Callable
+from dataclasses import replace
+from functools import lru_cache
+from time import perf_counter
 
 
 def retriever(name: str = "bm25") -> tuple[Callable[[str, int], list[str]], str]:
@@ -31,11 +37,79 @@ def retriever(name: str = "bm25") -> tuple[Callable[[str, int], list[str]], str]
     return (lambda query, k: [p.id for p in instance.search(query, limit=k)]), label
 
 
-def no_tools_llm(question: str) -> dict:
-    """TODO: the same model with no retrieval, SQL or verifier."""
-    raise NotImplementedError
+# --- Answer-level baselines (proposal section 4.1) ------------------------
+# Same model and policy token budget as the app (llm.OllamaEngine.for_policy), one call each.
+# Both use one abstention rule, so unsafe-answering and over-abstention compare fairly:
+# the prompt asks for exactly "I don't know" when unsure, and ABSTAINED also catches
+# other plain refusals.
+
+ABSTAINED = re.compile(r"^\W*I (?:do not|don't) know\b|\b(?:I (?:cannot|can't|am unable to) "
+                       r"(?:answer|confirm|provide|say)|unable to (?:answer|confirm|provide))\b", re.I)
+_SYSTEM = ("You answer questions from people buying an HDB resale flat in Singapore, about HDB/CPF "
+           "policy and resale prices. Answer concisely. If you cannot answer reliably, reply exactly: "
+           "I don't know.")
+_CITED = re.compile(r"\[(CHUNK_[A-Z]+_\d+)\]")
 
 
-def naive_rag(question: str) -> dict:
-    """TODO: one retrieval call plus one LLM call, no router or verifier."""
-    raise NotImplementedError
+@lru_cache(maxsize=1)
+def _engine():
+    from ..llm import OllamaEngine, OllamaSettings
+
+    return OllamaEngine(replace(OllamaSettings.from_env(), context_size=4096, max_output_tokens=850))
+
+
+def _profile_line(profile: dict | None) -> str:
+    filled = {k: v for k, v in (profile or {}).items() if v not in (None, "")}
+    return f"\n\nAbout me: {json.dumps(filled)}" if filled else ""
+
+
+def _response(system: str, text: str, started: float, citations: list[dict] | None = None) -> dict:
+    """A ChatResponse-like dict for metrics.end_to_end."""
+    return {"system": system, "status": "abstained" if ABSTAINED.search(text) else "answered",
+            "route": None, "message": text, "citations": citations or [], "price_result": None,
+            "latency_seconds": round(perf_counter() - started, 3)}
+
+
+def no_tools_llm(question: str, profile: dict | None = None) -> dict:
+    """The same model with no retrieval, SQL, router or verifier: one call."""
+    from ..llm import ModelEngineError
+
+    started = perf_counter()
+    try:
+        out = _engine().complete([{"role": "system", "content": _SYSTEM},
+                                  {"role": "user", "content": question + _profile_line(profile)}])
+    except ModelEngineError as error:
+        return {"error": str(error)}
+    return _response("no-tools", out.text, started)
+
+
+@lru_cache(maxsize=1)
+def _naive_retriever():
+    from ..components.policy_retrieval import HybridPolicyRetriever
+
+    return HybridPolicyRetriever()
+
+
+def naive_rag(question: str, profile: dict | None = None) -> dict:
+    """One retrieval call (the app's hybrid retriever, top 5) plus one model call.
+
+    No router, SQL, topic cards or verifier. Citations are the supplied passages
+    the answer names as [CHUNK_ID]; IDs that were not supplied are ignored.
+    """
+    from ..llm import ModelEngineError
+
+    started = perf_counter()
+    passages = _naive_retriever().search(question)
+    context = "\n\n".join(f"[{p.id}] {p.title}\n{p.text}" for p in passages)
+    prompt = (f"Passages from official HDB/CPF pages:\n\n{context}\n\nQuestion: {question}"
+              f"{_profile_line(profile)}\n\nAnswer from the passages and cite each one you use as [CHUNK_ID].")
+    try:
+        out = _engine().complete([{"role": "system", "content": _SYSTEM}, {"role": "user", "content": prompt}])
+    except ModelEngineError as error:
+        return {"error": str(error)}
+    by_id = {p.id: p for p in passages}
+    cited = [by_id[i] for i in dict.fromkeys(_CITED.findall(out.text)) if i in by_id]
+    return _response("naive-rag", out.text, started, [{"id": p.id, "text": p.text} for p in cited])
+
+
+SYSTEMS = {"no-tools": no_tools_llm, "naive-rag": naive_rag}

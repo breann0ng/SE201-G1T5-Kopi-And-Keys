@@ -32,23 +32,36 @@ def pct(n: int, d: int) -> str:
 
 
 def discovery(questions: Iterable[dict]) -> dict:
-    """Card matcher vs expected_cards on discovery questions (matched + blocked count as suggested)."""
+    """Card matcher vs expected_cards on discovery questions.
+
+    precision / recall: matched + blocked cards count as suggested (the matcher's
+    candidates, including cards still waiting on a profile field).
+    precision_shown / recall_shown: matched cards only, which are the cards the app
+    actually shows as suggestions. Cards ruled out by income count as neither.
+    """
     cards = load_cards()
-    rows, tp, fp, fn, ask_ok, ask_n = [], 0, 0, 0, 0, 0
+    rows, ask_ok, ask_n = [], 0, 0
+    counts = {"all": [0, 0, 0], "shown": [0, 0, 0]}  # tp, fp, fn
     for q in questions:
         if q["category"] != "discovery":
             continue
         result = match_cards(q["profile"], cards, topics=q.get("topics", []))
-        suggested = set(result.matched_ids) | {b.card.card_id for b in result.blocked}
+        shown = set(result.matched_ids)
+        suggested = shown | {b.card.card_id for b in result.blocked}
         expected = set(q["expected_cards"])
-        tp, fp, fn = tp + len(suggested & expected), fp + len(suggested - expected), fn + len(expected - suggested)
+        for key, got in (("all", suggested), ("shown", shown)):
+            c = counts[key]
+            c[0], c[1], c[2] = c[0] + len(got & expected), c[1] + len(got - expected), c[2] + len(expected - got)
         if q.get("expected_ask"):
             ask_n += 1
             ask_ok += result.ask_next == q["expected_ask"]
         rows.append({"id": q["id"], "extra": sorted(suggested - expected), "missed": sorted(expected - suggested),
+                     "shown": sorted(shown), "ruled_out": {r.card.card_id: r.reason for r in result.ruled_out},
                      "ask_next": result.ask_next, "expected_ask": q.get("expected_ask")})
-    return {"precision": pct(tp, tp + fp), "recall": pct(tp, tp + fn), "ask_next_accuracy": pct(ask_ok, ask_n),
-            "cases": rows}
+    (tp, fp, fn), (stp, sfp, sfn) = counts["all"], counts["shown"]
+    return {"precision": pct(tp, tp + fp), "recall": pct(tp, tp + fn),
+            "precision_shown": pct(stp, stp + sfp), "recall_shown": pct(stp, stp + sfn),
+            "ask_next_accuracy": pct(ask_ok, ask_n), "cases": rows}
 
 
 def retrieval_recall_at_k(questions: Iterable[dict], search: Callable[[str, int], list[str]], k: int = 5) -> dict:
