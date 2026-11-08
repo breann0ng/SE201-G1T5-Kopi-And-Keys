@@ -34,12 +34,14 @@ def searcher(mode: str):
         r = KeywordPolicyRetriever()
         return (lambda query, k: r.ranked_ids(query, k)), set(r.by_id)
     r = HybridPolicyRetriever()
-    if r.collection is None:
-        raise SystemExit(f"{mode} needs the policy index: {r.description}")
+    try:
+        r.require_dense()  # never report keyword-only search as dense or hybrid
+    except policy_index.IndexUnavailableError as error:
+        raise SystemExit(f"{mode} needs the full policy index and Ollama: {error}")
     indexed = set(r.collection.get(include=[])["ids"])
     if mode == "dense":
         return (lambda query, k: r._dense(query)[:k]), indexed
-    return (lambda query, k: [p.id for p in r.search(query, limit=k)]), indexed
+    return (lambda query, k: [p.id for p in r.search(query, limit=k, strict=True)]), indexed
 
 
 def main() -> int:

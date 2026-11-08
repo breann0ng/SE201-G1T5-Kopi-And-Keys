@@ -30,7 +30,7 @@ def retriever(name: str = "bm25") -> tuple[Callable[[str, int], list[str]], str]
     if ":" in name:
         module, _, fn = name.partition(":")
         return getattr(importlib.import_module(module), fn), name
-    from ..components import policy_retrieval
+    from ..components import policy_index, policy_retrieval
 
     impl = {"bm25": policy_retrieval.KeywordPolicyRetriever,
             "hybrid": getattr(policy_retrieval, "HybridPolicyRetriever", None)}.get(name)
@@ -38,6 +38,13 @@ def retriever(name: str = "bm25") -> tuple[Callable[[str, int], list[str]], str]
         raise SystemExit(f"Unknown retriever {name!r}: use bm25, hybrid or module:function")
     instance = impl()
     label = getattr(instance, "description", name)
+    if name == "hybrid":
+        # Never score keyword-only search as "hybrid" (index missing, partial, or Ollama down).
+        try:
+            instance.require_dense()
+        except policy_index.IndexUnavailableError as error:
+            raise SystemExit(f"--retriever hybrid needs the full policy index and Ollama: {error}")
+        return (lambda query, k: [p.id for p in instance.search(query, limit=k, strict=True)]), label
     return (lambda query, k: [p.id for p in instance.search(query, limit=k)]), label
 
 
@@ -96,14 +103,13 @@ def no_tools_llm(question: str, profile: dict | None = None, history: list[dict]
 def _naive_retriever():
     from ..components.policy_retrieval import HybridPolicyRetriever
 
-    return HybridPolicyRetriever()
+    retriever = HybridPolicyRetriever()
+    retriever.require_dense()  # a baseline run must not silently use keyword-only search
+    return retriever
 
 
 def _dense_top5(query: str):
     r = _naive_retriever()
-    if r.collection is None:
-        from ..components.policy_index import IndexUnavailableError
-        raise IndexUnavailableError("dense-only naive RAG needs the policy index")
     return r.get(r._dense(query)[:5])
 
 
@@ -119,7 +125,7 @@ def naive_rag(question: str, profile: dict | None = None, history: list[dict] | 
 
     started = perf_counter()
     query = " ".join([t["content"] for t in history or [] if t["role"] == "user"] + [question])
-    passages = _dense_top5(query) if dense_only else _naive_retriever().search(query)
+    passages = _dense_top5(query) if dense_only else _naive_retriever().search(query, strict=True)
     context = "\n\n".join(f"[{p.id}] {p.title}\n{p.text}" for p in passages)
     prompt = (f"Passages from official HDB/CPF pages:\n\n{context}\n\nQuestion: {question}"
               f"{_profile_line(profile)}\n\nAnswer from the passages and cite each one you use as [CHUNK_ID].")

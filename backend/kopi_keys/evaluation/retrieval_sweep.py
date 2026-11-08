@@ -51,8 +51,10 @@ def scores(questions: list[dict], ranked: dict[str, list[str]]) -> tuple[int, fl
 def main() -> int:
     questions = [q for q in load_questions("dev") if q.get("expected_chunk_ids")]
     retriever = HybridPolicyRetriever()
-    if retriever.collection is None:
-        raise SystemExit(f"Needs the policy index and Ollama: {retriever.description}")
+    try:
+        retriever.require_dense()  # a partial index would make dense rankings look worse than they are
+    except policy_index.IndexUnavailableError as error:
+        raise SystemExit(f"Needs the full policy index and Ollama: {error}")
     keyword = retriever.keyword
     print(f"{len(questions)} dev questions with evidence; embedding each once")
 
