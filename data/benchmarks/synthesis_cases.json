@@ -63,7 +63,7 @@
       "id": "SYN-08", "category": "loan_control",
       "question": "What is the monthly household income ceiling for an HDB housing loan for families?",
       "profile": {"household_type": "couple_family"},
-      "chunk_ids": ["CHUNK_LOAN_28", "CHUNK_LOAN_27"],
+      "chunk_ids": ["CHUNK_LOAN_49"],
       "expected": "answered",
       "required_quote_groups": [["$16,000 for families"], ["$24,000 for extended families"], ["$8,000 for singles"]]
     },
