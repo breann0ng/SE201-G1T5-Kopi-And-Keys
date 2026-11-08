@@ -233,3 +233,36 @@ policy on "loan" / "hdb" alone.
 
 ### What I kept or changed
 [Record anything you kept or changed.]
+
+## 2026-11-08 · Policy relevance: answers_aspect check (shadow mode)
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/components/answer_aspects.py (new),
+  policy_guardrails.py, policy_synthesis.py, verifier.py, schemas.py,
+  tests/test_answer_aspects.py
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+score_relevance compares words, not meaning, so a quote that shares the
+question's words but answers a different part of it can pass. I asked how to
+check that a quote answers what was asked.
+
+### How I checked it
+- The check works out which aspects the question asks (income, lease,
+  timing, ...) and requires each quote to address one, e.g. a duration for
+  "how long". Known false pass now caught: "a valid HFE letter" does not
+  answer "How long is an HFE letter valid for?".
+- First version had the model label each quote. On the synthesis benchmark
+  (12 cases, qwen2.5:3b) this made its quotes long and non-verbatim: quality
+  passes 10 -> 5, over-abstentions 2 -> 7. The default is now code-only
+  (generation unchanged); model labels are opt-in (KOPI_ASPECT_LABEL=model).
+- Enforcing it exposed two false rejects, fixed in general ways: grant names
+  ("Proximity Housing Grant") and "without adding amounts" no longer count
+  as asks. With enforce, the benchmark matches the check being off.
+- Default is shadow (KOPI_ASPECT_CHECK): recorded in relevance_scores, never
+  blocks. The benchmark has no wrong-answer quotes, so it shows no harm, not
+  benefit; enforce waits for shadow traces compared with the LangSmith judge.
+  554 tests pass in shadow and enforce mode.
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]
