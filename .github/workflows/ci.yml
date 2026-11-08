@@ -51,6 +51,18 @@ jobs:
       - name: Run pytest
         run: python -m pytest -q -rs
 
+      - name: Check policy guardrail mutations (offline)
+        run: python scripts/mutation_test_policy.py --jobs 2
+
+      - name: Save policy mutation evidence
+        if: always() && hashFiles('.local/reports/policy-mutations.json') != ''
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6
+        with:
+          name: policy-mutations-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .local/reports/policy-mutations.json
+          include-hidden-files: true
+          retention-days: 14
+
   frontend:
     name: Frontend lint and build (Node 22)
     runs-on: ubuntu-latest

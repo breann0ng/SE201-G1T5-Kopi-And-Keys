@@ -1,0 +1,222 @@
+{
+  "date": "2026-11-08",
+  "evaluation_type": "curated offline development fault injection",
+  "scope": "20 curated verifier/profile/trace fault scenarios; not a whole-project score",
+  "active_snapshot": "2026-10-15",
+  "baseline_tests": 108,
+  "summary": {
+    "planned": 20,
+    "executed": 20,
+    "killed": 20,
+    "survived": 0,
+    "errors_or_timeouts": 0,
+    "score": 1.0,
+    "complete": true
+  },
+  "runner_sha256": "91c8f7a66df221ab3d5f6bf7c2a17f35f5e06ea60661683e604a47c674dc679f",
+  "test_sha256": {
+    "test_synthesiser_verifier.py": "8d830cf0a91fb04fd48b4d58aeec8a2a2a668a14d402da11deeb63015534fe6b",
+    "test_policy_finals.py": "8f8ff00fde41bb3366a5711a8ac76e2db5cb98a2cf26b878012da21d8126f46a",
+    "test_policy_safety.py": "fa49f22da2fd45072db1d6f5bb8c708ab91bb4362fbd13a9483cdf7b8d362e3c",
+    "test_profile_scope.py": "5b6c9fd4ace0d21cbbd2bc3547498512992d4ab89ba01efcdaf53974d97a2043",
+    "test_graph.py": "4630c321f44623ad8e9e9a99a922cb8f99ae1e584e26c53e1114d77a8fbd4bad",
+    "fakes.py": "fe49edf28382d3f4d09fbb99baac1fc633d58d74424b1fb4a05f47db4632294a",
+    "conftest.py": "07596fa3ddb3f431463689b5c4135c3ab618e7cdebc33bdad5af11535cdba82a"
+  },
+  "source_sha256": {
+    "backend/kopi_keys/components/policy_guardrails.py": "8d58b99a26d3133d92f3a9c9beaf7236cb403ab57e76bef879e4fe5d996c4cf7",
+    "backend/kopi_keys/components/profile_context.py": "9d91076934914c87e3369fa57f7f43a4ec7a0b1c43abe3e68fb34d8cdc445805",
+    "backend/kopi_keys/components/verifier.py": "da2850a5d3b292dbe02f32fea45bee4b3533acc8f84e94beea45f6eef1f18851",
+    "backend/kopi_keys/graph.py": "f7bacf4dcde0ab69daec6ad6b10e97699399cc877ae712f9c484f1ad1a9656c3",
+    "backend/kopi_keys/llm.py": "8c4d29f9798035ad9354586c662f16f79f44e92a165a57180ab44c4acc567344"
+  },
+  "mutations": [
+    {
+      "id": "POL-MUT-01",
+      "name": "Missing citation accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 108,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    },
+    {
+      "id": "POL-MUT-02",
+      "name": "Unknown citation accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 113,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    },
+    {
+      "id": "POL-MUT-03",
+      "name": "Superseded source accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 115,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    },
+    {
+      "id": "POL-MUT-04",
+      "name": "Quote need not occur in source",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 191,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 4
+    },
+    {
+      "id": "POL-MUT-05",
+      "name": "Displayed wording may change the quote",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 211,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    },
+    {
+      "id": "POL-MUT-06",
+      "name": "Assistant-control output allowed",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 184,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 6
+    },
+    {
+      "id": "POL-MUT-07",
+      "name": "Low-relevance quote accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 176,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 2
+    },
+    {
+      "id": "POL-MUT-08",
+      "name": "Multi-grant coverage check removed",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 180,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 3
+    },
+    {
+      "id": "POL-MUT-09",
+      "name": "Household scope check removed",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 181,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 2
+    },
+    {
+      "id": "POL-MUT-10",
+      "name": "Missing-evidence errors discarded",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 162,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 2
+    },
+    {
+      "id": "POL-MUT-11",
+      "name": "SQL value comparison removed",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 90,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 5
+    },
+    {
+      "id": "POL-MUT-12",
+      "name": "Trailing numeric text accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 79,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 3
+    },
+    {
+      "id": "POL-MUT-13",
+      "name": "Duplicate statistic accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 82,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    },
+    {
+      "id": "POL-MUT-14",
+      "name": "Missing statistic accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 95,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    },
+    {
+      "id": "POL-MUT-15",
+      "name": "Second-timer EHG scope gate removed",
+      "file": "backend/kopi_keys/components/profile_context.py",
+      "line": 31,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    },
+    {
+      "id": "POL-MUT-16",
+      "name": "Mixed/single profile conflict ignored",
+      "file": "backend/kopi_keys/components/profile_context.py",
+      "line": 23,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    },
+    {
+      "id": "POL-MUT-17",
+      "name": "Specialised PDF scope ignored",
+      "file": "backend/kopi_keys/components/policy_guardrails.py",
+      "line": 175,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 2
+    },
+    {
+      "id": "POL-MUT-18",
+      "name": "Retry allowance exceeds proposal",
+      "file": "backend/kopi_keys/graph.py",
+      "line": 39,
+      "status": "killed",
+      "runtime_exception_failures": 8,
+      "assertion_failures": 4
+    },
+    {
+      "id": "POL-MUT-19",
+      "name": "Prompt text leaked to model trace",
+      "file": "backend/kopi_keys/llm.py",
+      "line": 74,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    },
+    {
+      "id": "POL-MUT-20",
+      "name": "Answer text leaked to model trace",
+      "file": "backend/kopi_keys/llm.py",
+      "line": 85,
+      "status": "killed",
+      "runtime_exception_failures": 0,
+      "assertion_failures": 1
+    }
+  ],
+  "limits": [
+    "20 selected faults, not exhaustive mutation coverage, security certification or model safety accuracy.",
+    "No live model or held-out evaluation. Code and tests are AI-assisted; independent review remains required.",
+    "Only actual assertion or pytest.fail detection counts; runtime-only, setup/import, skipped and timeout outcomes do not count as kills.",
+    "Some mutants also exhaust scripted test responses; their runtime exceptions are recorded separately and are not sufficient for a kill.",
+    "The first hosted CI run remains pending until push and review."
+  ]
+}
