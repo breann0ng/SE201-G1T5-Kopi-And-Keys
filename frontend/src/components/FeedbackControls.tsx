@@ -44,7 +44,6 @@ export function FeedbackControls({ response }: { response: ChatResponse }) {
     try {
       await postFeedback({
         message_id: messageId,
-        langsmith_run_id: response.langsmith_run_id ?? null,
         rating: next,
         reason: details.reason,
         comment: details.comment,
