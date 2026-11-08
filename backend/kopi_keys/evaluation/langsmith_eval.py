@@ -5,6 +5,7 @@ Usage (repo root, project venv, LangSmith key in .env):
     python -m kopi_keys.evaluation.langsmith_eval run --prefix hybrid-k5 # code metrics only (free)
     python -m kopi_keys.evaluation.langsmith_eval run --limit 3          # quick smoke test
     python -m kopi_keys.evaluation.langsmith_eval run --judge anthropic:claude-haiku-5-5
+    python -m kopi_keys.evaluation.langsmith_eval run --router rules --prefix rules-only
 
 Scores per question come from metrics.end_to_end, the same code run_eval --local uses, so
 LangSmith's averages match our reports: route_correct, unsafe_answering (abstain questions only),
@@ -104,7 +105,8 @@ def upload(client) -> None:
           f"({len(questions)} questions, snapshot {active_snapshot()})")
 
 
-def run(client, prefix: str, judge_model: str | None, limit: int | None, concurrency: int) -> None:
+def run(client, prefix: str, judge_model: str | None, limit: int | None, concurrency: int,
+        router: str = "hybrid") -> None:
     from langsmith import evaluate
 
     from ..components.policy_retrieval import TOP_K, HybridPolicyRetriever
@@ -114,7 +116,11 @@ def run(client, prefix: str, judge_model: str | None, limit: int | None, concurr
     from ..schemas import ChatRequest
 
     by_id = {q["id"]: q for q in load_questions("dev")}
-    graph = build_graph(retriever=HybridPolicyRetriever(), price_tool=SqlitePriceTool())  # as main.py
+    from ..main import router_fallback
+
+    classifier = router_fallback() if router == "hybrid" else None
+    graph = build_graph(retriever=HybridPolicyRetriever(), price_tool=SqlitePriceTool(),
+                        intent_classifier=classifier)  # as main.py
 
     def target(inputs: dict) -> dict:
         state = run_graph(graph, ChatRequest(**inputs))
@@ -154,7 +160,8 @@ def run(client, prefix: str, judge_model: str | None, limit: int | None, concurr
         target, data=data, evaluators=evaluators, experiment_prefix=prefix,
         max_concurrency=concurrency, client=client,
         metadata={"model": settings.model, "device": settings.device, "top_k": TOP_K,
-                  "retriever": "hybrid", "snapshot": active_snapshot(), "judge": judge_model},
+                  "retriever": "hybrid", "snapshot": active_snapshot(), "judge": judge_model,
+                  "router": "hybrid" if classifier else "rules"},
     )
 
 
@@ -167,6 +174,8 @@ def main() -> int:
     r.add_argument("--prefix", default="dev", help="experiment name prefix, e.g. hybrid-k5")
     r.add_argument("--judge", metavar="PROVIDER:MODEL", help="add an LLM-judged answer_relevance score")
     r.add_argument("--limit", type=int, help="only the first N questions (smoke test)")
+    r.add_argument("--router", choices=["hybrid", "rules"], default="hybrid",
+                   help="hybrid: rules + LLM fallback, as the app runs (default); rules: no fallback")
     r.add_argument("--concurrency", type=int, default=1,
                    help="questions at once (default 1: a CPU Ollama is the bottleneck)")
     args = ap.parse_args()
@@ -181,7 +190,7 @@ def main() -> int:
     else:
         if not client.has_dataset(dataset_name=DATASET):
             raise SystemExit(f"No {DATASET} dataset yet: run the upload command first.")
-        run(client, args.prefix, args.judge, args.limit, args.concurrency)
+        run(client, args.prefix, args.judge, args.limit, args.concurrency, args.router)
     return 0
 
 

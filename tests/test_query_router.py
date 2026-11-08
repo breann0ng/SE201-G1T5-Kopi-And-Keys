@@ -126,6 +126,8 @@ def test_town_anywhere_go_for_maisonettes_and_address_blocks():
     "Forecast resale prices in Woodlands",
     "Can you guarantee my grant application will be approved?",
     "Will my application be approved?",
+    "How much is our flat in Bedok worth today?",
+    "How much could we sell our 4-room for?",
 ])
 def test_forecasts_and_guarantees_are_declined_even_with_price_or_policy_words(question):
     routed = route_query(question, {})

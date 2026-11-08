@@ -103,6 +103,16 @@ class OllamaEngine:
         )
         return OllamaEngine(settings=settings, client=self._client)
 
+    def for_router(self, schema: dict):
+        """Intent fallback: a few output tokens and a shorter timeout (a timeout asks the user
+        to clarify). Same context size as the policy engine, so Ollama need not reload the model."""
+        settings = replace(
+            self.settings, context_size=4096, max_output_tokens=40, response_format=schema,
+            timeout_seconds=min(self.settings.timeout_seconds, 60),
+            model=os.getenv("KOPI_ROUTER_MODEL", self.settings.model),
+        )
+        return OllamaEngine(settings=settings, client=self._client)
+
     def _request(self, method: str, path: str, payload: dict | None = None) -> dict:
         def send(client):
             response = client.request(

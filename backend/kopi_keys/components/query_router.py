@@ -2,11 +2,11 @@
 
 Diagram box: "Query router (LLM)". The current implementation is rule-based
 (keywords + regex) and is the baseline for the dev-set routing labels.
-`rule_intent` returns None when no rule matches; `route_query` records that as
-intent_source="no_match" (still declined for now). That is the hook for an LLM
-fallback: only no-match questions would go to it, and it can never override a
-rule, least of all the scope guard (forecasts, guarantees). Field extraction
-stays in regex either way. Output must still pass `RouterOutput` validation.
+Hybrid: `rule_intent` returns None when no rule matches. Only those questions
+go to the LLM fallback (components/intent_fallback.py, called from graph.py);
+it can never override a rule, least of all the scope guard (forecasts,
+guarantees). Field extraction stays in regex either way. Output must still
+pass `RouterOutput` validation.
 
 `missing_fields` is a temporary hard-coded gate. Per proposal Appendix B it
 should eventually be driven by the topic cards' required fields
@@ -22,8 +22,12 @@ from pydantic import Field
 from typing import Literal
 
 from ..schemas import Contract, Intent, Route, RouterStatus
+from .intent_fallback import FallbackDecision
 
-IntentSource = Literal["rules", "no_match"]
+# rules: a rule decided. no_match: no rule fired and no LLM was asked (declined by default).
+# llm: the LLM fallback chose confidently. llm_unsure / llm_error: low confidence or unusable
+# output, so the user is asked which topic they mean.
+IntentSource = Literal["rules", "no_match", "llm", "llm_unsure", "llm_error"]
 
 
 # --- Intent classification -------------------------------------------------
@@ -90,6 +94,13 @@ WILL_VALUE_CHANGE = re.compile(
     r"rise|fall|drop|increase|decrease|appreciate|depreciate|crash)\b",
     re.IGNORECASE,
 )
+# Valuing one specific flat (OOS-05: "What is my flat at Blk 512 ... worth right now?"). Without
+# a rule it reached the LLM fallback, which read it as a price question.
+OWN_FLAT_VALUE = re.compile(
+    r"\b(?:my|our|this|that)\s+(?:flat|unit|home|house|place)\b[^.?!]{0,60}\bworth\b"
+    r"|\bhow much (?:can|could|will|would) (?:i|we) (?:sell|get for) (?:my|our|this)\b",
+    re.IGNORECASE,
+)
 GUARANTEE = re.compile(
     r"\bguarantee\w*\b|\b(?:will|would)\s+(?:my|our|the)\b.{0,40}\b(?:application|appeal)\b.{0,20}"
     r"\bbe\s+(?:approved|successful|accepted)\b",
@@ -101,7 +112,8 @@ def out_of_scope(message: str) -> bool:
     """Forecasts, valuations of the future and guarantees: always declined, whatever else matches."""
     if any(pattern in message.casefold() for pattern in UNANSWERABLE_PATTERNS):
         return True
-    return any(p.search(message) for p in (GUARANTEE, FORECAST_WORDS, WILL_VALUE_CHANGE, FUTURE_VALUE))
+    return any(p.search(message) for p in (GUARANTEE, FORECAST_WORDS, WILL_VALUE_CHANGE, FUTURE_VALUE,
+                                            OWN_FLAT_VALUE))
 
 
 # "How much is a flat in Toa Payoh?" names no flat type and no strong price word,
@@ -399,13 +411,27 @@ class RouterOutput(Contract):
     intent_source: IntentSource = "rules"
 
 
-def route_query(message: str, known: dict | None = None, context_question: str | None = None) -> RouterOutput:
-    """Classify and extract. Values found in the message win; `known` fills gaps."""
+def route_query(message: str, known: dict | None = None, context_question: str | None = None,
+                fallback: FallbackDecision | None = None) -> RouterOutput:
+    """Classify and extract. Values found in the message win; `known` fills gaps.
+
+    `fallback` is the LLM's decision for a question no rule matched (the graph asks for it
+    only after a first call returned intent_source="no_match"). It is ignored whenever a rule
+    matches, so it can never override a rule. A confident intent is used as is; a low-confidence
+    or unusable one asks the user which topic they mean instead of declining.
+    """
     known = known or {}
     intent = rule_intent(context_question or message)
     intent_source: IntentSource = "rules"
     if intent is None:
         intent, intent_source = "unanswerable", "no_match"
+        if fallback is not None:
+            if fallback.intent is None:
+                intent_source = "llm_error"
+            elif fallback.confidence == "high":
+                intent, intent_source = fallback.intent, "llm"
+            else:
+                intent_source = "llm_unsure"
     extracted = extract_fields(message, bare_town=intent in ("price", "mixed"))
     values = {
         field: extracted[field] if extracted[field] is not None else known.get(field)
@@ -416,6 +442,8 @@ def route_query(message: str, known: dict | None = None, context_question: str |
     missing = missing_fields(intent, message, values)
     if re.fullmatch(r"\s*(?:i (?:want|would like) to know about|tell me about|what is|explain)\s+hdb[?.! ]*", message, re.I):
         missing = ["topic"]
+    if intent_source in ("llm_unsure", "llm_error"):
+        missing = ["topic"]  # ask which topic they mean rather than decline
     if missing:
         route, status = "clarify", "clarify"
     elif intent == "unanswerable":
