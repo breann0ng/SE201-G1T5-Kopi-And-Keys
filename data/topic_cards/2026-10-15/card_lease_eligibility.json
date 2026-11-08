@@ -13,7 +13,7 @@
     "CHUNK_LEASE_15",
     "CHUNK_LEASE_01",
     "CHUNK_LEASE_02",
-    "CHUNK_LEASE_04"
+    "CHUNK_LEASE_20"
   ],
   "question_template": "For a resale flat with remaining lease of {remaining_lease}, where the youngest buyer is aged {age}, using CPF: {intends_to_use_cpf}, with a {loan_type} loan, how much CPF can be used and does the remaining lease cover the youngest buyer as required?",
   "snapshot_date": "2026-10-15",

@@ -13,6 +13,7 @@ Checks:
  7. question_template has no policy figures (digits or $) and only {placeholders}
  8. every raw file's sha256 matches manifest.json (snapshot evidence is byte-exact)
  9. every card's overview quote appears verbatim in its current (not superseded) chunk
+10. every card's income_schemes name a scheme in backend/kopi_keys/rules/income_ceilings.json
 """
 from __future__ import annotations
 
@@ -68,6 +69,7 @@ class Card(Strict):
     question_template: str = Field(min_length=1)
     snapshot_date: date
     overview: OverviewQuote | None = None
+    income_schemes: dict[Literal["family", "single"], str] = {}
 
 
 def main() -> int:
@@ -141,7 +143,10 @@ def main() -> int:
 
     # 5-7. cards
     cards, card_parse = [], []
-    for p in sorted((ROOT / "data" / "topic_cards").glob("*.json")):
+    card_files = sorted((ROOT / "data" / "topic_cards" / day).glob("*.json"))
+    if not card_files:
+        card_parse.append(f"no cards in data/topic_cards/{day}/; run build_cards.py {day}")
+    for p in card_files:
         try:
             cards.append(Card.model_validate_json(p.read_text(encoding="utf-8")))
         except ValidationError as e:
@@ -178,6 +183,11 @@ def main() -> int:
         elif card.overview.quote not in c.content:
             overview.append(f"{card.card_id}: overview quote not verbatim in {card.overview.chunk_id}")
     check("overview quotes verbatim", overview)
+    ceilings = json.loads((ROOT / "backend" / "kopi_keys" / "rules" / "income_ceilings.json")
+                          .read_text(encoding="utf-8"))["schemes"]
+    check("income_schemes in income_ceilings.json",
+          [f"{card.card_id}: {household} -> {scheme!r} not in income_ceilings.json"
+           for card in cards for household, scheme in card.income_schemes.items() if scheme not in ceilings])
 
     print(f"Validating snapshot {day}: {len(chunks)} chunks, {len(cards)} cards\n")
     for name, n in results:
