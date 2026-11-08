@@ -38,8 +38,10 @@ def test_first_timer_sc_spr_couple_with_details_matches_ehg(cards):
     result = match_cards(profile, cards)
     assert "CARD_EHG" in result.matched_ids
     blocked = by_id(result)
-    assert blocked["CARD_FAMILY_GRANT"] == {"flat_type"}
-    assert "CARD_SINGLES_GRANT" not in blocked  # single-only trigger rules it out
+    # flat_type only sets the grant amount, so it no longer blocks the card
+    assert "CARD_FAMILY_GRANT" in result.matched_ids
+    assert result.amount_missing["CARD_FAMILY_GRANT"] == ("flat_type",)
+    assert "CARD_SINGLES_GRANT" not in blocked  # SC/SPR is outside its citizenship trigger
     assert "CARD_STEPUP_GRANT" not in blocked  # second-timer trigger rules it out
 
 
