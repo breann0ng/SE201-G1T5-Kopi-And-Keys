@@ -5,8 +5,9 @@ tool, synthesiser, verifier, model) imports this module, and feedback text is ne
 prompt or retrieval query. It is untrusted input, so it is never logged at INFO or above.
 
 Where it goes:
-- LangSmith (primary review interface), as feedback key "user_rating" on the answer's trace, when
-  tracing gave the answer a run id and an API key is configured. Failures never fail the request.
+- LangSmith (primary review interface), as one feedback item (key "user_rating") per answer on its
+  trace, when tracing gave the answer a run id and an API key is configured. A later click updates
+  that item instead of adding another. Failures never fail the request.
 - A local SQLite backup at data/feedback/feedback.db (git-ignored), one row per message_id.
   KOPI_FEEDBACK_DB overrides the path (tests use a temporary file).
 
@@ -18,6 +19,7 @@ import os
 import re
 import sqlite3
 import threading
+import uuid
 from collections import OrderedDict
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -25,7 +27,7 @@ from pathlib import Path
 from typing import Literal
 
 from langsmith import Client
-from langsmith.utils import tracing_is_enabled
+from langsmith.utils import LangSmithConflictError, LangSmithNotFoundError, tracing_is_enabled
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator
 
 
@@ -34,6 +36,8 @@ logger = logging.getLogger(__name__)
 DEFAULT_DB = Path(__file__).resolve().parents[2] / "data" / "feedback" / "feedback.db"
 CONTEXT_SIZE = 1000
 COMMENT_MAX = 500
+# Never change this: it is what makes a message's LangSmith feedback id the same on every click.
+FEEDBACK_ID_NAMESPACE = uuid.UUID("7c1e4f52-9a3b-4d86-b0f7-2e5a6c9d1f34")
 _UUID = r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 # C0/C1 control characters except newline, plus bidirectional overrides that can disguise text.
 _CONTROL = re.compile(r"[\x00-\x09\x0b-\x1f\x7f-\x9f‪-‮⁦-⁩]")
@@ -68,6 +72,11 @@ class FeedbackRequest(BaseModel):
             return value
         value = _CONTROL.sub("", value).strip()
         return value or None
+
+
+def feedback_id_for(message_id: str) -> str:
+    """The LangSmith feedback id for an answer: one answer, one id, however many clicks."""
+    return str(uuid.uuid5(FEEDBACK_ID_NAMESPACE, message_id))
 
 
 def tracing_enabled() -> bool:
@@ -109,6 +118,7 @@ _SCHEMA = """
 CREATE TABLE IF NOT EXISTS feedback (
     message_id       TEXT PRIMARY KEY,
     langsmith_run_id TEXT,
+    feedback_id      TEXT,
     rating           INTEGER NOT NULL CHECK (rating IN (1, -1)),
     reason           TEXT,
     comment          TEXT,
@@ -125,12 +135,13 @@ CREATE TABLE IF NOT EXISTS feedback (
 # A later click overwrites the rating, reason and comment. Context is kept from the first row if
 # the server has since forgotten it (for example after a restart).
 _UPSERT = """
-INSERT INTO feedback (message_id, langsmith_run_id, rating, reason, comment, question, answer,
+INSERT INTO feedback (message_id, langsmith_run_id, feedback_id, rating, reason, comment, question, answer,
                       route, snapshot, context_missing, created_at, updated_at)
-VALUES (:message_id, :langsmith_run_id, :rating, :reason, :comment, :question, :answer,
+VALUES (:message_id, :langsmith_run_id, :feedback_id, :rating, :reason, :comment, :question, :answer,
         :route, :snapshot, :context_missing, :now, :now)
 ON CONFLICT(message_id) DO UPDATE SET
     langsmith_run_id = COALESCE(excluded.langsmith_run_id, feedback.langsmith_run_id),
+    feedback_id = excluded.feedback_id,
     rating = excluded.rating,
     reason = excluded.reason,
     comment = excluded.comment,
@@ -157,10 +168,12 @@ class FeedbackStore:
     def path(self) -> Path:
         return self._path or db_path()
 
-    def save(self, item: FeedbackRequest, context: AnswerContext | None) -> None:
+    def save(self, item: FeedbackRequest, context: AnswerContext | None) -> bool:
+        """Store the rating. Returns True if this is the first one for this message_id."""
         row = {
             "message_id": item.message_id,
             "langsmith_run_id": context.langsmith_run_id if context else None,
+            "feedback_id": feedback_id_for(item.message_id),
             "rating": item.rating,
             "reason": item.reason,
             "comment": item.comment,
@@ -178,10 +191,16 @@ class FeedbackStore:
             try:
                 with connection:
                     connection.execute(_SCHEMA)
+                    columns = {column[1] for column in connection.execute("PRAGMA table_info(feedback)")}
+                    if "feedback_id" not in columns:  # database created before this column existed
+                        connection.execute("ALTER TABLE feedback ADD COLUMN feedback_id TEXT")
+                    first = connection.execute("SELECT 1 FROM feedback WHERE message_id = ?",
+                                               (item.message_id,)).fetchone() is None
                     connection.execute(_UPSERT, row)
             finally:
                 connection.close()
         logger.debug("Feedback stored for message %s", item.message_id)
+        return first
 
 
 def langsmith_comment(reason: str | None, comment: str | None) -> str | None:
@@ -190,20 +209,43 @@ def langsmith_comment(reason: str | None, comment: str | None) -> str | None:
     return reason or comment
 
 
-def send_to_langsmith(run_id: str | None, rating: int, reason: str | None, comment: str | None) -> bool:
-    """Attach the rating to the answer's trace. Never raises; never logs the key or the text."""
+def send_to_langsmith(run_id: str | None, message_id: str, rating: int, reason: str | None,
+                      comment: str | None, first: bool) -> bool:
+    """Create or update this answer's one feedback item. Never raises; never logs the key or text."""
     if not run_id or not (os.getenv("LANGSMITH_API_KEY") or os.getenv("LANGCHAIN_API_KEY")):
         return False
+    feedback_id = feedback_id_for(message_id)
+    score = 1 if rating == 1 else 0
+    text = langsmith_comment(reason, comment)
     try:
-        Client().create_feedback(
-            run_id,
-            key="user_rating",
-            score=1 if rating == 1 else 0,
-            comment=langsmith_comment(reason, comment),
-            stop_after_attempt=2,
-            # Feedback should not change how long LangSmith keeps the trace.
-            extend_trace_retention=False,
-        )
+        client = Client()
+
+        def update() -> None:
+            # "" clears the old text: the SDK skips comment=None, which would leave a 👎 reason on a 👍.
+            client.update_feedback(feedback_id, score=score, comment=text or "")
+
+        def create_or_update() -> None:
+            try:
+                client.create_feedback(
+                    run_id,
+                    key="user_rating",
+                    score=score,
+                    comment=text,
+                    feedback_id=feedback_id,
+                    stop_after_attempt=2,
+                    # Feedback should not change how long LangSmith keeps the trace.
+                    extend_trace_retention=False,
+                )
+            except LangSmithConflictError:  # another click created it first
+                update()
+
+        if first:
+            create_or_update()
+        else:
+            try:
+                update()
+            except LangSmithNotFoundError:  # the earlier create failed or has not landed yet
+                create_or_update()
         return True
     except Exception as error:
         logger.warning("LangSmith feedback was not sent (%s).", type(error).__name__)

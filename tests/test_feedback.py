@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from langsmith.utils import LangSmithConflictError, LangSmithNotFoundError
 
 from fakes import FictionalRetriever
 import kopi_keys.feedback as feedback
@@ -29,15 +30,31 @@ PACKAGE = Path(feedback.__file__).parent
 
 
 class RecordingClient:
-    """Stands in for langsmith.Client. raises=True simulates a LangSmith outage."""
+    """Stands in for langsmith.Client and behaves like the server: duplicate ids conflict, unknown
+    ids are not found. raises=True simulates an outage; created_elsewhere=True simulates another
+    click's create landing just before this one."""
 
     calls: list = []
+    existing: set = set()
     raises = False
+    created_elsewhere = False
 
     def create_feedback(self, run_id, **kwargs):
-        RecordingClient.calls.append({"run_id": run_id, **kwargs})
+        RecordingClient.calls.append({"op": "create", "run_id": run_id, **kwargs})
         if RecordingClient.raises:
             raise ConnectionError("LangSmith is down")
+        if RecordingClient.created_elsewhere:
+            RecordingClient.existing.add(kwargs["feedback_id"])
+        if kwargs["feedback_id"] in RecordingClient.existing:
+            raise LangSmithConflictError("already exists")
+        RecordingClient.existing.add(kwargs["feedback_id"])
+
+    def update_feedback(self, feedback_id, **kwargs):
+        RecordingClient.calls.append({"op": "update", "feedback_id": feedback_id, **kwargs})
+        if RecordingClient.raises:
+            raise ConnectionError("LangSmith is down")
+        if feedback_id not in RecordingClient.existing:
+            raise LangSmithNotFoundError("not found")
 
 
 def _no_model(*args, **kwargs):
@@ -49,7 +66,8 @@ def isolated(monkeypatch, tmp_path):
     # Deterministic and offline: answers come from the extractive fake synthesiser (engine=None)
     # and FictionalRetriever; any real model call fails the test.
     monkeypatch.setattr(OllamaEngine, "complete", _no_model)
-    RecordingClient.calls, RecordingClient.raises = [], False
+    RecordingClient.calls, RecordingClient.existing = [], set()
+    RecordingClient.raises = RecordingClient.created_elsewhere = False
     monkeypatch.setattr(feedback, "Client", RecordingClient)
     db = tmp_path / "feedback.db"
     monkeypatch.setenv("KOPI_FEEDBACK_DB", str(db))
@@ -189,9 +207,11 @@ def test_langsmith_receives_user_rating_on_the_answer_trace(monkeypatch):
         rate(c, answer["message_id"], -1, reason="wrong_numbers", comment="median looks off")
         rate(c, answer["message_id"], 1)
     down, up = RecordingClient.calls
-    assert down["run_id"] == answer["langsmith_run_id"] and down["key"] == "user_rating"
+    assert down["op"] == "create" and down["run_id"] == answer["langsmith_run_id"]
+    assert down["key"] == "user_rating" and down["extend_trace_retention"] is False
     assert down["score"] == 0 and down["comment"] == "wrong_numbers: median looks off"
-    assert up["score"] == 1 and up["comment"] is None
+    assert up["op"] == "update" and up["score"] == 1
+    assert up["comment"] == ""  # clears the old reason; the SDK would skip None and keep it
 
 
 def test_request_that_includes_a_run_id_is_rejected(monkeypatch, isolated):
@@ -252,6 +272,100 @@ def test_langsmith_failure_still_records_and_returns_success(monkeypatch, isolat
     assert loud == ["LangSmith feedback was not sent (ConnectionError)."]
     assert not any("SECRET-COMMENT-TEXT" in r.getMessage() or "test-key-not-real" in r.getMessage()
                    for r in caplog.records)
+
+
+def test_changing_a_rating_updates_one_feedback_item_instead_of_adding_more(monkeypatch, isolated):
+    """👎 → 👎 + reason → 👍 for one message: one create, then updates, all with the same id."""
+    tracing_on(monkeypatch)
+    with TestClient(make_app()) as c:
+        message_id = ask(c)["message_id"]
+        rate(c, message_id, -1)
+        rate(c, message_id, -1, reason="outdated", comment="old figure")
+        rate(c, message_id, 1)
+    calls = RecordingClient.calls
+    expected = feedback.feedback_id_for(message_id)
+    assert [call["op"] for call in calls] == ["create", "update", "update"]
+    assert {call["feedback_id"] for call in calls} == {expected}
+    assert [call["score"] for call in calls] == [0, 0, 1]
+    assert calls[1]["comment"] == "outdated: old figure"
+    [row] = rows(isolated)
+    assert row["feedback_id"] == expected and row["rating"] == 1
+
+
+def test_feedback_id_is_deterministic_and_differs_between_messages(monkeypatch):
+    tracing_on(monkeypatch)
+    one, two = str(uuid.uuid4()), str(uuid.uuid4())
+    assert feedback.feedback_id_for(one) == feedback.feedback_id_for(one) != feedback.feedback_id_for(two)
+    assert uuid.UUID(feedback.feedback_id_for(one)).version == 5
+    with TestClient(make_app()) as c:
+        first = ask(c)
+        cached = ask(c)  # same answer and trace, but a different message
+        rate(c, first["message_id"], 1)
+        rate(c, cached["message_id"], 1)
+    assert [call["op"] for call in RecordingClient.calls] == ["create", "create"]
+    assert RecordingClient.calls[0]["feedback_id"] != RecordingClient.calls[1]["feedback_id"]
+
+
+RUN_ID, MESSAGE_ID = str(uuid.uuid4()), str(uuid.uuid4())
+
+
+def test_update_that_finds_nothing_creates_instead():
+    assert feedback.send_to_langsmith(RUN_ID, MESSAGE_ID, -1, None, None, first=False) is True
+    assert [call["op"] for call in RecordingClient.calls] == ["update", "create"]
+
+
+def test_create_that_already_exists_updates_instead():
+    RecordingClient.existing.add(feedback.feedback_id_for(MESSAGE_ID))
+    assert feedback.send_to_langsmith(RUN_ID, MESSAGE_ID, 1, None, None, first=True) is True
+    assert [call["op"] for call in RecordingClient.calls] == ["create", "update"]
+    assert RecordingClient.calls[-1]["score"] == 1
+
+
+def test_update_create_race_ends_in_an_update():
+    """Update finds nothing, then another click creates it just before this create."""
+    RecordingClient.created_elsewhere = True
+    assert feedback.send_to_langsmith(RUN_ID, MESSAGE_ID, 1, None, None, first=False) is True
+    assert [call["op"] for call in RecordingClient.calls] == ["update", "create", "update"]
+
+
+def test_failed_first_create_is_repaired_by_the_next_click(monkeypatch):
+    tracing_on(monkeypatch)
+    with TestClient(make_app()) as c:
+        message_id = ask(c)["message_id"]
+        RecordingClient.raises = True
+        assert rate(c, message_id, -1).status_code == 200
+        RecordingClient.raises = False
+        assert rate(c, message_id, 1).status_code == 200
+    assert [call["op"] for call in RecordingClient.calls] == ["create", "update", "create"]
+    assert RecordingClient.calls[-1]["score"] == 1
+
+
+def test_update_failure_never_raises_or_logs_text(caplog):
+    RecordingClient.raises = True
+    with caplog.at_level(logging.DEBUG, logger="kopi_keys.feedback"):
+        sent = feedback.send_to_langsmith(RUN_ID, MESSAGE_ID, -1, "other", "SECRET-COMMENT-TEXT", first=False)
+    assert sent is False
+    assert [r.getMessage() for r in caplog.records] == ["LangSmith feedback was not sent (ConnectionError)."]
+
+
+def test_existing_database_gains_the_feedback_id_column(isolated):
+    """A database created before feedback_id existed keeps working and keeps its rows."""
+    old_id = str(uuid.uuid4())
+    connection = sqlite3.connect(isolated)
+    with connection:
+        connection.execute("""CREATE TABLE feedback (
+            message_id TEXT PRIMARY KEY, langsmith_run_id TEXT,
+            rating INTEGER NOT NULL CHECK (rating IN (1, -1)), reason TEXT, comment TEXT, question TEXT,
+            answer TEXT, route TEXT, snapshot TEXT, context_missing INTEGER NOT NULL,
+            created_at TEXT NOT NULL, updated_at TEXT NOT NULL)""")
+        connection.execute("INSERT INTO feedback (message_id, rating, context_missing, created_at, updated_at) "
+                           "VALUES (?, 1, 1, 'then', 'then')", (old_id,))
+    connection.close()
+    with TestClient(make_app()) as c:
+        new_id = str(uuid.uuid4())
+        assert rate(c, new_id, -1).status_code == 200
+    stored = {row["message_id"]: row["feedback_id"] for row in rows(isolated)}
+    assert stored == {old_id: None, new_id: feedback.feedback_id_for(new_id)}
 
 
 # --- Write-only access --------------------------------------------------------------------------
