@@ -13,7 +13,10 @@ month) with each question's `price_filters`, including `lease_band` / `storey_ba
 `price_figures` runs the price tool on those filters and compares volume and median with
 `expected_price`, which is computed separately with plain SQL on `hdb_prices.db`. End to end,
 answered price questions are also checked against `expected_price`.
-| `baselines.py` | Retrievers to score (`bm25`, `hybrid`, or `module:function`). The answer-level baselines (same LLM without tools, naive single-call RAG) are still TODO |
+| `baselines.py` | Retrievers to score (`bm25`, `hybrid`, or `module:function`), and the answer-level baselines: the same LLM without tools (`no-tools`) and naive single-call RAG (`naive-rag` hybrid, `naive-rag-dense`). Hybrid scoring refuses the keyword-only fallback, so a failed embedding service can never be reported as hybrid |
+| `run_baselines.py` | Runs the full app (in-process) or a baseline on the dev set, sending scripted follow-up turns, and saves answers and `end_to_end` scores to `data/evaluation-data/results/` |
+| `retrieval_report.py` | Hit@5, Recall@5, Recall@20 and MRR@20 for `bm25` / `dense` / `hybrid`, in three slices (all, policy, discovery), with a miss type per question. Prints strict and relaxed scores |
+| `stats.py`, `compare.py` | 95% Wilson intervals and paired exact McNemar tests; `compare.py` lines up result files question by question on fixed populations (a run error counts as a failure) |
 | `run_eval.py` | The command below; reports go to `.local/reports/` (gitignored) |
 | `synthesis_benchmark.py` | Nisha's fixed-evidence CPU synthesis comparison; independent of the team dev/held-out splits. See [the finals guide](../../../docs/finals-nisha.md). |
 
@@ -32,6 +35,10 @@ answered price questions are also checked against `expected_price`.
   set `KOPI_HELDOUT_DIR` to the folder holding `heldout_questions.jsonl`, then add
   `--split heldout --final`.
 
+**Strict and relaxed retrieval scoring.** `data/evaluation-data/development/accepted_evidence.json`
+lists same-fact alternatives for two evidence labels (POL-02, POL-04) under a written rule.
+The labels themselves are never edited, and strict scores are always reported beside relaxed ones.
+
 After editing the dev set, regenerate the router labels:
 
 ```powershell
@@ -49,7 +56,31 @@ After editing the dev set, regenerate the router labels:
 
 End-to-end runs call Ollama for every question and take a long time on CPU.
 
-## Development results (2026-10-17, dev set; not results to report)
+Finals runs (from `backend/`):
+
+```powershell
+..\.venv\Scripts\python.exe -m kopi_keys.evaluation.retrieval_report --mode hybrid      # strict + relaxed
+..\.venv\Scripts\python.exe -m kopi_keys.evaluation.run_baselines --system no-tools     # naive-rag-dense, naive-rag, full
+..\.venv\Scripts\python.exe -m kopi_keys.evaluation.compare <result files>              # CIs + paired McNemar
+```
+
+## Finals development results (2026-11-08, 50-question dev set)
+
+See [Sandra's finals results](../../../docs/sandra_finals_results.md) for the full tables, the
+miss diagnosis and limits. Headline figures (95% Wilson intervals):
+
+| Metric | Result |
+|---|---|
+| Policy Hit@5, hybrid, strict (22 Qs) | 81.8% (18/22), CI 61.5–92.7% |
+| Policy Recall@5, hybrid, strict / relaxed | 74.2% / 83.3% (target ≥ 85%) |
+| Discovery card recall / precision (7 Qs, 15 cards) | 93% / 54% (target ≥ 70% / ≥ 80%) |
+| No-tools baseline: cited answers / price figures | 0% (0/42) / 0% (0/21) |
+| Naive RAG (dense): cited answers / price figures | 62% (26/42) / 0% (0/21) |
+
+The tables below are from the earlier 30-question set and are kept for history; they are not
+comparable with the 50-question figures.
+
+## Earlier development results (2026-10-17, 30-question set; not results to report)
 
 | Metric | Result | Target |
 |---|---|---|

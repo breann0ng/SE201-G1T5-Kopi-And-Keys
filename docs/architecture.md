@@ -23,7 +23,7 @@ Python module paths are relative to `backend/kopi_keys/`. Paths beginning with
 | Component | File | Owner | Current implementation |
 | --- | --- | --- | --- |
 | Query Router | `components/query_router.py` | Breann; price rules by Tasha | Rules/regex, extraction, dates and required-field gate. Dev routing labels: 50; known gaps are listed in `tests/test_development_set_contract.py`. LLM classifier not built. |
-| Discovery/topic cards | `components/topic_cards.py`, `topic_cards.py`, `data/topic_cards/` | Sandra | 12 cards, matching, profile hints, overviews, cited suggestions and grant income notes. Some inputs are not collected yet. |
+| Discovery/topic cards | `components/topic_cards.py`, `topic_cards.py`, `data/topic_cards/` | Sandra | 12 cards as rules: eligibility vs amount-only fields, income ceilings (read from `rules/`), cited exclusions (owning private property rules out the CPF grants), priority order, profile hints, overviews, cited suggestions and grant income notes. Some inputs are not collected yet. |
 | Policy retrieval/index | `components/policy_retrieval.py`, `components/policy_index.py` | Sandra; initial policy integration by Nisha | Keyword ranking plus EmbeddingGemma/ChromaDB vectors, scheme focus, deduplication and keyword fallback. Index built locally with `scripts/build_policy_index.py`. |
 | Price Query Tool | `components/price_query.py`, `ingest/resale_db.py` | Tasha | Connected read-only SQLite tool, Decimal statistics, lease/floor refinements and recent transactions. |
 | Income rules | `rules/`, `components/topic_cards.py` | Tasha and Sandra | Pure Python boundary checks with verified source data/conditions; notes rather than eligibility verdicts. |
@@ -33,7 +33,7 @@ Python module paths are relative to `backend/kopi_keys/`. Paths beginning with
 | Harness | `graph.py`, `state.py` | Breann; team integration | One graph, bounded retry and immediate abstention on model-engine failure. |
 | API | `main.py` | Team | `/health`, `/chat`, `/chat/stream`, in-memory cache and model warm-up. |
 | Frontend | `frontend/` | Sandra; price UI by Tasha, profile/history integration by Nisha | React chat, sources, profile, progress, recent chats, price refinement and local feedback. |
-| Evaluation | `evaluation/` | Sandra | Dev loader, metrics and runner. No-tools and naive-RAG answer baselines remain TODO. |
+| Evaluation | `evaluation/` | Sandra | Dev loader, metrics, runner, answer-level baselines (no-tools, naive single-call RAG), retrieval report (Hit@5/Recall@5/MRR, strict and relaxed) and paired comparison with 95% CIs. See `docs/sandra_finals_results.md`. |
 | Tracing | Response `trace` and `@traceable` in `llm.py` | Breann; APAC setup by Nisha | Node traces in responses; optional LangSmith graph/model tracing with credentials and matching region. |
 
 ## Flow
