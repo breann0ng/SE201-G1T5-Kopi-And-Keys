@@ -50,6 +50,12 @@ _SYNONYMS = {
     "eip": ["ethnic", "integration"],
     "couple": ["family"], "married": ["family"], "spouse": ["family"],
     "mortgage": ["loan"], "financing": ["loan"],
+    # Added 2026-11-08: everyday words for HDB's terms. HDB writes "parents/ child",
+    # "private residential property" and "ethnic group"; buyers say mum, condo, Chinese.
+    **{w: ["parent"] for w in ("mum", "mom", "mother", "mummy", "mommy", "dad", "father", "daddy", "papa", "mama")},
+    **{w: ["private", "residential", "property"] for w in ("condo", "condominium")},
+    **{w: ["ethnic", "integration", "quota"] for w in ("chinese", "malay", "indian", "eurasian", "race", "racial",
+                                                         "ethnicity")},
 }
 # Words in almost every chunk: they shouldn't decide the ranking.
 _GENERIC = frozenset({"hdb", "flat", "resale", "buy", "buying", "singapore", "housing"})
