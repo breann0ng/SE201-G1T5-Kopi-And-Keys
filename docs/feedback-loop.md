@@ -35,19 +35,24 @@ Every chat response (from `/chat` and the final `/chat/stream` event) now carrie
 | `langsmith_run_id` | The answer's LangSmith trace id when tracing is on, otherwise `null`. A cached answer gets a new `message_id` but keeps the trace id of the run that produced it. |
 
 The browser sends `POST /api/feedback` (backend route `/feedback`) with only `message_id`,
-`langsmith_run_id`, `rating` (1 or -1), `reason` (one of the enum values or null) and `comment`
-(≤ 500 characters; control characters stripped). Extra fields are rejected.
+`rating` (1 or -1), `reason` (one of the enum values or null) and `comment` (≤ 500 characters;
+control characters stripped). Any other field is rejected, including `langsmith_run_id`: the
+backend never accepts a trace id from the browser.
 
-The **question, answer text, route and policy snapshot date come from the server**, from an
-in-memory map of the last 1000 delivered answers. The browser cannot supply them. If the map
-has no entry (backend restarted, or more than 1000 answers since), the row is stored with
-`context_missing = 1` and those four fields empty. The LangSmith trace still has them when tracing
-was on.
+The **question, answer text, route, policy snapshot date and trace id come from the server**,
+from an in-memory map of the last 1000 delivered answers. The browser cannot supply them. If the
+map has no entry (backend restarted, or more than 1000 answers since), the row is stored with
+`context_missing = 1` and those fields empty.
+
+**Feedback on answers from before a backend restart is saved locally only.** The server no longer
+knows which trace those answers belong to, so LangSmith is not called at all. Look for these in
+the local backup. If an answer was rated before the restart and changed after it, the local row
+has the newer rating and LangSmith keeps the older one.
 
 | Where | What | Who can see it |
 | --- | --- | --- |
-| **LangSmith** (primary) | Feedback key `user_rating` on the answer's trace: score 1 (👍) or 0 (👎), comment `"<reason>: <comment>"`. Sent only when the answer has a run id and `LANGCHAIN_API_KEY`/`LANGSMITH_API_KEY` is set. | People invited to the LangSmith project. |
-| **Local SQLite backup** | `data/feedback/feedback.db`, created on first use, git-ignored, never committed. One row per `message_id` (a later click overwrites the earlier rating, reason and comment). Columns: ids, rating, reason, comment, question, answer, route, snapshot, `context_missing`, `created_at`, `updated_at` (UTC). `KOPI_FEEDBACK_DB` overrides the path. | Anyone with access to the machine running the backend. |
+| **LangSmith** (primary) | Feedback key `user_rating` on the answer's trace: score 1 (👍) or 0 (👎), comment `"<reason>: <comment>"`. One item per answer: its id is derived from `message_id`, so a later click updates that item instead of adding another. Sent only when the server still knows the answer's run id and `LANGCHAIN_API_KEY`/`LANGSMITH_API_KEY` is set. | People invited to the LangSmith project. |
+| **Local SQLite backup** | `data/feedback/feedback.db`, created on first use, git-ignored, never committed. One row per `message_id` (a later click overwrites the earlier rating, reason and comment). Columns: ids (including `feedback_id`, the LangSmith feedback id), rating, reason, comment, question, answer, route, snapshot, `context_missing`, `created_at`, `updated_at` (UTC). `KOPI_FEEDBACK_DB` overrides the path. | Anyone with access to the machine running the backend. |
 
 A LangSmith failure is logged as a warning naming only the exception type, and never fails the
 request. Feedback text and the API key are never logged at INFO or above. Feedback is sent with

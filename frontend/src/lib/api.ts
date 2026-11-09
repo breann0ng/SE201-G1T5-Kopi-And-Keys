@@ -134,7 +134,6 @@ export type FeedbackReason =
 
 export type FeedbackBody = {
   message_id: string;
-  langsmith_run_id: string | null;
   rating: 1 | -1;
   reason: FeedbackReason | null;
   comment: string | null;

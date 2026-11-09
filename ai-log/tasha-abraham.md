@@ -214,4 +214,8 @@ be exactly the integers 1 or -1 (Pydantic otherwise accepts true and 1.0);
 the server's own trace id wins over the browser's copy; feedback does not
 extend LangSmith trace retention; a database error returns 503 without
 affecting chat. Two existing cache tests in test_api.py now ignore
-message_id.
+message_id. After review on PR #17 (2026-11-08) I changed two things: a later
+click now updates one LangSmith feedback item (id derived from message_id)
+instead of adding another, and the run id comes only from the server, so
+requests that include one are rejected and unknown messages are saved locally
+without calling LangSmith.
