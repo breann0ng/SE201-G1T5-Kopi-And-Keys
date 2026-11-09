@@ -95,6 +95,7 @@ export type Route = "policy" | "price" | "mixed" | "discovery" | "clarify" | "ab
 export type ChatStatus = "answered" | "clarifying" | "abstained";
 
 export type ChatResponse = {
+  profile_note?: string | null;
   status: ChatStatus;
   /** Policy evidence source: "demo" = fictional test passages (UI warns), "snapshot" = official ACTIVE snapshot. */
   mode: "demo" | "snapshot";

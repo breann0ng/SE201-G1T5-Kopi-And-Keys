@@ -233,3 +233,34 @@ The longer replay exposed a separate unresolved content issue: generic resale
 eligibility can produce an incomplete selection of genuine source conditions.
 Do not treat that as solved by these conversation fixes or by a passing citation
 check. The experimental citizenship/age-focused question was not activated.
+
+### Sidebar consistency and profile-change notices
+
+Conflicting sidebar choices show an immediate amber alert. Checks concern the
+meaning of the selectors (single versus family/multi-person household and mixed
+couple versus single), not policy age/income limits or subsidy eligibility. Policy
+requests, including generic topic selections and LLM-routed policy intents, ask
+for correction before retrieval. Pure price queries remain available.
+
+An actual edit emits a local **Profile updated** message naming changed fields.
+Consecutive quick edits settle into one notice; no numeric values are copied into
+the notice. The notice appears immediately while pending. During generation it
+explains that the running answer uses the earlier submitted profile, then is
+appended after the answer settles. It never starts a model request, interrupts
+the running answer or enters the history sent to the backend/model. A pending
+notice is discarded on a chat switch rather than leaking into another chat.
+Committed notices remain beside saved questions; notice-only drafts aren't saved.
+Loading the app or selecting an unchanged value does not emit a change notice.
+
+The adapter snapshots the profile at request start. Later edits apply to the next
+request. Answered policy responses can carry a note showing the sidebar citizenship/
+household supplied for that question, missing sidebar details and the fact that
+no eligibility decision was made. The note survives Copy; it is not recomputed
+from the current sidebar when displaying an old answer. Clearing sidebar details
+does not delete facts already written in the chat.
+
+Manual checks: select Single Singapore Citizen with Couple/family, see the amber
+alert and local chat notice, and ask Resale eligibility. Correct the household to
+Single and see another change notice. Change a profile field during an answer:
+it should finish without being rewritten, and the next question should use the
+new profile. Switch chats before the pending notice settles and check for leaks.

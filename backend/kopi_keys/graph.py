@@ -79,7 +79,7 @@ def build_graph(
     # --- Nodes --------------------------------------------------------------
 
     def query_router(state: GraphState):
-        from .components.profile_context import profile_issue
+        from .components.profile_context import profile_conflict, profile_issue
 
         if ELIGIBILITY_CONFIRMATION.search(state.message):
             return {"route": "abstain", "status": "abstain", "abstain_reason": "eligibility_confirmation",
@@ -102,6 +102,10 @@ def build_graph(
                 usage = {"model_calls": state.model_calls + 1,
                          "model_usage": [*state.model_usage, {"model": decision.model, **decision.usage}]}
         update = {**routed.model_dump(), **usage}
+        conflict = profile_conflict(state)
+        if routed.intent in {"policy", "mixed", "discovery"} and conflict:
+            return {**usage, "route": "clarify", "status": "clarify", "missing_fields": ["profile"],
+                    "router_note": conflict, "trace": ["query_router:clarify:profile_scope"]}
         # An explicit hypothetical cohort can differ from the sidebar. Do not send
         # contradictory first-timer and subsidy-status values to the synthesiser.
         if state.subsidy_status and routed.first_timer is not None and routed.first_timer != state.first_timer:

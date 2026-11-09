@@ -990,3 +990,41 @@ used the specific safe response. Raw drafts/reasons and the unsuccessful policy
 experiment remain in ignored local reports. No held-out file, policy snapshot,
 SQL database, policy model prompt or verifier threshold changed. Earlier broad
 benchmark results remain scoped to their own revisions.
+
+## 9 November 2026 — Sidebar conflicts and immediate local change notices
+
+The user clarified that discrepancies meant conflicting sidebar selectors, then
+requested an immediate in-chat notice after edits. Added structural warnings for
+single/family citizenship and household combinations and mixed-couple/single
+combinations. Consistent Single Singapore Citizen + Single is not itself an error.
+Age/income policy eligibility rules were not encoded as sidebar contradictions.
+Generic policy requests and LLM-routed policy intents now stop on these conflicts
+before policy retrieval; price queries remain usable with the visible UI warning.
+
+Profile edits produce an immediate local pending notice, coalescing rapid edits
+before committing a history item. During a run, it waits to append until the
+answer settles, preserving the in-flight message tree. Pending notices are scoped
+to the selected chat and discarded on switching. They don't call the model or
+enter model/backend conversation history, and don't save otherwise empty drafts.
+The adapter now snapshots profile values before its first progress yield so a
+mid-request edit applies only to the next question. Saved notices contain changed
+field names, not income/age values. Old answer metadata is not rewritten.
+
+Answered policy responses get a request-profile basis note and missing-sidebar
+details, explicitly not an eligibility decision. This is derived from the request
+outside the model output; Copy retains it. Both plain and streamed API paths and
+changed-profile/cache behavior are covered. Moved the existing mixed/single guard
+into a reusable consistency function and updated that mutation's exact target.
+
+Validation: **886 backend tests**, **30 frontend tests**, lint/build pass with
+existing warnings. **20/20 policy mutations detected**, 116-test baseline, zero
+errors/timeouts. Actual-runtime tests cover local-only notices, coalescing, no
+model-history leakage, in-flight updates, chat switching and submitted-profile
+snapshots. Live API conflict cases clarified as expected. The consistent-single
+live model draft reached synthesis but failed source verification; profile-note
+delivery for answered responses is covered by mocked API/stream tests, not claimed
+as an accepted live policy answer. This remains the previously documented policy
+quality limitation. Browser automation lost geometry/focus even after restoration,
+so visual notice verification remains manual; no sidebar test edits were completed.
+No policy snapshot, price database, model prompt, verifier threshold or held-out
+data changed. This feature does not certify personal eligibility or chatbot accuracy.

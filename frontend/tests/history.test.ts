@@ -11,6 +11,16 @@ Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
 } });
 beforeEach(() => values.clear());
 
+test("profile notices don't save empty drafts, but keep their local metadata beside real questions", () => {
+  const base = message("Profile updated");
+  const notice = { ...base, role: "assistant" as const, metadata: { ...base.metadata, custom: { kind: "profile_change" } } };
+  saveChat([notice]);
+  assert.equal(loadChat().length, 0);
+  saveChat([message("Question"), notice]);
+  assert.equal(loadChat().length, 2);
+  assert.equal(loadChat()[1].metadata?.custom?.kind, "profile_change");
+});
+
 function message(text: string): ThreadMessage {
   return { id: text, role: "user", content: [{ type: "text", text }],
     metadata: { custom: {} } } as ThreadMessage;

@@ -1,5 +1,6 @@
 import type { ThreadMessage, ThreadMessageLike, ThreadRuntime } from "@assistant-ui/react";
 import { load, save } from "./storage.ts";
+import { isProfileChangeMessage } from "./profileChanges.ts";
 
 /**
  * Conversation memory, frontend half (option A in the team discussion).
@@ -23,7 +24,7 @@ const textOf = (m: ThreadMessage) =>
 /** Earlier turns (excluding the message being sent now), oldest first. */
 export function toHistory(earlier: readonly ThreadMessage[]): HistoryTurn[] {
   return earlier
-    .filter((m) => m.role === "user" || m.role === "assistant")
+    .filter((m) => (m.role === "user" || m.role === "assistant") && !isProfileChangeMessage(m))
     .map((m) => ({ role: m.role as "user" | "assistant", content: textOf(m).slice(0, 12000) }))
     .filter((t) => t.content)
     .slice(-MAX_HISTORY_MESSAGES);
@@ -118,6 +119,7 @@ export function saveChat(messages: readonly ThreadMessage[]): void {
   if (changingChat) return;
   const done = messages.filter((m) => m.status?.type !== "running");
   if (!done.length) return;
+  if (done.every(isProfileChangeMessage)) return; // don't save a notice-only empty draft
   const id = currentChatId();
   const saved: ThreadMessageLike[] = done.slice(-MAX_SAVED_MESSAGES).map(
     (m): ThreadMessageLike => ({

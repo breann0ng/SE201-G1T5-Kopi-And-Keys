@@ -54,7 +54,7 @@ function formatSelectedBinaryRows(text: string, response: ChatResponse): string 
 
 /** Copy the answer and its provenance, rather than the main text alone. */
 export function answerForClipboard(response: ChatResponse): string {
-  const parts = [numberCitations(response)];
+  const parts = [response.profile_note, numberCitations(response)].filter((part): part is string => !!part);
   const numberOf = (id: string) => response.citations.findIndex((source) => source.id === id) + 1;
   if (response.overview?.length) {
     parts.push(response.overview.map((item) => `${item.title}: ${item.quote} [${numberOf(item.citation_id)}]`).join("\n\n"));

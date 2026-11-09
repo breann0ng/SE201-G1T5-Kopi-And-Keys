@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { BuyerProfile } from "./api";
 import { load, save } from "./storage";
+import { profileChangeText } from "./profileChanges";
 
 const KEY = "kk:profile";
 
@@ -18,6 +19,7 @@ type ProfileContextValue = {
   setProfile: (p: BuyerProfile) => void;
   /** Always the latest profile; read by the chat adapter at send time. */
   profileRef: React.RefObject<BuyerProfile>;
+  subscribeChanges: (listener: (text: string) => void) => () => void;
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -31,9 +33,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     return saved;
   });
   const profileRef = useRef(profile);
+  const listeners = useRef(new Set<(text: string) => void>());
+  const subscribeChanges = useCallback((listener: (text: string) => void) => {
+    listeners.current.add(listener);
+    return () => { listeners.current.delete(listener); };
+  }, []);
   const setProfile = (next: BuyerProfile) => {
+    const notice = profileChangeText(profileRef.current, next);
     profileRef.current = next;
     updateProfile(next);
+    if (notice) listeners.current.forEach((listener) => listener(notice));
   };
 
   useEffect(() => {
@@ -41,7 +50,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, [profile]);
 
   return (
-    <ProfileContext.Provider value={{ profile, setProfile, profileRef }}>
+    <ProfileContext.Provider value={{ profile, setProfile, profileRef, subscribeChanges }}>
       {children}
     </ProfileContext.Provider>
   );

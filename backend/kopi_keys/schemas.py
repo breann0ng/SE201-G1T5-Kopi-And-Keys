@@ -225,6 +225,7 @@ class ChatResponse(Contract):
     mode: EvidenceMode = "demo"
     route: Route | None = None
     message: str
+    profile_note: str | None = None
     citations: list[PolicyPassage] = Field(default_factory=list)
     price_result: PriceResult | None = None
     suggestions: list[Suggestion] = Field(default_factory=list)

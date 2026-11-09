@@ -51,6 +51,12 @@ test("a clarification with no sources does not invent citations", () => {
     "Please provide age.");
 });
 
+test("copy preserves the profile basis supplied with that answer", () => {
+  const copy = answerForClipboard({ ...response, profile_note: "Profile supplied: Single. Not an eligibility decision." });
+  assert.match(copy, /^Profile supplied: Single/);
+  assert.match(copy, /Conditional answer/);
+});
+
 const binaryHeader = "Fictional lease condition covers age 99 Applicable Limits for Fictional Usage";
 const yesRow = "The fictional amount is capped at $123.";
 const noRow = "The fictional amount is reduced. Another quoted condition applies.";

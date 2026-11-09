@@ -6,6 +6,7 @@ export type ChatContextValue = {
   runtime: AssistantRuntime;
   /** Starts an empty conversation; earlier saved chats remain available. */
   newChat: () => void;
+  pendingProfileChange?: string | null;
 };
 
 export const ChatContext = createContext<ChatContextValue | null>(null);
