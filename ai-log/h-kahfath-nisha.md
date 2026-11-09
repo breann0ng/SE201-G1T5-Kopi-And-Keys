@@ -1066,3 +1066,32 @@ review. These scores do not establish complete answers or held-out accuracy.
 The frontend, policy snapshots/index, ACTIVE, SQL data and held-out files were not
 changed. Raw fictional drafts/reports remain local with tracing disabled. See
 `docs/policy-gap-followup.md` and the dated benchmark summary for remaining checks.
+
+## 9 November 2026 — Short EHG/PHG question and connected source excerpts
+
+The user tested the shorter `Can EHG and PHG be combined?` question with a single
+citizen/single household, switching First-timer to Second-timer and leaving age
+and income blank. Both refused. This was not a profile contradiction. Reproduced
+both: the relevant singles passage was retrieved, but the model split its
+prerequisite and immediately following PHG sentence into two claims. The normal
+verifier correctly required a complete cited relationship, then refused after
+the unsuccessful repair.
+
+Added a bounded synthesis resolver for these adjacent selections. It requires
+unique exact substrings from the same source, no omitted intervening words, a
+relationship connecting the requested grants and compatible aspect labels. It
+restores original source order, checks each selection's household scope before
+joining and still sends the complete excerpt through the normal verifier.
+Different sources, changed/repeated/overlapping quotes, gaps with conditions,
+opposite household scope, absent connection and explicit missing evidence have
+negative regression coverage. Prompts, thresholds and policy data remain fixed.
+
+Validation: **909 backend tests passed**, **20/20 curated policy mutations
+detected** (116-test baseline; no errors/timeouts). Four profile development
+replays answered, including both previously failing single cases. After a targeted
+development-backend restart, the actual two localhost API questions, including
+the unpunctuated second-timer wording, answered with citations and the second-timer
+scope note. The fixed-evidence GPU check remains **11/12**, including both correct
+negative controls; the same SYN-08 mismatch remains for independent rubric review.
+No held-out data or new policy source was used; tracing stayed off. Browser Stop/
+Edit/chat-switch testing and independent semantic completeness review remain open.

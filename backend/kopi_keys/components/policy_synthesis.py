@@ -245,6 +245,49 @@ def answer_schema(allowed_ids: list[str], maximum_claims: int, question: str, la
     return schema
 
 
+def connected_grant_quotes(selected: list[PolicyClaim], sources: dict, state: GraphState, question: str) -> list[PolicyClaim]:
+    """Restore adjacent selections as one source excerpt, never stitch separate rules.
+
+    A model may split a prerequisite and its following "also" sentence, even
+    though together they form the requested relationship. Require exact unique
+    matches with only whitespace between them; retain original source order and
+    all selected words. The normal verifier still checks the resulting excerpt.
+    """
+    if not combination_question(question):
+        return selected
+    groups = {}
+    for index, claim in enumerate(selected):
+        groups.setdefault(claim.citation_id, []).append((index, claim))
+    replacements, consumed = {}, set()
+    for cid, group in groups.items():
+        source = sources[cid]
+        if len(group) < 2 or source.superseded or len({c.answers_aspect for _, c in group}) > 1:
+            continue
+        if any(source.text.count(c.supporting_quote.strip()) != 1 for _, c in group):
+            continue
+        positions = sorted((source.text.index(c.supporting_quote.strip()), index, c) for index, c in group)
+        if any(right[0] < left[0] + len(left[2].supporting_quote.strip()) or
+               source.text[left[0] + len(left[2].supporting_quote.strip()):right[0]].strip()
+               for left, right in zip(positions, positions[1:])):
+            continue
+        start, end = positions[0][0], positions[-1][0] + len(positions[-1][2].supporting_quote.strip())
+        excerpt = source.text[start:end]
+        if len(excerpt) > 800 or not has_combination_rule(excerpt, requested_grants(question)):
+            continue
+        # Joining an opposite-scoped sentence with another household's sentence
+        # must not conceal the per-selection scope failure.
+        original = [Claim(text=scope_label(c.supporting_quote), supporting_quote=c.supporting_quote,
+                          citation_ids=[cid]) for _, c in group]
+        if household_scope_errors(state.model_copy(update={"draft": Draft(kind="answer", claims=original)}), {cid: source}):
+            continue
+        first = min(index for index, _ in group)
+        replacements[first] = selected[first].model_copy(update={"supporting_quote": excerpt})
+        consumed.update(index for index, _ in group)
+    return [
+        replacements.get(index, claim) for index, claim in enumerate(selected)
+        if index not in consumed or index in replacements]
+
+
 class PolicySummariser:
     def __init__(self, engine: TextEngine, model_override: str | None = None):
         self.engine = engine
@@ -324,10 +367,11 @@ class PolicySummariser:
                        for item in error.errors(include_input=False, include_url=False)]
             return [], generation, details
         sources = {p.id: p for p in passages}
+        selected = connected_grant_quotes(answer.claims, sources, state, question)
         claims = [(table_claim(sources[c.citation_id], c.supporting_quote, question)
                    or Claim(text=scope_label(c.supporting_quote), citation_ids=[c.citation_id],
                             supporting_quote=c.supporting_quote))
                   .model_copy(update={"answers_aspect": (c.answers_aspect or aspects.OTHER) if label_aspects else None})
-                  for c in answer.claims]
+                  for c in selected]
         errors = ["Missing policy evidence: " + item for item in answer.missing_evidence]
         return claims, generation, errors

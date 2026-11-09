@@ -77,3 +77,30 @@ Use fictional details and start a new chat for each independent scenario.
 4. Start an answer, Stop, edit/resend, then switch chats during generation. Replies
    should remain in their own chat. This browser interaction is still unreported;
    runtime regression tests alone do not establish visual correctness.
+
+## Short grant-combination wording follow-up
+
+The user then tested `Can EHG and PHG be combined?` as Single Singapore Citizen +
+Single, first as First-timer and then Second-timer, with age/income blank. Both
+attempts refused. This was a valid test, distinct from the earlier wording that
+explicitly mentioned a resale flat.
+
+The exact profile replay retrieved the relevant singles passage. The model split
+the prerequisite and its adjacent PHG sentence into separate claims, so neither
+excerpt contained the complete relationship the verifier requires. Synthesis now
+restores the selected sentences as one continuous original excerpt only when all
+selections uniquely match one source, have only whitespace between them and
+explicitly connect the requested grants. Original source order and every selected
+word are retained. Opposite household scope is checked before joining. Distinct
+sources, gaps containing omitted conditions, repeated/altered text and adjacent
+descriptions without a connection remain unjoined. Explicit missing evidence
+still blocks the answer. This does not weaken the verifier's relationship rule.
+
+Afterwards both actual localhost API requests answered with one cited source;
+the second-timer response retained the explicit profile limitation. First-timer
+family and mixed-family general-information controls also passed. See the
+[connected-quote evidence](benchmarks/2026-11-09-connected-grants.json): 909 backend
+tests and 20/20 curated mutations pass, and the fixed-evidence check remains 11/12
+with the same SYN-08 mismatch. No additional age/income input was needed for these
+general-information questions. Personal eligibility and broader completeness are
+still separate checks.
