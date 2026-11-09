@@ -1,0 +1,227 @@
+{
+  "scope": "20 curated verifier/profile/trace fault scenarios; not a whole-project score",
+  "generated_at": "2026-11-09T05:48:14.521492+00:00",
+  "python": "3.11.4 (tags/v3.11.4:d2340ef, Jun  7 2023, 05:45:37) [MSC v.1934 64 bit (AMD64)]",
+  "tests": [
+    "test_synthesiser_verifier.py",
+    "test_policy_finals.py",
+    "test_policy_safety.py",
+    "test_profile_scope.py",
+    "test_graph.py"
+  ],
+  "baseline": {
+    "status": "passed",
+    "tests": 109,
+    "failures": []
+  },
+  "summary": {
+    "planned": 20,
+    "executed": 20,
+    "killed": 20,
+    "survived": 0,
+    "errors_or_timeouts": 0,
+    "score": 1.0,
+    "complete": true
+  },
+  "runner_sha256": "91c8f7a66df221ab3d5f6bf7c2a17f35f5e06ea60661683e604a47c674dc679f",
+  "test_sha256": {
+    "test_synthesiser_verifier.py": "8d830cf0a91fb04fd48b4d58aeec8a2a2a668a14d402da11deeb63015534fe6b",
+    "test_policy_finals.py": "8f8ff00fde41bb3366a5711a8ac76e2db5cb98a2cf26b878012da21d8126f46a",
+    "test_policy_safety.py": "fa49f22da2fd45072db1d6f5bb8c708ab91bb4362fbd13a9483cdf7b8d362e3c",
+    "test_profile_scope.py": "5b6c9fd4ace0d21cbbd2bc3547498512992d4ab89ba01efcdaf53974d97a2043",
+    "test_graph.py": "f640e79a2cc2241c90fcf668b634a03b8a2491076bf7b781ecd5217c5a21f024",
+    "fakes.py": "fe49edf28382d3f4d09fbb99baac1fc633d58d74424b1fb4a05f47db4632294a",
+    "conftest.py": "74d5f25536488fdeaa898c17a85a67c495664beb245efecde68b511bfd82b438"
+  },
+  "active_snapshot": "2026-10-15",
+  "source_sha256": {
+    "backend/kopi_keys/components/policy_guardrails.py": "b2a24b90e4ed1925bf439c17d794e9e27dea837540d624133657d10d02f2b330",
+    "backend/kopi_keys/components/profile_context.py": "9d91076934914c87e3369fa57f7f43a4ec7a0b1c43abe3e68fb34d8cdc445805",
+    "backend/kopi_keys/components/verifier.py": "42d13c4681fa328eeaaa206c3b53f6ce9d1110bb74f75f9367831acf1fbb0b2d",
+    "backend/kopi_keys/graph.py": "66a87b169504442ebafc2356559a211e75f557981c1b8d3a3e2fbb8176a0b122",
+    "backend/kopi_keys/llm.py": "5f48812d376f3aa89ae5822a109f7be24638bdb45f3593b8980bdb4fd39fcc8c"
+  },
+  "tested_main": "d9a1b88476df00d92e2eec2bd87e68e9cc109adc",
+  "mutations": [
+    {
+      "id": "POL-MUT-01",
+      "name": "Missing citation accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 111,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-02",
+      "name": "Unknown citation accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 116,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-03",
+      "name": "Superseded source accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 118,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-04",
+      "name": "Quote need not occur in source",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 199,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-05",
+      "name": "Displayed wording may change the quote",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 219,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-06",
+      "name": "Assistant-control output allowed",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 192,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-07",
+      "name": "Low-relevance quote accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 182,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-08",
+      "name": "Multi-grant coverage check removed",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 188,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-09",
+      "name": "Household scope check removed",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 189,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-10",
+      "name": "Missing-evidence errors discarded",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 167,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-11",
+      "name": "SQL value comparison removed",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 93,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-12",
+      "name": "Trailing numeric text accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 82,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-13",
+      "name": "Duplicate statistic accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 85,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-14",
+      "name": "Missing statistic accepted",
+      "file": "backend/kopi_keys/components/verifier.py",
+      "line": 98,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-15",
+      "name": "Second-timer EHG scope gate removed",
+      "file": "backend/kopi_keys/components/profile_context.py",
+      "line": 31,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-16",
+      "name": "Mixed/single profile conflict ignored",
+      "file": "backend/kopi_keys/components/profile_context.py",
+      "line": 23,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-17",
+      "name": "Specialised PDF scope ignored",
+      "file": "backend/kopi_keys/components/policy_guardrails.py",
+      "line": 180,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-18",
+      "name": "Retry allowance exceeds proposal",
+      "file": "backend/kopi_keys/graph.py",
+      "line": 40,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 8
+    },
+    {
+      "id": "POL-MUT-19",
+      "name": "Prompt text leaked to model trace",
+      "file": "backend/kopi_keys/llm.py",
+      "line": 74,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    },
+    {
+      "id": "POL-MUT-20",
+      "name": "Answer text leaked to model trace",
+      "file": "backend/kopi_keys/llm.py",
+      "line": 85,
+      "status": "killed",
+      "tests": 109,
+      "runtime_exception_failures": 0
+    }
+  ]
+}

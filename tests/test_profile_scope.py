@@ -65,7 +65,9 @@ def test_mixed_household_is_not_blanket_rejected_as_second_timer():
 
 def test_mixed_single_profile_is_clarified():
     state = GraphState(message=QUESTION, household_type="single", subsidy_status="mixed", first_timer=False)
-    assert profile_issue(state)[0] == "clarify"
+    issue = profile_issue(state)
+    assert issue is not None
+    assert issue[0] == "clarify"
 
 
 def test_person_like_me_requires_missing_profile_fields():

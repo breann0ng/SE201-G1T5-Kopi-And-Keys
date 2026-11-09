@@ -476,6 +476,74 @@ income, eligibility and new-flat questions retain their wider evidence. Tests
 cover those boundaries, and explicit missing-evidence errors still force repair
 or abstention. No policy facts, snapshots, numeric-price logic or stored chats
 were rewritten. The loading message now reflects possible multi-minute CPU work.
+## 2026-11-08 - Policy mutation checks and final readiness
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** `scripts/mutation_test_policy.py`, `tests/test_policy_mutation_runner.py`,
+  `tests/test_profile_scope.py`, `.github/workflows/ci.yml`, mutation/readiness docs,
+  the responsible-AI record and curated benchmark summary
+- **Outcome:** Changed on `test/nisha-policy-mutations`, based on the UI/profile fixes
+
+### What I asked for
+Check what remains before finals, whether GPU use/public deployment is worthwhile,
+and strengthen Nisha's mutation/security evaluation using the pasted AI checklist
+as context. The user has not decided on public hosting. Codex recommended a local
+final demo and private GPU tunnelling; no deployment or cluster session was started.
+
+### How I checked it
+Reviewed the existing safety suite, price mutation runner, CI and outstanding PRs.
+PR #16/#17/#18 heads were unchanged from the prior review, so their fixes remain
+pending. The pasted checklist was not installed as AGENTS.md or treated as proof
+of course requirements, external enforcement or an immutable audit log.
+
+The new runner's 108-test unmodified baseline passed. It injected 20 documented
+faults in private code copies; all 20 were detected, with no survivors or runner/
+setup errors/timeouts. At least one assertion or explicit pytest failure is required;
+runtime-only exceptions cannot count. Some retry mutants also exhaust scripted
+test responses, and those runtime exceptions are recorded separately. The first
+baseline attempt found a missing copied chunk fixture and scored zero mutants;
+the fixture-copy boundary was corrected before the reported run.
+
+Fifteen runner tests cover error/timeout classification, no credentials/held-out
+path in the child environment, copy-only mutation and cleanup. One existing
+profile test gained an explicit non-null assertion before tuple indexing. The
+final full suite passed: 493 passed, 1 skipped (no vector index in this isolated
+checkout), 4 existing expected failures. Workflow YAML and whitespace checks pass.
+The official upload-artifact v6 tag was resolved and pinned to its immutable SHA.
+
+### What I kept or changed
+No production verifier/model/profile logic was changed for the score. The runner
+uses existing behavioural tests, copies selected public fixtures and code into
+checked temporary directories, strips inherited service/cloud keys, disables
+tracing/plugins and blocks real HTTPX transports in tests. It creates no symbolic
+links to the live checkout and never opens the private held-out split. No GPU,
+live model calls, new Python packages or external records were used.
+
+Added CI execution after pytest and a 14-day JSON artifact, plus a curated summary
+without local paths or per-test payloads. The docs separate development controls
+from runtime safeguards, list remaining PR/integration/privacy/redirect checks,
+and put live dev evaluation before a versioned freeze and fresh held-out run.
+They explicitly note that logs are Git-versioned, dependency audit is report-only,
+branch protection is unverified, and public hosting needs separate safeguards.
+Human review, pushing, hosted CI, PR merges and final live/held-out evaluation
+remain pending. This is not a claim of complete security or independent assurance.
+
+### Integration refresh — 9 November 2026
+Merged main through PR #22 without rewriting the published branch. All 20 exact
+mutation anchors still match current code. Reran 109 baseline tests and all 20
+mutants: 20 killed, no survivors and no errors/timeouts. The 15 runner tests pass;
+full pytest reports 700 passed, 1 skipped and 2 existing expected failures. This
+checkout has no built vector index, so applicable tests use keyword fallback;
+no live model, GPU or held-out evaluation was used. Added a separate dated summary
+in `docs/benchmarks/2026-11-09-policy-mutation-summary.json`, preserving the earlier
+108-test result as historical evidence. Updated readiness notes to reflect merged
+PRs and retained unresolved runtime/manual checks. CI keeps the blocking offline
+mutation check and includes the bounded Gitleaks download retry from PR #23.
+Then merged Sandra's #21 results/documentation update. Mutation source, runner
+and selected test hashes are unchanged, and the final full pytest rerun again
+passed 700 tests (1 skipped, 2 expected failures). The branch is pushed; the
+GitHub integration rejects PR creation with HTTP 403, so a prepared comparison
+link is supplied for submission. No held-out questions or active data changed.
+
 ## 2026-11-07 - Profile scope, source tables and scrolling follow-up
 - **Tool (model):** OpenAI Codex (GPT-6)
 - **Files:** BuyerProfile/state/profile controls and `profile_context.py` from the saved

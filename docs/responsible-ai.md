@@ -104,6 +104,28 @@ the reviewed code, prompts, model, inference settings and ACTIVE snapshot. Run
 the team's fresh held-out set separately. Findings used to tune the system are
 development findings; tuning after a held-out run changes its interpretation.
 
+## Policy fault injection, 8 November 2026
+
+The UI/profile/verifier follow-up has an offline, curated mutation check in
+`scripts/mutation_test_policy.py`. It checks whether existing regression tests
+notice 20 deliberately removed/weakened controls, including citation validity,
+source/household scope, numeric output, the repair bound and trace redaction.
+The 108-test baseline passed and all 20 selected faults were detected by at least
+one assertion or explicit test failure. There were no runner/setup errors or
+timeouts. Pure runtime exceptions cannot count as detection; additional runtime
+side effects are recorded separately in the report. Fifteen tests check the
+runner's classification, credential stripping, copy isolation and cleanup.
+
+This is development evidence for named faults, not whole-project mutation
+coverage, independent validation, model behaviour or a security guarantee. The
+code/test pairing still requires a teammate's review. CI runs it after pytest
+with a read-only token and retains its report; hosted execution and required
+branch protection need verification after merge. No GPU, held-out questions,
+production profiles or new Python dependencies were used. See the
+[method and commands](policy-mutation-testing.md),
+[curated result](benchmarks/2026-11-08-policy-mutation-summary.json), and
+[remaining integration/security/evaluation work](finals-readiness.md).
+
 ## Known limits and follow-up
 
 - The current deterministic router treats bare `Explain PHG conditions.` as out
