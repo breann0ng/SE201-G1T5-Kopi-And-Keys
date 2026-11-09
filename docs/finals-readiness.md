@@ -7,7 +7,7 @@ was treated as a proposal, not repository instructions or verified course text.
 
 ## Integration update — 9 November 2026
 
-PRs #16–#20 and #22 are now merged. The removed SYN-08 evidence mapping, source
+PRs #16–#22 are now merged. The removed SYN-08 evidence mapping, source
 table test IDs, router scope restrictions and feedback record/trace ownership
 fixes are on main. PR #23 contains the separate New chat selection fix; PR #24 is
 the candidate-only price watcher. This mutation branch has merged current main:

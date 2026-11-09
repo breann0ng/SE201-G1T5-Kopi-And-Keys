@@ -484,6 +484,11 @@ in `docs/benchmarks/2026-11-09-policy-mutation-summary.json`, preserving the ear
 108-test result as historical evidence. Updated readiness notes to reflect merged
 PRs and retained unresolved runtime/manual checks. CI keeps the blocking offline
 mutation check and includes the bounded Gitleaks download retry from PR #23.
+Then merged Sandra's #21 results/documentation update. Mutation source, runner
+and selected test hashes are unchanged, and the final full pytest rerun again
+passed 700 tests (1 skipped, 2 expected failures). The branch is pushed; the
+GitHub integration rejects PR creation with HTTP 403, so a prepared comparison
+link is supplied for submission. No held-out questions or active data changed.
 
 ## 2026-11-07 - Profile scope, source tables and scrolling follow-up
 - **Tool (model):** OpenAI Codex (GPT-6)
