@@ -1,7 +1,7 @@
 import { AssistantRuntimeProvider, useLocalRuntime } from "@assistant-ui/react";
 import { BookOpen, Menu, MessageSquare, Settings, SquarePen, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { createAdvisorAdapter } from "../lib/adapter";
 import { ChatContext } from "../lib/chat";
 import { changeChat, currentChatId, deleteChat, loadChat, openChat, saveChat, startNewChat, summaries, type ChatSummary } from "../lib/history";
@@ -23,6 +23,7 @@ export function Layout() {
   const [theme, setTheme] = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   // Runtime lives here so the conversation survives switching between pages; it is also
   // saved in this browser so it survives a reload.
   const adapter = useMemo(() => createAdvisorAdapter(() => profileRef.current), [profileRef]);
@@ -39,9 +40,11 @@ export function Layout() {
   };
 
   useEffect(() => {
-    const title = chats.find((c) => c.id === activeId)?.title ?? "New chat";
+    const title = pathname === "/sources" ? "Sources"
+      : pathname === "/settings" ? "Settings"
+      : chats.find((c) => c.id === activeId)?.title ?? "New chat";
     document.title = `${title} | Kopi & Keys`;
-  }, [chats, activeId]);
+  }, [chats, activeId, pathname]);
 
   useEffect(
     () =>

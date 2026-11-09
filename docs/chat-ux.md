@@ -131,13 +131,21 @@ Additional manual checks (browser automation could not complete the visual check
 An empty conversation is shown as a selected **New chat** row in Recent chats.
 It is a draft, not another saved empty conversation: repeated clicks do not fill
 history or remove earlier saved chats. Its first question supplies its title.
-The browser tab follows the selected conversation title.
+The browser tab follows the selected conversation title on Chat, and shows
+Sources or Settings on those pages.
 
 Switching conversations cancels the client request, clears the unsent composer
 text and pauses history writes during runtime replacement. This prevents an
 intermediate reset notification from copying the previous thread under the next
 thread's ID. Clicking an already-selected conversation preserves its draft and
 running request. Saved profile values remain separate and unchanged.
+
+Switching away while generation is running intentionally cancels that client
+request. The old saved chat may keep the user question without a reply because
+running assistant drafts are not saved as completed answers. This is not a claim
+that remote GPU execution stops immediately. Two regression tests use the actual
+installed assistant-ui runtime with a stream that sends a late chunk after
+cancellation: neither a new draft nor a reopened saved chat receives that chunk.
 
 Manual check: open an existing chat, type an unsent draft, then click New chat.
 Expect the welcome screen, an empty composer, selected New chat row and browser

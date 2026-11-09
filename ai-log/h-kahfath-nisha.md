@@ -561,3 +561,15 @@ permanent 504 stopped after five total attempts; HTTP 404 failed after one;
 an incorrect checksum failed before extraction. All four checks passed. A new
 hosted run is triggered by pushing this follow-up; local checks do not establish
 that the GitHub release endpoint has recovered or that the secret scan has passed.
+
+### Review follow-up — 9 November 2026
+Documented that switching chats during generation cancels the client request and
+can leave the old question without a completed reply. Added two integration
+regressions using the installed assistant-ui runtime rather than mocked reset
+events. Each deliberately releases an old stream after cancellation, checking
+that it cannot alter a new draft or an existing saved conversation. Both pass;
+no late-update leak was reproduced in these scenarios, so no speculative runtime
+rewrite was added. Frontend tests now total 20 passed. Browser tab titles also
+follow Sources and Settings instead of showing the current conversation there.
+Lint/build are checked again; GPU execution and held-out evaluation are outside
+these tests. PR descriptions are prepared separately for review.

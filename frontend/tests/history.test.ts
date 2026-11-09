@@ -1,6 +1,7 @@
 import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import type { ThreadMessage } from "@assistant-ui/react";
+import { AssistantRuntimeImpl, LocalRuntimeCore } from "@assistant-ui/core/internal";
 import { changeChat, currentChatId, deleteChat, loadChat, openChat, saveChat, startNewChat, summaries } from "../src/lib/history.ts";
 
 const values = new Map<string, string>();
@@ -86,3 +87,61 @@ test("saving resumes after a failed reset", () => {
   saveChat([message("Still saved")]);
   assert.equal(loadChat()[0].content, "Still saved");
 });
+
+for (const target of ["new", "saved"] as const) {
+  test(`late cancelled stream cannot leak into the ${target} conversation`, { timeout: 5000 }, async () => {
+    // Exercise the installed assistant-ui runtime, not a mock of its reset events.
+    const other = currentChatId();
+    saveChat([message("Saved other question")]);
+    startNewChat();
+    const old = currentChatId();
+    let release!: () => void, started!: () => void, finished!: () => void;
+    let signal: AbortSignal | undefined;
+    const released = new Promise<void>((resolve) => { release = resolve; });
+    const streaming = new Promise<void>((resolve) => { started = resolve; });
+    const settled = new Promise<void>((resolve) => { finished = resolve; });
+    const core = new LocalRuntimeCore({ adapters: { chatModel: {
+      async *run({ abortSignal }) {
+        signal = abortSignal;
+        try {
+          yield { content: [{ type: "text" as const, text: "Partial old answer" }] };
+          started();
+          await released;
+          // Deliberately return a late chunk even after the request was cancelled.
+          yield { content: [{ type: "text" as const, text: "Late old answer" }] };
+        } finally { finished(); }
+      },
+    } } }, []);
+    const runtime = new AssistantRuntimeImpl(core);
+    const unsubscribe = runtime.thread.subscribe(() => saveChat(runtime.thread.getState().messages));
+    try {
+      runtime.thread.append("Old question");
+      await streaming;
+      assert.equal(runtime.thread.getState().isRunning, true);
+      assert.equal(runtime.thread.getState().messages.length, 2);
+      changeChat(runtime.thread, () => {
+        if (target === "saved") return openChat(other);
+        startNewChat();
+        return [];
+      });
+      const selected = currentChatId();
+      const beforeLate = JSON.stringify(runtime.thread.getState().messages);
+      assert.equal(signal?.aborted, true);
+      release();
+      await settled;
+      // Let the runtime's async cancellation/final notifications settle too.
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      assert.equal(JSON.stringify(runtime.thread.getState().messages), beforeLate);
+      assert.equal(currentChatId(), selected);
+      const shown = JSON.stringify(loadChat());
+      assert.doesNotMatch(shown, /Old question|Partial old answer|Late old answer/);
+      assert.equal(loadChat().length, target === "saved" ? 1 : 0);
+      assert.equal(openChat(old)[0].content, "Old question");
+      assert.equal(loadChat().length, 1);
+    } finally {
+      release();
+      unsubscribe();
+      core.threads.getMainThreadRuntimeCore().detach();
+    }
+  });
+}
