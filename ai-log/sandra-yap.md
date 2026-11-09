@@ -321,6 +321,31 @@ not significant at n = 22". The adviser's plan claimed the embedding prefixes we
 (they were already in place) and that the suite had 240+ tests (it has 515); both corrected.
 No held-out material was opened.
 
+## 2026-11-09 · Verification suite: mutation testing, property, convention and floor tests
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** scripts/mutation_test_retrieval_eval.py, tests/test_eval_compare.py,
+  test_eval_stats.py, test_retrieval_report.py, test_topic_card_component.py,
+  test_properties.py, test_conventions.py, test_scraping_validate.py,
+  test_retrieval_floor.py, evaluation/stats.py, docs/testing-retrieval-and-evaluation.md
+- **Outcome:** Changed
+
+### What I asked for
+Mutation testing on my eight modules using Tasha's method, tests for the weakest ones, then
+the other Week 10 instruments: property, convention, data-validation and regression tests.
+
+### How I checked it
+Ran the runner before and after: the four weakest modules went from 28.2% to 93.3%, all eight
+from 35.7% to 54.3%. Read the 28 survivors (8 equivalent, 20 harmless strings). Six new
+assertions computed their expected values with the code under test; these were changed to
+literals. Checked the retrieval floor fails when the top result is dropped (10/22). Full
+suite: 967 passed.
+
+### What I kept or changed
+Reused Tasha's mutant generator without editing it. The first run left a `data/XXchromaXX/`
+folder from a string mutant, so the runner now cleans these up. A property test found that
+`wilson(0, n)` and `wilson(n, n)` fell just inside 0 and 1; fixed in stats.py (no reported
+figure changes). No Hypothesis dependency added; properties are checked over every small input.
+
 ## 2026-11-09 · Full-system re-run after the router change, and a live freshness check
 - **Tool (model):** Claude Code (Claude Opus 5.5)
 - **Files:** evaluation/freshness.py, tests/test_eval_freshness.py, evaluation/README.md,
@@ -347,3 +372,24 @@ alongside it instead of changing the labels. The first version showed "past 6 mo
 (cut to Oct and say November is missing), so I updated the check to expect that behaviour
 and kept a test that fails the old one. Documented as L2, fixed; I did not edit the price
 tool or router.
+
+## 2026-11-10 · Known limitations and content-based doc names
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** docs/testing-retrieval-and-evaluation.md, docs/evaluation-results.md,
+  scripts/mutation_test_retrieval_eval.py, README.md, docs/architecture.md,
+  backend/kopi_keys/evaluation/README.md
+- **Outcome:** Changed
+
+### What I asked for
+Turn the testing doc's open next steps into known limitations, since development stops after
+the final presentation, and rename files that were named after me.
+
+### How I checked it
+Checked every link to the renamed files (README, architecture doc, evaluation README) still
+resolves.
+
+### What I kept or changed
+Limitations listed plainly: policy_retrieval, policy_index and chunk.py at 29-36% mutation
+score, no tests for the one-off baseline scripts, four modules not re-measured, and a
+keyword-only retrieval floor. Files now named by content (evaluation-results.md,
+testing-retrieval-and-evaluation.md, mutation_test_retrieval_eval.py); the AI log keeps my name.
