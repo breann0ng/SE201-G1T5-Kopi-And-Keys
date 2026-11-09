@@ -168,6 +168,10 @@ def publish(report: dict, root: Path = ROOT) -> dict:
     run(root, "git", "add", "--", *paths)
     run(root, "git", "commit", "-m", f"data: stage policy snapshot {candidate} for review")
     run(root, "git", "push", "origin", f"HEAD:refs/heads/{branch}")
+    # Preserve a recovery pointer if GitHub rejects PR creation after this push.
+    # Never delete a remote branch automatically: the PR may have been created
+    # even if the client lost its response.
+    report["candidate_branch"] = branch
     body += (f"Candidate: `{candidate}`. Change counts: `{json.dumps(report['counts'])}`.\n\n"
              f"{build_note}\n\n"
              "**Merging this PR does not activate it.** ACTIVE, the served chunks/topic cards and the "
@@ -176,7 +180,8 @@ def publish(report: dict, root: Path = ROOT) -> dict:
              "and table labels, not just amounts.\n"
              "- [ ] Check extraction quality, effective dates, redirects and missing pages.\n"
              "- [ ] Record reviewer, date, findings and unresolved issues in the candidate README.\n"
-             "- [ ] Approve the bot PR's CI workflows if GitHub requests approval; require passing CI.\n"
+             "- [ ] Approve the bot PR's CI workflows if GitHub requests approval; if no run appears, "
+             "manually run the CI workflow on this exact candidate branch and require passing checks.\n"
              "- [ ] Keep the evaluation snapshot fixed during held-out evaluation.\n\n"
              "Activation is a separate reviewed change: follow `docs/policy-watcher.md`, "
              "regenerate/validate chunks and topic cards, rebuild the index and restart the backend.")

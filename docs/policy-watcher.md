@@ -42,6 +42,13 @@ If a candidate PR is already open, a later changed check preserves its new evide
 links the pending PR in the attention issue. It does not overwrite the candidate. Review the latest
 evidence, finish or close the older candidate, then rerun if a newer candidate PR is needed.
 
+Merging an inactive candidate does not advance the comparison baseline. If there
+is no open candidate, a later week can therefore create another dated candidate
+against the same ACTIVE. During a freeze, keep one candidate open for review
+instead of repeatedly merging equivalent inactive snapshots. Assign a weekly
+reviewer and backup to check Actions/the attention issue; this workflow cannot
+keep policy current if nobody reviews and separately activates accepted changes.
+
 ## Evidence dates and frozen evaluation
 
 The workflow never changes ACTIVE, the served chunks/topic cards, income rules, SQLite prices,
@@ -61,6 +68,10 @@ These dates are not policy effective dates. A blocked attempt does not make stor
 verified, change citation dates or update a public freshness indicator. No new freshness UI is added.
 The refresh refuses to run against ACTIVE or an older date, preserving the active evidence.
 
+The previous monthly workflow also left ACTIVE unchanged: its automatic push
+archived inactive snapshots rather than updating the advisor's served policy.
+The new review PR adds review before archival as well as before activation.
+
 ## GitHub setup
 
 The built-in `GITHUB_TOKEN` needs contents, issues and pull-request write permissions. The owner
@@ -68,8 +79,18 @@ must allow **GitHub Actions to create pull requests** in Settings > Actions > Ge
 policy may restrict this. Keep main-branch protection and required reviews/checks enabled.
 Do not grant the watcher a branch-protection bypass.
 
-GitHub may display **Approve workflows to run** for a PR created by the built-in token. A maintainer
-must approve those CI runs when prompted and inspect required checks before merging. The watcher
+If PR creation fails after the branch push, `candidate_branch` in the watcher
+report identifies the retained branch. The status report and prepared PR body
+are retained in the watcher artifact. Enable the repository setting, then create
+the draft PR from that existing branch; do not create another snapshot or delete
+the branch blindly. A lost API response may still correspond to a created PR.
+
+GitHub's current [token documentation](https://docs.github.com/en/actions/concepts/security/github_token)
+describes approval-required runs for bot-created/opened or updated PRs. A maintainer
+selects **Approve workflows to run** when shown and inspects the checks. If no run
+appears, after the CI manual trigger is merged select **Actions > CI > Run workflow**
+and choose the **candidate branch**, not main. Inspect results for that exact head
+commit; rerunning main does not test the candidate. The watcher
 does not approve, merge or enable auto-merge. See GitHub's
 [workflow-trigger rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)
 and [schedule limitations](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).

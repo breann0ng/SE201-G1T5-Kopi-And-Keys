@@ -84,3 +84,152 @@ def test_unrelated_new_question_does_not_inherit_the_price_question(graph):
 def test_no_carry_over_after_a_policy_question():
     request = follow_up("what about 2015", first="How long is an HFE letter valid for?")
     assert initial_state(request).get("followup_question") is None
+
+
+FLOOR_AND_LEASE = "how about 16th floor and what are the remaining lease restrictions?"
+
+
+def floor_history(message):
+    return ChatRequest(message=message, history=[
+        HistoryTurn(role="user", content="What are resale prices for 4-room flats in Tampines?"),
+        HistoryTurn(role="assistant", content="Historical transaction summary."),
+        HistoryTurn(role="user", content=FLOOR_AND_LEASE),
+        HistoryTurn(role="assistant", content="Which floor band would you like to compare?"),
+    ])
+
+
+@pytest.mark.parametrize("message", [FLOOR_AND_LEASE, "what about floor 16?", "16th floor"])
+def test_exact_floor_followup_clarifies_tool_limit_without_model_calls(graph, message):
+    state = run_graph(graph, follow_up(message))
+    assert state.response.status == "clarifying"
+    assert state.missing_fields == ["floor_scope"] and state.model_calls == 0
+    assert state.price_result is None and state.storey_band is None
+    assert "cannot filter transactions to one exact floor" in state.response.message
+    assert "high floors (13+)" in state.response.message
+    if "lease" in message:
+        assert "CPF usage" in state.response.message and "grant eligibility" in state.response.message
+
+
+def test_year_after_floor_lease_clarification_explains_data_coverage(graph):
+    state = run_graph(graph, floor_history("how about the data in 2027"))
+    assert state.followup_question == "What are resale prices for 4-room flats in Tampines?"
+    assert (state.town, state.flat_type) == ("TAMPINES", "4 ROOM")
+    assert state.abstain_reason == "price_out_of_range" and state.model_calls == 0
+    assert "Jan 2017 to Jul 2025" in state.response.message
+    assert "Jan 2027" in state.response.message
+    assert "Past sales can't tell you what future prices will be" in state.response.message
+
+
+def test_answering_floor_clarification_uses_only_the_requested_supported_band(graph):
+    state = run_graph(graph, floor_history("high floor"))
+    assert state.route == "price" and state.storey_band == "high"
+    assert state.price_result.filters.storey_band == "high"
+    assert state.response.status == "abstained"  # fixture has no high-floor transactions
+    assert "No matching" in state.response.message
+
+
+def test_an_unrelated_policy_question_still_resets_price_followup_context():
+    request = floor_history("how about the data in 2027")
+    request.history.extend([
+        HistoryTurn(role="user", content="What is the EHG?"),
+        HistoryTurn(role="assistant", content="Grant overview."),
+    ])
+    assert initial_state(request).get("followup_question") is None
+
+
+@pytest.mark.parametrize("message", [
+    "How about the 16th floor; can you predict prices next year?",
+    "How about recommending a good property agent in Tampines?",
+    "How about the 16th floor; should I buy now or wait?",
+])
+def test_price_context_does_not_bypass_scope_guards(graph, message):
+    request = floor_history(message)
+    assert initial_state(request).get("followup_question") is None
+    state = run_graph(graph, request)
+    assert state.response.status == "abstained" and state.route == "abstain"
+
+
+@pytest.mark.parametrize("reply,band", [
+    ("13+", "high"), ("High floors (13+)", "high"), ("high", "high"),
+    ("7–12", "mid"), ("Mid floors (7–12)", "mid"),
+    ("1-6", "low"), ("Low floors (1–6)", "low"),
+])
+def test_floor_clarification_accepts_the_displayed_band_labels(reply, band):
+    from kopi_keys.components.query_router import route_query
+    request = floor_history(reply)
+    request.history[-1] = HistoryTurn(role="assistant", content=(
+        "I can compare low floors (1–6), mid floors (7–12), or high floors (13+), "
+        "but cannot filter transactions to one exact floor. Which floor band would you like to compare?"))
+    state = initial_state(request)
+    routed = route_query(request.message, state, context_question=state.get("followup_question"))
+    assert routed.route == "price" and routed.storey_band == band
+    assert (routed.town, routed.flat_type) == ("TAMPINES", "4 ROOM")
+
+
+def test_full_floor_band_lease_and_year_conversation(graph):
+    # Use the actual emitted clarification rather than a hand-written approximation.
+    history = [HistoryTurn(role="user", content="What are resale prices for 4-room flats in Tampines?"),
+               HistoryTurn(role="assistant", content="Historical transaction summary.")]
+    states = []
+    for message in (FLOOR_AND_LEASE, "13+", "lease rules", "how about data in 2027?"):
+        state = run_graph(graph, ChatRequest(message=message, history=history))
+        states.append(state)
+        history += [HistoryTurn(role="user", content=message),
+                    HistoryTurn(role="assistant", content=state.response.message)]
+    assert states[0].response.asking_for == "storey_band"
+    assert states[1].route == "price" and states[1].price_result.filters.storey_band == "high"
+    assert states[2].response.status == "clarifying" and states[2].response.asking_for == "lease_topic"
+    assert "CPF usage" in states[2].response.message and states[2].model_calls == 0
+    assert states[3].abstain_reason == "price_out_of_range"
+    assert states[3].storey_band == "high" and states[3].model_calls == 0
+    assert "Jan 2017 to Jul 2025" in states[3].response.message
+
+
+def test_floor_number_is_not_reinterpreted_as_a_band_outside_floor_clarification():
+    request = ChatRequest(message="13+", history=[
+        HistoryTurn(role="user", content="Am I eligible for EHG?"),
+        HistoryTurn(role="assistant", content="Please provide: age."),
+    ])
+    state = initial_state(request)
+    assert state.get("storey_band") is None and state.get("followup_question") is None
+
+
+@pytest.mark.parametrize("choice,term", [("CPF usage", "CPF"), ("HDB loans", "loan"), ("Grant eligibility", "grant")])
+def test_lease_topic_reply_becomes_a_scoped_policy_question(choice, term):
+    from kopi_keys.components.query_router import route_query
+    from kopi_keys.components.synthesiser import Synthesiser
+    from kopi_keys.state import GraphState
+    routed = route_query("lease rules")
+    assert routed.route == "clarify"
+    prompt = Synthesiser(None).synthesise(GraphState(message="lease rules", **routed.model_dump(exclude={"needs_confirmation"}))).draft.message
+    request = ChatRequest(message=choice, history=[
+        HistoryTurn(role="user", content="lease rules"), HistoryTurn(role="assistant", content=prompt),
+    ])
+    state = initial_state(request)
+    assert "lease" in state["followup_question"].lower() and term.lower() in state["followup_question"].lower()
+    assert route_query(choice, state, context_question=state["followup_question"]).route == "policy"
+
+
+def test_period_reply_can_return_to_prices_after_a_scoped_lease_topic(graph):
+    history = floor_history("lease rules").history
+    scope = run_graph(graph, ChatRequest(message="lease rules", history=history))
+    history += [HistoryTurn(role="user", content="lease rules"),
+                HistoryTurn(role="assistant", content=scope.response.message),
+                HistoryTurn(role="user", content="CPF usage"),
+                HistoryTurn(role="assistant", content="No evidence in this fictional fixture.")]
+    state = run_graph(graph, ChatRequest(message="how about data in 2027?", history=history))
+    assert state.route == "price" and state.abstain_reason == "price_out_of_range"
+    assert (state.town, state.flat_type) == ("TAMPINES", "4 ROOM")
+
+
+def test_new_price_question_does_not_resurrect_an_older_floor_filter():
+    from kopi_keys.components.query_router import route_query
+    request = ChatRequest(message="how about data in 2027?", history=[
+        HistoryTurn(role="user", content="What are high-floor 4-room prices in Tampines?"),
+        HistoryTurn(role="assistant", content="High-floor summary."),
+        HistoryTurn(role="user", content="What are 3-room prices in Bedok?"),
+        HistoryTurn(role="assistant", content="All floors summary."),
+    ])
+    state = initial_state(request)
+    routed = route_query(request.message, state, context_question=state["followup_question"])
+    assert (routed.town, routed.flat_type, routed.storey_band) == ("BEDOK", "3 ROOM", None)

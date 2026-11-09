@@ -1,0 +1,25 @@
+{
+  "date_sgt": "2026-11-09",
+  "branch": "fix/finals-integration-gaps",
+  "scope": "Development regression for complete floor-band/lease/year conversation; not held-out evaluation or semantic accuracy.",
+  "backend_tests_passed": 859,
+  "new_backend_regression_instances": 14,
+  "focused_tests_after_readability_refactor": 32,
+  "frontend_tests_passed": 20,
+  "lint_errors": 0,
+  "existing_lint_warnings": 4,
+  "frontend_build_passed": true,
+  "live_api_sequence": [
+    {"turn": "purchase_target", "status": "answered", "flat_type": "3 ROOM", "town": "TAMPINES"},
+    {"turn": "exact_floor_and_lease", "status": "clarifying", "asking_for": "storey_band"},
+    {"turn": "13+", "status": "answered", "storey_band": "high", "transactions": 21, "median_sgd": "635000"},
+    {"turn": "lease rules", "status": "clarifying", "asking_for": "lease_topic"},
+    {"turn": "2027 data", "status": "abstained", "route": "price", "latest_data_month": "2026-10"}
+  ],
+  "cpf_choice_branch": {"status": "answered", "route": "policy", "verifier_passed": true, "semantic_review_pending": true},
+  "updated_buttons_browser_replay": false,
+  "policy_sources_changed": false,
+  "price_database_changed": false,
+  "heldout_read": false,
+  "prior_broad_benchmarks_rerun": false
+}

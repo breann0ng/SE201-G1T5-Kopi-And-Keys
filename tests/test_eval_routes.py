@@ -46,10 +46,12 @@ def test_price_filters_pin_the_router_date_for_relative_periods():
     assert metrics.price_filters([q], "2026-11", "2026-10")["mismatches"][0]["wrong"] == ["end_month", "start_month"]
 
 
-def test_price_filters_report_a_missed_band_and_follow_clarification_turns():
+def test_price_filters_extract_bands_report_real_mismatches_and_follow_clarification_turns():
     banded = _price_question("What do high floor 4-room flats in Tampines go for?",
                              start_month="2025-11", storey_band="high")
-    assert metrics.price_filters([banded], "2026-10", "2026-10")["mismatches"][0]["wrong"] == ["storey_band"]
+    assert metrics.price_filters([banded], "2026-10", "2026-10")["accuracy"] == "100% (1/1)"
+    missing = {**banded, "turns": [{"user": "What do 4-room flats in Tampines go for?"}]}
+    assert metrics.price_filters([missing], "2026-10", "2026-10")["mismatches"][0]["wrong"] == ["storey_band"]
     clarified = {"id": "PRC-98", "price_filters": {"town": "TAMPINES", "flat_type": "4 ROOM",
                                                    "start_month": "2025-11", "end_month": "2026-10"},
                  "turns": [{"user": "How much is a flat in Tampines?"},

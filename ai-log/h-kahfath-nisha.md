@@ -766,3 +766,167 @@ rewrite was added. Frontend tests now total 20 passed. Browser tab titles also
 follow Sources and Settings instead of showing the current conversation there.
 Lint/build are checked again; GPU execution and held-out evaluation are outside
 these tests. PR descriptions are prepared separately for review.
+
+## 2026-11-09 — Integrated finals gap review
+
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Branch/base:** `fix/finals-integration-gaps`, from merged main `19eeaec`
+- **Scope:** Policy prompt/verifier, bounded graph retrieval, price-filter
+  extraction/provenance, reproducible dev evaluation, HTTP redirect validation,
+  feedback export, Windows mutation portability, dependency audit and handoff.
+
+### What I asked for
+
+After PRs #23–#26 merged, review and address the remaining gaps. Keep main and the
+reviewed data/evaluation labels intact; prepare changes separately for review.
+
+### What I kept or changed
+
+Preserved the one-repair limit, 0.20 relevance threshold, quote/numeric checks and
+read-only price data. Mixed prompts now separate policy questions from SQL prices.
+Footnote markup is normalised without dropping its reference number; verified
+table scope and explicit age/percentage aspects contribute to relevance.
+Missing policy evidence can use one rewritten local search inside the existing
+repair. Existing SQL results are reused. This is not an unrestricted agent loop.
+
+Purchase-target flat/town extraction, lease/floor propagation and verifier checks
+address lost/misapplied SQL filters. Partial date coverage is disclosed instead of
+silently appearing complete. Removed two strict expected-failure markers only
+after the unchanged Stage 1 labels passed. No label, snapshot or SQL figure was
+edited to improve a score. Local eval dates are pinned, scripted follow-ups are
+consistent, and initial-response/final routes remain separately inspectable.
+
+The scheduled HTTP fetcher now checks redirect hops before contacting them. CSV
+review exports escape formula prefixes. Windows price mutations copy tracked
+inputs without administrator/symlink privileges. The frontend lockfile has
+compatible updates plus a scoped TypeScript-ESLint minimatch override. CI audits
+the RAG extra as well and retains JSON findings; it remains report-only.
+
+The actual laptop environment had advisories missed by a fresh core/dev audit.
+Recorded versions, then updated pip/setuptools/certifi/oauthlib. Chroma 1.5.9 has
+unpatched advisory records; they are not ignored. The app uses a local persistent
+store without a Chroma HTTP service or user-defined embedding configuration.
+This exposure assessment does not patch the library or approve public hosting.
+
+### How I checked it
+
+- Full laptop suite with the index: **828 passed** after the package updates.
+- Separate fresh core/dev environment: **827 passed, 1 skipped** (no Chroma/index).
+- Frontend: **20 passed**, lint/build pass with four existing refresh warnings
+  and the bundle-size warning. `npm audit`: zero entries after fixes.
+- Validated **898 chunks / 12 cards**, including raw-source checksums and quotes.
+- Policy mutations: **20/20 detected**, 109-test baseline, no errors/timeouts.
+- Price mutations: **374/390 (95.9%)**, 16 survivors. Its legacy runner counts
+  nonzero test exits as kills; this is not the stricter policy-runner assertion
+  classification or a whole-project security score.
+- Read-only dev routing/filter/SQL checks: **50/50**, **23/23**, **23/23**.
+- GPU 50-dev run: final-route 47/50, initial-response-route 49/50, 0/8 labelled
+  unsafe answers, 5/42 over-abstentions, zero uncited answers/availability errors,
+  and 19/19 answered price cases matching figures **and** filters. The single raw
+  staleness screen remains for human cohort/context review. Recorded source
+  hashes match the retained runtime; historical diagnostic attempts stay separate.
+- Live synthetic safety: default Qwen2.5:3b CPU **16/16**, including **3/3**
+  positive controls. Shared 27.3B GPU tag **14/16**, with **1/3** positive controls;
+  no availability errors. The larger model over-refused two clean cases. A prompt
+  experiment did not fix those misses and was reverted; its run is not reported
+  as the retained implementation. No broad safety/accuracy guarantee follows.
+
+### Remaining review
+
+Retrieval/card targets and five development abstentions still need component
+review. Browser interaction, root/node tracing privacy, retention, hosted watcher
+permissions/access and independent semantic/held-out evaluation remain explicit
+team actions. The active GitHub ruleset requires a PR but zero approvals and no
+required-status rule; Breann must verify/update server-enforced controls.
+Cross-component changes expand my tuning involvement, so held-out author
+independence assignments need review. No held-out file was opened. Raw outputs,
+fictional profiles and local runtime details remain under ignored `.local/`.
+See `docs/finals-readiness.md`, `docs/dependency-audit.md` and the dated curated
+integration summary. These changes still need teammate review before main.
+
+## 9 November 2026 — Follow-up to PR #25/#26 review
+
+Kept the merged reviewed-candidate policy workflow. Limited the policy mutation
+step to pull requests targeting the default branch and manual CI runs, avoiding
+a duplicate mutation run on the subsequent main push. Full pytest still runs on
+main pushes. A blocked HTTPX request now leaves an isolation marker and makes
+the mutation result an error, even if a test catches the exception or later times
+out; it cannot inflate the detected-fault score. This is an HTTPX guard, not an
+operating-system network sandbox.
+
+The policy watcher records the pushed candidate branch before attempting PR
+creation and retains the prepared PR body as an artifact. Documented recovery,
+bot-workflow approval/manual CI on the exact candidate branch, reviewer ownership,
+and repeated candidates while ACTIVE remains unchanged. No automatic branch
+deletion or snapshot activation was added. The earlier monthly workflow also
+required separate activation; its automatic archive commit did not update the
+served policy. Repository Actions permissions still require owner verification.
+
+Validation: the laptop suite passed **834 tests**; the fresh core/dev environment
+passed **833 with 1 expected skip** without Chroma/index. The sandbox first blocked
+the temporary local Git publication test; rerunning with local subprocess access
+passed. The stricter mutation runner
+detected **20/20** curated faults with a passing **109-test** baseline and no
+errors/timeouts. Added regressions include a real subprocess whose test catches
+a blocked HTTP request; the runner still rejects the result. No GPU rerun was
+needed for these CI/tooling/documentation changes. No hosted watcher run, issue,
+or candidate PR was published as part of this follow-up. These results do not
+establish whole-project security or replace independent held-out evaluation.
+
+## 9 November 2026 — Exact-floor and period follow-up regression
+
+Reproduced the user's three-turn price/floor/2027 conversation. Exact floors
+cannot be represented by the existing SQL floor bands. The router now requests
+a supported band and disambiguates the lease question, instead of attempting a
+policy answer that the verifier rejects. It does not silently treat floor 16 as
+all high-floor transactions. An explicit band choice can proceed with a scope
+notice. Clarification preserves the original price context for later period
+questions, but an unrelated standalone policy question resets that context.
+Scope guards still take precedence over follow-up inheritance.
+
+Added 11 regression cases. Full backend suite: **845 passed**. The live API on
+the GPU-connected integration checkout returned the correct 3-room Tampines
+result, then a floor/lease clarification in 0.126 seconds and a database-coverage
+explanation for 2027 in 0.106 seconds. These two follow-ups need no model call.
+The shared model was verified loaded entirely in the new job's GPU memory;
+embeddings and SQLite remain local, with tracing disabled. Timing is a single
+development observation, not a controlled speed or accuracy benchmark. Earlier
+broader benchmark reports retain their prior source hashes and were not rerun
+or relabelled as results for this follow-up commit.
+
+Used the computer-use skill to inspect Edge. The recent-sales disclosure was
+closed, and expanding it visibly displayed all five populated transaction rows
+and column headings. No frontend/SQL rewrite was needed: the pasted blank grid
+was the collapsed table's copy representation. Confirmed the app already running
+on port 8000 caused the duplicate-server error; restarted that single backend to
+load the fix. Main and the root checkout remain unchanged.
+
+## 9 November 2026 — Completing floor-band and lease clarification replies
+
+The user's longer replay exposed a missing path: typed `13+` did not resume the
+floor clarification, then “lease rules” lost the price context. Added failing
+regressions first and fixed the reply parsing/history path. Floor band aliases
+are interpreted only in the pending floor clarification; the selected band is
+remembered for related price periods and reset for a new independent price
+request. A broad lease request now asks for CPF/loan/grant purpose. Its reply
+becomes a scoped question for normal retrieval and verification, not evidence.
+Unrelated policy questions and scope guards retain their reset/decline behavior.
+
+Extended the optional `asking_for` contract and the existing message-only quick
+reply UI with floor bands and lease topics. These buttons do not alter sidebar
+profile values. Added 14 backend regression instances, including the full chain,
+all displayed floor labels, interpretation outside a floor prompt, a return to
+prices after a scoped lease choice, and resetting an old floor filter.
+
+Validation: full suite **859 passed**; **32 follow-up tests** passed after a
+readability refactor; **20 frontend tests** passed, lint/build pass with the four
+existing refresh warnings and bundle warning. Node's initial sandbox child-
+process denial was resolved by running the normal checks with subprocess access.
+The live GPU-connected API replay answered `13+` with the high-floor filter
+(21 transactions, median SGD 635,000), clarified the lease purpose, and returned
+the October 2026 data limit for 2027. A separate CPF-usage choice returned a cited
+policy answer passing the verifier; semantic completeness still needs review.
+No policies, SQL data, model prompts, verifier thresholds or held-out files changed.
+The updated button interactions were not replayed in the browser in this step;
+the full sequence and topic branch were checked through the live API. Earlier
+browser confirmation of the populated recent-sales disclosure still applies.

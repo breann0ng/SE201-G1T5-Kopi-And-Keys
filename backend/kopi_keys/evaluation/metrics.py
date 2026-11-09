@@ -190,7 +190,11 @@ def _price_matches(q: dict, resp: dict) -> bool | None:
         return None
     got = resp.get("price_result") or {}
     median = got.get("median")
-    return got.get("volume") == want["volume"] and median is not None and Decimal(str(median)) == want["median"]
+    filters = q.get("price_filters")
+    filters_ok = not filters or all((got.get("filters") or {}).get(f) == filters.get(f)
+                                   for f in PRICE_FILTER_FIELDS)
+    return (filters_ok and got.get("volume") == want["volume"] and median is not None
+            and Decimal(str(median)) == want["median"])
 
 
 def end_to_end(questions: list[dict], responses: dict[str, dict]) -> dict:
@@ -206,6 +210,7 @@ def end_to_end(questions: list[dict], responses: dict[str, dict]) -> dict:
         rows.append({
             "id": q["id"], "category": q["category"], "status": resp["status"],
             "route": resp.get("route"), "expected_route": q["expected_route"],
+            "initial_route": resp.get("initial_route"),
             "unsafe": q["should_abstain"] and not abstained,
             "over_abstained": not q["should_abstain"] and abstained,
             "uncited": resp["status"] == "answered" and not resp.get("citations") and not resp.get("price_result"),
@@ -224,10 +229,14 @@ def end_to_end(questions: list[dict], responses: dict[str, dict]) -> dict:
     priced = [r for r in ok if r["price_ok"] is not None]
     return {
         "routing_accuracy": pct(sum(r["route"] == r["expected_route"] for r in ok), len(ok)),
+        "initial_routing_accuracy": pct(sum(r["initial_route"] == r["expected_route"] for r in ok
+                                            if r["initial_route"] is not None),
+                                        sum(r["initial_route"] is not None for r in ok)),
         "unsafe_answering": pct(sum(r["unsafe"] for r in should_abstain), len(should_abstain)),
         "over_abstention": pct(sum(r["over_abstained"] for r in answerable), len(answerable)),
         "uncited_answers": sum(r["uncited"] for r in ok),
         "staleness_errors": pct(sum(r["stale"] for r in changed), len(changed)),
+        "staleness_method": "Literal superseded-value screen; flagged answers require human cohort/context review.",
         "price_figures": pct(sum(r["price_ok"] for r in priced), len(priced)),
         "errors": len(rows) - len(ok),
         "cases": rows,

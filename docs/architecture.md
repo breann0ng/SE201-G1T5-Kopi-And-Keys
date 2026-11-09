@@ -2,18 +2,22 @@
 
 The backend uses one LangGraph workflow (`backend/kopi_keys/graph.py`) and one
 shared `GraphState` (`state.py`). FastAPI calls that graph; the React frontend
-uses its streaming endpoint. This describes the implementation after PR #8,
-not every feature originally proposed for the final system.
+uses its streaming endpoint. Updated for the integrated finals follow-up on
+9 November 2026; this describes the implemented bounded workflow.
 
 ## Changes from the proposal
 
 Discovery is merged into the Synthesiser rather than a separate LLM agent.
-The query router and topic-card matching are currently rules and regex. Code
+The query router uses rules/regex with an optional schema-constrained LLM intent
+fallback for unmatched or weak rules. Extraction remains deterministic. Topic-card matching uses rules. Code
 chooses up to three cited suggestions, and the output node renders them. The
 model selects policy excerpts and formats already-computed price statistics.
 
-The verifier permits one synthesis repair. It does not trigger a new retrieval
-query, so iterative retrieval/backtracking is not implemented.
+The verifier permits one synthesis repair. When synthesis explicitly reports
+missing policy evidence, that repair can first perform one rewritten local search
+(at most two policy searches total). Other verification errors repair the draft
+without searching again. This is a bounded missing-evidence retry, not an
+unrestricted ReAct agent, general web browser or tool-execution loop.
 
 ## Components and ownership
 
@@ -22,7 +26,7 @@ Python module paths are relative to `backend/kopi_keys/`. Paths beginning with
 
 | Component | File | Owner | Current implementation |
 | --- | --- | --- | --- |
-| Query Router | `components/query_router.py` | Breann; price rules by Tasha | Rules/regex, extraction, dates and required-field gate. Dev routing labels: 50; known gaps are listed in `tests/test_development_set_contract.py`. LLM classifier not built. |
+| Query Router | `components/query_router.py`, `components/intent_fallback.py` | Breann; price rules by Tasha; integration fixes by Nisha | Strong rules win; optional constrained LLM intent fallback/weak-rule veto. Regex extracts dates, purchase-target flat/town and supported lease/floor bands. All 50 unchanged Stage 1 dev contracts pass. |
 | Discovery/topic cards | `components/topic_cards.py`, `topic_cards.py`, `data/topic_cards/` | Sandra | 12 cards as rules: eligibility vs amount-only fields, income ceilings (read from `rules/`), cited exclusions (owning private property rules out the CPF grants), priority order, profile hints, overviews, cited suggestions and grant income notes. Some inputs are not collected yet. |
 | Policy retrieval/index | `components/policy_retrieval.py`, `components/policy_index.py` | Sandra; initial policy integration by Nisha | Keyword ranking plus EmbeddingGemma/ChromaDB vectors, scheme focus, deduplication and keyword fallback. Index built locally with `scripts/build_policy_index.py`. |
 | Price Query Tool | `components/price_query.py`, `ingest/resale_db.py` | Tasha | Connected read-only SQLite tool, Decimal statistics, lease/floor refinements and recent transactions. |
@@ -31,7 +35,7 @@ Python module paths are relative to `backend/kopi_keys/`. Paths beginning with
 | Verifier | `components/verifier.py` | Nisha; later grounding fixes by Sandra | Named numeric checks, citations, verbatim quotes, table scope, superseded sources and topic-card checks. Can retain independently verified claims. |
 | Output/abstention | `graph.py`, `components/price_display.py`, `components/abstention.py` | Breann; price wording by Tasha | Verified messages or fixed abstention. Fewer than five sales are listed instead of a median summary. |
 | Harness | `graph.py`, `state.py` | Breann; team integration | One graph, bounded retry and immediate abstention on model-engine failure. |
-| API | `main.py` | Team | `/health`, `/chat`, `/chat/stream`, in-memory cache and model warm-up. |
+| API | `main.py` | Team | `/health`, `/chat`, `/chat/stream`, write-only `/feedback`, in-memory cache and model warm-up. |
 | Frontend | `frontend/` | Sandra; price UI by Tasha, profile/history integration by Nisha | React chat, sources, profile, progress, recent chats, price refinement and local feedback. |
 | Evaluation | `evaluation/` | Sandra | Dev loader, metrics, runner, answer-level baselines (no-tools, naive single-call RAG), retrieval report (Hit@5/Recall@5/MRR, strict and relaxed) and paired comparison with 95% CIs. See `docs/sandra_finals_results.md`. |
 | Tracing | Response `trace` and `@traceable` in `llm.py` | Breann; APAC setup by Nisha | Node traces in responses; optional LangSmith graph/model tracing with credentials and matching region. |
@@ -45,14 +49,15 @@ flowchart TD
     R -->|unsupported| A[abstention]
     R -->|policy / discovery / mixed| P[policy_retrieval]
     R -->|price| Q[price_query]
-    P -->|mixed| Q
-    P -->|policy / discovery| T[topic_cards]
+    P -->|mixed without SQL result| Q
+    P -->|policy / discovery or SQL already available| T[topic_cards]
     Q --> T
     T -->|usable evidence or profile clarification| S
     T -->|no usable evidence| A
     S --> V[verifier]
     V -->|pass| O[output]
-    V -->|first failure| S
+    V -->|first failure without missing evidence| S
+    V -->|missing policy evidence; repair available| P
     V -->|second failure or engine error| A
 ```
 
@@ -69,14 +74,16 @@ flowchart TD
 5. Synthesis uses up to three policy passages and 800 source words by default,
    or formats price values. Table facts retain source row/column context.
 6. The verifier may retain independently valid claims if the resulting draft
-   passes all checks. Otherwise, one repair is allowed, followed by abstention
-   on another failure. Model errors abstain immediately. Output uses verified
+   passes all checks. Otherwise, one repair is allowed, optionally preceded by
+   a bounded missing-policy search. Existing SQL results are reused. Another
+   failure abstains. Model errors abstain immediately. Output uses verified
    parts only.
 
 ## Assumptions and boundaries
 
-- Price requests without dates use the last 12 months relative to the current
-  month. Named dates are parsed; coverage is limited to the dataset snapshot.
+- Price requests without dates use the last 12 months ending at the database's
+  latest month. Named/relative dates are parsed; partial coverage is explicitly
+  disclosed without changing requested filters or pretending data is newer.
 - SQLite selects transactions; Python Decimal code computes statistics
   deterministically. The LLM does not calculate or choose the figures.
 - Mixed requests can answer supported policy when prices are unavailable.

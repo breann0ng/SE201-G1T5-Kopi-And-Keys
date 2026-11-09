@@ -96,7 +96,9 @@ def child_environment(work: Path) -> dict[str, str]:
     return env
 
 
-def classify(code: int, junit: Path, expected_tests: int | None = None) -> dict:
+def classify(code: int, junit: Path, expected_tests: int | None = None, *, network_attempted: bool = False) -> dict:
+    if network_attempted:
+        return {"status": "error", "detail": "Live HTTP attempted inside isolation; not counted as mutation detection"}
     if code not in (0, 1) or not junit.is_file():
         return {"status": "error", "detail": f"pytest exit {code}; no valid assertion result"}
     try:
@@ -159,7 +161,8 @@ def _mutation_isolation(monkeypatch):
     from kopi_keys.components import verifier
     assert Path(verifier.__file__).resolve().is_relative_to(Path(__file__).resolve().parents[1])
     def deny(*args, **kwargs):
-        raise AssertionError("Live HTTP is disabled in policy mutation tests")
+        (Path(__file__).resolve().parents[1] / "live-http-attempted").touch()
+        raise RuntimeError("Live HTTP is disabled in policy mutation tests")
     monkeypatch.setattr(httpx.HTTPTransport, "handle_request", deny)
     monkeypatch.setattr(httpx.AsyncHTTPTransport, "handle_async_request", deny)
 ''')
@@ -174,8 +177,11 @@ def _mutation_isolation(monkeypatch):
             done = subprocess.run(command, cwd=work, env=child_environment(work), timeout=timeout,
                                   capture_output=True, text=True, encoding="utf-8", errors="replace")
         except subprocess.TimeoutExpired:
+            if (work / "live-http-attempted").exists():
+                return classify(-1, junit, network_attempted=True)
             return {"status": "timeout", "detail": f"Exceeded {timeout}s; not counted as killed"}
-        result = classify(done.returncode, junit, expected_tests)
+        result = classify(done.returncode, junit, expected_tests,
+                          network_attempted=(work / "live-http-attempted").exists())
         if result["status"] == "error":
             result["diagnostic"] = (done.stdout + done.stderr)[-2500:]
         return result

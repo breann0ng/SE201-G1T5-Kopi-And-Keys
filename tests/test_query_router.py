@@ -233,3 +233,17 @@ def test_provider_word_as_a_modifier_is_not_a_recommendation(question):
 def test_choosing_a_provider_is_still_declined(question):
     routed = route_query(question, {})
     assert (routed.route, routed.intent_source) == ("abstain", "rules"), question
+
+
+def test_exact_floor_price_requires_a_band_but_does_not_intercept_standalone_policy():
+    routed = route_query("What are prices for 3-room flats on the 16th floor in Tampines?")
+    assert routed.route == "clarify" and routed.missing_fields == ["floor_scope"]
+    assert routed.storey_band is None
+    policy = route_query("What CPF lease rules apply to buying a flat on the 16th floor?")
+    assert policy.route == "policy" and policy.missing_fields == []
+
+
+def test_explicit_band_choice_alongside_exact_floor_discloses_broader_scope():
+    routed = route_query("What are 3-room prices on the 16th floor in Tampines? Use high-floor sales.")
+    assert routed.route == "price" and routed.storey_band == "high"
+    assert "cannot filter transactions to one exact floor" in routed.router_note

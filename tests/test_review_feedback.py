@@ -3,6 +3,7 @@
 import csv
 import importlib.util
 import uuid
+import pytest
 from pathlib import Path
 
 from kopi_keys.feedback import AnswerContext, FeedbackRequest, FeedbackStore
@@ -48,3 +49,15 @@ def test_missing_database_is_not_an_error(tmp_path, capsys):
     assert review.main(["--db", str(tmp_path / "none.db")]) == 0
     assert "nothing recorded yet" in capsys.readouterr().out
     assert not (tmp_path / "none.db").exists()
+
+
+@pytest.mark.parametrize("text", ["=1+1", " +SUM(1,2)", "\t@SUM(1,2)", "-2+3"])
+def test_csv_export_treats_untrusted_formula_prefixes_as_text(tmp_path, text):
+    output = tmp_path / "review.csv"
+    row = {"rating": -1, "question": text, "answer": "Normal answer.", "comment": text}
+    review.export([row], output, full=True)
+    with output.open(encoding="utf-8", newline="") as handle:
+        exported = next(csv.DictReader(handle))
+    assert exported["question"] == "'" + text and exported["comment"] == "'" + text
+    assert exported["rating"] == "-1" and exported["answer"] == "Normal answer."
+    assert row["question"] == text  # export does not modify the saved feedback

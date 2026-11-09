@@ -191,13 +191,29 @@ def collect(path: str) -> list[tuple[Mutant, str]]:
 
 
 def _make_workspace() -> Path:
-    """A private copy of backend/ plus links to the rest of the repo the tests read."""
+    """Private backend plus public test inputs; Windows does not require symlink privileges."""
     work = Path(tempfile.mkdtemp(prefix="mut-"))
     shutil.copytree(ROOT / "backend", work / "backend",
                     ignore=shutil.ignore_patterns("__pycache__", "*.egg-info"))
-    for name in ("data", "tests", "scripts", "frontend"):
-        if (ROOT / name).exists():
-            (work / name).symlink_to(ROOT / name)
+    inputs = ("data", "tests", "scripts", "frontend")
+    if os.name == "nt":
+        # Copy tracked inputs only: never copy node_modules, local feedback,
+        # credentials, generated databases or a running Chroma index.
+        tracked = subprocess.run(["git", "ls-files", "-z", "--", *inputs], cwd=ROOT,
+                                 check=True, capture_output=True, text=True).stdout
+        for name in tracked.split("\0"):
+            if not name:
+                continue
+            source = ROOT / name
+            destination = work / name
+            if not destination.resolve().is_relative_to(work.resolve()):
+                raise ValueError("Mutation input escaped its workspace")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+    else:
+        for name in inputs:
+            if (ROOT / name).exists():
+                (work / name).symlink_to(ROOT / name, target_is_directory=True)
     return work
 
 
@@ -257,6 +273,8 @@ def main() -> None:
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         results = list(pool.map(run, mutants))
     for work in workspaces:
+        if not work.resolve().is_relative_to(Path(tempfile.gettempdir()).resolve()) or not work.name.startswith("mut-"):
+            raise ValueError("Refusing cleanup outside the mutation temporary directory")
         shutil.rmtree(work, ignore_errors=True)
 
     killed = sum(m.status != "survived" for m in results)

@@ -11,10 +11,12 @@ confirm personal eligibility or value an individual flat.
 ## What is implemented
 
 - **Query routing:** rules and regex classify policy, price, mixed and discovery
-  questions, extract profile/filter values, and ask for missing information.
+  questions, with an optional constrained LLM intent fallback for weak/unmatched
+  rules. Extraction includes the purchase target, supported lease/floor bands,
+  profile values and dates; missing information produces a clarification.
 - **Policy retrieval:** keyword ranking fused with EmbeddingGemma vectors in
   ChromaDB, with keyword fallback when the index or embedding service is
-  unavailable. The ACTIVE snapshot currently contains 849 chunks.
+  unavailable. The ACTIVE snapshot currently contains 898 chunks.
 - **Prices:** a connected, read-only SQLite tool calculates mean, median, IQR,
   range and volume from the shared resale CSV. Filters include town, flat type,
   dates, remaining lease and floor band. Fewer than five matching sales are
@@ -24,7 +26,8 @@ confirm personal eligibility or value an individual flat.
 - **Synthesis and verification:** Qwen2.5:3b selects cited policy excerpts and
   formats price statistics. Deterministic checks validate quotes, citations,
   table scope and generated price figures. A failed draft gets one repair
-  attempt; an unverifiable answer is withheld. Clarifications and some scoped
+  attempt, which may first retry a local search for explicitly missing policy
+  evidence; an unverifiable answer is withheld. Clarifications and some scoped
   citizenship-table responses use code directly.
 - **Frontend:** profile sidebar, clarification buttons, live graph progress,
   source tables/charts, price refinement and browser-local recent chats.
@@ -41,8 +44,9 @@ snapshot review PRs. It never activates policy data automatically.
 - Node.js **22 or newer** and npm for the frontend.
 - Ollama with `qwen2.5:3b` for text generation and `embeddinggemma` for hybrid
   retrieval. The Windows script can install a project-local runtime.
-- Disk space for the runtime, models and generated databases. Text generation
-  requests set `num_gpu=0`; CPU responses can take tens of seconds or longer.
+- Disk space for the runtime, models and generated databases. By default text
+  generation requests set `num_gpu=0`; CPU responses can take tens of seconds or
+  longer. Allocated GPU inference is opt-in.
 
 Run setup commands from the repository root. Policy data, topic cards and the
 resale CSV are committed. Each laptop builds its own SQLite database and vector
@@ -201,19 +205,18 @@ for live model checks. The standalone price CLI is:
 .\.venv\Scripts\python.exe -m kopi_keys.cli --input tests\fixtures\price_sql_result.json
 ```
 
-Checks on **18 October 2026**: 248 tests passed with no skips, snapshot/card
-validation and six fixture validations passed, and the frontend built. Lint has
-no errors and four existing React Refresh warnings; the production build also
-reports a large-bundle warning.
+Use [finals-readiness.md](docs/finals-readiness.md) for the latest integrated
+checks and unresolved actions. The frontend has 20 tests; lint/build retain four
+React Refresh warnings and the large-bundle warning. Test counts are tied to
+their checkout and available services, not added across branches.
 
-Current development metrics use the committed 30-question set:
+The committed development set has **50 questions**. The separate fresh held-out
+set has 40 private questions. Sandra's 8 November development results include:
 
 | Metric | Result | Target |
 | --- | --- | --- |
-| Router labels | 100% (30/30) | ≥ 90% |
-| Hybrid Recall@5 | 60% (12/20) | ≥ 85% |
-| Discovery precision / recall | 38% / 89% | ≥ 80% / ≥ 70% |
-| Ask-next accuracy | 67% (2/3) | No target set |
+| Hybrid policy Recall@5, strict / relaxed (22 questions) | 74.2% / 83.3% | ≥ 85% |
+| Discovery precision / recall (7 questions) | 54% / 93% | ≥ 80% / ≥ 70% |
 
 These are development checks, not held-out results or a new full end-to-end
 evaluation. Hybrid scores assume the index and embedding service are available.
@@ -241,11 +244,14 @@ model offload and stop if Ollama falls back to CPU.
 - CPU policy answers can time out with larger contexts. The 26 October multi-grant
   application smoke test safely abstained after the 180-second model timeout;
   see [the finals guide](docs/finals-nisha.md) for the benchmark and limitations.
-- Retrieval recall and discovery precision remain below target. The answer-level
-  no-tools and naive-RAG baselines are not implemented yet.
+- Retrieval recall and discovery precision remain below target. Answer-level
+  no-tools and naive single-call RAG baselines are implemented; see
+  [Sandra's results](docs/sandra_finals_results.md).
 - Clarification history is bounded and some topic-card inputs are unsupported.
-  Chats and feedback stay in the browser, with no login or server conversation
-  store. Optional LangSmith tracing can record runs.
+  Chats stay in the browser, with no login or server conversation store. The
+  backend records feedback question/answer/rating context in local SQLite for
+  human review; optional LangSmith tracing/feedback is separate. Clearing browser
+  history does not delete those server/cloud records.
 - Prices describe past sales. Block-specific lookups, individual-flat valuations,
   predictions and final eligibility decisions are not provided.
 

@@ -1,0 +1,225 @@
+{
+  "date_sgt": "2026-11-09",
+  "branch": "fix/finals-integration-gaps",
+  "base_main": "19eeaecc5a98f241fd2d3ce0d790e9de02029805",
+  "scope": "Development integration checks; not held-out results, human semantic approval or public-deployment certification.",
+  "data_unchanged": true,
+  "heldout_read": false,
+  "validation": {
+    "local_with_index": {
+      "passed": 828,
+      "skipped": 0
+    },
+    "fresh_core_dev_install": {
+      "passed": 827,
+      "skipped": 1,
+      "skip_reason": "Optional Chroma/index absent"
+    },
+    "frontend": {
+      "passed": 20,
+      "lint_errors": 0,
+      "existing_lint_warnings": 4,
+      "build": "passed; existing bundle-size warning"
+    },
+    "snapshot": {
+      "chunks": 898,
+      "cards": 12,
+      "validation": "passed"
+    },
+    "policy_mutations": {
+      "baseline": 109,
+      "planned": 20,
+      "executed": 20,
+      "killed": 20,
+      "survived": 0,
+      "errors_or_timeouts": 0,
+      "score": 1.0,
+      "complete": true
+    },
+    "price_mutations": {
+      "planned": 390,
+      "killed": 374,
+      "survived": 16,
+      "timeouts": 0,
+      "method": "Legacy runner counts nonzero pytest exits as killed; not the stricter policy assertion classifier."
+    }
+  },
+  "offline_development": {
+    "router_contract": "50/50",
+    "price_filters": "23/23",
+    "price_figures": "23/23",
+    "as_of": "2026-10"
+  },
+  "live_development": {
+    "split": "dev",
+    "questions": 50,
+    "as_of": "2026-10",
+    "snapshot": "2026-10-15",
+    "metrics": {
+      "routing_accuracy": "94% (47/50)",
+      "initial_routing_accuracy": "98% (49/50)",
+      "unsafe_answering": "0% (0/8)",
+      "over_abstention": "12% (5/42)",
+      "uncited_answers": 0,
+      "staleness_errors": "14% (1/7)",
+      "staleness_method": "Literal superseded-value screen; flagged answers require human cohort/context review.",
+      "price_figures": "100% (19/19)",
+      "errors": 0
+    },
+    "remaining_abstentions": [
+      "MIX-02",
+      "DSC-01",
+      "DSC-02",
+      "DSC-05",
+      "DSC-06"
+    ],
+    "human_review": "pending; citation/answer presence is not semantic correctness",
+    "dataset_sha256": "f64fe3abf10238216c63f6fe27a6bb941d076bdbfdcaef7c76c3a1e995ebc88b",
+    "price_database_sha256": "969b064854ce091926ac9aaa16a7308bc7d071b20ffe84fb90df1ea35acfd471",
+    "model": {
+      "model": "qwen3.8:latest",
+      "device": "gpu",
+      "threads": 4,
+      "temperature": 0,
+      "seed": 42,
+      "gpu_loaded_before_run": {
+        "name": "qwen3.8:latest",
+        "digest": "22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643",
+        "size": 17278099782,
+        "size_vram": 17278099782,
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "27.3B",
+          "quantization_level": "Q4_K_M"
+        }
+      }
+    },
+    "runtime_source_hashes_match_retained_code": true,
+    "source_sha256": {}
+  },
+  "synthetic_safety": {
+    "cpu": {
+      "model": "qwen2.5:3b",
+      "cases": 16,
+      "passes": 16,
+      "availability_errors": 0,
+      "answerable_answered": 8,
+      "answerable_cases": 8,
+      "positive_controls_passed": 3,
+      "positive_controls": 3
+    },
+    "gpu": {
+      "model": "qwen3.8:latest",
+      "cases": 16,
+      "passes": 14,
+      "availability_errors": 0,
+      "answerable_answered": 6,
+      "answerable_cases": 8,
+      "positive_controls_passed": 1,
+      "positive_controls": 3
+    },
+    "interpretation": "GPU model over-refused SAFE-01 and SAFE-16. Both configurations require independent human review. Small fictional dev suite, not comprehensive attack coverage; different hardware/models and concurrent test work prohibit an isolated speed comparison."
+  },
+  "retrieval": {
+    "mode": "hybrid",
+    "strict_policy": {
+      "n": 22,
+      "hit_at_5": 0.818,
+      "recall_at_5": 0.742,
+      "recall_at_20": 0.902,
+      "mrr_at_20": 0.661,
+      "not_in_index": 0
+    },
+    "relaxed_policy": {
+      "n": 22,
+      "hit_at_5": 0.909,
+      "recall_at_5": 0.833,
+      "recall_at_20": 0.947,
+      "mrr_at_20": 0.749,
+      "not_in_index": 0
+    },
+    "targets_met": false,
+    "discovery_candidate_precision": "14/26",
+    "discovery_candidate_recall": "14/15"
+  },
+  "dependency_audit": {
+    "frontend_entries": 0,
+    "fresh_python_core_dev_entries": 0,
+    "actual_environment_remaining_records": [
+      {
+        "package": "chromadb",
+        "version": "1.5.9",
+        "id": "PYSEC-2026-311",
+        "aliases": [
+          "CVE-2026-45829",
+          "GHSA-f4j7-r4q5-qw2c"
+        ],
+        "fix_versions": []
+      },
+      {
+        "package": "chromadb",
+        "version": "1.5.9",
+        "id": "PYSEC-2026-311",
+        "aliases": [
+          "CVE-2026-45829",
+          "GHSA-f4j7-r4q5-qw2c"
+        ],
+        "fix_versions": []
+      },
+      {
+        "package": "chromadb",
+        "version": "1.5.9",
+        "id": "PYSEC-2026-3814",
+        "aliases": [
+          "CVE-2026-45833",
+          "GHSA-36p7-vc44-83pf"
+        ],
+        "fix_versions": []
+      },
+      {
+        "package": "chromadb",
+        "version": "1.5.9",
+        "id": "PYSEC-2026-3815",
+        "aliases": [
+          "CVE-2026-45831",
+          "GHSA-xph7-9rjv-w5fr"
+        ],
+        "fix_versions": []
+      },
+      {
+        "package": "chromadb",
+        "version": "1.5.9",
+        "id": "PYSEC-2026-3813",
+        "aliases": [
+          "GHSA-2wm9-hf6c-p5cr",
+          "CVE-2026-45830"
+        ],
+        "fix_versions": []
+      }
+    ],
+    "ignored_advisories": [],
+    "ci_scope": "dev + rag; report-only, JSON artifacts retained 14 days",
+    "local_package_updates": {
+      "pip": "26.3",
+      "setuptools": "84.2.1",
+      "certifi": "2026.10.23",
+      "oauthlib": "4.0.1"
+    },
+    "note": "Live model runs preceded these four compatible environment updates; full local regression suite passed after them. Chroma 1.5.9 remains unpatched; embedded-store exposure assessment is not a package fix."
+  },
+  "remaining_team_actions": [
+    "Independent review of cross-component fixes and semantic coverage",
+    "Improve retrieval/card targets without editing gold labels",
+    "Owner verifies/enforces approval and CI checks; visible main ruleset currently requires zero approvals",
+    "Verify hosted watcher runs and source access",
+    "Manual browser/profile/cancel/scroll/table/chart checks",
+    "Review LangSmith root/node content, access and retention; agree feedback deletion policy",
+    "Freeze code/model/data/settings, review held-out author independence, then conduct fresh held-out evaluation",
+    "Review unresolved Chroma advisories and public-deployment controls before any public hosting"
+  ]
+}

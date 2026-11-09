@@ -240,6 +240,24 @@ def test_notification_permissions_error_is_visible_failure(candidate, monkeypatc
     assert "publication_error" in report
 
 
+def test_pr_creation_failure_retains_recovery_branch_and_body(candidate, monkeypatch):
+    change(candidate, FOLDER + "changes_since_2026-10-15.json", changed=[{}])
+    recorded = fake_commands(monkeypatch)
+    fake = watch.run
+    def fail_pr(root, *args):
+        if args[:3] == ("gh", "pr", "create"):
+            raise subprocess.CalledProcessError(1, ["gh", "pr", "create"])
+        return fake(root, *args)
+    monkeypatch.setattr(watch, "run", fail_pr)
+    assert watch.main(root=candidate, do_publish=True) == 1
+    status = watch.read_json(candidate / ".local/reports/policy-watch-status.json")
+    assert status["candidate_branch"] == "automation/policy-snapshot-2026-11-09-1234"
+    assert "publication_error" in status
+    assert (candidate / ".local/reports/policy-watch-pr.md").is_file()
+    assert not any("--delete" in command for command in recorded)
+    assert (candidate / "data/policy_snapshots/ACTIVE").read_text() == "2026-10-15\n"
+
+
 def test_real_diff_catches_changed_conditions_even_when_amount_sets_match(candidate, monkeypatch):
     """Run the production diff: matching numbers alone must never mean unchanged policy."""
     script = SCRIPT.parent / "scraping/diff.py"

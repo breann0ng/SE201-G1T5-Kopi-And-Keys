@@ -56,6 +56,29 @@ After editing the dev set, regenerate the router labels:
 
 End-to-end runs call Ollama for every question and take a long time on CPU.
 
+Local full-system evaluation now pins the router to `dataset.AS_OF` and follows
+scripted clarification turns consistently in both runners. Remote API evaluation
+refuses questions whose date interpretation has drifted from the labels: use
+`--local` rather than changing the frozen data or labels to fit today's date.
+Reports retain the legacy final-route accuracy and separately report
+`initial_routing_accuracy`, so answering a clarification is not mistaken for an
+incorrect first-turn route. The superseded-value metric remains a literal screen;
+qualified earlier-cohort amounts need human review, not automatic deletion.
+
+For a development diagnosis with verifier reasons and a human-review worksheet:
+
+```powershell
+.\.venv\Scripts\python.exe -m kopi_keys.evaluation.dev_review --case-ids MIX-01 POL-02
+```
+
+Omit `--case-ids` for all 50 **development** questions. There is no held-out option.
+The command requires the complete hybrid index, disables tracing, pins dates,
+preserves errors/drafts/relevance scores and writes incrementally to ignored
+`.local/reports/dev-review.json`. GPU mode verifies actual offload before the run.
+Reports record source/evidence/dataset/SQL hashes; keep model settings, model
+digest and the final clean Git commit together when freezing. A completed run
+does not establish semantic accuracy: the human-review fields remain unfilled.
+
 Finals runs (from `backend/`):
 
 ```powershell

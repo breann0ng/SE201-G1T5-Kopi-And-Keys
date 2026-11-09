@@ -5,7 +5,60 @@ This records work remaining, not a security certification or approval to deploy.
 The pasted generic AI-development checklist
 was treated as a proposal, not repository instructions or verified course text.
 
-## Integration update — 9 November 2026
+## Current integration follow-up — 9 November 2026
+
+PRs **#23–#26 are merged** into main at `19eeaec`. The separate
+`fix/finals-integration-gaps` branch starts there. Earlier PR-status notes below
+are historical, not outstanding merge instructions.
+
+The branch fixes purchase-target flat/town selection, lease/floor propagation and
+verification, and disclosure of partially covered price periods. It separates
+policy prompts from transaction-price requests, preserves footnote numbers while
+normalising presentation, and includes canonical table scope in relevance checks.
+The 0.20 threshold is unchanged. Explicitly missing policy evidence can use one
+rewritten local search within the existing single synthesis-repair allowance.
+
+Scheduled HTTP policy fetching validates HTTPS, port, credentials, domain and
+robots permission **before each redirect hop**, counting/throttling every request
+and bounding redirects. The optional manual Playwright renderer is outside these
+new tests. No ACTIVE snapshot, policy text, vectors, SQL data or dev labels changed.
+
+Local evaluations pin router dates and preserve first-turn/final routes separately.
+The price checker verifies filters as well as figures. A dev diagnostic retains
+verifier reasons, quotes, hashes and blank human-review fields, with tracing off
+and no held-out mode. It refuses a missing/partial hybrid index.
+
+Frontend dependency fixes and a scoped TypeScript-ESLint minimatch override remove
+the reported Vite/minimatch advisories. `npm audit` reports zero findings; Python's
+freshly resolved **core/dev-only** requirements also have zero known findings.
+The separate actual-environment audit found old pip/setuptools/certifi/oauthlib
+and unresolved Chroma advisories. Compatible updates were applied to those four
+local packages; Chroma 1.5.9 was not downgraded or its warnings ignored. CI now
+audits the RAG extra too, retaining report-only behaviour and visible findings.
+See [dependency triage](dependency-audit.md) before interpreting an audit result.
+These are dated checks, not a security guarantee. The override uses `^11.0.1` only under
+TypeScript-ESLint, with Node 22/tests/lint/build checked. Feedback CSV exports escape
+formula prefixes without changing stored records. Windows price mutations copy
+tracked inputs without requiring symlink/admin privileges or copying private files.
+
+### Remaining team controls
+
+| Item | Verified status / next action | Owner |
+| --- | --- | --- |
+| Main protection | Active ruleset 26679938 requires a PR but **0 approvals**, no stale/last-push approval handling, and no required-status rule. Separate legacy protection/bypass settings are not established by this read. Require at least one independent approval and Backend/Frontend/Secret checks; verify bypasses. | Breann / repo owner |
+| Retrieval/cards | Reproduced policy hybrid Recall@5: **74.2% strict, 83.3% relaxed** (22 questions). Discovery candidate precision **54% (14/26)**, recall **93% (14/15)**. These targets remain unmet; do not change gold labels to hide misses. | Sandra / team |
+| Answer meaning | Review remaining development abstentions, missing conditions and broad discovery answers. Check earlier/later EC cohort wording. A verified quote is not a complete-answer guarantee. | Independent teammate / component owners |
+| Hosted watchers | Check the first hosted revised workflow runs for permissions/source access. No live publication or activation was performed by this branch. An access denial is a blocked check, not newly verified policy. | Sandra / Nisha / repo owner |
+| Browser interactions | History/runtime/copy/table tests pass. Manually check Stop/Edit/resend, switching mid-answer, profile changes, long-answer/phone-width scrolling, source tables/charts and page titles in this checkout. | Demo operator |
+| Privacy | Review LangSmith root/node spans, historical records, access and retention. Agree local feedback retention/deletion and request handling. Browser clearing does not erase server/cloud data. Keep real-profile tracing off for demos. | Operators / Tasha |
+| Freeze/held-out | Freeze the reviewed commit, model digest/settings, snapshot/index, SQL hash and reference month. This branch expands Nisha's cross-component tuning involvement: revise the proposed held-out writer assignments for independence. No held-out file was read. | Team |
+| Public hosting | The recommendation remains a local/private-tunnel demo. Authentication, session isolation, rate/concurrency limits, budgets, HTTPS, retention and public abuse testing remain deployment prerequisites. | Team |
+
+See [dated integration evidence](benchmarks/2026-11-09-integration-summary.json).
+Historical counts and raw runs retain their own scope; never add branch counts or
+call an answered/cited result semantic accuracy without independent review.
+
+## Earlier integration update — 9 November 2026
 
 PRs #16–#22 are now merged. The removed SYN-08 evidence mapping, source
 table test IDs, router scope restrictions and feedback record/trace ownership
@@ -36,7 +89,7 @@ most negative security checks. A faster/larger model does not repair a bad
 router, missing evidence, wrong household scope or an unverified policy snapshot.
 Do not reuse an expired cluster allocation, old node/port or notebook token.
 
-## Work in order
+## Original work plan (historical; use current status above)
 
 1. **Resolve the reviewed PR findings.** At the checked revisions #16/#18 still
    reference removed SYN-08 chunk IDs. In isolated review copies, replacing them

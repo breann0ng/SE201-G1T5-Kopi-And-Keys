@@ -25,6 +25,12 @@ or vector index is copied. Tests assert the copied verifier was actually importe
 and deny real HTTPX transports; existing mock transports remain usable. These
 test controls are not a general-purpose OS/network sandbox.
 
+The HTTP blocker records a marker outside test results and raises a runtime
+exception. Any attempted live HTTP invalidates the run as an isolation error,
+even if a test catches the exception or another assertion fails. It never counts
+as a killed mutant. A real subprocess regression exercises this containment path
+without making a network connection.
+
 The baseline must pass first. Every mutant runs the same complete selected suite
 without `-x`, so execution count can be checked against the baseline. A pytest
 assertion failure (including explicit `pytest.fail`) counts as killed. A mutant
@@ -47,7 +53,9 @@ the mutation definitions rather than silently running fewer cases.
 The full local report is `.local/reports/policy-mutations.json`. It records the
 baseline, mutations, failing test names/reasons, source/runner/test hashes, snapshot,
 Python version and separate error counts. CI runs the check inside the existing
-Backend tests job after pytest and retains the JSON artifact for 14 days. The
+Backend tests job after pytest for PRs to the default branch and explicit manual
+CI runs; it is skipped on the duplicate main push after merge. Unit tests still
+run on main pushes. The mutation JSON artifact is retained for 14 days. The
 upload action is pinned to the official v6 tag's immutable SHA. The repository
 owner must make that Backend job a required branch-protection check if it is not
 already required; merely committing a workflow does not enforce merging rules.

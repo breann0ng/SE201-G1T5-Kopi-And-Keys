@@ -148,6 +148,9 @@ into a prompt, retrieval query, topic card or test fixture without rewriting the
   copy comments into issues, PRs, tests or chat. Delete rows or LangSmith feedback that contain
   personal data.
 - Clearing browser data removes only the remembered thumb highlight, not recorded feedback.
+- CSV exports prefix spreadsheet formula strings as text without altering the
+  saved question/answer/comment. This does not make feedback trustworthy or turn
+  it into a training label.
 - **A public deployment would need more (future work):** admin login checked on the server for
   any review page, HTTPS, a retention and deletion policy for feedback and traces, and PDPA
   consideration (purpose, consent notice, access and correction requests).

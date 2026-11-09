@@ -1,0 +1,22 @@
+{
+  "date_sgt": "2026-11-09",
+  "branch": "fix/finals-integration-gaps",
+  "scope": "User-reported three-turn development regression, not held-out evaluation or a model-quality benchmark.",
+  "backend_tests_passed": 845,
+  "new_regression_cases": 11,
+  "live_api": {
+    "purchase_target": {"flat_type": "3 ROOM", "town": "TAMPINES", "status": "answered"},
+    "exact_floor_and_lease": {"status": "clarifying", "elapsed_seconds": 0.126, "model_calls": 0},
+    "period_2027": {"status": "abstained", "route": "price", "latest_data_month": "2026-10", "elapsed_seconds": 0.106, "model_calls": 0}
+  },
+  "browser": {
+    "recent_sales_disclosure_expanded": true,
+    "populated_rows_visible": 5,
+    "headers_visible": true,
+    "frontend_changed": false
+  },
+  "policy_sources_changed": false,
+  "price_database_changed": false,
+  "heldout_read": false,
+  "prior_broad_benchmarks_rerun": false
+}

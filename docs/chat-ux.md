@@ -152,3 +152,45 @@ Expect the welcome screen, an empty composer, selected New chat row and browser
 title `New chat | Kopi & Keys`. Send a new question: only that conversation should
 take the new title. Reopen the earlier conversation and confirm its messages and
 title remain intact. Reload while the draft is empty; New chat should stay selected.
+
+### Price follow-ups and recent sales (9 November 2026)
+
+The price tool supports low (1–6), mid (7–12) and high (13+) floor bands, not an
+exact floor. An exact-floor price request asks the user to choose a band without
+running SQL or the model. A combined floor/lease follow-up also asks whether the
+lease question concerns CPF usage, loans, grants or price comparisons. It does
+not infer an exact-floor price or make an eligibility decision.
+
+That clarification preserves the previous price question. A later “how about the
+data in 2027” uses its town/flat type and the database's actual date coverage to
+explain unavailable records without prediction. A new unrelated policy question
+resets this follow-up context; forecast and other scope guards still apply.
+
+Recent transactions are inside the **5 most recent matching sales** disclosure.
+Click it to show the rows. A browser check confirmed all five rows and headers
+are present; copying a closed disclosure into another app can produce an empty
+table representation. This was not missing SQL data or an empty rendered table.
+
+The development API already running on port 8000 must be stopped before starting
+another copy. Error 10048 indicates the duplicate listener, not an Ollama or GPU
+failure. Refreshing the frontend does not require another backend process.
+
+### Completing clarification replies
+
+Floor clarifications now provide low/mid/high quick-reply buttons. Typed replies
+such as `13+`, `7–12`, `1–6`, `high`, and the displayed labels resume the price
+question only when answering that floor prompt. A bare number/range is not a
+global profile/floor inference. The selected band persists for related period
+follow-ups, while a new independent price request resets old band filters.
+
+The broad reply “lease rules” asks whether the user means CPF usage, HDB housing
+loans or grants, with corresponding buttons. Selecting one constructs a scoped
+policy **question**, never policy evidence. A related price-period question can
+return to the property's price context after this clarification; an unrelated
+policy question still clears it. Verifier thresholds and evidence checks remain.
+
+Manual replay: ask for 3-room Tampines prices after mentioning an owned 2-room;
+ask about floor 16 and lease restrictions; answer `13+`; ask `lease rules`; then
+ask for 2027 data. Expect a high-floor price result, a lease-topic clarification
+and a dated coverage explanation. Separately select CPF usage after the lease
+prompt and inspect its citations. High-floor figures are not floor-16 valuations.
