@@ -1,0 +1,20 @@
+{
+  "date_sgt": "2026-11-09",
+  "branch": "fix/finals-integration-gaps",
+  "scope": "Profile selector consistency and local change-notice regressions; not policy accuracy or held-out evaluation.",
+  "backend_tests_passed": 886,
+  "frontend_tests_passed": 30,
+  "new_backend_regression_instances": 10,
+  "new_frontend_test_cases": 8,
+  "frontend_lint_build_passed": true,
+  "policy_mutations": {"baseline_tests": 116, "detected": 20, "planned": 20, "errors_or_timeouts": 0},
+  "live_conflicting_profiles_clarified": 2,
+  "live_consistent_single_policy_answer": "source verification failed; not counted as accepted policy guidance",
+  "answered_profile_note_api_stream_tests_passed": true,
+  "notice_actual_runtime_tests_passed": true,
+  "notice_browser_visual_verification": false,
+  "policy_sources_changed": false,
+  "price_database_changed": false,
+  "heldout_read": false,
+  "prior_broad_benchmarks_rerun": false
+}

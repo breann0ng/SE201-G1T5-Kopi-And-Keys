@@ -147,3 +147,42 @@ def test_inconsistent_eligibility_profile_does_not_block_a_pure_price_question()
     state = GraphState(message="Can I know the resale prices of 4 room flats in Tampines?",
                        citizenship="SC_single", household_type="extended_family")
     assert profile_issue(state) is None
+
+
+@pytest.mark.parametrize("fields", [
+    {"citizenship": "SC_single", "household_type": "couple_family"},
+    {"citizenship": "SC/SC", "household_type": "single"},
+    {"citizenship": "SC/SPR", "household_type": "single"},
+    {"citizenship": "SPR/SPR", "household_type": "single"},
+    {"citizenship": "SC_single", "subsidy_status": "mixed"},
+])
+def test_generic_policy_question_stops_on_structurally_conflicting_sidebar(fields):
+    class NoRetrieval:
+        def search(self, *args, **kwargs):
+            pytest.fail("Conflicting profile must be clarified before policy retrieval")
+    state = run_graph(build_graph(retriever=NoRetrieval(), synthesiser=Synthesiser(None), cards=[]),
+                      ChatRequest(message="Resale eligibility", profile=BuyerProfile(**fields)))
+    assert state.response.status == "clarifying" and state.model_calls == 0
+    assert "Your situation" in state.response.message
+    assert not state.response.citations
+
+
+def test_consistent_single_profile_is_not_itself_a_discrepancy():
+    state = GraphState(message="Resale eligibility", citizenship="SC_single", household_type="single")
+    assert profile_issue(state) is None
+
+
+def test_conflict_is_checked_after_llm_intent_fallback_before_policy_retrieval():
+    from kopi_keys.components.intent_fallback import FallbackDecision
+    class Classifier:
+        def classify(self, message):
+            return FallbackDecision(intent="policy", confidence="high", model="fixture")
+    class NoRetrieval:
+        def search(self, *args, **kwargs):
+            pytest.fail("Policy retrieval must not run with an inconsistent profile")
+    state = run_graph(build_graph(retriever=NoRetrieval(), synthesiser=Synthesiser(None),
+                                 intent_classifier=Classifier(), cards=[]),
+                      ChatRequest(message="Help me figure this out", profile=BuyerProfile(
+                          citizenship="SC_single", household_type="couple_family")))
+    assert state.response.status == "clarifying" and state.model_calls == 1
+    assert "Please correct" in state.response.message

@@ -24,7 +24,7 @@ from .components.price_query import (
     latest_month,
 )
 from .components.intent_fallback import IntentClassifier
-from .components.query_router import EXTRACTED_FIELDS, route_query
+from .components.query_router import EXTRACTED_FIELDS, ELIGIBILITY_CONFIRMATION, route_query
 from .components.synthesiser import Synthesiser, SynthesiserAgent
 from .components.topic_cards import (
     TopicCard, discovery_question_field, income_ceiling_checks, load_cards, match_cards,
@@ -79,8 +79,11 @@ def build_graph(
     # --- Nodes --------------------------------------------------------------
 
     def query_router(state: GraphState):
-        from .components.profile_context import profile_issue
+        from .components.profile_context import profile_conflict, profile_issue
 
+        if ELIGIBILITY_CONFIRMATION.search(state.message):
+            return {"route": "abstain", "status": "abstain", "abstain_reason": "eligibility_confirmation",
+                    "trace": ["query_router:abstain:eligibility_confirmation"]}
         issue = profile_issue(state)
         if issue:
             route, message = issue
@@ -99,6 +102,10 @@ def build_graph(
                 usage = {"model_calls": state.model_calls + 1,
                          "model_usage": [*state.model_usage, {"model": decision.model, **decision.usage}]}
         update = {**routed.model_dump(), **usage}
+        conflict = profile_conflict(state)
+        if routed.intent in {"policy", "mixed", "discovery"} and conflict:
+            return {**usage, "route": "clarify", "status": "clarify", "missing_fields": ["profile"],
+                    "router_note": conflict, "trace": ["query_router:clarify:profile_scope"]}
         # An explicit hypothetical cohort can differ from the sidebar. Do not send
         # contradictory first-timer and subsidy-status values to the synthesiser.
         if state.subsidy_status and routed.first_timer is not None and routed.first_timer != state.first_timer:
@@ -283,7 +290,7 @@ def build_graph(
                     state.missing_fields[0], state.missing_fields[0])
                     if state.missing_fields and state.missing_fields[0] in {
                         "user_age", "income", "citizenship", "first_timer", "household_type", "flat_type",
-                        "floor_scope", "lease_scope"} else None,
+                        "floor_scope", "lease_scope", "topic"} else None,
             )}
         parts = [f"{claim.text} [{', '.join(claim.citation_ids)}]" for claim in draft.claims]
         if state.router_note:

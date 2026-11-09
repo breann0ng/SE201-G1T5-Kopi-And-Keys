@@ -57,7 +57,7 @@ SPECS = [
     ("Second-timer EHG scope gate removed", COMPONENTS + "profile_context.py",
      'if state.subsidy_status == "second_timer":', 'if False:'),
     ("Mixed/single profile conflict ignored", COMPONENTS + "profile_context.py",
-     'if state.subsidy_status == "mixed" and state.household_type == "single":', 'if False:'),
+     'if profile.subsidy_status == "mixed" and (profile.household_type == "single" or profile.citizenship == "SC_single"):', 'if False:'),
     ("Specialised PDF scope ignored", COMPONENTS + "policy_guardrails.py",
      'if personal_question(question):', 'if False:'),
     ("Retry allowance exceeds proposal", "backend/kopi_keys/graph.py",

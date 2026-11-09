@@ -16,6 +16,7 @@ AbstainReason = Literal[
     "price_out_of_range",
     "engine_unavailable",
     "verification_failed",
+    "eligibility_confirmation",
 ]
 
 MESSAGES: dict[str, str] = {
@@ -25,6 +26,8 @@ MESSAGES: dict[str, str] = {
     "price_out_of_range": "Our resale records have no sales for the period you asked about.",
     "engine_unavailable": "I could not generate an answer because the language model engine was unavailable.",
     "verification_failed": "I could not verify the drafted answer against its sources, so I will not show it.",
+    "eligibility_confirmation": ("I can explain the published conditions, but I cannot confirm that you qualify "
+                                "or that an application will be approved. Use HDB's HFE assessment for a decision."),
 }
 # Reasons whose detail is already a complete plain-English message (written in code, not by
 # the model), shown on its own instead of appended to the fixed text.

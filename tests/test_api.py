@@ -42,6 +42,38 @@ def test_unsupported_request_abstains():
     assert body["trace"] == ["query_router:abstain:no_rule_match", "abstention:unsupported"]
 
 
+def test_policy_answer_records_request_profile_basis_and_missing_details_without_a_verdict():
+    with client() as c:
+        body = c.post("/chat", json={"message": "What is the demo grant policy?", "profile": {
+            "citizenship": "SC_single", "household_type": "single",
+        }}).json()
+    assert body["status"] == "answered"
+    assert "Single Singapore Citizen" in body["profile_note"]
+    assert "age" in body["profile_note"] and "not an eligibility decision" in body["profile_note"]
+
+
+def test_changed_sidebar_profile_has_a_new_basis_without_rewriting_the_prior_answer():
+    with client() as c:
+        first = c.post("/chat", json={"message": "What is the demo grant policy?", "profile": {
+            "citizenship": "SC_single", "household_type": "single",
+        }}).json()
+        second = c.post("/chat", json={"message": "What is the demo grant policy?", "profile": {
+            "citizenship": "SC/SC", "household_type": "couple_family", "age": 42,
+        }}).json()
+    assert "Single Singapore Citizen" in first["profile_note"]
+    assert "Two Singapore Citizens" in second["profile_note"]
+    assert "age" not in second["profile_note"]
+
+
+def test_streamed_policy_answer_also_keeps_the_submitted_profile_basis():
+    import json
+    with client() as c:
+        lines = c.post("/chat/stream", json={"message": "What is the demo grant policy?", "profile": {
+            "citizenship": "SC_single", "household_type": "single",
+        }}).text.splitlines()
+    assert "Single Singapore Citizen" in json.loads(lines[-1])["response"]["profile_note"]
+
+
 def test_structured_price_filters_reach_price_tool():
     with client() as c:
         body = c.post("/chat", json={"message": "prices", "price_filters": {
