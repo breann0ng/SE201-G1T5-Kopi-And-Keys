@@ -12,7 +12,7 @@ from ..state import GraphState
 from . import answer_aspects as aspects
 from .policy_guardrails import (mentioned_grants, normalized_policy_text, requested_grants,
                                 combination_question, score_relevance, has_combination_rule,
-                                prerequisite_sentences, household_scope_errors)
+                                prerequisite_sentences, household_scope_errors, policy_focus)
 
 
 class PolicyClaim(Contract):
@@ -58,6 +58,14 @@ Do not add numbers or rules from memory. Do not make a final personal eligibilit
 decision: explain conditions and identify remaining checks instead.
 Focus on the actual question; omit unrelated grants, sales launches and repeated
 introductions. Prefer a complete sentence that directly answers the question.
+Select policy evidence only. Resale transaction prices are handled by a separate
+SQL tool and price formatter. Never list a missing resale price, median or sales
+statistic in missing_evidence; that field is ONLY for missing policy rules.
+For a mixed question, give the supported policy conditions without calculating
+prices or grants. Missing profile details prevent a personal decision, but do not
+prevent quoting the relevant general conditions and qualifications.
+Keep list markers and footnote numbers exactly as supplied; do not stitch table
+rows into prose. HTML emphasis, superscripts and line breaks are presentation.
 For a broad loan question, explain the supported loan options and their main
 differences. For a PR-couple question, distinguish the relevant flat classifications.
 For a PR-only resale purchase question, include BOTH citizenship requirements:
@@ -231,6 +239,8 @@ class PolicySummariser:
 
     def generate(self, state: GraphState) -> tuple[list[Claim], Generation, list[str]]:
         question = state.followup_question or state.message
+        if state.route == "mixed":
+            question = policy_focus(question)
         needed = requested_grants(question)
         complex_question = len(needed) > 1
         max_passages = max(MAX_PASSAGES, 5) if complex_question else MAX_PASSAGES
@@ -268,7 +278,7 @@ class PolicySummariser:
         engine =self.engine.for_policy(schema, model_override=self.model_override) if isinstance(self.engine, OllamaEngine) else self.engine
         context = {
             "question": question,
-            "latest_message": state.message,
+            "latest_message": policy_focus(state.message) if state.route == "mixed" else state.message,
             "profile": {"age": state.user_age, "citizenship": state.citizenship,
                         "household_type": state.household_type, "first_timer": state.first_timer,
                         "subsidy_status": state.subsidy_status,
@@ -280,6 +290,8 @@ class PolicySummariser:
                 "combination_rule_required": combination_question(question),
                 "preserve_prerequisites": True,
                 "do_not_compute_grant_totals": True,
+                "policy_only": True,
+                "price_handled_separately": state.route == "mixed",
             },
         }
         if label_aspects:

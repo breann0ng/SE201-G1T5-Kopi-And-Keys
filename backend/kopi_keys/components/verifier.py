@@ -146,7 +146,7 @@ def policy_relevance_scores(state: GraphState) -> list[dict]:
             continue  # Legacy/offline extractive fixtures have no model-selected quote.
         cited = [sources[c] for c in claim.citation_ids if c in sources and not sources[c].superseded]
         best = max((score_relevance(question, claim.supporting_quote, p.title,
-                                    claim.source_criterion or "") for p in cited),
+                                    " ".join(filter(None, [claim.source_scope, claim.source_criterion]))) for p in cited),
                    key=lambda s: s.score, default=score_relevance(question, claim.supporting_quote))
         scores.append({"claim_index": index, "score": best.score, "reason": best.reason,
                        "matched_terms": list(best.matched_terms),
@@ -245,6 +245,8 @@ def verify(state: GraphState) -> list[str]:
             errors.append("Price result does not match the requested town and flat type.")
         if requested[2] is not None and (returned.start_month, returned.end_month) != requested[2:]:
             errors.append("Price result does not match the requested month range.")
+        if (returned.lease_band, returned.storey_band) != (state.lease_band, state.storey_band):
+            errors.append("Price result does not match the requested lease and floor bands.")
     elif draft.price_text:
         errors.append("Price figures were drafted without an executed price result.")
 

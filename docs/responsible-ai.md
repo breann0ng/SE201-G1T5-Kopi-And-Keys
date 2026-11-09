@@ -128,6 +128,13 @@ production profiles or new Python dependencies were used. See the
 
 ## Known limits and follow-up
 
+The [9 November integration review](finals-readiness.md) records redirect-hop
+hardening, filter provenance, a bounded missing-policy search, dependency audit
+triage and the actual main ruleset gaps. Feedback CSV export prefixes formula
+strings as text; this does not change saved feedback or implement retention.
+New live development runs are separate from the historical CPU safety evidence
+and the team's independent held-out work.
+
 - The current deterministic router treats bare `Explain PHG conditions.` as out
   of scope; the full grant name routes correctly. SAFE-16 uses the full name to
   exercise synthesis. This is recorded for the router owner, not silently claimed

@@ -14,10 +14,7 @@ VALID_STATUSES = {"continue", "clarify", "abstain"}
 # Dev labels the rule-based router does not meet yet. The labels state the correct
 # behaviour; the router was not tuned to them. strict=True: when a router change fixes
 # one, its test fails as XPASS, so remove the ID here.
-KNOWN_ROUTER_GAPS = {
-    "MIX-07": "takes the first flat type named ('our 2-room') instead of the one being bought (3-room)",
-    "DSC-06": "takes the owned 2-room as flat_type instead of the 3-room being bought",
-}
+KNOWN_ROUTER_GAPS = {}  # Purchase-target extraction now passes these unchanged labels.
 
 
 def load_labels():

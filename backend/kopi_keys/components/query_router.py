@@ -22,7 +22,7 @@ from pydantic import Field
 
 from typing import Literal
 
-from ..schemas import Contract, Intent, Route, RouterStatus
+from ..schemas import Contract, Intent, Route, RouterStatus, LeaseBand, StoreyBand
 from .intent_fallback import FallbackDecision
 
 # rules: a rule decided. no_match: no rule fired and no LLM was asked (declined by default).
@@ -325,7 +325,24 @@ def _canonical_town(text: str) -> str:
     return "KALLANG/WHAMPOA" if name == "KALLANG WHAMPOA" else name
 
 
-EXTRACTED_FIELDS = ("user_age", "income", "citizenship", "town", "flat_type", "first_timer", "household_type")
+EXTRACTED_FIELDS = ("user_age", "income", "citizenship", "town", "flat_type", "first_timer", "household_type",
+                    "lease_band", "storey_band")
+
+
+def price_bands(message: str) -> dict:
+    """Only the tool's documented bands; never round an arbitrary floor/lease into a band."""
+    lease = None
+    for pattern, band in (
+        (r"\bnewer\s+(?:(?:[1-5][- ]room|executive|resale|(?:high|low|mid|middle)[- ]floors?)\s+)*flats?\b|\b80\s*\+\s*(?:years?|yrs?)\b", "80_plus"),
+        (r"\b(?:under|below|less than)\s+60\s*(?:years?|yrs?)\b", "under_60"),
+        (r"\b60\s*(?:to|[-–])\s*79\s*(?:years?|yrs?)\b", "60_79"),
+    ):
+        if re.search(pattern, message, re.I):
+            lease = band
+            break
+    floor = re.search(r"\b(low|mid|middle|high)[- ]floors?\b", message, re.I)
+    return {"lease_band": lease,
+            "storey_band": {"middle": "mid"}.get(floor.group(1).lower(), floor.group(1).lower()) if floor else None}
 
 
 def extract_fields(message: str, bare_town: bool = False) -> dict:
@@ -358,7 +375,19 @@ def extract_fields(message: str, bare_town: bool = False) -> dict:
     town_match = next((m for m in TOWN_PATTERN.finditer(message) if not_parents_town(m)), None)
     if town_match is None and bare_town:
         town_match = next((m for m in BARE_TOWN_PATTERN.finditer(message) if not_parents_town(m)), None)
-    flat_match = FLAT_PATTERN.search(message)
+    flat_matches = list(FLAT_PATTERN.finditer(message))
+    def target_flat(match):
+        prefix = message[max(0, match.start() - 70):match.start()]
+        buying = re.search(r"\b(?:buy(?:ing)?|want(?:\s+to\s+buy)?|looking\s+for|upgrad(?:e|ing)\s+to)\s+"
+                           r"(?:(?:a|an|the|new|resale|another)\s+)*$", prefix, re.I)
+        pricing = re.search(r"^\s+(?:prices?|costs?)\b", message[match.end():], re.I)
+        return bool(buying or pricing)
+    flat_match = next((m for m in flat_matches if target_flat(m)), flat_matches[0] if flat_matches else None)
+    # In a move, the target flat's location wins over the current home's location.
+    if flat_match and target_flat(flat_match):
+        target_town = next((m for m in TOWN_PATTERN.finditer(message, flat_match.end()) if not_parents_town(m)), None)
+        if target_town:
+            town_match = target_town
     flat_type = flat_match.group(1).upper() if flat_match else None
     if flat_match and flat_match.group(2):
         flat_type = f"{flat_match.group(2)} ROOM"
@@ -386,6 +415,7 @@ def extract_fields(message: str, bare_town: bool = False) -> dict:
         "flat_type": flat_type,
         "first_timer": first_timer,
         "household_type": household_type,
+        **price_bands(message),
     }
 
 
@@ -480,6 +510,8 @@ class RouterOutput(Contract):
     household_type: str | None = None
     start_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     end_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+    lease_band: LeaseBand | None = None
+    storey_band: StoreyBand | None = None
     # An assumption the answer must state (e.g. maisonettes counted as Executive flats).
     router_note: str | None = None
     # "no_match": no rule fired, so the question was declined by default, not by a rule.
@@ -523,6 +555,10 @@ def route_query(message: str, known: dict | None = None, context_question: str |
         field: extracted[field] if extracted[field] is not None else known.get(field)
         for field in EXTRACTED_FIELDS
     }
+    if context_question:
+        for field, value in price_bands(context_question).items():
+            if values[field] is None:
+                values[field] = value
     period = extract_month_range(message) or (extract_month_range(context_question) if context_question else None)
     values["start_month"], values["end_month"] = period or (known.get("start_month"), known.get("end_month"))
     missing = missing_fields(intent, message, values)

@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 from datetime import datetime, timezone
+from datetime import date
 
 from . import baselines, metrics
 from ..components.price_query import SqlitePriceTool, ToolUnavailableError, latest_month
@@ -27,10 +28,20 @@ REPORTS = ROOT / ".local" / "reports"
 
 
 def chat_responses(questions: list[dict], api: str | None) -> dict[str, dict]:
-    """POST each question (with its profile) to /chat, over HTTP or in-process."""
-    from ..schemas import BuyerProfile
+    """Use scripted turns consistently; pin the in-process router to the label date."""
+    from .run_baselines import run_full
 
     if api:
+        from ..components.query_router import extract_month_range
+
+        year, month = map(int, AS_OF.split("-"))
+        dependent = [q["id"] for q in questions if any(
+            extract_month_range(t["user"], today=date(year, month, 1)) !=
+            extract_month_range(t["user"], today=date.today())
+            for t in q.get("turns", []) if "user" in t)]
+        if dependent:
+            raise SystemExit("Remote API dates cannot be pinned to the evaluation labels (as of " + AS_OF +
+                             "). Use --local for a reproducible comparison. Affected IDs: " + ", ".join(dependent))
         import httpx
         client = httpx.Client(base_url=api, timeout=180)
     else:
@@ -38,13 +49,10 @@ def chat_responses(questions: list[dict], api: str | None) -> dict[str, dict]:
 
         from ..main import app
         client = TestClient(app)
-    fields = BuyerProfile.model_fields
     out = {}
     with client:
         for q in questions:
-            profile = {k: v for k, v in q["profile"].items() if k in fields}
-            r = client.post("/chat", json={"message": q["question"], "profile": profile})
-            out[q["id"]] = r.json() if r.status_code == 200 else {"error": f"HTTP {r.status_code}"}
+            out[q["id"]] = run_full(client, q, as_of=None if api else AS_OF)
     return out
 
 
@@ -73,6 +81,8 @@ def main() -> int:
     report = {
         "split": args.split, "questions": len(questions), "snapshot": active_snapshot(),
         "retriever": retriever_name,
+        "router_as_of": AS_OF if not args.api else None,
+        "remote_clock_uncontrolled": bool(args.api),
         "stage1": metrics.stage1_routing(questions),
         "discovery": metrics.discovery(questions),
         "retrieval": metrics.retrieval_recall_at_k(questions, search, k=5),

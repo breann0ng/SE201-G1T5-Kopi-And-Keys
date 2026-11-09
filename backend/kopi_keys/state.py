@@ -48,6 +48,7 @@ class GraphState(Contract):
 
     # Policy Retrieval Tool
     retrieval_queries: list[str] = Field(default_factory=list)
+    retrieval_retry_query: str | None = None
     passages: list[PolicyPassage] = Field(default_factory=list)
 
     # Price Query Tool

@@ -71,7 +71,11 @@ def export(rows: list[dict], path: Path, full: bool) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
-        writer.writerows(rows)
+        # CSV quoting alone does not stop spreadsheet formulas. Keep untrusted
+        # questions/answers/comments as text if a reviewer opens the file in Excel.
+        writer.writerows({key: ("'" + value if isinstance(value, str)
+                               and value.lstrip().startswith(("=", "+", "-", "@")) else value)
+                          for key, value in row.items()} for row in rows)
     print(f"\nWrote {len(rows)} rows to {path}" + ("" if full else " (comments omitted; use --full)"))
 
 

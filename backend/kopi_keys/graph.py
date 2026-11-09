@@ -18,7 +18,7 @@ from pydantic import ValidationError
 
 from .components.abstention import abstention_message
 from .components.policy_retrieval import TOP_K, PolicyRetriever, KeywordPolicyRetriever
-from .components.price_display import price_answer
+from .components.price_display import price_answer, month_label
 from .components.price_query import (
     PriceOutOfRangeError, PriceQueryTool, ToolUnavailableError, UnconfiguredPriceTool, filters_from_state,
     latest_month,
@@ -38,6 +38,7 @@ from .state import GraphState, initial_state
 
 
 MAX_REPAIRS = 1  # Proposal: one retry, then abstain.
+MAX_POLICY_RETRIEVALS = 2  # One rewritten search can use the existing repair, not extend it.
 POLICY_ROUTES = {"policy", "discovery", "mixed"}
 PRICE_ROUTES = {"price", "mixed"}
 
@@ -111,14 +112,16 @@ def build_graph(
         return {**update, "trace": [f"query_router:{routed.route}{suffix}"]}
 
     def policy_retrieval(state: GraphState):
-        query = state.followup_question or state.message
+        query = state.retrieval_retry_query or state.followup_question or state.message
         if state.household_type == "single":
             query += " singles"
         elif state.household_type in {"couple_family", "fiance", "extended_family"}:
             query += " families"
         passages = retriever.search(query, limit=TOP_K)
-        accumulated = {p.id: p for p in state.passages}
-        accumulated.update({p.id: p for p in passages})
+        # Put the rewritten search's best hits inside the synthesis context budget.
+        accumulated = {p.id: p for p in passages}
+        for passage in state.passages:
+            accumulated.setdefault(passage.id, passage)
         return {
             "passages": list(accumulated.values()),
             "retrieval_queries": [*state.retrieval_queries, query],
@@ -127,12 +130,22 @@ def build_graph(
 
     def price_query(state: GraphState):
         try:
-            result = price_tool.query(filters_from_state(state, latest_month=latest_month(price_tool)))
+            data_end = latest_month(price_tool)
+            result = price_tool.query(filters_from_state(state, latest_month=data_end))
         except PriceOutOfRangeError as error:
             return {"price_error": str(error), "price_out_of_range": True, "trace": ["price_query:out_of_range"]}
         except (ToolUnavailableError, ValidationError) as error:
             return {"price_error": str(error), "trace": ["price_query:unavailable"]}
-        return {"price_result": result, "trace": [f"price_query:{result.volume} transactions"]}
+        update = {"price_result": result, "trace": [f"price_query:{result.volume} transactions"]}
+        from .components.price_query import DATA_START_MONTH
+
+        if result.filters.start_month < DATA_START_MONTH or (data_end and result.filters.end_month > data_end):
+            coverage = f"Records are available from {month_label(DATA_START_MONTH)}"
+            if data_end:
+                coverage += f" to {month_label(data_end)}"
+            coverage += ". The requested period extends beyond this coverage; figures use only the available sales."
+            update["router_note"] = " ".join(filter(None, [state.router_note, coverage]))
+        return update
 
     def topic_cards(state: GraphState):
         missing = personal_eligibility_fields(state, cards)
@@ -229,6 +242,13 @@ def build_graph(
                 update["abstain_reason"] = "verification_failed"
             else:
                 update["repair_count"] = state.repair_count + 1
+                missing = [e.removeprefix("Missing policy evidence: ") for e in state.synthesis_errors
+                           if e.startswith("Missing policy evidence: ")]
+                if state.route in POLICY_ROUTES and missing and len(state.retrieval_queries) < MAX_POLICY_RETRIEVALS:
+                    # This is a local search string, never a URL, SQL statement or executable tool.
+                    question = state.followup_question or state.message
+                    update["retrieval_retry_query"] = question[:600] + " " + " ".join(missing)[:300]
+                    update["trace"].append("policy_retrieval:retry_requested")
         return update
 
     def abstention(state: GraphState):
@@ -308,7 +328,7 @@ def build_graph(
         return "policy_retrieval" if state.route in POLICY_ROUTES else "price_query"
 
     def after_retrieval(state: GraphState) -> str:
-        return "price_query" if state.route in PRICE_ROUTES else "topic_cards"
+        return "price_query" if state.route in PRICE_ROUTES and state.price_result is None else "topic_cards"
 
     def after_topic_cards(state: GraphState) -> str:
         if state.route == "clarify":
@@ -318,6 +338,9 @@ def build_graph(
     def after_verifier(state: GraphState) -> str:
         if state.abstain_reason:
             return "abstention"
+        if (state.verification_errors and state.retrieval_retry_query
+                and len(state.retrieval_queries) < MAX_POLICY_RETRIEVALS):
+            return "policy_retrieval"
         return "synthesiser" if state.verification_errors else "output"
 
     graph = StateGraph(GraphState)
@@ -338,7 +361,7 @@ def build_graph(
     graph.add_edge("price_query", "topic_cards")
     graph.add_conditional_edges("topic_cards", after_topic_cards, ["synthesiser", "abstention"])
     graph.add_edge("synthesiser", "verifier")
-    graph.add_conditional_edges("verifier", after_verifier, ["synthesiser", "output", "abstention"])
+    graph.add_conditional_edges("verifier", after_verifier, ["policy_retrieval", "synthesiser", "output", "abstention"])
     graph.add_edge("abstention", END)
     graph.add_edge("output", END)
     compiled = graph.compile()

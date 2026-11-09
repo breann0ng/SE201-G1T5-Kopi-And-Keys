@@ -241,3 +241,21 @@ retains the small-development-set limitation and pending human review.
 
 See [responsible-ai.md](responsible-ai.md) for evidence, ownership and residual
 risks. This suite is separate from the team's dev and fresh held-out evaluation.
+
+## Integrated development checks, 9 November 2026
+
+The [integration summary](benchmarks/2026-11-09-integration-summary.json) records
+the follow-up after PRs #23–#26 merged: policy/price task separation, bounded
+missing-policy retrieval within the one-repair budget, table/footnote relevance,
+filter provenance, redirect-hop checks and dependency triage. Runtime hashes
+match the retained 50-dev and safety runs. Data and labels were not changed.
+The default CPU model passed 16/16 synthetic checks with 3/3 positive controls;
+the shared 27.3B GPU tag passed 14/16 with 1/3 positive controls. This is small-set
+development evidence, not a claim that larger models are safer or more accurate.
+
+The [current readiness record](finals-readiness.md) distinguishes completed
+checks from independent semantic review, retrieval/card targets, server-enforced
+review, privacy/retention, browser checks and fresh held-out work. The optional
+RAG dependency still has unresolved Chroma advisories; see
+[dependency-audit.md](dependency-audit.md). Historical results above retain their
+original model, data and test scopes.

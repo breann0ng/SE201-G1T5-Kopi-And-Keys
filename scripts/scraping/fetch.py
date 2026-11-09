@@ -24,7 +24,7 @@ import time
 import urllib.robotparser
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 import httpx
 
@@ -56,6 +56,7 @@ MIN_DELAY_S = 3.0
 # Was 30 for Day 1. Raised 2026-10-15 by Sandra for the agreed scope (see discover.py);
 # kept as a safety stop against runaway loops, not as a budget.
 FETCH_CAP = 200
+MAX_REDIRECTS = 5
 
 _last_hit: dict[str, float] = {}
 
@@ -73,7 +74,15 @@ def now_sgt() -> str:
 
 
 def domain_of(url: str) -> str:
-    host = (urlparse(url).hostname or "").lower()
+    parsed = urlparse(url)
+    try:
+        valid = (parsed.scheme == "https" and parsed.port in (None, 443)
+                 and parsed.username is None and parsed.password is None)
+    except ValueError:
+        valid = False
+    if not valid:
+        raise SystemExit("Refusing URL outside the HTTPS policy-source boundary")
+    host = (parsed.hostname or "").lower()
     for d in ALLOWED:
         if host == d or host.endswith("." + d):
             return d
@@ -119,16 +128,35 @@ def _count(log: dict, url: str, kind: str) -> None:
 
 
 def get(url: str, log: dict, kind: str) -> httpx.Response:
-    domain = domain_of(url)
-    _count(log, url, kind)
-    _throttle(domain)
-    with httpx.Client(headers={"User-Agent": ua_for(url)}, follow_redirects=True, timeout=30) as c:
-        resp = c.get(url)
-    log["events"][-1]["http_status"] = resp.status_code
-    # Redirects must stay on the allowlist.
-    domain_of(str(resp.url))
-    save_log(log)
-    return resp
+    """Check every redirect BEFORE fetching it; each hop consumes the fetch cap."""
+    original_domain = domain_of(url)
+    history = []
+    with httpx.Client(follow_redirects=False, timeout=30, trust_env=False) as c:
+        for hop in range(MAX_REDIRECTS + 1):
+            domain = domain_of(url)
+            _count(log, url, kind if not history else "redirect")
+            _throttle(domain)
+            resp = c.get(url, headers={"User-Agent": ua_for(url)})
+            log["events"][-1]["http_status"] = resp.status_code
+            save_log(log)
+            if resp.status_code not in (301, 302, 303, 307, 308):
+                resp.history = history
+                return resp
+            if hop == MAX_REDIRECTS or not resp.headers.get("location"):
+                raise FetchBlocked(url, "Redirect limit reached or redirect destination missing", resp.status_code)
+            target = urljoin(str(resp.url), resp.headers["location"])
+            try:
+                target_domain = domain_of(target)
+            except SystemExit:
+                raise FetchBlocked(url, "Redirect destination is outside the allowed HTTPS policy sources",
+                                   resp.status_code) from None
+            # A robots file must not grant another source's crawling permission.
+            if kind == "robots" and target_domain != original_domain:
+                raise FetchBlocked(url, "robots.txt redirected to a different policy source", resp.status_code)
+            if kind != "robots" and robots_allowed(target, log) is not True:
+                raise FetchBlocked(url, "Redirect destination has no verified robots permission", resp.status_code)
+            history.append(resp)
+            url = target
 
 
 def robots(log: dict) -> None:

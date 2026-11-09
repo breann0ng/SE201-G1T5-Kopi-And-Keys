@@ -26,7 +26,8 @@ from datetime import datetime, timezone
 from time import perf_counter
 
 from . import baselines, metrics
-from .dataset import DATA, load_questions
+from .dataset import AS_OF, DATA, load_questions
+from contextlib import nullcontext
 
 RESULTS = DATA / "evaluation-data" / "results"
 SYSTEM_NAMES = ("full", *baselines.SYSTEMS)
@@ -43,22 +44,29 @@ def _full_client():
     return TestClient(app)
 
 
-def run_full(client, q: dict) -> dict:
+def run_full(client, q: dict, *, as_of: str | None = None) -> dict:
+    """Pin dates only for an in-process evaluation; HTTP clients cannot pin a remote server."""
     from ..schemas import BuyerProfile
 
     profile = {k: v for k, v in q["profile"].items() if k in BuyerProfile.model_fields}
     turns, history, resp = user_turns(q), [], {}
     started = perf_counter()
-    for n, text in enumerate(turns):
-        r = client.post("/chat", json={"message": text, "profile": profile, "history": history})
-        if r.status_code != 200:
-            return {"error": f"HTTP {r.status_code}: {r.text[:200]}"}
-        resp = r.json()
-        if resp.get("status") != "clarifying" or n + 1 == len(turns):
-            break
-        history += [{"role": "user", "content": text}, {"role": "assistant", "content": resp["message"]}]
+    initial_route = None
+    with metrics.router_today(as_of) if as_of else nullcontext():
+        for n, text in enumerate(turns):
+            r = client.post("/chat", json={"message": text, "profile": profile, "history": history})
+            if r.status_code != 200:
+                return {"error": f"HTTP {r.status_code}: {r.text[:200]}"}
+            resp = r.json()
+            if n == 0:
+                initial_route = resp.get("route")
+            if resp.get("status") != "clarifying" or n + 1 == len(turns):
+                break
+            history += [{"role": "user", "content": text}, {"role": "assistant", "content": resp["message"]}]
     resp["latency_seconds"] = round(perf_counter() - started, 3)
     resp["turns_sent"] = n + 1
+    resp["initial_route"] = initial_route
+    resp["router_as_of"] = as_of
     return resp
 
 
@@ -89,7 +97,7 @@ def run(system: str, limit: int | None = None) -> dict:
         ctx = client if client is not None else _null()
         with ctx:
             for i, q in enumerate(questions, 1):
-                resp = run_full(client, q) if client is not None else run_baseline(baselines.SYSTEMS[system], q)
+                resp = run_full(client, q, as_of=AS_OF) if client is not None else run_baseline(baselines.SYSTEMS[system], q)
                 responses[q["id"]] = resp
                 f.write(json.dumps({"id": q["id"], "category": q["category"], "question": q["question"],
                                     "system": system, "response": resp}, ensure_ascii=False, default=str) + "\n")
@@ -100,7 +108,8 @@ def run(system: str, limit: int | None = None) -> dict:
     scored.pop("ragas", None)
     lat = [r["latency_seconds"] for r in responses.values() if "latency_seconds" in r]
     scored["mean_latency_s"] = round(sum(lat) / len(lat), 2) if lat else None
-    scored.update(system=system, questions=len(questions), responses_file=out_path.name)
+    scored.update(system=system, questions=len(questions), responses_file=out_path.name,
+                  router_as_of=AS_OF if system == "full" else None)
     (RESULTS / f"{stamp}_metrics.json").write_text(json.dumps(scored, indent=2, default=str), encoding="utf-8")
     print(json.dumps({k: v for k, v in scored.items() if k != "cases"}, indent=1))
     return scored

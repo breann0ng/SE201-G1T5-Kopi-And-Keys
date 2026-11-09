@@ -25,7 +25,9 @@ _FACETS = {
     "citizenship": r"\bcitizen\w*\b|\bspr\b|\bpr\b|permanent resident",
     "distance": r"\bdistance\b|\bwithin\b.{0,12}\bkm\b|\bnear\b|\bliv(?:e|ing)\s+with\b",
     "amount": r"\bamount\b|\bhow much\b|\bmaximum\b|\bup to\b|\$\s*\d",
+    "age": r"\bturning\s+\d{2}\b|\baged?\b|\byears? old\b",
 }
+_FACETS["amount"] += r"|\b\d+(?:\.\d+)?\s*%"
 
 # Narrow checks for instructions aimed at the assistant, rather than housing
 # conditions such as "you must apply for an HFE letter". This is a containment
@@ -74,20 +76,34 @@ def prerequisite_sentences(text: str) -> list[str]:
 
 def normalized_policy_text(text: str) -> str:
     """Ignore presentational emphasis only; never discard words or list content."""
-    text = html.unescape(re.sub(r"</?(?:strong|b|em|i|u)>", "", text, flags=re.I))
+    text = html.unescape(re.sub(r"</?(?:strong|b|em|i|u|sup)>", "", text, flags=re.I))
+    text = re.sub(r"<br\s*/?>", " ", text, flags=re.I)
+    text = text.replace(r"\[", "[").replace(r"\]", "]")
     text = text.replace("**", "").replace("__", "")
     return re.sub(r"-\s+(?=\w)", "-", " ".join(text.split()))
 
 
 def _terms(text: str) -> set[str]:
-    return {t for t in policy_tokens(text) if len(t) > 1 and t not in _GENERIC and not t.isdigit()}
+    terms = {t for t in policy_tokens(text) if len(t) > 1 and t not in _GENERIC and not t.isdigit()}
+    if re.search(_FACETS["age"], text, re.I):
+        terms.add("age")  # "turning 35" and "years old" ask about the same policy aspect
+    return terms
 
 
 def policy_focus(question: str) -> str:
     """The policy part of a question: without its price half (checked against SQL) or
     instructions on what not to do ("without adding maximum amounts together")."""
-    question = re.split(r"\band\b(?=.{0,60}\b(?:median price|resale price|price of|price for)\b)", question,
-                        maxsplit=1, flags=re.I)[0]
+    # Only remove a conjoined transaction-price clause. Grant amounts, loan
+    # costs and lease policy still belong to this check; SQL verifies prices.
+    parts = re.split(r"\b(?:and|also)\b", question, flags=re.I)
+    policy_parts = [part for part in parts if not (
+        (re.search(r"\b(?:prices?|median|cost|go for|sell for|selling|damage)\b", part, re.I)
+         or (re.search(r"\bhow much\b", part, re.I)
+             and re.search(r"\b[1-5][- ]?room\b|\bflats?\b", part, re.I)))
+        and not re.search(r"\b(?:grants?|ehg|phg|cpf|loans?|mortgage|fees?)\b", part, re.I)
+    )]
+    if policy_parts and len(policy_parts) < len(parts):
+        question = " and ".join(policy_parts)
     return re.sub(r"\b(?:without|do not|don't|never)\s+(?:adding|add|summing|sum|calculating|calculate)\b[^.?!;]*",
                   "", question, flags=re.I)
 

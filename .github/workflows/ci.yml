@@ -105,16 +105,27 @@ jobs:
         with:
           node-version: "22"
 
-      - name: pip-audit (installed project and its dependencies)
+      - name: pip-audit (core, dev and RAG dependencies)
         continue-on-error: true  # report only, for now
         run: |
-          python -m pip install -e ".[dev]" pip-audit==2.10.1
-          pip-audit --skip-editable
+          python -m pip install -e ".[dev,rag]" pip-audit==2.10.1
+          pip-audit --skip-editable --format=json --output=python-audit.json
 
       - name: npm audit (high and above)
         continue-on-error: true  # report only, for now
         working-directory: frontend
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high --json > npm-audit.json
+
+      - name: Save dependency findings for review
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6
+        with:
+          name: dependency-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            python-audit.json
+            frontend/npm-audit.json
+          retention-days: 14
+          if-no-files-found: warn
 
   secrets:
     name: Secret scan (gitleaks)

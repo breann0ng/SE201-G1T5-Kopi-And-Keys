@@ -766,3 +766,80 @@ rewrite was added. Frontend tests now total 20 passed. Browser tab titles also
 follow Sources and Settings instead of showing the current conversation there.
 Lint/build are checked again; GPU execution and held-out evaluation are outside
 these tests. PR descriptions are prepared separately for review.
+
+## 2026-11-09 — Integrated finals gap review
+
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Branch/base:** `fix/finals-integration-gaps`, from merged main `19eeaec`
+- **Scope:** Policy prompt/verifier, bounded graph retrieval, price-filter
+  extraction/provenance, reproducible dev evaluation, HTTP redirect validation,
+  feedback export, Windows mutation portability, dependency audit and handoff.
+
+### What I asked for
+
+After PRs #23–#26 merged, review and address the remaining gaps. Keep main and the
+reviewed data/evaluation labels intact; prepare changes separately for review.
+
+### What I kept or changed
+
+Preserved the one-repair limit, 0.20 relevance threshold, quote/numeric checks and
+read-only price data. Mixed prompts now separate policy questions from SQL prices.
+Footnote markup is normalised without dropping its reference number; verified
+table scope and explicit age/percentage aspects contribute to relevance.
+Missing policy evidence can use one rewritten local search inside the existing
+repair. Existing SQL results are reused. This is not an unrestricted agent loop.
+
+Purchase-target flat/town extraction, lease/floor propagation and verifier checks
+address lost/misapplied SQL filters. Partial date coverage is disclosed instead of
+silently appearing complete. Removed two strict expected-failure markers only
+after the unchanged Stage 1 labels passed. No label, snapshot or SQL figure was
+edited to improve a score. Local eval dates are pinned, scripted follow-ups are
+consistent, and initial-response/final routes remain separately inspectable.
+
+The scheduled HTTP fetcher now checks redirect hops before contacting them. CSV
+review exports escape formula prefixes. Windows price mutations copy tracked
+inputs without administrator/symlink privileges. The frontend lockfile has
+compatible updates plus a scoped TypeScript-ESLint minimatch override. CI audits
+the RAG extra as well and retains JSON findings; it remains report-only.
+
+The actual laptop environment had advisories missed by a fresh core/dev audit.
+Recorded versions, then updated pip/setuptools/certifi/oauthlib. Chroma 1.5.9 has
+unpatched advisory records; they are not ignored. The app uses a local persistent
+store without a Chroma HTTP service or user-defined embedding configuration.
+This exposure assessment does not patch the library or approve public hosting.
+
+### How I checked it
+
+- Full laptop suite with the index: **828 passed** after the package updates.
+- Separate fresh core/dev environment: **827 passed, 1 skipped** (no Chroma/index).
+- Frontend: **20 passed**, lint/build pass with four existing refresh warnings
+  and the bundle-size warning. `npm audit`: zero entries after fixes.
+- Validated **898 chunks / 12 cards**, including raw-source checksums and quotes.
+- Policy mutations: **20/20 detected**, 109-test baseline, no errors/timeouts.
+- Price mutations: **374/390 (95.9%)**, 16 survivors. Its legacy runner counts
+  nonzero test exits as kills; this is not the stricter policy-runner assertion
+  classification or a whole-project security score.
+- Read-only dev routing/filter/SQL checks: **50/50**, **23/23**, **23/23**.
+- GPU 50-dev run: final-route 47/50, initial-response-route 49/50, 0/8 labelled
+  unsafe answers, 5/42 over-abstentions, zero uncited answers/availability errors,
+  and 19/19 answered price cases matching figures **and** filters. The single raw
+  staleness screen remains for human cohort/context review. Recorded source
+  hashes match the retained runtime; historical diagnostic attempts stay separate.
+- Live synthetic safety: default Qwen2.5:3b CPU **16/16**, including **3/3**
+  positive controls. Shared 27.3B GPU tag **14/16**, with **1/3** positive controls;
+  no availability errors. The larger model over-refused two clean cases. A prompt
+  experiment did not fix those misses and was reverted; its run is not reported
+  as the retained implementation. No broad safety/accuracy guarantee follows.
+
+### Remaining review
+
+Retrieval/card targets and five development abstentions still need component
+review. Browser interaction, root/node tracing privacy, retention, hosted watcher
+permissions/access and independent semantic/held-out evaluation remain explicit
+team actions. The active GitHub ruleset requires a PR but zero approvals and no
+required-status rule; Breann must verify/update server-enforced controls.
+Cross-component changes expand my tuning involvement, so held-out author
+independence assignments need review. No held-out file was opened. Raw outputs,
+fictional profiles and local runtime details remain under ignored `.local/`.
+See `docs/finals-readiness.md`, `docs/dependency-audit.md` and the dated curated
+integration summary. These changes still need teammate review before main.
