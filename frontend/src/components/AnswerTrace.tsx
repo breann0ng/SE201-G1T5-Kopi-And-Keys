@@ -20,7 +20,7 @@ function describe(step: string): string {
 
 /**
  * Developer details under an answer: the graph steps taken and the SQL query log.
- * Shown only when Settings → "Show developer details" is on (for demos and debugging).
+ * Shown only when the "kk:dev-details" browser preference is true (for demos and debugging).
  */
 export function AnswerTrace({ response }: { response: ChatResponse }) {
   const price = response.price_result;

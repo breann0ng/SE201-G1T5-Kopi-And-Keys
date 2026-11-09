@@ -124,7 +124,7 @@ Additional manual checks (browser automation could not complete the visual check
    grant award should appear. Changing sidebar income must not change the historical chart.
 5. Scroll long chat content to both ends at normal and enlarged browser zoom. The composer should
    stay within the viewport with no outer document scroll into a large blank area. Confirm Sources
-   and Settings still scroll within their page areas, including on a narrow window.
+   still scrolls within its page area, including on a narrow window.
 
 ### New chat selection (9 November 2026)
 
@@ -132,7 +132,7 @@ An empty conversation is shown as a selected **New chat** row in Recent chats.
 It is a draft, not another saved empty conversation: repeated clicks do not fill
 history or remove earlier saved chats. Its first question supplies its title.
 The browser tab follows the selected conversation title on Chat, and shows
-Sources or Settings on those pages.
+Sources on that page.
 
 Switching conversations cancels the client request, clears the unsent composer
 text and pauses history writes during runtime replacement. This prevents an
@@ -264,3 +264,10 @@ alert and local chat notice, and ask Resale eligibility. Correct the household t
 Single and see another change notice. Change a profile field during an answer:
 it should finish without being rewritten, and the next question should use the
 new profile. Switch chats before the pending notice settles and check for leaks.
+
+### Settings page removed (10 November 2026)
+
+The Settings page and its theme choice were removed; the app is light mode only. "Clear my data"
+and a short data note moved under **Your situation** in the sidebar. `/settings` redirects to the
+chat. Developer details (the per-answer trace) are off; to show them for a demo, run
+`localStorage.setItem("kk:dev-details", "true")` in the browser console and reload.

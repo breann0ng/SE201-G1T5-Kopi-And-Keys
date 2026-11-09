@@ -157,6 +157,20 @@ def policy_relevance_scores(state: GraphState) -> list[dict]:
     return scores
 
 
+def table_row_answers_question(question: str, claim) -> bool:
+    """A scoped table claim whose row criterion is what the question asks about is relevant.
+
+    Word overlap undercounts table cells: asked whether a Singaporean and a PR can buy, the
+    Citizenship row says "Be an SC or SPR", sharing almost no words with the question. The
+    row label itself ("Citizenship") shows the cell answers the asked aspect. Quotes are still
+    checked word for word against the source and the table column, as for any claim.
+    """
+    criterion = getattr(claim, "source_criterion", None)
+    if not criterion or claim.supporting_quote is None:
+        return False
+    return any(aspects.shows_aspect(aspect, criterion) for aspect in aspects.asked_aspects(question))
+
+
 def verify(state: GraphState) -> list[str]:
     draft = state.draft
     if draft is None:
@@ -178,8 +192,9 @@ def verify(state: GraphState) -> list[str]:
     if not 0 < minimum <= 1:
         raise ValueError("KOPI_POLICY_MIN_RELEVANCE must be greater than 0 and at most 1.")
     enforce_aspects = aspects.mode() == "enforce"
+    claims = draft.claims
     for score in policy_relevance_scores(state):
-        if score["score"] < minimum:
+        if score["score"] < minimum and not table_row_answers_question(question, claims[score["claim_index"]]):
             errors.append(f"Low policy relevance for claim {score['claim_index'] + 1}: "
                           f"{score['score']:.2f} < {minimum:.2f} ({score['reason']}). "
                           "Select a quote addressing the question, or abstain if the evidence is missing.")

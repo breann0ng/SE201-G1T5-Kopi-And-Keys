@@ -1,13 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Thread } from "./components/Thread";
 import "./index.css";
 import { PrefsProvider } from "./lib/prefs";
 import { ProfileProvider } from "./lib/profile";
 import "./lib/theme";
-import { SettingsPage } from "./pages/SettingsPage";
 import { SourcesPage } from "./pages/SourcesPage";
 
 function ErrorPage() {
@@ -33,7 +32,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Thread /> },
       { path: "sources", element: <SourcesPage /> },
-      { path: "settings", element: <SettingsPage /> },
+      // The Settings page was removed; old links go back to the chat.
+      { path: "settings", element: <Navigate to="/" replace /> },
     ],
   },
 ]);

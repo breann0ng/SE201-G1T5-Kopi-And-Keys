@@ -83,8 +83,18 @@ def normalized_policy_text(text: str) -> str:
     return re.sub(r"-\s+(?=\w)", "-", " ".join(text.split()))
 
 
+# Words buyers use for the terms HDB writes, folded to one form for the relevance check only
+# (search is unchanged). Without them a correct quote can score as irrelevant: a question about
+# a "Singaporean" husband shares no word with a table row saying "SC or SPR".
+_RELEVANCE_EQUIVALENTS = {
+    "singaporean": "sc", "citizen": "sc",
+    "wife": "spouse", "husband": "spouse", "hubby": "spouse",
+}
+
+
 def _terms(text: str) -> set[str]:
-    terms = {t for t in policy_tokens(text) if len(t) > 1 and t not in _GENERIC and not t.isdigit()}
+    terms = {_RELEVANCE_EQUIVALENTS.get(t, t) for t in policy_tokens(text)
+             if len(t) > 1 and t not in _GENERIC and not t.isdigit()}
     if re.search(_FACETS["age"], text, re.I):
         terms.add("age")  # "turning 35" and "years old" ask about the same policy aspect
     return terms
