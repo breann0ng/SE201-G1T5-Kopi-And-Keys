@@ -40,6 +40,16 @@ remain visible; unchanged checks do not close outstanding review issues.
 The watcher needs neither a GPU nor an LLM. Separate GPU integration checks used
 another frozen checkout and are not included in this watcher's test counts.
 
+### Review follow-up — 9 November 2026
+Changed automatic checks from daily to Monday approximately 10:33 SGT to limit
+repeat notifications and large candidate uploads while the active dataset stays
+frozen. Manual dispatch remains. Documented that unchanged-versus-last-candidate
+deduplication is not implemented: a candidate still different from the active CSV
+can be reported again in a later week, as can an unresolved access failure.
+The 39 watcher tests still pass; workflow YAML, the weekly cron, manual trigger
+and read-contents/write-issues permissions were checked. No active data, comparison
+rules, notification failure handling or candidate validation were relaxed.
+
 ## 2026-10-15 · Local CPU model, price synthesiser and numeric verifier
 - **Tool (model):** OpenAI Codex (GPT-6)
 - **Files:** originally `backend/kopi_keys/midpoint/`, setup scripts, tests and

@@ -1,7 +1,7 @@
 name: Price refresh (candidate only)
 on:
   schedule:
-    - cron: '33 2 * * *' # Approximately 10:33 SGT; source publishes daily, scheduler may delay.
+    - cron: '33 2 * * 1' # Monday approximately 10:33 SGT; scheduler may delay.
   workflow_dispatch:
 
 permissions:

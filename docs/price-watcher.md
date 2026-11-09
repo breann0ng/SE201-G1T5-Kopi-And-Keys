@@ -56,7 +56,7 @@ from deletions/additions; review both rather than treating every addition as a n
 
 ## Scheduled review
 
-`.github/workflows/price-refresh.yml` runs daily at approximately **10:33 SGT**
+`.github/workflows/price-refresh.yml` runs weekly on Monday at approximately **10:33 SGT**
 (GitHub may delay it), and supports manual dispatch after it reaches the default
 branch. It has read access to repository contents and permission to write issues;
 it cannot commit, push or activate data.
@@ -66,6 +66,11 @@ failed check opens an attention issue, or comments on an existing marked issue
 with the new run link. An unchanged check leaves pending review issues open.
 Notification errors fail visibly instead of silently claiming success. Search
 index delays can still cause duplicate issues; consolidate them during review.
+The comparison intentionally stays against the team's frozen active CSV. An
+unreviewed changed candidate can therefore be reported again on a later weekly
+run; identical-candidate deduplication is not implemented. Weekly scheduling
+limits repeat issue comments and large candidate uploads, and manual dispatch
+remains available after a new release or before a planned data review.
 
 Diagnostic artifacts are retained for 30 days. Changed, validated candidates also
 upload the specific CSV, database and report. Archive any candidate you intend to
