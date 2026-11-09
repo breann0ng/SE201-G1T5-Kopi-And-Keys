@@ -13,8 +13,6 @@ import json
 import re
 import sys
 
-from bs4 import BeautifulSoup
-
 from fetch import ROOT, SNAPSHOT_DATE
 
 DOLLAR = re.compile(r"\$\s?\d[\d,]*(?:\.\d+)?(?:\s?[kKmM]\b)?")
@@ -30,6 +28,9 @@ def figures(text: str) -> set[str]:
 
 
 def main() -> None:
+    # The regex-only figures() helper is also used by diff.py and offline tests.
+    from bs4 import BeautifulSoup
+
     date = sys.argv[1] if len(sys.argv) > 1 else SNAPSHOT_DATE
     snap = ROOT / "data" / "policy_snapshots" / date
     manifest = json.loads((snap / "manifest.json").read_text(encoding="utf-8"))

@@ -60,7 +60,7 @@ export function SourcesPage() {
           <h2 className="font-semibold">How we keep it current</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-600 dark:text-slate-400">
             <li>
-              A monthly check, and a manual one after announced policy changes, captures these pages
+              A weekly check, and a manual one after announced policy changes, captures these pages
               again when the official sites allow it.
             </li>
             <li>
