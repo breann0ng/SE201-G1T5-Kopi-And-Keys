@@ -22,7 +22,7 @@ AbstainReason = Literal[
 MESSAGES: dict[str, str] = {
     "unsupported": "I can help with HDB resale policy and resale price questions only.",
     "no_evidence": "I could not find suitable policy evidence or price data to answer this.",
-    "no_transactions": "No matching resale transactions were found for the requested filters.",
+    "no_transactions": "No matching resale transactions were found for the requested filters. Try a wider date range, another town or another flat type.",
     "price_out_of_range": "Our resale records have no sales for the period you asked about.",
     "engine_unavailable": "I could not generate an answer because the language model engine was unavailable.",
     "verification_failed": "I could not verify the drafted answer against its sources, so I will not show it.",

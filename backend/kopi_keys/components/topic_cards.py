@@ -95,6 +95,11 @@ def personal_eligibility_fields(state: GraphState, cards: list[TopicCard]) -> li
 
     if not personal_question(query):
         return []
+    from .policy_guardrails import combination_question
+    if combination_question(query) and not re.search(
+        r"\b(?:eligible|eligibility|qualif\w*|income|salary|amounts?|maximum)\b|how much", query, re.I,
+    ):
+        return []  # a grant relationship question is not a personal eligibility/amount assessment
     wanted = []
     if "ehg" in query or "enhanced cpf housing grant" in query:
         wanted = ["CARD_EHG"]
