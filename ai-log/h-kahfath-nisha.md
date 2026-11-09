@@ -900,3 +900,33 @@ and column headings. No frontend/SQL rewrite was needed: the pasted blank grid
 was the collapsed table's copy representation. Confirmed the app already running
 on port 8000 caused the duplicate-server error; restarted that single backend to
 load the fix. Main and the root checkout remain unchanged.
+
+## 9 November 2026 — Completing floor-band and lease clarification replies
+
+The user's longer replay exposed a missing path: typed `13+` did not resume the
+floor clarification, then “lease rules” lost the price context. Added failing
+regressions first and fixed the reply parsing/history path. Floor band aliases
+are interpreted only in the pending floor clarification; the selected band is
+remembered for related price periods and reset for a new independent price
+request. A broad lease request now asks for CPF/loan/grant purpose. Its reply
+becomes a scoped question for normal retrieval and verification, not evidence.
+Unrelated policy questions and scope guards retain their reset/decline behavior.
+
+Extended the optional `asking_for` contract and the existing message-only quick
+reply UI with floor bands and lease topics. These buttons do not alter sidebar
+profile values. Added 14 backend regression instances, including the full chain,
+all displayed floor labels, interpretation outside a floor prompt, a return to
+prices after a scoped lease choice, and resetting an old floor filter.
+
+Validation: full suite **859 passed**; **32 follow-up tests** passed after a
+readability refactor; **20 frontend tests** passed, lint/build pass with the four
+existing refresh warnings and bundle warning. Node's initial sandbox child-
+process denial was resolved by running the normal checks with subprocess access.
+The live GPU-connected API replay answered `13+` with the high-floor filter
+(21 transactions, median SGD 635,000), clarified the lease purpose, and returned
+the October 2026 data limit for 2027. A separate CPF-usage choice returned a cited
+policy answer passing the verifier; semantic completeness still needs review.
+No policies, SQL data, model prompts, verifier thresholds or held-out files changed.
+The updated button interactions were not replayed in the browser in this step;
+the full sequence and topic branch were checked through the live API. Earlier
+browser confirmation of the populated recent-sales disclosure still applies.

@@ -174,3 +174,23 @@ table representation. This was not missing SQL data or an empty rendered table.
 The development API already running on port 8000 must be stopped before starting
 another copy. Error 10048 indicates the duplicate listener, not an Ollama or GPU
 failure. Refreshing the frontend does not require another backend process.
+
+### Completing clarification replies
+
+Floor clarifications now provide low/mid/high quick-reply buttons. Typed replies
+such as `13+`, `7–12`, `1–6`, `high`, and the displayed labels resume the price
+question only when answering that floor prompt. A bare number/range is not a
+global profile/floor inference. The selected band persists for related period
+follow-ups, while a new independent price request resets old band filters.
+
+The broad reply “lease rules” asks whether the user means CPF usage, HDB housing
+loans or grants, with corresponding buttons. Selecting one constructs a scoped
+policy **question**, never policy evidence. A related price-period question can
+return to the property's price context after this clarification; an unrelated
+policy question still clears it. Verifier thresholds and evidence checks remain.
+
+Manual replay: ask for 3-room Tampines prices after mentioning an owned 2-room;
+ask about floor 16 and lease restrictions; answer `13+`; ask `lease rules`; then
+ask for 2027 data. Expect a high-floor price result, a lease-topic clarification
+and a dated coverage explanation. Separately select CPF usage after the lease
+prompt and inspect its citations. High-floor figures are not floor-16 valuations.
