@@ -547,3 +547,17 @@ not discard its draft. Earlier saved conversations and profile values remain.
 The source changes were also applied to the isolated local GPU frontend preview;
 no model restart, database change, automatic main merge or backend change was
 needed. Stopping the client is not a claim of immediate remote GPU cancellation.
+
+### Follow-up: Gitleaks download reliability
+PR #23's CI run 42568039899 passed backend, frontend and audit jobs, but GitHub
+returned HTTP 504 while downloading Gitleaks. The scanner did not run. Added four
+bounded curl retries, connection/transfer timeouts and a retry time budget to the
+existing install step, using curl's documented transient-error handling. The
+pinned version/hash, SHA-256 verification, scan range and blocking exit code remain.
+
+Exercised the actual YAML install shell with Git Bash against a localhost fault
+server and an inert archive: two 504s then success recovered on request three;
+permanent 504 stopped after five total attempts; HTTP 404 failed after one;
+an incorrect checksum failed before extraction. All four checks passed. A new
+hosted run is triggered by pushing this follow-up; local checks do not establish
+that the GitHub release endpoint has recovered or that the secret scan has passed.
