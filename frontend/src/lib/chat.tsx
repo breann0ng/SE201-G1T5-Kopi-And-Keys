@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 /** Gives pages and message components access to the chat runtime (set up in Layout). */
 export type ChatContextValue = {
   runtime: AssistantRuntime;
-  /** Clears the visible conversation and the copy saved in this browser. */
+  /** Starts an empty conversation; earlier saved chats remain available. */
   newChat: () => void;
 };
 

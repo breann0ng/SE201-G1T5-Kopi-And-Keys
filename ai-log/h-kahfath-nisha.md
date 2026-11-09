@@ -514,3 +514,36 @@ No access restrictions were bypassed, no policy snapshot was refreshed or
 activated, and the old failed run was not rerun. This handles a blocked refresh
 honestly; it does not restore HDB access or make the existing data newly verified.
 Publishing and activation still require a complete run and the existing review.
+
+## 2026-11-09 - New chat selection and title
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** `frontend/src/components/Layout.tsx`, `frontend/src/lib/history.ts`,
+  `frontend/src/lib/chat.tsx`, `frontend/tests/history.test.ts`,
+  `frontend/tests/sourceContent.test.ts`, `docs/chat-ux.md`
+- **Outcome:** Changed on separate branch `fix/new-chat-selection`
+
+### What I asked for
+Fix New chat showing the welcome screen while retaining an earlier chat's name
+or selection. The user supplied a screenshot from the GPU-connected test app.
+
+### How I checked it
+Added six regression tests covering fresh selection, first-question naming,
+reopening old messages, intermediate reset notifications, composer clearing,
+repeated empty drafts, active-chat deletion and resuming saves after errors.
+All 18 frontend tests passed. Lint passed with four existing React refresh
+warnings; the production build passed with the existing large-bundle warning.
+The first test run exposed outdated EHG fixture IDs in main's existing source
+table tests. Included the same two-line fixture correction already present in
+Breann's pending router PR; no policy text or source values changed.
+Browser click-through remains a manual check; these counts are frontend tests,
+not a repeat of GPU model quality or backend evaluation.
+
+### What I kept or changed
+Empty drafts now appear as one selected New chat row without accumulating saved
+empty chats. The first sent question supplies the title, including the browser
+tab title. Conversation switching pauses saves during replacement, cancels the
+client request and clears the composer. Clicking the current conversation does
+not discard its draft. Earlier saved conversations and profile values remain.
+The source changes were also applied to the isolated local GPU frontend preview;
+no model restart, database change, automatic main merge or backend change was
+needed. Stopping the client is not a claim of immediate remote GPU cancellation.

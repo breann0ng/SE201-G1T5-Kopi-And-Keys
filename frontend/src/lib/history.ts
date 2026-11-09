@@ -1,5 +1,5 @@
-import type { ThreadMessage, ThreadMessageLike } from "@assistant-ui/react";
-import { load, save } from "./storage";
+import type { ThreadMessage, ThreadMessageLike, ThreadRuntime } from "@assistant-ui/react";
+import { load, save } from "./storage.ts";
 
 /**
  * Conversation memory, frontend half (option A in the team discussion).
@@ -7,7 +7,7 @@ import { load, save } from "./storage";
  * The backend accepts recent turns as context, never as policy evidence.
  * Set VITE_SEND_HISTORY=false to disable sending recent turns.
  */
-export const SEND_HISTORY = import.meta.env.VITE_SEND_HISTORY !== "false";
+export const SEND_HISTORY = import.meta.env?.VITE_SEND_HISTORY !== "false";
 
 /** Previous turns sent to the model. Kept small for the local model's context window. */
 export const MAX_HISTORY_MESSAGES = 12;
@@ -67,10 +67,16 @@ function titleOf(messages: readonly ThreadMessageLike[]): string {
   return line ? (line.length > 48 ? `${line.slice(0, 47)}…` : line) : "New chat";
 }
 
-export const summaries = (chats = loadChats()): ChatSummary[] =>
-  chats.filter((c) => c.messages.length)
+export const summaries = (chats = loadChats()): ChatSummary[] => {
+  const active = currentChatId();
+  const saved = chats.filter((c) => c.messages.length)
     .sort((a, b) => b.updated - a.updated)
     .map(({ id, title, updated }) => ({ id, title, updated }));
+  // An empty draft has an identity too. Display it without filling saved history
+  // with blank entries or evicting an older conversation before anything is sent.
+  return saved.some((c) => c.id === active) ? saved
+    : [{ id: active, title: "New chat", updated: 0 }, ...saved];
+};
 
 export function currentChatId(): string {
   const id = load<string | null>(CURRENT_KEY, null);
@@ -91,7 +97,25 @@ export function openChat(id: string): ThreadMessageLike[] {
   return loadChats().find((c) => c.id === id)?.messages ?? [];
 }
 
+let changingChat = false;
+
+/** Suppress intermediate runtime notifications while replacing a conversation. */
+export function changeChat(
+  thread: Pick<ThreadRuntime, "cancelRun" | "reset"> & { composer: Pick<ThreadRuntime["composer"], "setText"> },
+  select: () => readonly ThreadMessageLike[],
+): void {
+  changingChat = true;
+  try {
+    thread.cancelRun();
+    thread.reset(select());
+    thread.composer.setText("");
+  } finally {
+    changingChat = false;
+  }
+}
+
 export function saveChat(messages: readonly ThreadMessage[]): void {
+  if (changingChat) return;
   const done = messages.filter((m) => m.status?.type !== "running");
   if (!done.length) return;
   const id = currentChatId();

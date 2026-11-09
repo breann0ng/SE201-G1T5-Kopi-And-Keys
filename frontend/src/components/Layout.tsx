@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { createAdvisorAdapter } from "../lib/adapter";
 import { ChatContext } from "../lib/chat";
-import { currentChatId, deleteChat, loadChat, openChat, saveChat, startNewChat, summaries, type ChatSummary } from "../lib/history";
+import { changeChat, currentChatId, deleteChat, loadChat, openChat, saveChat, startNewChat, summaries, type ChatSummary } from "../lib/history";
 import { useProfile } from "../lib/profile";
 import { Logo, LogoIcon } from "./Logo";
 import { useTheme, type Theme } from "../lib/theme";
@@ -38,6 +38,11 @@ export function Layout() {
     setActiveId(currentChatId());
   };
 
+  useEffect(() => {
+    const title = chats.find((c) => c.id === activeId)?.title ?? "New chat";
+    document.title = `${title} | Kopi & Keys`;
+  }, [chats, activeId]);
+
   useEffect(
     () =>
       runtime.thread.subscribe(() => {
@@ -51,8 +56,10 @@ export function Layout() {
     () => ({
       runtime,
       newChat: () => {
-        startNewChat();
-        runtime.thread.reset();
+        changeChat(runtime.thread, () => {
+          startNewChat();
+          return [];
+        });
         refresh();
       },
     }),
@@ -99,9 +106,11 @@ export function Layout() {
               <li key={c.id} className="group flex items-center">
                 <button
                   title={c.title}
+                  aria-current={c.id === activeId ? "page" : undefined}
                   onClick={() => {
-                    if (runtime.thread.getState().isRunning) return;
-                    runtime.thread.reset(openChat(c.id));
+                    if (c.id !== activeId) {
+                      changeChat(runtime.thread, () => openChat(c.id));
+                    }
                     refresh();
                     setMenuOpen(false);
                     navigate("/");
@@ -118,8 +127,14 @@ export function Layout() {
                   aria-label={`Delete chat: ${c.title}`}
                   onClick={() => {
                     const wasActive = c.id === activeId;
-                    deleteChat(c.id);
-                    if (wasActive) runtime.thread.reset();
+                    if (wasActive) {
+                      changeChat(runtime.thread, () => {
+                        deleteChat(c.id);
+                        return [];
+                      });
+                    } else {
+                      deleteChat(c.id);
+                    }
                     refresh();
                   }}
                   className="p-1 text-slate-400 opacity-0 group-hover:opacity-100 hover:text-coral-500 focus:opacity-100"
