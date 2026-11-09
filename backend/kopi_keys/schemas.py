@@ -225,13 +225,14 @@ class ChatResponse(Contract):
     mode: EvidenceMode = "demo"
     route: Route | None = None
     message: str
+    profile_note: str | None = None
     citations: list[PolicyPassage] = Field(default_factory=list)
     price_result: PriceResult | None = None
     suggestions: list[Suggestion] = Field(default_factory=list)
     retrieval_rounds: int = 0
     trace: list[str] = Field(default_factory=list)
     asking_for: Literal["citizenship", "age", "household_income", "first_timer", "household_type", "flat_type",
-                        "storey_band", "lease_topic"] | None = None
+                        "storey_band", "lease_topic", "topic"] | None = None
     # Broad questions: one row per relevant scheme, each cited (see topic_cards.overview_topic).
     overview: list[OverviewItem] = Field(default_factory=list)
     # Retrieved official passages the answer did not quote, for readers who want more context.

@@ -117,6 +117,10 @@ def create_app(graph=None) -> FastAPI:
         """Cache hits get a new message_id but keep the original answer's trace id."""
         if cached:
             response = response.model_copy(update={"message_id": new_run_id()})
+        from .components.profile_context import policy_profile_note
+        response = response.model_copy(update={
+            "profile_note": policy_profile_note(request.profile, request.message, response),
+        })
         contexts.remember(response.message_id, AnswerContext(
             question=request.message, answer=response.message, route=response.route,
             snapshot=_active_snapshot() or None, langsmith_run_id=response.langsmith_run_id,

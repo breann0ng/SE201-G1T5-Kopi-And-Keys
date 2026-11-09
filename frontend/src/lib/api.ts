@@ -95,6 +95,7 @@ export type Route = "policy" | "price" | "mixed" | "discovery" | "clarify" | "ab
 export type ChatStatus = "answered" | "clarifying" | "abstained";
 
 export type ChatResponse = {
+  profile_note?: string | null;
   status: ChatStatus;
   /** Policy evidence source: "demo" = fictional test passages (UI warns), "snapshot" = official ACTIVE snapshot. */
   mode: "demo" | "snapshot";
@@ -114,7 +115,7 @@ export type ChatResponse = {
   retrieval_rounds: number;
   trace: string[];
   /** Field requested by a clarification (a profile field or a price filter); drives quick-reply buttons. */
-  asking_for?: keyof BuyerProfile | "flat_type" | "storey_band" | "lease_topic" | null;
+  asking_for?: keyof BuyerProfile | "flat_type" | "storey_band" | "lease_topic" | "topic" | null;
   /** Identifies this answer for POST /feedback; absent in older saved chats. */
   message_id?: string | null;
   /** The answer's LangSmith trace id when tracing is on, otherwise null. */

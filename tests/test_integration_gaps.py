@@ -103,7 +103,7 @@ def test_mixed_question_does_not_ask_policy_model_to_supply_sql_prices():
     assert engine.context["answer_requirements"]["price_handled_separately"] is True
 
 
-def test_partial_price_period_discloses_actual_data_coverage_without_changing_filters():
+def test_partial_price_period_queries_available_months_and_names_the_missing_ones():
     from types import SimpleNamespace
     from kopi_keys.components.synthesiser import Synthesiser
     from kopi_keys.graph import build_graph, run_graph
@@ -121,8 +121,11 @@ def test_partial_price_period_discloses_actual_data_coverage_without_changing_fi
     graph = build_graph(retriever=FictionalRetriever(), price_tool=Tool(), synthesiser=Synthesiser(Engine()), cards=[])
     state = run_graph(graph, ChatRequest(message="4-room prices in Bishan in the first half of 2026?"))
     assert state.response.status == "answered"
-    assert state.price_result.filters.end_month == "2026-06"
-    assert "to Mar 2026" in state.response.message and "only the available sales" in state.response.message
+    # Asked for Jan to Jun 2026 with data to Mar 2026: the figures cover Jan to Mar, and the
+    # answer names the months that have no data yet (graph.price_query, missing_months_note).
+    assert state.price_result.filters.end_month == "2026-03"
+    assert "We don't have sales data for Apr 2026 to Jun 2026 yet" in state.response.message
+    assert "so these figures cover Jan 2026 to Mar 2026" in state.response.message
 
 
 @pytest.mark.parametrize("requested,returned", [

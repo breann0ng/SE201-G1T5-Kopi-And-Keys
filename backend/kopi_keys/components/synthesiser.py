@@ -90,7 +90,8 @@ class PriceSummariser:
 
 def clarifying_question(missing: list[str]) -> str:
     if missing == ["topic"]:
-        return "Which part of HDB housing would you like to know about: resale eligibility, grants, housing loans, or CPF and lease rules?"
+        from .query_router import TOPIC_SCOPE_MESSAGE
+        return TOPIC_SCOPE_MESSAGE
     labels = [FIELD_LABELS.get(field, field) for field in missing]
     return f"Please provide: {', '.join(labels)}."
 

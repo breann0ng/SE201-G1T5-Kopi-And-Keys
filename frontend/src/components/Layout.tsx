@@ -9,6 +9,7 @@ import { useProfile } from "../lib/profile";
 import { Logo, LogoIcon } from "./Logo";
 import { useTheme, type Theme } from "../lib/theme";
 import { ProfilePanel } from "./ProfilePanel";
+import { ProfileChangeController, type PendingProfileChange } from "../lib/profileChanges";
 
 export type LayoutContext = { theme: Theme; setTheme: (t: Theme) => void };
 
@@ -19,7 +20,7 @@ const NAV = [
 ];
 
 export function Layout() {
-  const { profileRef } = useProfile();
+  const { profileRef, subscribeChanges } = useProfile();
   const [theme, setTheme] = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -29,6 +30,13 @@ export function Layout() {
   const adapter = useMemo(() => createAdvisorAdapter(() => profileRef.current), [profileRef]);
   const [initialMessages] = useState(loadChat);
   const runtime = useLocalRuntime(adapter, { initialMessages });
+  const [pendingProfileChange, setPendingProfileChange] = useState<PendingProfileChange | null>(null);
+  useEffect(() => {
+    const controller = new ProfileChangeController(runtime.thread, currentChatId, setPendingProfileChange);
+    const unsubscribeProfile = subscribeChanges((text) => controller.notify(text));
+    const unsubscribeThread = runtime.thread.subscribe(() => controller.onThreadChange());
+    return () => { unsubscribeProfile(); unsubscribeThread(); controller.dispose(); };
+  }, [runtime, subscribeChanges]);
 
   // Saved conversations listed under "Recent chats"; refreshed whenever the thread changes.
   const [chats, setChats] = useState<ChatSummary[]>(summaries);
@@ -58,6 +66,7 @@ export function Layout() {
   const chat = useMemo(
     () => ({
       runtime,
+      pendingProfileChange: pendingProfileChange?.chatId === activeId ? pendingProfileChange.text : null,
       newChat: () => {
         changeChat(runtime.thread, () => {
           startNewChat();
@@ -66,7 +75,7 @@ export function Layout() {
         refresh();
       },
     }),
-    [runtime],
+    [runtime, pendingProfileChange, activeId],
   );
 
   const sidebar = (

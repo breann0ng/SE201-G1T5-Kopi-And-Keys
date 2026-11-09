@@ -150,7 +150,7 @@ def _price_followup(message: str, previous_question: str | None) -> bool:
     """
     from .components.query_router import (
         BARE_TOWN_PATTERN, EXACT_FLOOR_PATTERN, FLOOR_BAND_PATTERN, FLAT_PATTERN,
-        MAISONETTE, UNANSWERABLE_PATTERNS, classify_intent, out_of_scope, lease_scope_question,
+        MAISONETTE, UNANSWERABLE_PATTERNS, classify_intent, out_of_scope, lease_scope_question, extract_fields,
     )
 
     if not previous_question or classify_intent(previous_question) not in ("price", "mixed"):
@@ -158,11 +158,18 @@ def _price_followup(message: str, previous_question: str | None) -> bool:
     if (_FOLLOWUP_BLOCKED.search(message) or out_of_scope(message)
             or any(p in message.casefold() for p in UNANSWERABLE_PATTERNS)):
         return False
-    if classify_intent(message) != "unanswerable":
+    intent = classify_intent(message)
+    if intent != "unanswerable":
+        if intent == "price":
+            fields = extract_fields(message, bare_town=True)
+            if not (fields["town"] and fields["flat_type"]):
+                return True  # details/refinements retain the active period and filters
         # A floor/lease follow-up still refers to the earlier transaction question.
         # Keep that context so the router can clarify an unsupported exact floor.
         return lease_scope_question(message) or bool(
             _FOLLOWUP_OPENER.search(message) and EXACT_FLOOR_PATTERN.search(message))
+    if EXACT_FLOOR_PATTERN.search(message):
+        return True  # e.g. "What happens if I want to buy the 16th floor?"
     if _FOLLOWUP_OPENER.search(message):
         return True
     rest = message
@@ -177,7 +184,7 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
     profile = request.profile
     filters = request.price_filters
     from .components.query_router import (classify_intent, extract_month_range, FLOOR_SCOPE_PREFIX,
-                                          floor_band_reply, lease_scope_question, lease_topic_reply)
+                                          floor_band_reply, lease_scope_question, lease_topic_reply, topic_reply, all_floors)
 
     # History supplies conversation context, never policy evidence. Explicit
     # sidebar fields take precedence; the router then applies the current turn.
@@ -188,15 +195,17 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
     for turn in request.history:
         if turn.role == "user":
             fields = _reply_fields(turn.content, previous_reply)
-            answering_floor = previous_reply.startswith(FLOOR_SCOPE_PREFIX) and floor_band_reply(turn.content) is not None
+            answering_floor = previous_reply.startswith(FLOOR_SCOPE_PREFIX) and (
+                floor_band_reply(turn.content) is not None or all_floors(turn.content, reply=True))
             answering_clarification = answering_floor or (previous_reply.startswith("Please provide:") and not re.search(
                 r"\?|\b(?:can|may|what|how|why|eligible|qualify)\b", turn.content, re.I)
             )
-            scoped_policy = lease_topic_reply(turn.content, previous_reply)
+            chosen_topic = topic_reply(turn.content, previous_reply)
+            scoped_policy = lease_topic_reply(turn.content, previous_reply) or chosen_topic
             intent = classify_intent(turn.content)
             price_turn = intent in {"price", "mixed"} or _price_followup(turn.content, price_question)
             if intent in {"price", "mixed"} and not _price_followup(turn.content, previous_question):
-                for field in ("lease_band", "storey_band"):
+                for field in ("lease_band", "storey_band", "start_month", "end_month"):
                     remembered.pop(field, None)  # a new price request starts a new filter scope
             self_description = bool(re.search(
                 r"\b(?:i am|i'm|we are|we're|my income|our income|i earn|we earn|my salary|our salary)\b",
@@ -205,8 +214,15 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
             remembered.update({k: v for k, v in fields.items()
                                if v is not None and (k in {"town", "flat_type"} or self_description or answering_clarification
                                                      or (price_turn and k in {"lease_band", "storey_band"}))})
+            if price_turn or answering_floor:
+                if period := extract_month_range(turn.content):
+                    remembered["start_month"], remembered["end_month"] = period
+                if all_floors(turn.content, reply=answering_floor):
+                    remembered["storey_band"] = None
             if scoped_policy:
                 previous_question = scoped_policy
+                if chosen_topic:
+                    price_question = None
             elif intent != "unanswerable" and not answering_clarification:
                 if not _price_followup(turn.content, previous_question):
                     previous_question = turn.content
@@ -218,8 +234,9 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
         else:
             previous_reply = turn.content
     current = _reply_fields(request.message, previous_reply)
-    scoped_policy = lease_topic_reply(request.message, previous_reply)
-    answering_floor = previous_reply.startswith(FLOOR_SCOPE_PREFIX) and floor_band_reply(request.message) is not None
+    scoped_policy = lease_topic_reply(request.message, previous_reply) or topic_reply(request.message, previous_reply)
+    answering_floor = previous_reply.startswith(FLOOR_SCOPE_PREFIX) and (
+        floor_band_reply(request.message) is not None or all_floors(request.message, reply=True))
     last_reply = request.history[-1] if request.history else None
     if scoped_policy:
         followup_question = scoped_policy
@@ -251,8 +268,8 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
         household_type=profile.household_type or remembered.get("household_type"),
         town=filters.town if filters else remembered.get("town"),
         flat_type=filters.flat_type if filters else remembered.get("flat_type"),
-        start_month=filters.start_month if filters else None,
-        end_month=filters.end_month if filters else None,
+        start_month=filters.start_month if filters else price_memory.get("start_month"),
+        end_month=filters.end_month if filters else price_memory.get("end_month"),
         lease_band=filters.lease_band if filters else price_memory.get("lease_band"),
         storey_band=filters.storey_band if filters else price_memory.get("storey_band"),
         data_origin=data_origin,

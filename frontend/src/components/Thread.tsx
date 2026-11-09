@@ -15,6 +15,8 @@ import { AnswerExtras, StatusBadge } from "./AnswerExtras";
 import { FeedbackControls } from "./FeedbackControls";
 import { Logo } from "./Logo";
 import { QuickReplies } from "./QuickReplies";
+import type { ProfileChangeMeta } from "../lib/profileChanges";
+import { useChat } from "../lib/chat";
 import { MarkdownText, SourceMarkdown } from "./MarkdownText";
 
 const STARTERS = [
@@ -33,6 +35,7 @@ export function Thread() {
             <Welcome />
           </ThreadPrimitive.Empty>
           <ThreadPrimitive.Messages components={{ UserMessage, AssistantMessage, EditComposer }} />
+          <PendingProfileNotice />
           <div className="h-6 shrink-0" />
         </div>
         <ThreadPrimitive.ViewportFooter className="sticky bottom-0 mx-auto w-full max-w-3xl shrink-0 bg-white pb-4 dark:bg-slate-950">
@@ -45,6 +48,11 @@ export function Thread() {
       </ThreadPrimitive.Viewport>
     </ThreadPrimitive.Root>
   );
+}
+
+function PendingProfileNotice() {
+  const { pendingProfileChange } = useChat();
+  return pendingProfileChange ? <p role="status" className="my-2 rounded-lg bg-brand-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">{pendingProfileChange}</p> : null;
 }
 
 function Welcome() {
@@ -139,12 +147,20 @@ function EditComposer() {
 }
 
 function AssistantMessage() {
-  const custom = useAuiState((s) => s.message.metadata.custom) as Partial<AdvisorMeta> | undefined;
+  const custom = useAuiState((s) => s.message.metadata.custom) as Partial<AdvisorMeta | ProfileChangeMeta> | undefined;
   const progress = (custom as Partial<ProgressMeta> | undefined)?.kind === "progress" ? (custom as unknown as ProgressMeta) : undefined;
   // metadata.custom is {} while the request is in flight, so check it is complete.
   const meta =
     custom?.kind === "response" || custom?.kind === "error" ? (custom as AdvisorMeta) : undefined;
   const running = useAuiState((s) => s.message.status?.type === "running");
+
+  if (custom?.kind === "profile_change") return (
+    <MessagePrimitive.Root className="py-2">
+      <div role="status" className="rounded-lg border border-brand-100 bg-brand-50 px-3 py-2 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+        <MessagePrimitive.Parts />
+      </div>
+    </MessagePrimitive.Root>
+  );
 
   const tone =
     meta?.kind === "error"
@@ -169,6 +185,11 @@ function AssistantMessage() {
         ) : (
           <>
             <StatusBadge meta={meta} />
+            {meta?.kind === "response" && meta.response.profile_note && (
+              <p role="note" className="mb-3 rounded-lg bg-brand-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                {meta.response.profile_note}
+              </p>
+            )}
             {meta?.kind === "response" ? (
               <div className="leading-relaxed"><SourceMarkdown text={numberCitations(meta.response)} /></div>
             ) : <MessagePrimitive.Parts components={{ Text: MarkdownText }} />}

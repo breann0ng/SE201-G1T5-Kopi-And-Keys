@@ -42,8 +42,9 @@ def _price_question(text, **filters):
 def test_price_filters_pin_the_router_date_for_relative_periods():
     q = _price_question("What did 4-room flats in Tampines sell for in the past 6 months?")
     assert metrics.price_filters([q], "2026-10", "2026-10")["accuracy"] == "100% (1/1)"
-    # The same question labelled a month later no longer matches.
-    assert metrics.price_filters([q], "2026-11", "2026-10")["mismatches"][0]["wrong"] == ["end_month", "start_month"]
+    # Asked a month later, "past 6 months" starts a month later (Jun, not May). The end is
+    # still Oct 2026: a period past the data ends at the newest data month.
+    assert metrics.price_filters([q], "2026-11", "2026-10")["mismatches"][0]["wrong"] == ["start_month"]
 
 
 def test_price_filters_extract_bands_report_real_mismatches_and_follow_clarification_turns():

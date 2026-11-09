@@ -2,6 +2,7 @@ import { UserRound } from "lucide-react";
 import { emptyProfile, useProfile } from "../lib/profile";
 import { citizenshipOptions } from "../lib/vocab";
 import type { BuyerProfile } from "../lib/api";
+import { profileWarnings } from "../lib/profileWarnings";
 
 const field =
   "mt-1 w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900";
@@ -9,6 +10,7 @@ const field =
 /** Optional buyer details, sent with each question so answers can be specific. Replaces login. */
 export function ProfilePanel() {
   const { profile, setProfile } = useProfile();
+  const warnings = profileWarnings(profile);
   const num = (v: string) => (v === "" ? null : Math.max(0, Number(v)));
 
   return (
@@ -19,6 +21,13 @@ export function ProfilePanel() {
       <p className="text-xs text-slate-500 dark:text-slate-400">
         Optional. Applied to your next question. Earlier answers keep their original context.
       </p>
+      {warnings.length > 0 && (
+        <div role="alert" className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100">
+          <p className="font-semibold">Check your profile details</p>
+          <ul className="mt-1 list-disc space-y-1 pl-4">{warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul>
+          <p className="mt-1">Correct these selections before asking for policy guidance. Transaction prices can still be checked.</p>
+        </div>
+      )}
 
       <label className="block text-xs font-medium">
         Household citizenship

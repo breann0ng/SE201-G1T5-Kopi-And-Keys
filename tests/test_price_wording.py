@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import pytest
 
-from kopi_keys.components.price_display import lease_note, price_answer, subject_label
+from kopi_keys.components.price_display import lease_note, missing_months_note, price_answer, subject_label
 from kopi_keys.schemas import BandStat, PriceFilters, PriceResult
 
 FILTERS = PriceFilters(town="TOA PAYOH", flat_type="5 ROOM", start_month="2025-11", end_month="2026-10")
@@ -127,3 +127,30 @@ def test_unexpected_layout_lists_each_verified_line():
     text = price_answer("Median: SGD 1,050,000.00\n\nMean: SGD 1,079,268.31", PRICE)
     assert text == ("**5-room flats in Toa Payoh**, Nov 2025 to Oct 2026\n\n"
                     "- Median: SGD 1,050,000.00\n- Mean: SGD 1,079,268.31")
+
+
+
+# --- months asked for but not in the data yet ---------------------------------
+
+def test_one_missing_month():
+    """'Past 6 months' asked in Nov 2026 with data to Oct 2026: filters end at Oct."""
+    asked = FILTERS.model_copy(update={"start_month": "2026-06"})
+    assert missing_months_note(asked, "2026-11") == (
+        "We don't have sales data for Nov 2026 yet: our records go up to Oct 2026, "
+        "so these figures cover Jun 2026 to Oct 2026.")
+
+
+def test_several_missing_months_are_named_as_a_range():
+    assert missing_months_note(FILTERS, "2027-01") == (
+        "We don't have sales data for Nov 2026 to Jan 2027 yet: our records go up to Oct 2026, "
+        "so these figures cover Nov 2025 to Oct 2026.")
+
+
+def test_december_rolls_over_to_january():
+    december = FILTERS.model_copy(update={"end_month": "2026-12"})
+    assert missing_months_note(december, "2027-01").startswith("We don't have sales data for Jan 2027 yet")
+
+
+@pytest.mark.parametrize("requested_end", [None, "2026-10", "2026-09"])
+def test_no_missing_months_note_when_the_data_covers_the_request(requested_end):
+    assert missing_months_note(FILTERS, requested_end) is None
