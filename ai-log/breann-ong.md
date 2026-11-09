@@ -265,13 +265,11 @@ check that a quote answers what was asked.
 - [Describe your own review.]
 
 ### What I kept or changed
-[Record anything you kept or changed.]
-
 ## 2026-11-08 · PR review: provider rule declined valid questions; merge with main
 - **Tool (model):** Claude Code (Claude Opus 5.5)
 - **Files:** backend/kopi_keys/components/query_router.py, graph.py (merge),
   tests/test_query_router.py, tests/test_intent_fallback.py
-- **Outcome:** [Kept / Changed — choose after your review]
+- **Outcome:** [Kept]
 
 ### What I asked for
 Fixes for two review comments on the PR: a merge conflict in graph.py that
@@ -294,6 +292,84 @@ flat?" being declined as a provider recommendation, with no LLM appeal.
 - Found while testing, not fixed: "first-timers" (plural) is not extracted
   as first_timer; only the singular is.
 - [Describe your own review.]
+
+### What I kept or changed
+Kept the 
+
+## 2026-11-09 · CI failure: frontend test used chunk IDs from before re-chunking
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** frontend/tests/sourceContent.test.ts
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+Why "Frontend lint and build" failed on the router PR when the PR changed no
+frontend code.
+
+### How I checked it
+- Ran the CI steps locally: lint and build passed; npm test failed because
+  sourceContent.test.ts looks up CHUNK_EHG_32 and CHUNK_EHG_30, which no
+  longer exist. The re-chunking commit (738c3e0) renumbered the chunks a day
+  before the test was added, so main was failing too.
+- Found the same two tables by content (non-resident spouse; first-timer and
+  second-timer couple) and switched the test to CHUNK_EHG_48 and
+  CHUNK_EHG_46. 12/12 frontend tests pass.
+- Note for the team: tests that look up chunks by ID break whenever the PDFs
+  are re-chunked.
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]
+
+## 2026-11-09 · LLM-as-judge (answer relevance): fix, calibrate, run on the dev set
+- **Tool (model):** Claude Code (Claude Opus 5.5); judge model in LangSmith:
+  Gemini 3.6 Flash, then Gemini 3.5 Flash-Lite
+- **Files:** backend/kopi_keys/evaluation/langsmith_eval.py,
+  tests/test_langsmith_eval.py (new); LangSmith evaluator settings (prompt,
+  variable mapping, filters) changed through the API
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+Whether our LangSmith "Answer Relevance" judge actually scores our answers,
+whether to move to a stronger model, and whether a 0/1 score is too harsh.
+Then: fix it, test it on deliberately wrong answers, and run it on the dev set.
+
+### How I checked it
+- It was not judging answers. The evaluator mapped `output.message`, which on
+  our LangGraph trace is the user's question, not the answer
+  (`output.response.message`). All 8 scores so far were 0, with comments
+  saying the output "repeats the question". It also still used the generic
+  prompt, which penalises quoting neighbouring sentences.
+- Fixed in LangSmith: our HDB prompt from langsmith_eval.py, mapping
+  `input.message` / `output.response.message`, and a filter so only answered
+  runs are judged (declines are not "irrelevant" answers). The suggested filter
+  syntax `outputs.response.status` was rejected by LangSmith; the working form
+  is `output_key` / `output_value`, tested on real runs before saving.
+- Mapping is stored on the evaluator, not per rule, so the live-trace rule and
+  the dataset rule must see the same output shape. Experiments returned the
+  response directly; langsmith_eval.py now returns `{"response": ...}` like a
+  live trace. New test checks the shape and that the code metrics still score
+  it. 939 tests pass.
+- Calibration: 10 question/answer pairs, 3 correct and 7 deliberately wrong
+  (wrong scheme, wrong buyer x2, wrong town, wrong period, missing half of a
+  two-part question, off topic). Flash: 6/6 correct where it ran, but 4 calls
+  failed with 429 quota errors that LangSmith records as score 0. Flash-Lite:
+  10/10 correct, no errors. Quota errors are excluded from every average
+  (comment contains `ChatGoogleGenerativeAIError`).
+- Found and fixed on the way: the local Chroma index was missing 195 of 898
+  chunks (stale after merges); rebuilt with scripts/build_policy_index.py.
+  An earlier dev run was stopped because it mixed two judge models and used
+  the incomplete index.
+- Dev-set run judge-dev-lite (50 questions) vs pre-merge: over-abstention
+  31% -> 19%, price correct 76% -> 94%, route 98% both, unsafe 0/8 both, but
+  stale 0/7 -> 3/7. Judge: 70% relevant (21/30 answered), 0 errors. Of the 9
+  judged irrelevant, about 8 are real misses that passed every code check
+  (e.g. LTV "now" answered with the pre-August-2024 80% footnote; HFE validity
+  answered with processing time). The Bidadari price answer looks like a judge
+  false negative (Bidadari is in Toa Payoh). One run, different commit from
+  pre-merge, so differences are indicative only.
+- Kept the score binary: pass/fail judgements are more consistent across runs
+  than a 1-5 scale; the average over many questions gives the detail.
+- [Describe your own review, e.g. hand-check ~20 of the 21 answers judged relevant.]
 
 ### What I kept or changed
 [Record anything you kept or changed.]

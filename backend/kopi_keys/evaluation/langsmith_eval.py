@@ -12,6 +12,11 @@ LangSmith's averages match our reports: route_correct, unsafe_answering (abstain
 over_abstention (answerable questions only), uncited, stale (policy_changed only), price_ok and
 has_current (where labelled). Lower is better for unsafe/over-abstention/uncited/stale.
 
+Each experiment output is {"response": ChatResponse}, the same shape as a live trace's output, so
+the LangSmith UI evaluator maps inputs -> input.message and outputs -> output.response.message
+for both, filtered to answered runs with
+and(eq(output_key, "response.status"), eq(output_value, "answered")).
+
 --judge adds an LLM-judged answer_relevance score on answered questions (prompt below). It
 needs `pip install -e ".[judge]"` and the provider's key (OPENAI_API_KEY / ANTHROPIC_API_KEY)
 in .env. Judge scores are softer evidence than the code metrics: calibrate before reporting.
@@ -124,11 +129,13 @@ def run(client, prefix: str, judge_model: str | None, limit: int | None, concurr
 
     def target(inputs: dict) -> dict:
         state = run_graph(graph, ChatRequest(**inputs))
-        return state.response.model_dump(mode="json")
+        # Same shape as a live LangGraph trace's output ({"response": ...}), so one LangSmith
+        # evaluator mapping (output.response.message) serves experiments and live traces alike.
+        return {"response": state.response.model_dump(mode="json")}
 
     def code_metrics(outputs: dict, example) -> dict:
         q = by_id[example.metadata["id"]]
-        case = metrics.end_to_end([q], {q["id"]: outputs})["cases"][0]
+        case = metrics.end_to_end([q], {q["id"]: outputs["response"]})["cases"][0]
         if "error" in case:
             return {"key": "error", "score": 1, "comment": case["error"]}
         results = []
@@ -148,9 +155,10 @@ def run(client, prefix: str, judge_model: str | None, limit: int | None, concurr
                                     feedback_key="answer_relevance")
 
         def answer_relevance(inputs: dict, outputs: dict) -> dict:
-            if outputs.get("status") != "answered":
+            response = outputs["response"]
+            if response.get("status") != "answered":
                 return {"results": []}  # abstentions and clarifications have nothing to judge
-            return judge(inputs=inputs["message"], outputs=outputs["message"])
+            return judge(inputs=inputs["message"], outputs=response["message"])
 
         evaluators.append(answer_relevance)
 
