@@ -49,6 +49,10 @@ can be reported again in a later week, as can an unresolved access failure.
 The 39 watcher tests still pass; workflow YAML, the weekly cron, manual trigger
 and read-contents/write-issues permissions were checked. No active data, comparison
 rules, notification failure handling or candidate validation were relaxed.
+The follow-up CI run hit the same Gitleaks download failure before scanning.
+Copied the bounded retry/timeouts already validated in PR #23, preserving its
+version/hash pin and blocking checksum/scan steps. This is a CI download fix,
+not a secret finding or relaxation of scanning.
 
 ## 2026-10-15 · Local CPU model, price synthesiser and numeric verifier
 - **Tool (model):** OpenAI Codex (GPT-6)
