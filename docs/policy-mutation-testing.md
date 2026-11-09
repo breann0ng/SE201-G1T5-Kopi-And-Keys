@@ -1,8 +1,8 @@
 # Policy/verifier mutation checks
 
-Nisha, 8 November 2026. These are curated fault-injection checks on the current
-UI/profile/verifier branch. Merge that prerequisite before this branch. They
-complement Tasha's price-tool mutation tests, not replace them.
+Nisha, initially checked 8 November 2026 and rerun against integrated main on
+9 November. The UI/profile prerequisite is already merged. These curated
+fault-injection checks complement Tasha's price-tool mutation tests.
 
 ## What is measured
 
@@ -61,6 +61,14 @@ mutation and cleanup, including a timeout case. No production module was changed
 to increase this score; existing regression tests detected these faults. One
 profile test was strengthened to assert a non-null clarification before indexing
 it, so detection is an explicit failed requirement rather than a TypeError.
+
+After merging main through PR #22 on 9 November, **109 baseline tests passed** and
+all **20/20 faults were detected**, with zero survivors/errors/timeouts. The full
+backend suite on this branch passed **700 tests**, with 1 skipped and 2 existing
+expected failures. The isolated checkout had no built vector index and used the
+documented keyword fallback in relevant tests. This is not a live hybrid-RAG or
+held-out evaluation. The dated summary is
+[`2026-11-09-policy-mutation-summary.json`](benchmarks/2026-11-09-policy-mutation-summary.json).
 
 ## How to present the result honestly
 

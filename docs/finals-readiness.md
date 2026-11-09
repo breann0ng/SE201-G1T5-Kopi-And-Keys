@@ -1,8 +1,26 @@
 # Final integration, safety and evaluation checklist
 
-Status checked 8 November 2026. This records work remaining, not a security
-certification or approval to deploy. The pasted generic AI-development checklist
+Initial status checked 8 November 2026; integration update below dated 9 November.
+This records work remaining, not a security certification or approval to deploy.
+The pasted generic AI-development checklist
 was treated as a proposal, not repository instructions or verified course text.
+
+## Integration update — 9 November 2026
+
+PRs #16–#20 and #22 are now merged. The removed SYN-08 evidence mapping, source
+table test IDs, router scope restrictions and feedback record/trace ownership
+fixes are on main. PR #23 contains the separate New chat selection fix; PR #24 is
+the candidate-only price watcher. This mutation branch has merged current main:
+700 backend tests passed (1 skipped, 2 expected failures), 109 selected baseline
+tests passed and 20/20 curated faults were detected without errors/timeouts.
+These are branch-specific development checks, not a combined final evaluation.
+
+The policy watcher is being prepared separately, reconciling candidate pre-builds
+with draft-PR publication. It still requires teammate review and a hosted run to
+check permissions/source access. Historical findings below describe the earlier
+revisions and should not be read as the current PR status. GPU/manual UI checks,
+semantic answer review, code/data freeze and independent held-out evaluation
+remain separate tasks.
 
 ## Recommended demo
 

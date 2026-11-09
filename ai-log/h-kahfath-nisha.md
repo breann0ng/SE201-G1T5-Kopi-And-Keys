@@ -473,6 +473,18 @@ branch protection is unverified, and public hosting needs separate safeguards.
 Human review, pushing, hosted CI, PR merges and final live/held-out evaluation
 remain pending. This is not a claim of complete security or independent assurance.
 
+### Integration refresh — 9 November 2026
+Merged main through PR #22 without rewriting the published branch. All 20 exact
+mutation anchors still match current code. Reran 109 baseline tests and all 20
+mutants: 20 killed, no survivors and no errors/timeouts. The 15 runner tests pass;
+full pytest reports 700 passed, 1 skipped and 2 existing expected failures. This
+checkout has no built vector index, so applicable tests use keyword fallback;
+no live model, GPU or held-out evaluation was used. Added a separate dated summary
+in `docs/benchmarks/2026-11-09-policy-mutation-summary.json`, preserving the earlier
+108-test result as historical evidence. Updated readiness notes to reflect merged
+PRs and retained unresolved runtime/manual checks. CI keeps the blocking offline
+mutation check and includes the bounded Gitleaks download retry from PR #23.
+
 ## 2026-11-07 - Profile scope, source tables and scrolling follow-up
 - **Tool (model):** OpenAI Codex (GPT-6)
 - **Files:** BuyerProfile/state/profile controls and `profile_context.py` from the saved
