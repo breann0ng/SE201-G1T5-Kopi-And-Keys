@@ -20,6 +20,8 @@ and(eq(output_key, "response.status"), eq(output_value, "answered")).
 --judge adds an LLM-judged answer_relevance score on answered questions (prompt below). It
 needs `pip install -e ".[judge]"` and the provider's key (OPENAI_API_KEY / ANTHROPIC_API_KEY)
 in .env. Judge scores are softer evidence than the code metrics: calibrate before reporting.
+A failed judge call (e.g. a quota error) is recorded as judge_error, never as answer_relevance 0.
+A crashed target (no output) is recorded as error by code_metrics and is not judged.
 
 The held-out set is never uploaded: it stays private for the final run_eval.
 """
@@ -72,6 +74,16 @@ SCORES = [
     ("has_current", "has_current", lambda q: q.get("current_value") is not None),
     ("price_ok", "price_ok", lambda q: True),
 ]
+
+
+def _response(outputs) -> dict | None:
+    """The ChatResponse dict from an experiment output, or None if the target produced none."""
+    response = outputs.get("response") if isinstance(outputs, dict) else None
+    return response if isinstance(response, dict) else None
+
+
+def _error(comment: str) -> dict:
+    return {"key": "error", "score": 1, "comment": comment}
 
 
 def _request(q: dict) -> dict:
@@ -133,11 +145,20 @@ def run(client, prefix: str, judge_model: str | None, limit: int | None, concurr
         # evaluator mapping (output.response.message) serves experiments and live traces alike.
         return {"response": state.response.model_dump(mode="json")}
 
-    def code_metrics(outputs: dict, example) -> dict:
-        q = by_id[example.metadata["id"]]
-        case = metrics.end_to_end([q], {q["id"]: outputs["response"]})["cases"][0]
+    def code_metrics(run, example, outputs: dict) -> dict:
+        question_id = (example.metadata or {}).get("id")
+        q = by_id.get(question_id)
+        if q is None:
+            return _error(f"{question_id!r} is not in the local dev set: run the upload command")
+        response = _response(outputs)
+        if response is None:  # the target crashed: the SDK passes outputs={}
+            return _error(f"The target produced no response: {getattr(run, 'error', None) or 'no output'}")
+        try:
+            case = metrics.end_to_end([q], {q["id"]: response})["cases"][0]
+        except (KeyError, TypeError) as error:
+            return _error(f"Malformed response (missing {error}): cannot score it")
         if "error" in case:
-            return {"key": "error", "score": 1, "comment": case["error"]}
+            return _error(case["error"])
         results = []
         for key, field, applies in SCORES:
             value = case["route"] == case["expected_route"] if field is None else case[field]
@@ -155,10 +176,16 @@ def run(client, prefix: str, judge_model: str | None, limit: int | None, concurr
                                     feedback_key="answer_relevance")
 
         def answer_relevance(inputs: dict, outputs: dict) -> dict:
-            response = outputs["response"]
-            if response.get("status") != "answered":
-                return {"results": []}  # abstentions and clarifications have nothing to judge
-            return judge(inputs=inputs["message"], outputs=response["message"])
+            response = _response(outputs)
+            # Nothing to judge: a crashed target (code_metrics records the error), an abstention
+            # or a clarification.
+            if response is None or response.get("status") != "answered":
+                return {"results": []}
+            try:
+                return judge(inputs=inputs.get("message", ""), outputs=response.get("message") or "")
+            except Exception as error:  # e.g. a provider quota error (429)
+                # A separate key, so a failed judge call is never averaged as "not relevant".
+                return {"key": "judge_error", "score": 1, "comment": f"{type(error).__name__}: {error}"[:500]}
 
         evaluators.append(answer_relevance)
 
