@@ -542,6 +542,11 @@ PR #23's bounded Gitleaks download retries. Publication tests still use mocks
 and a local bare Git remote; no live scrape, notification or activation was run.
 A hosted schedule remains necessary to verify actual source access and bot PR
 permissions after merge.
+Then integrated #21's results/documentation changes and reran full pytest:
+721 passed, 1 skipped, 2 expected failures. Frontend tests (12), lint and build
+pass with the existing warnings. The branch is pushed; PR submission through the
+GitHub connector is unavailable (HTTP 403), so a prepared comparison link is
+provided. No live watcher publication or policy activation was performed.
 
 ## 2026-11-01 - Policy refresh deprecation and blocked-source handling
 - **Tool (model):** OpenAI Codex (GPT-6)
