@@ -1,10 +1,13 @@
 """Query Router: classify the question, extract buyer/price filters, validate.
 
 Diagram box: "Query router (LLM)". The current implementation is rule-based
-(keywords + regex) and is the baseline for the dev-set routing labels. An LLM
-classifier should replace `classify_intent` and `extract_fields` behind the
-same `route_query` contract; its output must still pass `RouterOutput`
-validation before anything runs.
+(keywords + regex) and is the baseline for the dev-set routing labels.
+Hybrid: `rule_intent` returns None when no rule matches. Those questions go to
+the LLM fallback (components/intent_fallback.py, called from graph.py), and so
+do weak matches (generic keywords only), which the LLM may only veto. It can
+never override a strong rule, least of all the scope guard (request types the
+app declines). Field extraction stays in regex either way. Output must still
+pass `RouterOutput` validation.
 
 `missing_fields` is a temporary hard-coded gate. Per proposal Appendix B it
 should eventually be driven by the topic cards' required fields
@@ -17,7 +20,16 @@ from decimal import Decimal
 
 from pydantic import Field
 
+from typing import Literal
+
 from ..schemas import Contract, Intent, Route, RouterStatus
+from .intent_fallback import FallbackDecision
+
+# rules: a rule decided. no_match: no rule fired and no LLM was asked (declined by default).
+# llm: the LLM fallback chose confidently. llm_unsure / llm_error: low confidence or unusable
+# output, so the user is asked which topic they mean.
+# rules_confirmed: a weak rule match the LLM did not veto. llm_declined: one it vetoed.
+IntentSource = Literal["rules", "no_match", "llm", "llm_unsure", "llm_error", "rules_confirmed", "llm_declined"]
 
 
 # --- Intent classification -------------------------------------------------
@@ -25,7 +37,7 @@ from ..schemas import Contract, Intent, Route, RouterStatus
 FLAT_PATTERN = re.compile(r"\b(([1-5])\s*[- ]?room|executive)(?:\s+flat)?\b", re.IGNORECASE)
 PRICE_WORDS = (
     "price", "prices", "selling", "sold", "cost", "median", "benchmark",
-    "going for", "what did", "how much", "damage", "listed at", "normal",
+    "going for", "what did", "how much", "the damage", "listed at", "normal",
     "go for", "goes for", "sell for", "sells for",
 )
 POLICY_WORDS = (
@@ -65,6 +77,95 @@ UNANSWERABLE_PATTERNS = (
     "confirm we are", "confirm i am", "confirm that we", "confirm that i", "definitely eligible",
     "guarantee we", "guarantee i",
 )
+# Added 2026-11-06: scope guard, checked before every other rule. OOS-06 ("What will 4-room
+# flats in Tampines cost next year?") was routed as price and answered with past prices, and
+# OOS-07 ("Can you guarantee my Family Grant application will be approved ...?") as policy.
+# A time phrase alone is not a forecast ("Can I sell my flat in 5 years?" is a MOP question,
+# "We're buying next year" is context), so it only counts right next to price/value wording in
+# the same sentence. "How much will a 4-room cost?" asks for today's prices, so "will" only
+# counts with wording about prices changing.
+FORECAST_WORDS = re.compile(r"\b(?:forecast\w*|predict\w*|projections?|projected)\b", re.IGNORECASE)
+_FUTURE = (r"(?:(?:next|coming)\s+(?:year|month|decade|few\s+(?:years|months)|\d+\s+years)"
+           r"|in\s+(?:\d+|a\s+few|few|two|three|five|ten)\s+years?|in\s+the\s+future|future)")
+_VALUE = r"(?:prices?|cost\w*|worth|value|sell\s+for|go\s+for|fetch|appreciat\w*|depreciat\w*)"
+FUTURE_VALUE = re.compile(
+    rf"\b{_VALUE}\b[^.?!]{{0,30}}\b{_FUTURE}\b|\b{_FUTURE}\b[^.?!]{{0,30}}\b{_VALUE}\b", re.IGNORECASE,
+)
+WILL_VALUE_CHANGE = re.compile(
+    r"\b(?:will|going\s+to|gonna)\b[^.?!]{0,50}\b(?:be\s+worth\s+(?:more|less)|go\s+(?:up|down)|"
+    r"rise|fall|drop|increase|decrease|appreciate|depreciate|crash)\b",
+    re.IGNORECASE,
+)
+# Valuing one specific flat (OOS-05: "What is my flat at Blk 512 ... worth right now?"). Without
+# a rule it reached the LLM fallback, which read it as a price question.
+OWN_FLAT_VALUE = re.compile(
+    r"\b(?:my|our|this|that)\s+(?:flat|unit|home|house|place)\b[^.?!]{0,60}\bworth\b"
+    r"|\bhow much (?:can|could|will|would) (?:i|we) (?:sell|get for) (?:my|our|this)\b",
+    re.IGNORECASE,
+)
+GUARANTEE = re.compile(
+    r"\bguarantee\w*\b|\b(?:will|would)\s+(?:my|our|the)\b.{0,40}\b(?:application|appeal)\b.{0,20}"
+    r"\bbe\s+(?:approved|successful|accepted)\b",
+    re.IGNORECASE,
+)
+
+
+# Added 2026-11-08: declines written per request type, not per case, so a new provider or task
+# is covered without a new rule. Three questions passed as policy on "loan" / "hdb" alone:
+# "Recommend me a good mortgage broker", "Which bank gives the cheapest home loan right now?",
+# "Can you write my appeal letter to HDB?".
+# Recommend a provider: a choosing word just before a kind of provider.
+# The provider must be what is being chosen, not a word describing something else: "Which bank
+# loan documents are required?" asks about documents (code review, PR #20), and "Who pays the
+# agent's commission?" about a fee. So the provider may not be followed by a noun it modifies
+# or by a possessive.
+_PROVIDER_AS_MODIFIER = (
+    r"(?!'s\b|’s\b|\s+(?:loans?|mortgages?|documents?|paperwork|statements?|accounts?|fees?|charges?|"
+    r"commissions?|rates?|interest|valuations?|letters?|approvals?|requirements?|terms|polic(?:y|ies)|"
+    r"forms?|processing|checks?|rules?)\b)"
+)
+RECOMMEND_PROVIDER = re.compile(
+    r"\b(?:recommend|suggest|which|who|best|good|reliable|trusted|trustworthy|cheapest|top)\b[^.?!]{0,25}?"
+    r"\b(?:agents?|agency|agencies|brokers?|banks?|lenders?|lawyers?|law\s+firms?|conveyancers?|"
+    r"contractors?|renovators?|interior\s+designers?|movers?|valuers?)\b" + _PROVIDER_AS_MODIFIER +
+    r"|\b(?:best|cheapest|lowest[- ]interest)\s+(?:home\s+|bank\s+|mortgage\s+|housing\s+)?(?:loans?|mortgages?)\b",
+    re.IGNORECASE,
+)
+# Investment advice. "Should I wait to buy ...?" stays in scope (POL-02 asks about grant timing).
+INVESTMENT_ADVICE = re.compile(
+    r"\b(?:good|better|bad|worse|smart|wise|safe)\s+investment\b"
+    r"|\b(?:stocks?|shares|crypto|bonds|etfs?)\b[^.?!]{0,40}\b(?:or|vs|versus|instead)\b"
+    r"|\b(?:or|vs|versus|instead\s+of)\b[^.?!]{0,40}\b(?:stocks?|shares|crypto|bonds|etfs?)\b"
+    r"|\bis\s+(?:it|now)\s+(?:a\s+)?(?:good|right|bad|the\s+right)\s+time\s+to\s+(?:buy|sell)\b",
+    re.IGNORECASE,
+)
+# A task done for the user: the verb right after "can you" / "please", or writing a document.
+# "Can you tell me how to submit ...?" is a process question and does not match.
+DO_A_TASK = re.compile(
+    r"\b(?:can|could|would|will)\s+you\s+(?:please\s+)?(?:help\s+(?:me|us)\s+)?"
+    r"(?:write|draft|compose|fill\s+(?:in|out|up)|submit|apply|book|send|email|call|contact|negotiate)\b"
+    r"|\bplease\s+(?:write|draft|compose|fill|submit|apply|send|book)\b"
+    r"|\b(?:write|draft|compose)\b[^.?!]{0,30}\b(?:letter|appeal|email|message|poem|essay|story|song)\b",
+    re.IGNORECASE,
+)
+
+# The request types the scope guard declines. Each one is a pattern, not a list of cases.
+SCOPE_GUARD = {
+    "predict": (FORECAST_WORDS, WILL_VALUE_CHANGE, FUTURE_VALUE),
+    "value_one_flat": (OWN_FLAT_VALUE,),
+    "guarantee": (GUARANTEE,),
+    "recommend_provider": (RECOMMEND_PROVIDER,),
+    "investment_advice": (INVESTMENT_ADVICE,),
+    "do_a_task": (DO_A_TASK,),
+}
+
+
+def out_of_scope(message: str) -> bool:
+    """Requests declined whatever else matches: predictions, valuing one flat, guarantees,
+    provider recommendations, investment advice and tasks done for the user."""
+    if any(pattern in message.casefold() for pattern in UNANSWERABLE_PATTERNS):
+        return True
+    return any(p.search(message) for patterns in SCOPE_GUARD.values() for p in patterns)
 
 
 # "How much is a flat in Toa Payoh?" names no flat type and no strong price word,
@@ -87,21 +188,50 @@ def _names_a_town(message: str) -> bool:
 
 
 def classify_intent(message: str) -> Intent:
+    """The rules' intent, with "no rule matched" counted as unanswerable (used by follow-ups)."""
+    return rule_intent(message) or "unanswerable"
+
+
+def rule_intent(message: str) -> Intent | None:
+    """Intent from the rules, or None when no rule matches (as opposed to an explicit decline)."""
+    return rule_match(message)[0]
+
+
+# Added 2026-11-08: keywords common outside the app's scope too ("a loan from the bank", "the
+# HDB hub", "how long to drive"). When these are the only reason a question is policy, the rule
+# still picks the intent but the LLM is asked to confirm (see route_query). "hdb loan" and
+# "housing loan" name the HDB's own loan, so they are strong.
+WEAK_POLICY_WORDS = {
+    "hdb", "loan", "mortgage", "financing", "borrow", "repayment", "interest rate", "instalment",
+    "installment", "block", "full", "how long", "stuck there", "neighbourhood", "condo", "rent",
+    "rental", "policy", "scheme", "allowed",
+}
+STRONG_POLICY_PHRASES = ("hdb loan", "housing loan", "resale")
+WEAK_DISCOVERY_WORDS = {"recommend"}
+
+
+def rule_match(message: str) -> tuple[Intent | None, bool]:
+    """(intent, weak). weak: policy or discovery decided only by generic keywords."""
     normalized = message.casefold()
-    if any(pattern in normalized for pattern in UNANSWERABLE_PATTERNS):
-        return "unanswerable"
+    if out_of_scope(message):
+        return "unanswerable", False
     has_price = any(word in normalized for word in PRICE_WORDS)
     policy_text = ADDRESS_BLOCK.sub(" ", normalized)
-    has_policy = any(word in policy_text for word in POLICY_WORDS) or bool(BUY_ELIGIBILITY.search(message))
-    is_discovery = any(phrase in normalized for phrase in DISCOVERY_WORDS) or (
-        bool(BUYING_GUIDE.search(message)) and not any(word in normalized for word in PRICE_WORDS))
-    if is_discovery:
-        return "discovery"
+    policy_hits = {word for word in POLICY_WORDS if word in policy_text}
+    has_policy = bool(policy_hits) or bool(BUY_ELIGIBILITY.search(message))
+    weak_policy = (bool(policy_hits) and policy_hits <= WEAK_POLICY_WORDS
+                   and not BUY_ELIGIBILITY.search(message)
+                   and not any(phrase in policy_text for phrase in STRONG_POLICY_PHRASES))
+    discovery_hits = {phrase for phrase in DISCOVERY_WORDS if phrase in normalized}
+    guide = bool(BUYING_GUIDE.search(message)) and not any(word in normalized for word in PRICE_WORDS)
+    if discovery_hits or guide:
+        weak = discovery_hits <= WEAK_DISCOVERY_WORDS and not guide and (not has_policy or weak_policy)
+        return "discovery", weak
     has_price_context = has_price and (
         bool(FLAT_PATTERN.search(message))
         or bool(MAISONETTE.search(message))
         or any(word in normalized for word in (
-            "price", "median", "benchmark", "going for", "cost", "damage", "listed at",
+            "price", "median", "benchmark", "going for", "cost", "the damage", "listed at",
             "go for", "goes for", "sell for", "sells for",
         ))
         or (not has_policy and (bool(PRICE_SUBJECT.search(message)) or _names_a_town(message)))
@@ -109,21 +239,21 @@ def classify_intent(message: str) -> Intent:
     has_explicit_price_stat = any(
         word in normalized
         for word in (
-            "price", "median", "benchmark", "going for", "cost", "damage", "listed at", "sold", "what did",
+            "price", "median", "benchmark", "going for", "cost", "the damage", "listed at", "sold", "what did",
         )
     )
     has_mixed_policy = any(
         word in policy_text for word in POLICY_WORDS if word not in {"lease"}
     ) or bool(BUY_ELIGIBILITY.search(message))
     if has_price_context and "grant" in normalized and not has_explicit_price_stat:
-        return "policy"
+        return "policy", False
     if has_price_context and has_mixed_policy:
-        return "mixed"
+        return "mixed", False
     if has_price_context:
-        return "price"
+        return "price", False
     if has_policy:
-        return "policy"
-    return "unanswerable"
+        return "policy", weak_policy
+    return None, False
 
 
 def route_for_intent(intent: Intent) -> Route:
@@ -352,14 +482,42 @@ class RouterOutput(Contract):
     end_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     # An assumption the answer must state (e.g. maisonettes counted as Executive flats).
     router_note: str | None = None
+    # "no_match": no rule fired, so the question was declined by default, not by a rule.
+    intent_source: IntentSource = "rules"
+    # A weak rule match (generic keywords only) the graph should ask the LLM to confirm.
+    needs_confirmation: bool = False
 
 
-def route_query(message: str, known: dict | None = None, context_question: str | None = None) -> RouterOutput:
-    """Classify and extract. Values found in the message win; `known` fills gaps."""
+def route_query(message: str, known: dict | None = None, context_question: str | None = None,
+                fallback: FallbackDecision | None = None) -> RouterOutput:
+    """Classify and extract. Values found in the message win; `known` fills gaps.
+
+    `fallback` is the LLM's decision, asked for by the graph after a first call returned
+    intent_source="no_match" or needs_confirmation=True.
+    - No rule matched: a confident intent is used as is; a low-confidence or unusable one asks
+      the user which topic they mean instead of declining.
+    - Weak rule match: the LLM can only veto it, with a confident "unanswerable". Any other
+      answer, or an error, keeps the rule's intent. It never switches one intent for another.
+    - Strong rule match: the decision is ignored.
+    """
     known = known or {}
-    intent = classify_intent(message)
-    if context_question:
-        intent = classify_intent(context_question)
+    intent, weak = rule_match(context_question or message)
+    weak = weak and context_question is None  # a follow-up keeps its earlier question's route
+    intent_source: IntentSource = "rules"
+    if weak and fallback is not None:
+        if fallback.intent == "unanswerable" and fallback.confidence == "high":
+            intent, intent_source = "unanswerable", "llm_declined"
+        elif fallback.intent is not None:
+            intent_source = "rules_confirmed"
+    elif intent is None:
+        intent, intent_source = "unanswerable", "no_match"
+        if fallback is not None:
+            if fallback.intent is None:
+                intent_source = "llm_error"
+            elif fallback.confidence == "high":
+                intent, intent_source = fallback.intent, "llm"
+            else:
+                intent_source = "llm_unsure"
     extracted = extract_fields(message, bare_town=intent in ("price", "mixed"))
     values = {
         field: extracted[field] if extracted[field] is not None else known.get(field)
@@ -370,6 +528,8 @@ def route_query(message: str, known: dict | None = None, context_question: str |
     missing = missing_fields(intent, message, values)
     if re.fullmatch(r"\s*(?:i (?:want|would like) to know about|tell me about|what is|explain)\s+hdb[?.! ]*", message, re.I):
         missing = ["topic"]
+    if intent_source in ("llm_unsure", "llm_error"):
+        missing = ["topic"]  # ask which topic they mean rather than decline
     if missing:
         route, status = "clarify", "clarify"
     elif intent == "unanswerable":
@@ -383,4 +543,5 @@ def route_query(message: str, known: dict | None = None, context_question: str |
         notes.append(BLOCK_NOTE)
     note = " ".join(notes) or None
     return RouterOutput(intent=intent, route=route, status=status, missing_fields=missing,
-                        router_note=note, **values)
+                        router_note=note, intent_source=intent_source,
+                        needs_confirmation=weak and fallback is None, **values)

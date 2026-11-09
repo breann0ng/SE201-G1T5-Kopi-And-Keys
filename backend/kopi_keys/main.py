@@ -18,6 +18,7 @@ from pathlib import Path
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 
+from .components.intent_fallback import SCHEMA as INTENT_SCHEMA, LLMIntentClassifier
 from .components.policy_retrieval import HybridPolicyRetriever
 from .components.price_query import SqlitePriceTool
 from .graph import build_graph, run_chat
@@ -80,6 +81,13 @@ def _warm_up() -> None:
         pass
 
 
+def router_fallback():
+    """The LLM fallback for questions no router rule matches; KOPI_ROUTER_FALLBACK=off disables it."""
+    if os.getenv("KOPI_ROUTER_FALLBACK", "llm").strip().lower() == "off":
+        return None
+    return LLMIntentClassifier(OllamaEngine().for_router(INTENT_SCHEMA))
+
+
 def create_app(graph=None) -> FastAPI:
     application = FastAPI(
         title="Kopi & Keys",
@@ -88,7 +96,8 @@ def create_app(graph=None) -> FastAPI:
     )
     # Without a built database the SQLite tool reports "unavailable", like the old placeholder.
     if graph is None:
-        graph = build_graph(retriever=HybridPolicyRetriever(), price_tool=SqlitePriceTool())
+        graph = build_graph(retriever=HybridPolicyRetriever(), price_tool=SqlitePriceTool(),
+                            intent_classifier=router_fallback())
         if os.getenv("KOPI_WARM_UP", "1") != "0":
             threading.Thread(target=_warm_up, daemon=True).start()
     cache = ResponseCache(int(os.getenv("KOPI_RESPONSE_CACHE", "200")))

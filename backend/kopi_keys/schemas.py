@@ -168,6 +168,8 @@ class Claim(Contract):
     supporting_quote: str | None = None
     source_scope: str | None = None
     source_criterion: str | None = None
+    # Which asked aspect the quote answers, as the model labelled it (components/answer_aspects.py).
+    answers_aspect: str | None = None
 
 
 class Suggestion(Contract):

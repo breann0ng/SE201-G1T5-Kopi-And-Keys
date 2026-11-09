@@ -83,6 +83,15 @@ def _terms(text: str) -> set[str]:
     return {t for t in policy_tokens(text) if len(t) > 1 and t not in _GENERIC and not t.isdigit()}
 
 
+def policy_focus(question: str) -> str:
+    """The policy part of a question: without its price half (checked against SQL) or
+    instructions on what not to do ("without adding maximum amounts together")."""
+    question = re.split(r"\band\b(?=.{0,60}\b(?:median price|resale price|price of|price for)\b)", question,
+                        maxsplit=1, flags=re.I)[0]
+    return re.sub(r"\b(?:without|do not|don't|never)\s+(?:adding|add|summing|sum|calculating|calculate)\b[^.?!;]*",
+                  "", question, flags=re.I)
+
+
 @dataclass(frozen=True)
 class RelevanceScore:
     score: float
@@ -99,11 +108,7 @@ def score_relevance(question: str, quote: str, source_title: str = "", criterion
     asks about a specific aspect (income, employment, etc.), the quoted text or
     table criterion must address an aspect too; a matching title alone is not enough.
     """
-    # Price details in a mixed request are checked independently against SQL.
-    question = re.split(r"\band\b(?=.{0,60}\b(?:median price|resale price|price of|price for)\b)", question,
-                        maxsplit=1, flags=re.I)[0]
-    question = re.sub(r"\b(?:without|do not|don't|never)\s+(?:adding|add|summing|sum|calculating|calculate)\b[^.?!;]*",
-                      "", question, flags=re.I)
+    question = policy_focus(question)
     needed = requested_grants(question)
     covered = mentioned_grants(quote + " " + source_title) & needed
     query_terms = _terms(question)

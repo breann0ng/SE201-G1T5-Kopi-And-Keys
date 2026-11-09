@@ -17,8 +17,6 @@ VALID_STATUSES = {"continue", "clarify", "abstain"}
 KNOWN_ROUTER_GAPS = {
     "MIX-07": "takes the first flat type named ('our 2-room') instead of the one being bought (3-room)",
     "DSC-06": "takes the owned 2-room as flat_type instead of the 3-room being bought",
-    "OOS-06": "a forecast ('cost next year') routes as a price question over the last 12 months",
-    "OOS-07": "'guarantee my ... application' is not an abstain pattern, so it routes as policy",
 }
 
 
