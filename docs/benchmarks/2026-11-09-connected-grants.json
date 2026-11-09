@@ -1,0 +1,75 @@
+{
+  "date_sgt": "2026-11-09",
+  "branch": "fix/policy-answer-coverage",
+  "baseline_commit": "3e3caa8",
+  "scope": "Targeted short grant-combination development regression; not final semantic accuracy or held-out evaluation.",
+  "backend_tests_passed": 909,
+  "new_regression_instances": 10,
+  "policy_mutations": {
+    "baseline_tests": 116,
+    "planned": 20,
+    "executed": 20,
+    "killed": 20,
+    "survived": 0,
+    "errors_or_timeouts": 0,
+    "score": 1.0,
+    "complete": true
+  },
+  "development_replay_before": {
+    "family": "answered",
+    "single": "abstained",
+    "single-second": "abstained",
+    "mixed-family": "answered"
+  },
+  "development_replay_after": {
+    "family": "answered",
+    "single": "answered",
+    "single-second": "answered",
+    "mixed-family": "answered"
+  },
+  "running_localhost_api": [
+    {
+      "id": "single-first",
+      "status": "answered",
+      "citations": 1
+    },
+    {
+      "id": "single-second",
+      "status": "answered",
+      "citations": 1
+    }
+  ],
+  "second_timer_scope_note_verified": true,
+  "age_and_income_omitted_in_exact_single_cases": true,
+  "fixed_evidence_synthesis": {
+    "qwen3.8:latest": {
+      "cases": 12,
+      "quality_passes": 11,
+      "answered": 10,
+      "correct_abstentions": 2,
+      "engine_errors": 0,
+      "median_seconds": 2.38,
+      "p95_seconds": 3.775,
+      "model_calls": 14,
+      "first_attempt_verifier_passes": 10,
+      "raw_first_attempt_passes": 10,
+      "answers_after_claim_pruning": 0,
+      "answerable_cases": 10,
+      "over_abstentions": 0,
+      "output_tokens": 1282,
+      "human_quality_review": "pending; automatic quote coverage is not factual accuracy"
+    }
+  },
+  "gpu": {
+    "name": "qwen3.8:latest",
+    "digest": "22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643",
+    "size_vram": 17278099782
+  },
+  "unchanged_quote_coverage_mismatch": "SYN-08; no label changes; independent rubric review pending",
+  "source_sha256": "64b8505382b52184cbc9710d18aa8f2ba85de5df29ff047d84d7129396289455",
+  "policy_sources_sql_index_model_prompt_or_threshold_changed": false,
+  "heldout_read": false,
+  "frontend_changed_or_rerun": false,
+  "independent_semantic_review": "pending",
+  "browser_stop_edit_chat_switch": "unreported"
+}

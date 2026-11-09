@@ -1028,3 +1028,105 @@ quality limitation. Browser automation lost geometry/focus even after restoratio
 so visual notice verification remains manual; no sidebar test edits were completed.
 No policy snapshot, price database, model prompt, verifier threshold or held-out
 data changed. This feature does not certify personal eligibility or chatbot accuracy.
+
+## 9 November 2026 — Follow-up policy quote context and subsidy notes
+
+After PR #28 was opened, created the separate `fix/policy-answer-coverage`
+worktree at `3ae6558`, leaving the submitted PR unchanged. Traced two fictional
+single-profile eligibility questions through hybrid retrieval, synthesis and
+verification. The model prefixed table excerpts with their column headings;
+those strings failed verbatim checks. UI-reference wording also gave the sidebar
+question zero lexical relevance. A family EHG/PHG positive control passed.
+
+The table resolver now recognises only an exact supplied column plus a uniquely
+matching continuous cell excerpt and restores the complete source cell. Invented
+or wrong columns, changed words, empty excerpts and ambiguity still fail. Narrow
+profile-UI references are removed from relevance focus while actual aspects stay
+enforced. `my sidebar profile` reaches the existing personal scope guard. No model
+prompt, policy value, minimum relevance or repair allowance changed.
+
+The user reported that sidebar warnings and change notices work, but changing
+subsidy history left the same general EHG/PHG answer unexplained. Added subsidy
+status to the request-profile note and a second-timer EHG scope limitation. This
+does not turn general source excerpts into a household eligibility assessment.
+The live API replay confirmed distinct first-/second-timer notes and an answered
+sidebar eligibility request. Stop/Edit/chat-switch browser results remain pending.
+
+Validation: **899 backend tests passed**, with the expected missing-fixture-index
+warning. An earlier sandboxed run had one failure pushing to the watcher's
+disposable local Git remote; an unrestricted full run passed, and the final full
+run passed after the additional subsidy tests. **20/20 curated policy mutations
+were detected**, 116-test baseline, zero errors/timeouts. The two reproduced
+refusals became verified answers, preserving the grant-combination control. The
+12-case fixed-evidence GPU synthesis check remained **11/12** on both baseline
+and follow-up code; SYN-08's quote-coverage mismatch was not relabelled. Its family
+question also has gold groups for other cohorts, requiring independent rubric
+review. These scores do not establish complete answers or held-out accuracy.
+
+The frontend, policy snapshots/index, ACTIVE, SQL data and held-out files were not
+changed. Raw fictional drafts/reports remain local with tracing disabled. See
+`docs/policy-gap-followup.md` and the dated benchmark summary for remaining checks.
+
+## 9 November 2026 — Short EHG/PHG question and connected source excerpts
+
+The user tested the shorter `Can EHG and PHG be combined?` question with a single
+citizen/single household, switching First-timer to Second-timer and leaving age
+and income blank. Both refused. This was not a profile contradiction. Reproduced
+both: the relevant singles passage was retrieved, but the model split its
+prerequisite and immediately following PHG sentence into two claims. The normal
+verifier correctly required a complete cited relationship, then refused after
+the unsuccessful repair.
+
+Added a bounded synthesis resolver for these adjacent selections. It requires
+unique exact substrings from the same source, no omitted intervening words, a
+relationship connecting the requested grants and compatible aspect labels. It
+restores original source order, checks each selection's household scope before
+joining and still sends the complete excerpt through the normal verifier.
+Different sources, changed/repeated/overlapping quotes, gaps with conditions,
+opposite household scope, absent connection and explicit missing evidence have
+negative regression coverage. Prompts, thresholds and policy data remain fixed.
+
+Validation: **909 backend tests passed**, **20/20 curated policy mutations
+detected** (116-test baseline; no errors/timeouts). Four profile development
+replays answered, including both previously failing single cases. After a targeted
+development-backend restart, the actual two localhost API questions, including
+the unpunctuated second-timer wording, answered with citations and the second-timer
+scope note. The fixed-evidence GPU check remains **11/12**, including both correct
+negative controls; the same SYN-08 mismatch remains for independent rubric review.
+No held-out data or new policy source was used; tracing stayed off. Browser Stop/
+Edit/chat-switch testing and independent semantic completeness review remain open.
+
+## 9 November 2026 — Distinct table criteria and loan scope
+
+The user's next replay passed price filter propagation (year, flat type and high
+floors across town changes) and Copy with provenance. The personal second-timer
+EHG scope response was expected, but a broader sidebar eligibility question still
+refused. Reproduced with and without its preceding EHG exchange: the model
+reported missing conditions because the synthesis sampler kept only one chunk
+per shared heading. Retrieval had found other relevant table criteria.
+
+Changed sampling to prefer distinct table criteria within the existing 3-passage/
+800-word ordinary budget. Repeated-criterion variants are deferred and reconsidered
+if room remains; their conditions are not assumed identical. Exact-text duplicates
+are excluded. No retrieval weights, chunk/index data or model prompt changed.
+
+The loan follow-up selected a genuine but unrelated EC-purchase financing
+restriction. Added a scoped verifier check, retaining explicit EC questions and
+incidental EC mentions in past-subsidy rules. The existing claim salvage keeps
+the cited general loan-options quote. An additional check rejects a selected
+requirement for another co-applicant in a personal single-person profile unless
+the question explicitly asks about that scenario. All facts still come from
+source quotes, not a new policy eligibility engine.
+
+Validation includes the four fictional GPU replays (second-timer with/without
+EHG history, first-timer control and loan follow-up), **916 backend tests**, and
+the existing fixed-evidence/curated-mutation checks recorded in the dated evidence.
+The initial explicit-EC unit fixture also contained an unrelated general quote;
+corrected it to test the EC quote itself rather than weakening relevance. Context
+tests cover duplicate removal, distinct criteria, differing same-criterion values
+and passage limits. Scope tests include positive and negative controls.
+
+Broad eligibility coverage and detailed loan comparison remain limited by the
+evidence/cohort context. An answered/verified status does not prove completeness.
+No held-out data, SQL database, ACTIVE snapshot, source text, relevance threshold
+or prompt was changed. Raw fictional reports remain local with tracing disabled.

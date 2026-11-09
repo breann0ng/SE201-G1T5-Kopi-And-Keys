@@ -1,0 +1,128 @@
+{
+  "date_sgt": "2026-11-09",
+  "branch": "fix/policy-answer-coverage",
+  "baseline_commit": "957670b",
+  "scope": "Targeted development evidence sampling and quote-scope checks, not full policy accuracy or eligibility assessment.",
+  "backend_tests_passed": 916,
+  "new_regression_instances": 7,
+  "policy_mutations": {
+    "baseline_tests": 116,
+    "planned": 20,
+    "executed": 20,
+    "killed": 20,
+    "survived": 0,
+    "errors_or_timeouts": 0,
+    "score": 1.0,
+    "complete": true
+  },
+  "before": {
+    "second-empty-history": {
+      "status": "abstained",
+      "displays_ec_purchase_restriction": false,
+      "displays_other_coapplicant_requirement": false
+    },
+    "second-after-ehg": {
+      "status": "abstained",
+      "displays_ec_purchase_restriction": false,
+      "displays_other_coapplicant_requirement": false
+    },
+    "first-control": {
+      "status": "answered",
+      "displays_ec_purchase_restriction": false,
+      "displays_other_coapplicant_requirement": false
+    },
+    "loan-followup": {
+      "status": "answered",
+      "displays_ec_purchase_restriction": true,
+      "displays_other_coapplicant_requirement": false
+    }
+  },
+  "after": {
+    "second-empty-history": {
+      "status": "answered",
+      "displays_ec_purchase_restriction": false,
+      "displays_other_coapplicant_requirement": false
+    },
+    "second-after-ehg": {
+      "status": "answered",
+      "displays_ec_purchase_restriction": false,
+      "displays_other_coapplicant_requirement": false
+    },
+    "first-control": {
+      "status": "answered",
+      "displays_ec_purchase_restriction": false,
+      "displays_other_coapplicant_requirement": false
+    },
+    "loan-followup": {
+      "status": "answered",
+      "displays_ec_purchase_restriction": false,
+      "displays_other_coapplicant_requirement": false
+    }
+  },
+  "running_api": [
+    {
+      "id": "personal-ehg-scope",
+      "status": "abstained",
+      "citations": 0
+    },
+    {
+      "id": "sidebar-eligibility",
+      "status": "answered",
+      "citations": 2
+    },
+    {
+      "id": "loans-after-prices",
+      "status": "answered",
+      "citations": 1
+    }
+  ],
+  "fixed_evidence_synthesis": {
+    "qwen3.8:latest": {
+      "cases": 12,
+      "quality_passes": 11,
+      "answered": 10,
+      "correct_abstentions": 2,
+      "engine_errors": 0,
+      "median_seconds": 2.541,
+      "p95_seconds": 3.829,
+      "model_calls": 14,
+      "first_attempt_verifier_passes": 10,
+      "raw_first_attempt_passes": 10,
+      "answers_after_claim_pruning": 0,
+      "answerable_cases": 10,
+      "over_abstentions": 0,
+      "output_tokens": 1295,
+      "human_quality_review": "pending; automatic quote coverage is not factual accuracy"
+    }
+  },
+  "gpu": {
+    "name": "qwen3.8:latest",
+    "digest": "22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643",
+    "size_vram": 17278099782
+  },
+  "unchanged_quote_coverage_mismatch": "SYN-08; labels unchanged; independent rubric review pending",
+  "source_sha256": {
+    "backend/kopi_keys/components/policy_synthesis.py": "df1aa06f3cbd24110798bf47cc381c8bfb31ad3213c5edb9bf759f663b26cffe",
+    "backend/kopi_keys/components/policy_guardrails.py": "0f5315e586474cb85188e7b837f9118b0d10375d548ad3ba93f458c1a5bce0e0",
+    "backend/kopi_keys/components/verifier.py": "7af19355113a4031cda01e6d1931b317464e3af4c76d58158437c3c2e5ea727b"
+  },
+  "context_selection_changed": true,
+  "retrieval_ranker_changed": false,
+  "context_budgets_model_prompt_or_relevance_threshold_changed": false,
+  "policy_sources_index_sql_or_active_changed": false,
+  "heldout_read": false,
+  "frontend_changed_or_rerun": false,
+  "cpu_latency_rerun": false,
+  "isolated_latency_comparison": false,
+  "user_browser_report": {
+    "price_followup_filters": "preserved year, flat type and floor band across town change",
+    "copy_sources": "URL and dates included",
+    "stop_edit_chat_switch": "unreported"
+  },
+  "remaining_limits": [
+    "selected eligibility excerpts are not a complete checklist",
+    "loan overview remains brief",
+    "retrieved household/cohort context needs independent review",
+    "held-out final evaluation not run"
+  ]
+}

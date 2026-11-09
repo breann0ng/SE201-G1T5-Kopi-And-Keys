@@ -5,7 +5,7 @@ import re
 
 def personal_question(question: str) -> bool:
     return bool(re.search(r"\b(?:am i|are we|do i qualify|do we qualify|can i|can we|for me|for us|"
-                          r"like me|like us|my situation|our situation|my profile|our profile)\b", question, re.I))
+                          r"like me|like us|my situation|our situation|(?:my|our) (?:sidebar )?profile)\b", question, re.I))
 
 
 def profile_issue(state) -> tuple[str, str] | None:
@@ -58,7 +58,12 @@ def policy_profile_note(profile, question: str, response) -> str | None:
                    "SC/NR": "Singapore Citizen with non-resident spouse/family"}.get(profile.citizenship, profile.citizenship)
     household = {"single": "Single", "couple_family": "Couple/family", "fiance": "Fiancé/fiancée",
                  "extended_family": "Extended family", "senior": "Senior household"}.get(profile.household_type)
-    selected = [value for value in (citizenship, household) if value]
+    status = profile.subsidy_status
+    if status is None and profile.first_timer is not None:
+        status = "first_timer" if profile.first_timer else "second_timer"
+    subsidy = {"first_timer": "First-timer household", "second_timer": "Second-timer household",
+               "mixed": "Mixed first-/second-timer couple"}.get(status)
+    selected = [value for value in (citizenship, household, subsidy) if value]
     if not selected:
         return None
     missing = []
@@ -69,4 +74,8 @@ def policy_profile_note(profile, question: str, response) -> str | None:
     note = "Profile supplied with this question: " + "; ".join(selected) + ". "
     if missing:
         note += "Not supplied in sidebar: " + ", ".join(missing) + ". "
-    return note + "These are source conditions, not an eligibility decision."
+    note += "These are source conditions, not an eligibility decision."
+    if status == "second_timer" and re.search(r"\behg\b|enhanced\s+(?:cpf\s+)?housing\s+grant", question, re.I):
+        note += (" The EHG excerpts are general scheme information, not an assessment of this second-timer household. "
+                 "If a co-applicant is a first-timer, use Mixed first-/second-timer couple and ask a profile-specific question.")
+    return note
