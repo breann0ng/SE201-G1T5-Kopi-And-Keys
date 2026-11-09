@@ -246,7 +246,7 @@ model offload and stop if Ollama falls back to CPU.
   see [the finals guide](docs/finals-nisha.md) for the benchmark and limitations.
 - Retrieval recall and discovery precision remain below target. Answer-level
   no-tools and naive single-call RAG baselines are implemented; see
-  [Sandra's results](docs/sandra_finals_results.md).
+  [evaluation results](docs/evaluation-results.md).
 - Clarification history is bounded and some topic-card inputs are unsupported.
   Chats stay in the browser, with no login or server conversation store. The
   backend records feedback question/answer/rating context in local SQLite for

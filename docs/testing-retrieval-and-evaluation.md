@@ -1,4 +1,4 @@
-# Testing Sandra's modules: mutation score
+# Testing retrieval, topic cards and evaluation: mutation score
 
 Owner: Sandra. Scope: retrieval, topic cards, chunking and the evaluation scripts Sandra wrote
 (the eight modules in the first table). Same method as Tasha's price-tool work: see
@@ -40,10 +40,10 @@ shared with Tasha's price scoring, so it was left out.
 ## How to rerun
 
 ```bash
-python scripts/mutation_test_sandra.py                        # all eight modules (~45 min)
-python scripts/mutation_test_sandra.py --only stats compare   # targets whose path contains these
-python scripts/mutation_test_sandra.py --list                 # count mutants only
-python scripts/mutation_test_sandra.py --json out.json        # every mutant and its result
+python scripts/mutation_test_retrieval_eval.py                        # all eight modules (~45 min)
+python scripts/mutation_test_retrieval_eval.py --only stats compare   # targets whose path contains these
+python scripts/mutation_test_retrieval_eval.py --list                 # count mutants only
+python scripts/mutation_test_retrieval_eval.py --json out.json        # every mutant and its result
 ```
 
 Run it from the repo root with the project venv. It uses only the standard library, so there is
@@ -51,7 +51,7 @@ no new dependency.
 
 ### How the runner works
 
-`scripts/mutation_test_sandra.py` reuses Tasha's mutant generator from `scripts/mutation_test.py`
+`scripts/mutation_test_retrieval_eval.py` reuses Tasha's mutant generator from `scripts/mutation_test.py`
 unchanged, with the same operators and the same skipped code: docstrings, annotations,
 `main()`/`__main__` blocks and exception classes. It differs from Tasha's runner in four ways:
 
@@ -135,7 +135,7 @@ they are. They are listed so the scores above are not read as more than they are
 **Low mutation scores.** Many small changes to these modules would not make any test fail.
 That says the tests are thin here, not that the code is wrong. The behaviour was checked
 end-to-end through the dev-set retrieval and answer evaluations instead
-(`docs/sandra_finals_results.md`).
+(`docs/evaluation-results.md`).
 
 - **`policy_retrieval.py` (35.6%).** The BM25 formula (lines 136–149) and the plural/stemming
   rules (lines 95–98) are not pinned by any test. The property tests and the Hit@5 floor

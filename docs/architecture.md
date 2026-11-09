@@ -37,7 +37,7 @@ Python module paths are relative to `backend/kopi_keys/`. Paths beginning with
 | Harness | `graph.py`, `state.py` | Breann; team integration | One graph, bounded retry and immediate abstention on model-engine failure. |
 | API | `main.py` | Team | `/health`, `/chat`, `/chat/stream`, write-only `/feedback`, in-memory cache and model warm-up. |
 | Frontend | `frontend/` | Sandra; price UI by Tasha, profile/history integration by Nisha | React chat, sources, profile, progress, recent chats, price refinement and local feedback. |
-| Evaluation | `evaluation/` | Sandra | Dev loader, metrics, runner, answer-level baselines (no-tools, naive single-call RAG), retrieval report (Hit@5/Recall@5/MRR, strict and relaxed) and paired comparison with 95% CIs. See `docs/sandra_finals_results.md`. |
+| Evaluation | `evaluation/` | Sandra | Dev loader, metrics, runner, answer-level baselines (no-tools, naive single-call RAG), retrieval report (Hit@5/Recall@5/MRR, strict and relaxed) and paired comparison with 95% CIs. See `docs/evaluation-results.md`. |
 | Tracing | Response `trace` and `@traceable` in `llm.py` | Breann; APAC setup by Nisha | Node traces in responses; optional LangSmith graph/model tracing with credentials and matching region. |
 
 ## Flow
