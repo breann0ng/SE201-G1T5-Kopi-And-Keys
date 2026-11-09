@@ -10,6 +10,7 @@ keyword ranker alone. Every passage keeps its source URL, dates, snapshot ID and
 import json
 import math
 import re
+import warnings
 from collections import Counter
 from functools import lru_cache
 from pathlib import Path
@@ -49,6 +50,12 @@ _SYNONYMS = {
     "eip": ["ethnic", "integration"],
     "couple": ["family"], "married": ["family"], "spouse": ["family"],
     "mortgage": ["loan"], "financing": ["loan"],
+    # Added 2026-11-08: everyday words for HDB's terms. HDB writes "parents/ child",
+    # "private residential property" and "ethnic group"; buyers say mum, condo, Chinese.
+    **{w: ["parent"] for w in ("mum", "mom", "mother", "mummy", "mommy", "dad", "father", "daddy", "papa", "mama")},
+    **{w: ["private", "residential", "property"] for w in ("condo", "condominium")},
+    **{w: ["ethnic", "integration", "quota"] for w in ("chinese", "malay", "indian", "eurasian", "race", "racial",
+                                                         "ethnicity")},
 }
 # Words in almost every chunk: they shouldn't decide the ranking.
 _GENERIC = frozenset({"hdb", "flat", "resale", "buy", "buying", "singapore", "housing"})
@@ -132,7 +139,7 @@ class KeywordPolicyRetriever:
         self.idf = {t: math.log(1 + (n - f + 0.5) / (f + 0.5)) for t, f in df.items()}
         self.k1, self.b = k1, b
 
-    def _score(self, terms: list[str], i: int) -> float:
+    def _score(self, terms: list[str], i: int, heading_bonus: float = _HEADING_BONUS) -> float:
         doc, score = self.docs[i], 0.0
         norm = 1 - self.b + self.b * self.lens[i] / self.avg
         for t in terms:
@@ -142,7 +149,7 @@ class KeywordPolicyRetriever:
                 score += weight * self.idf[t] * tf * (self.k1 + 1) / (tf + self.k1 * norm)
         if score <= 0:
             return 0.0
-        score += _HEADING_BONUS * len((set(terms) - _GENERIC) & self.headings[i])
+        score += heading_bonus * len((set(terms) - _GENERIC) & self.headings[i])
         c = self.chunks[i]
         score *= _TIER_WEIGHT.get(c.get("source_tier"), 0.7)
         if c.get("low_priority") or "recommended reads" in c["section_heading"].lower():
@@ -151,13 +158,19 @@ class KeywordPolicyRetriever:
             score *= _SHORT_CHUNK_WEIGHT
         return score
 
-    def ranked_ids(self, query: str, depth: int) -> list[str]:
-        """Chunk IDs by keyword score, best first, with identical text removed."""
+    def ranked_ids(self, query: str, depth: int, heading_bonus: float | None = None) -> list[str]:
+        """Chunk IDs by keyword score, best first, with identical text removed.
+
+        heading_bonus defaults to _HEADING_BONUS (keyword-only search); the hybrid
+        retriever passes its own (HYBRID_HEADING_BONUS).
+        """
         terms = policy_tokens(query)
         if not terms or depth <= 0:
             return []
+        bonus = _HEADING_BONUS if heading_bonus is None else heading_bonus
         # Best score first; equal scores keep file order, so the first copy of a duplicate wins.
-        scored = sorted(((self._score(terms, i), i) for i in range(len(self.chunks))), key=lambda s: (-s[0], s[1]))
+        scored = sorted(((self._score(terms, i, bonus), i) for i in range(len(self.chunks))),
+                        key=lambda s: (-s[0], s[1]))
         out, seen = [], set()
         for score, i in scored:
             if score <= 0 or len(out) >= depth:
@@ -192,9 +205,14 @@ class KeywordPolicyRetriever:
 
 # --- Hybrid retriever (proposal Stage 3: dense + keyword) ------------------
 
-RRF_K = 60           # reciprocal rank fusion constant
-CANDIDATES = 30      # depth taken from each ranker
-DENSE_WEIGHT = 3.0   # dense ranks count 3x keyword ranks (dev-set comparison: evaluation README)
+# Tuned 2026-11-06 with evaluation/retrieval_sweep.py on the 29 dev questions with evidence
+# (re-chunked snapshot): Recall@5 16/29 -> 20/29, MRR@10 0.497 -> 0.541. Chosen from a plateau
+# of settings scoring 19-20 (neighbour mean 19.4), changing the fewest values. Was 60 / 30 / 0.6.
+RRF_K = 20                  # reciprocal rank fusion constant
+CANDIDATES = 20             # depth taken from each ranker
+DENSE_WEIGHT = 3.0          # dense ranks count 3x keyword ranks
+HYBRID_HEADING_BONUS = 0.0  # every top setting had none; keyword-only search keeps _HEADING_BONUS
+                            # (dropping it there cost one hit, 14 -> 13 of 29)
 
 
 class HybridPolicyRetriever:
@@ -218,6 +236,15 @@ class HybridPolicyRetriever:
         except policy_index.IndexUnavailableError as error:
             self.collection = None
             self.description = f"keyword only ({error})"
+            warnings.warn(f"Policy search is keyword-only: {error}", stacklevel=2)
+        else:
+            # Added 2026-11-06: a build cut short, or chunks changed since the build, leaves
+            # chunks that dense search can never return.
+            missing = policy_index.missing_from_index(self.collection, self.keyword.by_id)
+            if missing:
+                self.description += f", {len(missing)} chunks missing from the index"
+                warnings.warn(f"The policy index lacks {len(missing)} of {len(self.keyword.by_id)} current chunks; "
+                              "run scripts/build_policy_index.py", stacklevel=2)
 
     def _dense(self, query: str) -> list[str]:
         vector = self._index.embed([self._index.query_text(query)], timeout=30)[0]
@@ -225,44 +252,76 @@ class HybridPolicyRetriever:
                                      where={"superseded": False})
         return hits["ids"][0]
 
-    def search(self, query: str, limit: int = TOP_K) -> list[PolicyPassage]:
-        rankings = [(1.0, self.keyword.ranked_ids(query, CANDIDATES))]
-        wants_example = bool(re.search(r"\bexamples?\b|\bworked\b|\billustrat", query, re.I))
-        focus = scheme_focus(query)
+    def require_dense(self) -> None:
+        """Raise IndexUnavailableError unless every current chunk is searchable by vector.
+
+        For evaluation: a score labelled "hybrid" must not come from keyword-only search.
+        """
+        if self.collection is None:
+            raise self._index.IndexUnavailableError(self.description)
+        missing = self._index.missing_from_index(self.collection, self.keyword.by_id)
+        if missing:
+            raise self._index.IndexUnavailableError(
+                f"the policy index lacks {len(missing)} current chunks; run scripts/build_policy_index.py")
+
+    def search(self, query: str, limit: int = TOP_K, *, strict: bool = False) -> list[PolicyPassage]:
+        """Fused top `limit`. The app falls back to keyword ranking when the index or Ollama
+        is unavailable; strict=True (evaluation) raises IndexUnavailableError instead."""
+        if strict and self.collection is None:
+            raise self._index.IndexUnavailableError(self.description)
+        keyword = self.keyword.ranked_ids(query, CANDIDATES, heading_bonus=HYBRID_HEADING_BONUS)
+        dense = None
         if self.collection is not None:
             try:
-                rankings.append((DENSE_WEIGHT, self._dense(query)))
+                dense = self._dense(query)
             except self._index.IndexUnavailableError:
+                if strict:
+                    raise
                 pass  # Ollama down: keyword ranking alone for this query
-        scores: dict[str, float] = {}
-        for weight, ranking in rankings:
-            for rank, chunk_id in enumerate(ranking):
-                if chunk_id in self.keyword.by_id:
-                    scores[chunk_id] = scores.get(chunk_id, 0.0) + weight / (RRF_K + rank + 1)
-        for chunk_id in scores:
-            c = self.keyword.by_id[chunk_id]
-            scores[chunk_id] *= _TIER_WEIGHT.get(c.get("source_tier"), 0.7)
-            if c.get("low_priority"):
-                scores[chunk_id] *= _LOW_PRIORITY_WEIGHT
-            if is_worked_example(c["content"]) and not wants_example:
-                scores[chunk_id] *= _WORKED_EXAMPLE_WEIGHT
-            if focus is not None:
-                name = c.get("policy_name", "").lower()
-                kind = "loan" if "loan" in name else "grant" if "grant" in name else None
-                if kind is not None:
-                    scores[chunk_id] *= _FOCUS_WEIGHT if kind == focus else _OFF_FOCUS_WEIGHT
-        best, seen = [], set()
-        for chunk_id in sorted(scores, key=scores.get, reverse=True):
-            fingerprint = _fingerprint(self.keyword.by_id[chunk_id]["content"])
-            if fingerprint not in seen:
-                seen.add(fingerprint)
-                best.append(chunk_id)
-            if len(best) == limit:
-                break
-        return self.keyword.get(best)
+        return self.keyword.get(fuse(self.keyword.by_id, query, keyword, dense, limit))
 
     def get(self, chunk_ids: list[str]) -> list[PolicyPassage]:
         return self.keyword.get(chunk_ids)
+
+
+def fuse(by_id: dict[str, dict], query: str, keyword: list[str], dense: list[str] | None, limit: int = TOP_K,
+         *, dense_weight: float = DENSE_WEIGHT, rrf_k: int = RRF_K, candidates: int = CANDIDATES) -> list[str]:
+    """Reciprocal-rank fusion of the keyword and dense rankings, then source tier, low
+    priority, worked examples and scheme focus, with identical text removed.
+
+    The parameters default to the app's settings; evaluation/retrieval_sweep.py varies them.
+    """
+    rankings = [(1.0, keyword[:candidates])]
+    if dense is not None:
+        rankings.append((dense_weight, dense[:candidates]))
+    wants_example = bool(re.search(r"\bexamples?\b|\bworked\b|\billustrat", query, re.I))
+    focus = scheme_focus(query)
+    scores: dict[str, float] = {}
+    for weight, ranking in rankings:
+        for rank, chunk_id in enumerate(ranking):
+            if chunk_id in by_id:
+                scores[chunk_id] = scores.get(chunk_id, 0.0) + weight / (rrf_k + rank + 1)
+    for chunk_id in scores:
+        c = by_id[chunk_id]
+        scores[chunk_id] *= _TIER_WEIGHT.get(c.get("source_tier"), 0.7)
+        if c.get("low_priority"):
+            scores[chunk_id] *= _LOW_PRIORITY_WEIGHT
+        if is_worked_example(c["content"]) and not wants_example:
+            scores[chunk_id] *= _WORKED_EXAMPLE_WEIGHT
+        if focus is not None:
+            name = c.get("policy_name", "").lower()
+            kind = "loan" if "loan" in name else "grant" if "grant" in name else None
+            if kind is not None:
+                scores[chunk_id] *= _FOCUS_WEIGHT if kind == focus else _OFF_FOCUS_WEIGHT
+    best, seen = [], set()
+    for chunk_id in sorted(scores, key=scores.get, reverse=True):
+        fingerprint = _fingerprint(by_id[chunk_id]["content"])
+        if fingerprint not in seen:
+            seen.add(fingerprint)
+            best.append(chunk_id)
+        if len(best) == limit:
+            break
+    return best
 
 
 @lru_cache(maxsize=1)

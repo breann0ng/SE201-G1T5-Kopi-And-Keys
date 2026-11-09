@@ -9,13 +9,15 @@
   ],
   "supporting_chunk_ids": [
     "CHUNK_FAMILY_04",
-    "CHUNK_SINGLES_03",
+    "CHUNK_SINGLES_05",
     "CHUNK_INCOME_01",
     "CHUNK_INCOME_03",
-    "CHUNK_LOAN_28"
+    "CHUNK_LOAN_49"
   ],
   "question_template": "For a {household_type} household with average gross monthly household income of {household_income}, which income ceiling applies to {scheme_of_interest}, and is the household within it?",
   "snapshot_date": "2026-10-15",
+  "group": "eligibility",
+  "priority": 55,
   "overview": {
     "chunk_id": "CHUNK_FAMILY_04",
     "quote": "Your average gross monthly household income must not exceed: $16,000"

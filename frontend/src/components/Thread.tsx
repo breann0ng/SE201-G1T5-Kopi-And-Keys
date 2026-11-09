@@ -5,14 +5,14 @@ import {
   ThreadPrimitive,
   useAuiState,
 } from "@assistant-ui/react";
-import { ArrowUp, Check, Copy, Pencil, Square, ThumbsDown, ThumbsUp } from "lucide-react";
+import { ArrowUp, Check, Copy, Pencil, Square } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { AdvisorMeta, ProgressMeta } from "../lib/adapter";
 import type { ChatResponse } from "../lib/api";
 import { answerForClipboard, numberCitations } from "../lib/answerText";
 import { Progress } from "./Progress";
-import { load, save } from "../lib/storage";
 import { AnswerExtras, StatusBadge } from "./AnswerExtras";
+import { FeedbackControls } from "./FeedbackControls";
 import { Logo } from "./Logo";
 import { QuickReplies } from "./QuickReplies";
 import { MarkdownText, SourceMarkdown } from "./MarkdownText";
@@ -189,9 +189,6 @@ function AssistantMessage() {
 }
 
 function AssistantActions({ response }: { response: ChatResponse }) {
-  const id = useAuiState((s) => s.message.id);
-  // Feedback is kept in this browser only for now (scaffold for the evaluation dataset).
-  const [vote, setVote] = useState<"up" | "down" | null>(() => load(`kk:feedback:${id}`, null));
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   useEffect(() => {
@@ -208,35 +205,16 @@ function AssistantActions({ response }: { response: ChatResponse }) {
       setCopyError(true);
     }
   };
-  const choose = (v: "up" | "down") => {
-    const next = vote === v ? null : v;
-    setVote(next);
-    save(`kk:feedback:${id}`, next);
-  };
   const btn = "rounded-md p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800";
   return (
-    <div className="mt-1 flex gap-1 pl-2">
+    <div className="mt-1 flex flex-wrap gap-1 pl-2">
       <button aria-label="Copy answer and sources" title="Copy answer, income notes and sources" className={btn} onClick={copyAnswer}>
         {copied ? <Check size={15} /> : <Copy size={15} />}
       </button>
       <span className="sr-only" role="status">{copied ? "Answer and sources copied." : ""}</span>
       {copyError && <span role="status" className="text-xs text-red-600">Copy unavailable. Select and copy the answer and sources.</span>}
-      <button
-        aria-label="Helpful"
-        aria-pressed={vote === "up"}
-        onClick={() => choose("up")}
-        className={`${btn} ${vote === "up" ? "text-brand-600" : ""}`}
-      >
-        <ThumbsUp size={15} />
-      </button>
-      <button
-        aria-label="Not helpful"
-        aria-pressed={vote === "down"}
-        onClick={() => choose("down")}
-        className={`${btn} ${vote === "down" ? "text-red-600" : ""}`}
-      >
-        <ThumbsDown size={15} />
-      </button>
+      {/* Recorded for the team to review; never changes answers (docs/feedback-loop.md). */}
+      <FeedbackControls response={response} />
     </div>
   );
 }

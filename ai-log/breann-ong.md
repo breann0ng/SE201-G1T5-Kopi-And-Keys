@@ -146,3 +146,154 @@ Make the three layout changes and fix every import and path they affect.
 ### What I kept or changed
 The AI left scripts/build_resale_db.py and scripts/build_policy_index.py as thin wrappers, so the commands in the README and docs work unchanged. The team needs to know that data/evaluation/ is now data/evaluation-data/ before merging, because open branches that touch the dev set will conflict.
 [Record anything you kept or changed.]
+
+## 2026-11-06 · LangSmith evaluators and dev-set experiments
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/evaluation/langsmith_eval.py (new), pyproject.toml
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+Whether LangSmith's built-in evaluators suit our app, how to set one up on
+live traces, and a way to run the dev set as LangSmith experiments.
+
+### How I checked it
+- It mapped each evaluator against our existing metrics: most (hallucination,
+  exact match, tool selection) are already covered more strictly by the
+  verifier and run_eval; answer relevance was the gap.
+- Set up an Answer Relevance evaluator on the kopi-and-keys project; the AI
+  confirmed through the LangSmith API that the filter and project were right
+  and explained the auto-created "Alignment" rule.
+- Uploaded the 50 dev questions as the kopi-dev-set dataset (held-out set
+  never uploaded) and ran 3-question experiments. Per-question scores reuse
+  metrics.end_to_end, so they match run_eval --local.
+- The LLM-judge option (--judge) has not been run yet.
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]
+
+## 2026-11-06 · Router scope guard and no-rule-match tracing
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/components/query_router.py, graph.py, state.py,
+  tests/test_query_router.py, tests/test_graph.py, tests/test_api.py,
+  tests/test_development_set_contract.py
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+How to make the rule-based router send more questions to the right place
+instead of declining them, using a rules + LLM hybrid. This entry covers the
+first two steps (rules only); the LLM fallback is not built yet.
+
+### How I checked it
+- The LangSmith smoke test showed OOS-06 (forecast) and OOS-07 (guarantee)
+  being answered. A new scope guard now declines forecasts, future prices and
+  guarantees before any other rule.
+- Its first version also declined "How much will a 4-room in Bishan cost?"
+  and "...? We're buying next year." The AI caught this by testing questions
+  that should still be answered, and tightened the rules; both are now tests.
+- Routes for all 50 dev questions were saved before and after: only OOS-06
+  and OOS-07 changed. Router routing is 50/50; 412 tests pass (2 known
+  flat-type gaps remain).
+- Traces now show query_router:abstain:no_rule_match when no rule fired, to
+  measure what an LLM fallback would see. I checked this in the frontend with
+  questions with no keywords and with questions that should be declined.
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]
+
+## 2026-11-08 · Router: request-type declines and weak-match confirmation
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/components/query_router.py, graph.py,
+  evaluation/fallback_eval.py, data/evaluation-data/fallback/fallback_questions.jsonl,
+  tests/test_query_router.py, tests/test_intent_fallback.py
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+How to stop patching the scope guard one case at a time. Three fresh questions
+("Recommend me a good mortgage broker", "Which bank gives the cheapest home
+loan right now?", "Can you write my appeal letter to HDB?") were answered as
+policy on "loan" / "hdb" alone.
+
+### How I checked it
+- Declines are now grouped by request type (predict, value one flat,
+  guarantee, recommend a provider, investment advice, do a task), so a new
+  provider or task is covered without a new rule.
+- When generic keywords alone ("hdb", "loan", "block", "how long", ...) make a
+  question policy, the LLM is asked to confirm. It can only veto (a confident
+  "unanswerable"), never switch the intent. Without the LLM nothing changes.
+- Routes for all 50 dev questions were saved before and after: none changed;
+  only POL-04 now gets the confirmation call (about 1 s).
+- Fixed "damage" counting as a price word on its own ("water damage").
+- Fallback set grew from 21 to 38 questions. With qwen2.5:3b: 37/38 (miss:
+  "What time does the HDB hub open on Saturday?" confirmed as policy). The AI
+  wrote these questions alongside the rules, so they are regression checks,
+  not an independent test. 528 tests pass (2 known flat-type gaps remain).
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]
+
+## 2026-11-08 · Policy relevance: answers_aspect check (shadow mode)
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/components/answer_aspects.py (new),
+  policy_guardrails.py, policy_synthesis.py, verifier.py, schemas.py,
+  tests/test_answer_aspects.py
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+score_relevance compares words, not meaning, so a quote that shares the
+question's words but answers a different part of it can pass. I asked how to
+check that a quote answers what was asked.
+
+### How I checked it
+- The check works out which aspects the question asks (income, lease,
+  timing, ...) and requires each quote to address one, e.g. a duration for
+  "how long". Known false pass now caught: "a valid HFE letter" does not
+  answer "How long is an HFE letter valid for?".
+- First version had the model label each quote. On the synthesis benchmark
+  (12 cases, qwen2.5:3b) this made its quotes long and non-verbatim: quality
+  passes 10 -> 5, over-abstentions 2 -> 7. The default is now code-only
+  (generation unchanged); model labels are opt-in (KOPI_ASPECT_LABEL=model).
+- Enforcing it exposed two false rejects, fixed in general ways: grant names
+  ("Proximity Housing Grant") and "without adding amounts" no longer count
+  as asks. With enforce, the benchmark matches the check being off.
+- Default is shadow (KOPI_ASPECT_CHECK): recorded in relevance_scores, never
+  blocks. The benchmark has no wrong-answer quotes, so it shows no harm, not
+  benefit; enforce waits for shadow traces compared with the LangSmith judge.
+  554 tests pass in shadow and enforce mode.
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]
+
+## 2026-11-08 · PR review: provider rule declined valid questions; merge with main
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/components/query_router.py, graph.py (merge),
+  tests/test_query_router.py, tests/test_intent_fallback.py
+- **Outcome:** [Kept / Changed — choose after your review]
+
+### What I asked for
+Fixes for two review comments on the PR: a merge conflict in graph.py that
+had to keep both the profile/subsidy-status fix from main and the LLM
+fallback, and "Which bank loan documents are required for buying a resale
+flat?" being declined as a provider recommendation, with no LLM appeal.
+
+### How I checked it
+- Conflict resolved by keeping both: the subsidy-status check now runs on
+  the final routing, after any LLM decision. A new test sends an LLM-routed
+  question with a contradicting sidebar and checks both behaviours.
+- The rule fired on "which ... bank" even when "bank" only described
+  something else. It now requires the provider to be what is chosen: not
+  followed by a noun it modifies (loan, documents, fees, ...) or a
+  possessive ("the agent's commission"). One structural rule, not a list
+  of cases.
+- Regression tests: 5 such questions are no longer declined by a rule;
+  5 real provider requests still are. Routes for the dev set and fallback
+  set are unchanged. 676 tests pass (2 known flat-type gaps remain).
+- Found while testing, not fixed: "first-timers" (plural) is not extracted
+  as first_timer; only the singular is.
+- [Describe your own review.]
+
+### What I kept or changed
+[Record anything you kept or changed.]

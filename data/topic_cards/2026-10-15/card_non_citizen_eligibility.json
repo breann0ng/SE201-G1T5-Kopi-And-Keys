@@ -18,15 +18,17 @@
   "supporting_chunk_ids": [
     "CHUNK_ELIG_24",
     "CHUNK_ELIG_58",
-    "CHUNK_ELIG_62",
+    "CHUNK_ELIG_127",
     "CHUNK_ELIG_21",
-    "CHUNK_ELIG_25",
-    "CHUNK_ELIG_28"
+    "CHUNK_ELIG_102",
+    "CHUNK_ELIG_103"
   ],
   "question_template": "For a {household_type} household with citizenship {citizenship}, applicant aged {age}, and (if applicable) a non-resident spouse holding {spouse_pass_type}, can the household buy a resale flat, and which conditions apply?",
   "snapshot_date": "2026-10-15",
+  "group": "eligibility",
+  "priority": 40,
   "overview": {
-    "chunk_id": "CHUNK_ELIG_62",
+    "chunk_id": "CHUNK_ELIG_127",
     "quote": "Long Term Visit Pass or Work Pass of at least 6 months"
   }
 }

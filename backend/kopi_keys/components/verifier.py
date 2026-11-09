@@ -17,7 +17,9 @@ Checks:
   passages, and each written number occurs in the supporting quote.
 
 Relevance scores and multi-grant coverage add conservative checks on topic and
-scope. They are heuristics, not proof of policy correctness; citation faithfulness
+scope. The answers_aspect check (components/answer_aspects.py) adds whether each
+quote answers an asked part of the question; it blocks only with
+KOPI_ASPECT_CHECK=enforce, and is otherwise recorded in relevance_scores. They are heuristics, not proof of policy correctness; citation faithfulness
 and eligibility interpretation still need manual review.
 """
 
@@ -28,6 +30,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 from ..schemas import CENT, PriceResult
 from ..state import GraphState
+from . import answer_aspects as aspects
 from .policy_guardrails import contains_model_instruction, grant_coverage_errors, household_scope_errors, normalized_policy_text, score_relevance
 
 
@@ -148,7 +151,9 @@ def policy_relevance_scores(state: GraphState) -> list[dict]:
         scores.append({"claim_index": index, "score": best.score, "reason": best.reason,
                        "matched_terms": list(best.matched_terms),
                        "requested_grants": list(best.requested_grants),
-                       "covered_grants": list(best.covered_grants)})
+                       "covered_grants": list(best.covered_grants),
+                       # Discovery questions are broad: profile details in them are context, not asks.
+                       **((aspects.check_claim(question, claim) if state.intent != "discovery" else None) or {})})
     return scores
 
 
@@ -172,11 +177,14 @@ def verify(state: GraphState) -> list[str]:
     minimum = float(os.getenv("KOPI_POLICY_MIN_RELEVANCE", "0.20"))
     if not 0 < minimum <= 1:
         raise ValueError("KOPI_POLICY_MIN_RELEVANCE must be greater than 0 and at most 1.")
+    enforce_aspects = aspects.mode() == "enforce"
     for score in policy_relevance_scores(state):
         if score["score"] < minimum:
             errors.append(f"Low policy relevance for claim {score['claim_index'] + 1}: "
                           f"{score['score']:.2f} < {minimum:.2f} ({score['reason']}). "
                           "Select a quote addressing the question, or abstain if the evidence is missing.")
+        elif enforce_aspects and score.get("aspect_ok") is False:
+            errors.append(aspects.aspect_error(score["claim_index"], score))
     errors.extend(grant_coverage_errors(question, draft.claims, sources))
     errors.extend(household_scope_errors(state, sources))
     for claim in draft.claims:

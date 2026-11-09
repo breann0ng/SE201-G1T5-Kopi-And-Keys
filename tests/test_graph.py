@@ -108,6 +108,12 @@ def test_price_question_missing_filters_gets_clarifying_question():
 def test_unsupported_question_abstains_without_tools():
     state = run_graph(graph(), ChatRequest(message="Tell me a joke."))
     assert state.response.status == "abstained"
+    assert state.response.trace == ["query_router:abstain:no_rule_match", "abstention:unsupported"]
+
+
+def test_rule_decline_is_traced_apart_from_no_rule_match():
+    state = run_graph(graph(), ChatRequest(message="Will HDB resale prices go up next year?"))
+    assert state.response.status == "abstained"
     assert state.response.trace == ["query_router:abstain", "abstention:unsupported"]
 
 

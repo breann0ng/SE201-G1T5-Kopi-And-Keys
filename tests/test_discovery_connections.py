@@ -52,7 +52,9 @@ def test_verifier_rejects_a_quote_that_is_only_an_introduction():
 def test_matched_cards_become_cited_suggestions(graph):
     state = ask(graph, "How long is an HFE letter valid?", COUPLE)
     ids = {p.id for p in state.passages}
-    assert [s.card_id for s in state.response.suggestions] == ["CARD_EHG"]
+    # Flat type only sets the Family Grant amount, so the card is suggested without it;
+    # cards come in priority order (the base grant before the EHG top-up).
+    assert [s.card_id for s in state.response.suggestions] == ["CARD_FAMILY_GRANT", "CARD_EHG"]
     assert all(cid in ids for s in state.response.suggestions for cid in s.citation_ids)
     assert state.verification_passed
 
@@ -63,10 +65,12 @@ def test_no_suggestion_for_the_scheme_the_question_already_asks_about(graph):
 
 
 def test_grant_questions_get_verified_income_notes_and_other_questions_do_not(graph):
-    grants = ask(graph, "How much EHG can I get?", COUPLE).response.income_notes
-    assert [n.scheme for n in grants] == ["enhanced_cpf_housing_grant_family"]
-    assert grants[0].within_ceiling and grants[0].ceiling == "9,000"
-    assert "only HDB's HFE letter confirms eligibility" in grants[0].message
+    notes = {n.scheme: n for n in ask(graph, "How much EHG can I get?", COUPLE).response.income_notes}
+    assert set(notes) == {"enhanced_cpf_housing_grant_family", "cpf_housing_grant_family"}
+    ehg = notes["enhanced_cpf_housing_grant_family"]
+    assert ehg.within_ceiling and ehg.ceiling == "9,000"
+    assert "only HDB's HFE letter confirms eligibility" in ehg.message
+    assert notes["cpf_housing_grant_family"].within_ceiling
     assert not ask(graph, "How long is an HFE letter valid?", COUPLE).response.income_notes
     assert not ask(graph, "How much EHG can I get?").response.income_notes  # no income stated
 

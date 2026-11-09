@@ -115,9 +115,44 @@ export type ChatResponse = {
   trace: string[];
   /** Field requested by a clarification (a profile field or a price filter); drives quick-reply buttons. */
   asking_for?: keyof BuyerProfile | "flat_type" | null;
+  /** Identifies this answer for POST /feedback; absent in older saved chats. */
+  message_id?: string | null;
+  /** The answer's LangSmith trace id when tracing is on, otherwise null. */
+  langsmith_run_id?: string | null;
 };
 
 export class ApiError extends Error {}
+
+export type FeedbackReason =
+  | "wrong_numbers"
+  | "wrong_policy_info"
+  | "outdated"
+  | "misunderstood_question"
+  | "missing_info"
+  | "wrong_suggestions"
+  | "other";
+
+export type FeedbackBody = {
+  message_id: string;
+  rating: 1 | -1;
+  reason: FeedbackReason | null;
+  comment: string | null;
+};
+
+/** Records a rating for the team to review. It never changes answers; nothing is read back. */
+export async function postFeedback(body: FeedbackBody): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new ApiError("Can't reach the advisor service.");
+  }
+  if (!res.ok) throw new ApiError(`Feedback was not recorded (HTTP ${res.status}).`);
+}
 
 /** Recent turns are conversation context, not policy evidence; price_filters come from the form. */
 function requestBody(

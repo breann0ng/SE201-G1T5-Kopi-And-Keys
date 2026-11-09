@@ -6,6 +6,10 @@ from kopi_keys.graph import build_graph
 from kopi_keys.main import create_app
 
 
+def _without_message_id(body):
+    return {key: value for key, value in body.items() if key != "message_id"}
+
+
 def client():
     return TestClient(create_app(build_graph(retriever=FictionalRetriever(), synthesiser=Synthesiser(engine=None), cards=[])))
 
@@ -35,7 +39,7 @@ def test_unsupported_request_abstains():
     with client() as c:
         body = c.post("/chat", json={"message": "Tell me a joke."}).json()
     assert body["status"] == "abstained"
-    assert body["trace"] == ["query_router:abstain", "abstention:unsupported"]
+    assert body["trace"] == ["query_router:abstain:no_rule_match", "abstention:unsupported"]
 
 
 def test_structured_price_filters_reach_price_tool():
@@ -57,7 +61,8 @@ def test_stream_reports_each_step_then_the_same_answer():
         plain = c.post("/chat", json={"message": "What is the demo grant policy?"}).json()
     steps = [l["step"] for l in lines if "step" in l]
     assert steps[:2] == ["query_router", "policy_retrieval"] and "verifier" in steps
-    assert lines[-1]["response"] == plain
+    # The second request is a cache hit: same answer, new message_id (for feedback).
+    assert _without_message_id(lines[-1]["response"]) == _without_message_id(plain)
 
 
 def test_repeated_question_is_served_from_the_cache():
@@ -73,7 +78,8 @@ def test_repeated_question_is_served_from_the_cache():
         first = c.post("/chat", json={"message": "What is the demo grant policy?"}).json()
         again = c.post("/chat", json={"message": "What is the demo grant policy?"}).json()
         other = c.post("/chat", json={"message": "What is the demo grant policy?", "profile": {"age": 30}}).json()
-    assert first == again and len(calls) == 2  # the profile change is a new answer
+    assert _without_message_id(first) == _without_message_id(again) and len(calls) == 2  # the profile change is a new answer
+    assert first["message_id"] != again["message_id"]
     assert other["status"] == "answered"
 
 

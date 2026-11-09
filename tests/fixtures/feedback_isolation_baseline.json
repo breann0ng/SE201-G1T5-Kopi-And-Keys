@@ -1,0 +1,57 @@
+{
+  "answers": {
+    "Tell me a joke.": {
+      "chat": {
+        "citations": [],
+        "message": "I can help with HDB resale policy and resale price questions only.",
+        "route": "abstain",
+        "status": "abstained"
+      },
+      "stream": {
+        "citations": [],
+        "message": "I can help with HDB resale policy and resale price questions only.",
+        "route": "abstain",
+        "status": "abstained"
+      }
+    },
+    "What is the demo grant policy?": {
+      "chat": {
+        "citations": [
+          {
+            "effective_date": "2000-01-01",
+            "id": "demo-programme",
+            "page_last_updated": null,
+            "snapshot_id": "fictional-demo-v1",
+            "source_url": "demo://programme",
+            "superseded": false,
+            "text": "The fictional demo programme requires the related demo condition to be met.",
+            "title": "Fictional demo programme",
+            "verified_on": "2000-01-01"
+          }
+        ],
+        "message": "The fictional demo programme requires the related demo condition to be met. [demo-programme]",
+        "route": "policy",
+        "status": "answered"
+      },
+      "stream": {
+        "citations": [
+          {
+            "effective_date": "2000-01-01",
+            "id": "demo-programme",
+            "page_last_updated": null,
+            "snapshot_id": "fictional-demo-v1",
+            "source_url": "demo://programme",
+            "superseded": false,
+            "text": "The fictional demo programme requires the related demo condition to be met.",
+            "title": "Fictional demo programme",
+            "verified_on": "2000-01-01"
+          }
+        ],
+        "message": "The fictional demo programme requires the related demo condition to be met. [demo-programme]",
+        "route": "policy",
+        "status": "answered"
+      }
+    }
+  },
+  "captured_on": "main@f96aa82"
+}

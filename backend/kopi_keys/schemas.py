@@ -168,6 +168,8 @@ class Claim(Contract):
     supporting_quote: str | None = None
     source_scope: str | None = None
     source_criterion: str | None = None
+    # Which asked aspect the quote answers, as the model labelled it (components/answer_aspects.py).
+    answers_aspect: str | None = None
 
 
 class Suggestion(Contract):
@@ -237,3 +239,7 @@ class ChatResponse(Contract):
     income_notes: list[IncomeNote] = Field(default_factory=list)
     # Discovery question where a missing "Your situation" detail would unlock more topic cards.
     profile_hint: bool = False
+    # Set by main.py when an answer is delivered, for POST /feedback. langsmith_run_id is null when
+    # tracing is off. Neither affects how the answer is produced.
+    message_id: str | None = None
+    langsmith_run_id: str | None = None

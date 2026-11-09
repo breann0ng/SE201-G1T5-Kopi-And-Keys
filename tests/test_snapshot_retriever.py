@@ -85,3 +85,45 @@ def test_hybrid_retriever_falls_back_to_keyword_search_without_an_index(tmp_path
     # Equal keyword scores: the tier-1 (official HDB) chunk ranks first, and the
     # chunk with identical text (CHUNK_T_03) is dropped as a duplicate.
     assert [p.id for p in retriever.search("proximity grant")] == ["CHUNK_T_02", "CHUNK_T_01"]
+
+
+def test_strict_search_refuses_keyword_only_fallback(tmp_path):
+    """Evaluation must not score keyword-only search as "hybrid" (PR #18 review)."""
+    from kopi_keys.components.policy_index import IndexUnavailableError
+    from kopi_keys.components.policy_retrieval import HybridPolicyRetriever
+
+    (tmp_path / "policy_snapshots").mkdir()
+    (tmp_path / "policy_snapshots" / "ACTIVE").write_text("2000-01-01", encoding="utf-8")  # no index for this date
+    chunk_dir = tmp_path / "policy_chunks" / "2000-01-01"
+    chunk_dir.mkdir(parents=True)
+    row = {"chunk_id": "CHUNK_T_01", "content": "proximity grant near parents", "source_tier": 1,
+           "source_url": "https://www.hdb.gov.sg/x", "policy_name": "Test", "section_heading": "",
+           "snapshot_date": "2000-01-01", "verified_on": "2000-01-01", "page_last_updated": None,
+           "effective_date": None, "superseded": False, "low_priority": False}
+    (chunk_dir / "chunks.jsonl").write_text(json.dumps(row), encoding="utf-8")
+    with pytest.warns(UserWarning):
+        retriever = HybridPolicyRetriever(data_dir=tmp_path)
+    assert [p.id for p in retriever.search("proximity grant")] == ["CHUNK_T_01"]  # the app falls back
+    with pytest.raises(IndexUnavailableError):
+        retriever.search("proximity grant", strict=True)
+    with pytest.raises(IndexUnavailableError):
+        retriever.require_dense()
+
+
+def test_strict_search_raises_when_embedding_fails_mid_run():
+    """An index that opened but whose embedding call fails must raise, not fall back."""
+    from kopi_keys.components import policy_index
+    from kopi_keys.components.policy_retrieval import HybridPolicyRetriever
+
+    retriever = HybridPolicyRetriever.__new__(HybridPolicyRetriever)
+    retriever._index = policy_index
+    retriever.keyword = KeywordPolicyRetriever()
+    retriever.collection = object()  # opened index
+
+    def down(query):
+        raise policy_index.IndexUnavailableError("Ollama embedding failed")
+
+    retriever._dense = down
+    assert retriever.search("proximity housing grant")  # app: keyword ranking for this query
+    with pytest.raises(policy_index.IndexUnavailableError):
+        retriever.search("proximity housing grant", strict=True)
