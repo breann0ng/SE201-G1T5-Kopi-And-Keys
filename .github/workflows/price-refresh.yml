@@ -1,0 +1,56 @@
+name: Price refresh (candidate only)
+on:
+  schedule:
+    - cron: '33 2 * * *' # Approximately 10:33 SGT; source publishes daily, scheduler may delay.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: price-refresh
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LANGSMITH_TRACING: 'false'
+      LANGCHAIN_TRACING_V2: 'false'
+      KOPI_HELDOUT_DIR: ''
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: python -m pip install -e .
+      - name: Download, validate and compare an inactive candidate
+        id: watch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/watch_resale_prices.py --notify
+      - name: Save source-check diagnostics
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: price-refresh-status-${{ github.run_id }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          retention-days: 30
+          path: .local/reports/price-refresh-status.json
+      - name: Save validated candidate for human review
+        if: always() && steps.watch.outputs.outcome == 'changed'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: price-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          retention-days: 30
+          path: |
+            .local/price-refresh/${{ steps.watch.outputs.candidate_id }}/resale.csv
+            .local/price-refresh/${{ steps.watch.outputs.candidate_id }}/hdb_prices.db
+            .local/price-refresh/${{ steps.watch.outputs.candidate_id }}/report.json
