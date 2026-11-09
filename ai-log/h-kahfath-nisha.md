@@ -1176,3 +1176,21 @@ source database, vector index and feedback path. Five fictional API checks throu
 the frontend proxy passed: room abbreviation after another flat type, spouse/
 single clarification, zero-sales guidance, and empty-profile spouse/CPF answers.
 Browser visual checking and human semantic review remain separate pending steps.
+
+## 10 November 2026 — Sandra's profile wording review follow-up
+
+On `fix/profile-wording-edge-cases`, based on main `0fea028` after PRs #33/#34,
+addressed the two review comments. The router masks both Family Grant and Family
+Grants before inferring a household. The spouse/sidebar check recognises explicit
+hypothetical marriage premises within their clause. A later factual spouse
+statement, or an unrelated income condition, still triggers clarification.
+
+Added ten regression instances covering plural wording, hypothetical marriage
+forms, and preserved checks for actual spouses. The tests reproduced seven
+failures before the implementation change; all 116 focused router/profile tests
+then passed. This remains a bounded wording heuristic, not general household
+reasoning. No synthesis prompt, sampling setting, policy data or held-out material
+was changed or used.
+
+Final validation: all **1,091 backend tests passed**, with the existing expected
+missing-index warning. Frontend files were unchanged in this follow-up.
