@@ -34,7 +34,7 @@ IntentSource = Literal["rules", "no_match", "llm", "llm_unsure", "llm_error", "r
 
 # --- Intent classification -------------------------------------------------
 
-FLAT_PATTERN = re.compile(r"\b(([1-5])\s*[- ]?room|executive)(?:\s+flat)?\b", re.IGNORECASE)
+FLAT_PATTERN = re.compile(r"\b(([1-5])\s*[- ]?(?:rooms?|rms?)|executive)(?:\s+flat)?\b", re.IGNORECASE)
 PRICE_WORDS = (
     "price", "prices", "selling", "sold", "cost", "median", "benchmark",
     "going for", "what did", "how much", "the damage", "listed at", "normal",
@@ -333,7 +333,7 @@ EXTRACTED_FIELDS = ("user_age", "income", "citizenship", "town", "flat_type", "f
 
 # Exact floors cannot be expressed by the price tool's low/mid/high bands.
 EXACT_FLOOR_PATTERN = re.compile(
-    r"\b(?:\d{1,3}(?:st|nd|rd|th)?\s+(?:floor|storey)|(?:floor|storey)\s+\d{1,3}(?![-\s]*room\b))\b", re.I,
+    r"\b(?:\d{1,3}(?:st|nd|rd|th)?\s+(?:floor|storey)|(?:floor|storey)\s+\d{1,3}(?![-\s]*(?:rooms?|rms?)\b))\b", re.I,
 )
 FLOOR_BAND_PATTERN = re.compile(r"\b(low|mid|middle|high)[- ]floors?\b", re.I)
 FLOOR_SCOPE_PREFIX = "I can compare low floors"
@@ -459,7 +459,8 @@ def extract_fields(message: str, bare_town: bool = False) -> dict:
     elif re.search(r"\bfirst[- ]timer\b", message, re.I):
         first_timer = True
     household_type = None
-    if re.search(r"\b(?:couple|married|family|families)\b", message, re.I):
+    household_text = re.sub(r"\bfamily\s+grant\b", " ", message, flags=re.I)
+    if re.search(r"\b(?:couple|married|family|families)\b", household_text, re.I):
         household_type = "couple_family"
     elif re.search(r"\b(?:i am|i'm|as a|buying as a)\s+single\b", message, re.I):
         household_type = "single"

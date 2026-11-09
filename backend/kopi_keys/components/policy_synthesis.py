@@ -84,6 +84,10 @@ Do not infer a personal grant amount from an income band without the complete
 household and lease conditions. Use up to 6 short claims for complex questions.
 Prefer one complete source paragraph covering the grant relationship and its
 prerequisite, then add only essential non-duplicate conditions.
+If purchase type is unspecified, a source rule explicitly conditional on resale
+can answer a general stacking question. Retain that resale condition; do not
+claim it applies to new flats or establishes this user's eligibility. Do not
+demand evidence for unasked purchase scenarios in missing_evidence.
 If required rules are absent, return missing_evidence with a short description
 of the missing rule. Return claims=[] when nothing answers the question.
 """

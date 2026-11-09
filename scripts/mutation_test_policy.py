@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COMPONENTS = "backend/kopi_keys/components/"
 TESTS = ["test_synthesiser_verifier.py", "test_policy_finals.py", "test_policy_safety.py",
-         "test_profile_scope.py", "test_graph.py", "test_verifier_relevance_wording.py"]
+         "test_profile_scope.py", "test_graph.py", "test_verifier_relevance_wording.py", "test_finals_context_relevance.py"]
 # One documented fault per case. Exact anchors make code drift fail visibly.
 SPECS = [
     ("Missing citation accepted", COMPONENTS + "verifier.py",
@@ -42,8 +42,10 @@ SPECS = [
      'if score["score"] < minimum and not table_row_answers_question(question, claims[score["claim_index"]]):',
      'if False:'),
     ("Table-row relevance rule accepts any row", COMPONENTS + "verifier.py",
-     '    return any(aspects.shows_aspect(aspect, criterion) for aspect in aspects.asked_aspects(question))',
+     '    return criterion.strip().casefold() == "citizenship" and any(aspects.shows_aspect(aspect, criterion) for aspect in asked)',
      '    return True'),
+    ("Named-scheme table rescue enabled", COMPONENTS + "verifier.py",
+     'if requested_grants(question) or "loan" in asked:', 'if False:'),
     ("Multi-grant coverage check removed", COMPONENTS + "verifier.py",
      'errors.extend(grant_coverage_errors(question, draft.claims, sources))', 'pass'),
     ("Household scope check removed", COMPONENTS + "verifier.py",
@@ -210,7 +212,7 @@ def main(argv=None) -> int:
     parent.mkdir(parents=True, exist_ok=True)
     baseline = execute(ROOT, parent, None, args.timeout)
     baseline["status"] = "passed" if baseline["status"] == "survived" else "failed"
-    report = {"scope": "20 curated verifier/profile/trace fault scenarios; not a whole-project score",
+    report = {"scope": f"{len(mutations)} curated verifier/profile/trace fault scenarios; not a whole-project score",
               "generated_at": datetime.now(timezone.utc).isoformat(), "python": sys.version,
               "tests": TESTS, "baseline": baseline, "mutations": [],
               "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),

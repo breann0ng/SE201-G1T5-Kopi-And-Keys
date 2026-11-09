@@ -1130,3 +1130,49 @@ Broad eligibility coverage and detailed loan comparison remain limited by the
 evidence/cohort context. An answered/verified status does not prove completeness.
 No held-out data, SQL database, ACTIVE snapshot, source text, relevance threshold
 or prompt was changed. Raw fictional reports remain local with tracing disabled.
+
+## 10 November 2026 — Pre-freeze context and relevance follow-up
+
+Read the supplied `Kopi_and_Keys_Testing_Session_9Nov.md` as third-party testing
+evidence. Its local-only patch was initially unavailable; the user then merged
+PR #31. Fetched `22f3953` and fast-forwarded the isolated follow-up branch to that
+commit. Kept a detached copy to distinguish the merged fix's live results from
+new changes. Did not treat the report's cleanup/tag/held-out commands as requests.
+
+Retained Tasha's relevance-only synonyms. Reproduced an additional false pass:
+a fictional loan income row answered an EHG income question at lexical score 0.0
+through the generic table-row escape. Narrowed the escape to the observed
+general citizenship case, requiring citizenship content and rejecting named
+grant/loan and missing-duration rescues. All six of Tasha's regressions still
+pass. Added negative scheme/duration cases and telemetry for table context; the
+threshold and verbatim/scope/coverage/number checks remain. Updated exact mutation
+anchors and added the named-scheme fault rather than bypassing mutation CI.
+
+Added room abbreviations with preserved capture groups, a before-tools spouse/
+single-profile clarification, and prevention of `Family Grant` being extracted
+as a household statement. The card gate distinguishes general combination rules
+from personal eligibility/amount requests. A short prompt clarification preserves
+conditional resale explanations. It did not eliminate generic-stacking refusal
+on the GPU, so that remains explicitly documented rather than force-passed.
+
+Added fixed no-sales/unsupported-period/profile headings and a widening suggestion.
+No status contract, dataset, source snapshot, vector index, price SQL or gold label
+was changed. The report's Mac calibration metrics were not independently
+reproduced; no embedding/cross-encoder gate or new reranker dependency was enabled.
+
+Agent checks: **958 backend tests**, **32 frontend tests**, lint/build pass with
+existing warnings. Sandbox initially blocked Node worker spawning; the normal
+runner passed with the needed process permission. **22/22 curated mutations
+detected**, 142-test baseline, no errors/timeouts. GPU fixed-evidence synthesis
+remains **11/12** (same SYN-08 mismatch); the four selected CPU grant controls pass
+**4/4**. These are different subsets/hardware and not overall accuracy or an
+isolated latency comparison. Empty-profile CPF was accepted on both models;
+the original CPU failure was not reproduced. Human semantic review and new UI
+checks remain pending. Full dev/fresh held-out evaluation and a frozen tag were
+not run/created by this follow-up. Raw fictional reports stay local, tracing off.
+
+Restarted the candidate app on the same localhost origin, retaining its existing
+source database, vector index and feedback path. Five fictional API checks through
+the frontend proxy passed: room abbreviation after another flat type, spouse/
+single clarification, zero-sales guidance, and empty-profile spouse/CPF answers.
+Browser visual checking and human semantic review remain separate pending steps.

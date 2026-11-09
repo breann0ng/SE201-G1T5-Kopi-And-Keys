@@ -31,7 +31,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from ..schemas import CENT, PriceResult
 from ..state import GraphState
 from . import answer_aspects as aspects
-from .policy_guardrails import contains_model_instruction, grant_coverage_errors, household_scope_errors, normalized_policy_text, property_scope_errors, score_relevance
+from .policy_guardrails import contains_model_instruction, grant_coverage_errors, household_scope_errors, normalized_policy_text, property_scope_errors, requested_grants, score_relevance
 
 
 # Reject malformed grouping, shorthand (600k), signs, percentages and exponents.
@@ -149,6 +149,7 @@ def policy_relevance_scores(state: GraphState) -> list[dict]:
                                     " ".join(filter(None, [claim.source_scope, claim.source_criterion]))) for p in cited),
                    key=lambda s: s.score, default=score_relevance(question, claim.supporting_quote))
         scores.append({"claim_index": index, "score": best.score, "reason": best.reason,
+                       "table_context_relevant": table_row_answers_question(question, claim),
                        "matched_terms": list(best.matched_terms),
                        "requested_grants": list(best.requested_grants),
                        "covered_grants": list(best.covered_grants),
@@ -158,17 +159,26 @@ def policy_relevance_scores(state: GraphState) -> list[dict]:
 
 
 def table_row_answers_question(question: str, claim) -> bool:
-    """A scoped table claim whose row criterion is what the question asks about is relevant.
+    """Conservative rescue for the observed general-purchase citizenship wording.
 
     Word overlap undercounts table cells: asked whether a Singaporean and a PR can buy, the
-    Citizenship row says "Be an SC or SPR", sharing almost no words with the question. The
-    row label itself ("Citizenship") shows the cell answers the asked aspect. Quotes are still
-    checked word for word against the source and the table column, as for any claim.
+    Citizenship row says "Be an SC or SPR", sharing almost no words with the question.
+    A shared row label cannot establish the requested scheme or duration. Keep
+    grant/loan-specific questions on the normal relevance path, and require a
+    duration in the quote if timing was asked. Other rows are not rescued.
+    Verbatim and canonical table-scope checks still run afterwards.
     """
     criterion = getattr(claim, "source_criterion", None)
     if not criterion or claim.supporting_quote is None:
         return False
-    return any(aspects.shows_aspect(aspect, criterion) for aspect in aspects.asked_aspects(question))
+    asked = aspects.asked_aspects(question)
+    if requested_grants(question) or "loan" in asked:
+        return False
+    if "timing" in asked and not aspects.shows_aspect("timing", claim.supporting_quote):
+        return False
+    if not (aspects.shows_aspect("citizenship", claim.supporting_quote) or re.search(r"\bSC\b", claim.supporting_quote, re.I)):
+        return False
+    return criterion.strip().casefold() == "citizenship" and any(aspects.shows_aspect(aspect, criterion) for aspect in asked)
 
 
 def verify(state: GraphState) -> list[str]:

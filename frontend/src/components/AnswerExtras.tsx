@@ -7,6 +7,7 @@ import { IncomeNotes, OverviewTable, RelatedPassages } from "./Overview";
 import { BandTables, NarrowItDown, RecentSales } from "./PriceRefine";
 import { MIN_SUMMARY_VOLUME, bandLabels } from "../lib/priceBands";
 import { SourceMaterial } from "./SourceMaterial";
+import { abstentionHeading } from "../lib/abstentionHeading";
 
 export function StatusBadge({ meta }: { meta: AdvisorMeta | undefined }) {
   if (!meta) return null;
@@ -27,7 +28,7 @@ export function StatusBadge({ meta }: { meta: AdvisorMeta | undefined }) {
   if (meta.response.status === "abstained") {
     return (
       <Badge className="text-slate-600 dark:text-slate-300">
-        <AlertTriangle size={14} /> I can't answer this reliably from official sources
+        <AlertTriangle size={14} /> {abstentionHeading(meta.response)}
       </Badge>
     );
   }

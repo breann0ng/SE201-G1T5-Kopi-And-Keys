@@ -15,7 +15,7 @@ def profile_issue(state) -> tuple[str, str] | None:
     # Pure transaction-price queries do not need household eligibility details.
     if classify_intent(question) in {"price", "unanswerable"}:
         return None
-    conflict = profile_conflict(state)
+    conflict = profile_conflict(state) or message_profile_conflict(state)
     if conflict:
         return "clarify", conflict
     if not personal_question(question):
@@ -30,6 +30,19 @@ def profile_issue(state) -> tuple[str, str] | None:
                            "first-timer EHG conditions or amount tables. If a co-applicant is a first-timer, "
                            "select Mixed first-/second-timer couple and ask again. Otherwise, check the applicable "
                            "HDB rules and HFE assessment; this is not an eligibility decision.")
+    return None
+
+
+def message_profile_conflict(state) -> str | None:
+    """Clarify a clear present-spouse/single contradiction; never silently edit a profile."""
+    question = state.message
+    single = state.household_type == "single" or state.citizenship == "SC_single"
+    spouse = re.search(r"\bmy\s+(?:wife|husband|spouse)\b\s+(?:is|and|has|holds)\b", question, re.I)
+    past = re.search(r"\b(?:widow\w*|divorc\w*|deceased|died|dead|passed away|ex-wife|ex-husband)\b", question, re.I)
+    if single and spouse and not past:
+        return ("Your message describes a spouse, but your sidebar describes a single-person household. "
+                "Please check Household citizenship and Household type in Your situation, then resend your question. "
+                "The sidebar has not been changed automatically.")
     return None
 
 

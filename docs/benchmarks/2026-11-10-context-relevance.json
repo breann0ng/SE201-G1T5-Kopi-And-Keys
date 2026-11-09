@@ -1,0 +1,330 @@
+{
+  "scope": "Targeted pre-freeze development follow-up; not final dev/held-out evaluation or overall factual accuracy.",
+  "created_at_utc": "2026-11-09T16:39:25.301486+00:00",
+  "base_commit": "2aa50e6bb8e74a355e2710784b9d4b9b08556b78",
+  "reviewed_verifier_pr": 31,
+  "branch": "fix/finals-context-relevance",
+  "source_sha256": {
+    "backend/kopi_keys/components/abstention.py": "e3b1a8eeb6aa3e5f7fac8281adddb5d7069e4d6fab4fa5a8c238b2819ae93b10",
+    "backend/kopi_keys/components/policy_synthesis.py": "9c1249d8e148506af1e7d6b0ab13fcdd85ad83f15b05266fa2287ca48bcd6d43",
+    "backend/kopi_keys/components/profile_context.py": "bf60090c1d65781e260fd84c1bab597a487237e315260e198819c0f7f66e069e",
+    "backend/kopi_keys/components/query_router.py": "5143f18848b56737fec8cd7c6cde0f4aa139feafb284ab419bd4b7a569d6dc00",
+    "backend/kopi_keys/components/topic_cards.py": "44682d29a992b7710f26bdefc6f0caf7150ee9d1d248bb50b4c3ee0665e92b26",
+    "backend/kopi_keys/components/verifier.py": "c3bafb4bec193e3bbaeb6a95c3e863ce75ef319977443f51120cf87ed49efe0b",
+    "backend/kopi_keys/graph.py": "6c262a3c792199cb27c6d32a4b93ac985368fe091ee7d5e8cc907facb26f2168",
+    "frontend/src/components/AnswerExtras.tsx": "2942847958a281b61dfb96c0c9cd4a396c9874d9a07acded604ab386dee83e9b",
+    "frontend/src/lib/abstentionHeading.ts": "aaa0ea123293e2a84df0714900a13216677dbadf641868de197cc8a75d02426b",
+    "frontend/tests/abstentionHeading.test.ts": "26e547a50ad04ff73513471cc3c64c22f440455c2974a9bffc9f1ca42af71446",
+    "scripts/mutation_test_policy.py": "8b63592f9386fbfc61578fea966935ade77a8334ebf3e2ad9d8d6fb0669aae23",
+    "tests/test_finals_context_relevance.py": "bf1106dc53048215d25b9964771504b5fb085a5a63d1c33e0a1a918cd3977c58"
+  },
+  "backend_tests": {
+    "tests": 958,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "frontend": {
+    "tests_passed": 32,
+    "lint": "passed with existing React Refresh warnings",
+    "build": "passed with existing bundle-size warning",
+    "visual_browser_check": "pending"
+  },
+  "mutation": {
+    "scope": "22 curated verifier/profile/trace fault scenarios; not a whole-project score",
+    "baseline": {
+      "status": "passed",
+      "tests": 142
+    },
+    "summary": {
+      "planned": 22,
+      "executed": 22,
+      "killed": 22,
+      "survived": 0,
+      "errors_or_timeouts": 0,
+      "score": 1.0,
+      "complete": true
+    },
+    "runner_sha256": "8b63592f9386fbfc61578fea966935ade77a8334ebf3e2ad9d8d6fb0669aae23",
+    "source_sha256": {
+      "backend/kopi_keys/components/policy_guardrails.py": "3916dcf7798b4af3f97963cc027999f978d3101c420cf28d0bb1086f991f106c",
+      "backend/kopi_keys/components/profile_context.py": "bf60090c1d65781e260fd84c1bab597a487237e315260e198819c0f7f66e069e",
+      "backend/kopi_keys/components/verifier.py": "c3bafb4bec193e3bbaeb6a95c3e863ce75ef319977443f51120cf87ed49efe0b",
+      "backend/kopi_keys/graph.py": "6c262a3c792199cb27c6d32a4b93ac985368fe091ee7d5e8cc907facb26f2168",
+      "backend/kopi_keys/llm.py": "5f48812d376f3aa89ae5822a109f7be24638bdb45f3593b8980bdb4fd39fcc8c"
+    },
+    "test_sha256": {
+      "test_synthesiser_verifier.py": "8d830cf0a91fb04fd48b4d58aeec8a2a2a668a14d402da11deeb63015534fe6b",
+      "test_policy_finals.py": "8f8ff00fde41bb3366a5711a8ac76e2db5cb98a2cf26b878012da21d8126f46a",
+      "test_policy_safety.py": "fa49f22da2fd45072db1d6f5bb8c708ab91bb4362fbd13a9483cdf7b8d362e3c",
+      "test_profile_scope.py": "7621bfc5c9bece779fa901efa51941a88869b3d9574c6e05cafaf38d0ca183cf",
+      "test_graph.py": "f640e79a2cc2241c90fcf668b634a03b8a2491076bf7b781ecd5217c5a21f024",
+      "test_verifier_relevance_wording.py": "37a3c07988deceadde191733ab11ef47dd1fb81a7b6863eac6b7efa439acef8a",
+      "test_finals_context_relevance.py": "94a1421f7692babcf9b2805e254d209733a1ab750e3bf91cbc26a2ab5c917391",
+      "fakes.py": "fe49edf28382d3f4d09fbb99baac1fc633d58d74424b1fb4a05f47db4632294a",
+      "conftest.py": "74d5f25536488fdeaa898c17a85a67c495664beb245efecde68b511bfd82b438"
+    }
+  },
+  "fixed_evidence_synthesis": {
+    "scope": "Different case sets/hardware; no pooled score or controlled latency conclusion. Human semantic review pending.",
+    "gpu": {
+      "model": {
+        "name": "qwen3.8:latest",
+        "digest": "22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643",
+        "size_vram": 17278099782
+      },
+      "summary": {
+        "qwen3.8:latest": {
+          "cases": 12,
+          "quality_passes": 11,
+          "answered": 10,
+          "correct_abstentions": 2,
+          "engine_errors": 0,
+          "median_seconds": 2.507,
+          "p95_seconds": 3.788,
+          "model_calls": 14,
+          "first_attempt_verifier_passes": 10,
+          "raw_first_attempt_passes": 10,
+          "answers_after_claim_pruning": 0,
+          "answerable_cases": 10,
+          "over_abstentions": 0,
+          "output_tokens": 1269,
+          "human_quality_review": "pending; automatic quote coverage is not factual accuracy"
+        }
+      },
+      "case_ids": [
+        "SYN-01",
+        "SYN-02",
+        "SYN-03",
+        "SYN-04",
+        "SYN-05",
+        "SYN-06",
+        "SYN-07",
+        "SYN-08",
+        "SYN-09",
+        "SYN-10",
+        "SYN-11",
+        "SYN-12"
+      ],
+      "usage_device_requested": "gpu",
+      "failed_quote_coverage_cases": [
+        "SYN-08"
+      ]
+    },
+    "cpu": {
+      "model": "qwen2.5:3b",
+      "ollama_version": "0.40.4",
+      "settings": {
+        "model": "qwen2.5:3b",
+        "timeout_seconds": 240.0,
+        "num_threads": 4,
+        "context_size": 2048,
+        "max_output_tokens": 220,
+        "response_format": "request-specific citation enum",
+        "keep_alive": "30m",
+        "device": "cpu",
+        "policy_context_size": 4096,
+        "policy_output_token_cap": 850,
+        "num_gpu": 0,
+        "temperature": 0,
+        "seed": 42,
+        "max_repairs": 1,
+        "minimum_relevance": 0.2,
+        "memory_policy": "other compared models unloaded before each batch; active model unloaded after batch",
+        "warmup": "one unscored policy-budget load before each model batch"
+      },
+      "case_ids": [
+        "SYN-01",
+        "SYN-02",
+        "SYN-03",
+        "SYN-04"
+      ],
+      "summary": {
+        "qwen2.5:3b": {
+          "cases": 4,
+          "quality_passes": 4,
+          "answered": 4,
+          "correct_abstentions": 0,
+          "engine_errors": 0,
+          "median_seconds": 37.871,
+          "p95_seconds": 53.894,
+          "model_calls": 5,
+          "first_attempt_verifier_passes": 3,
+          "raw_first_attempt_passes": 3,
+          "answers_after_claim_pruning": 0,
+          "answerable_cases": 4,
+          "over_abstentions": 0,
+          "output_tokens": 768,
+          "human_quality_review": "pending; automatic quote coverage is not factual accuracy"
+        }
+      },
+      "cases_sha256": "138240bcafd38ec086643ef081895396c02707f22edaad7cab225ab4b35a4d11",
+      "evidence_sha256": "55975bd00786665e32f3feb8d5002da0773c04b3f181138c43453dfa71bf00c7"
+    }
+  },
+  "live_api": {
+    "runtime": "GPU qwen3.8:latest, snapshot mode, existing Chroma index and fixed SQL database; tracing disabled.",
+    "frontend_and_proxy_health_http_status": 200,
+    "cases": [
+      {
+        "case": "wife-single-sidebar",
+        "http_status": 200,
+        "status": "clarifying",
+        "route": "clarify",
+        "trace": [
+          "query_router:clarify:profile_scope",
+          "synthesiser:clarify",
+          "verifier:passed",
+          "output"
+        ],
+        "citation_ids": []
+      },
+      {
+        "case": "room-abbreviation",
+        "http_status": 200,
+        "status": "answered",
+        "route": "price",
+        "trace": [
+          "query_router:price",
+          "price_query:535 transactions",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:passed",
+          "output"
+        ],
+        "citation_ids": [],
+        "filters": {
+          "town": "ANG MO KIO",
+          "flat_type": "3 ROOM",
+          "start_month": "2025-01",
+          "end_month": "2025-12",
+          "lease_band": null,
+          "storey_band": null
+        }
+      },
+      {
+        "case": "zero-sales",
+        "http_status": 200,
+        "status": "abstained",
+        "route": "price",
+        "trace": [
+          "query_router:price",
+          "price_query:0 transactions",
+          "topic_cards:0 matched",
+          "abstention:no_transactions"
+        ],
+        "citation_ids": []
+      },
+      {
+        "case": "wife-empty",
+        "http_status": 200,
+        "status": "answered",
+        "route": "policy",
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:passed",
+          "output"
+        ],
+        "citation_ids": [
+          "CHUNK_ELIG_44"
+        ]
+      },
+      {
+        "case": "cpf-empty",
+        "http_status": 200,
+        "status": "answered",
+        "route": "policy",
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:passed after dropping 1 unverified quote(s)",
+          "output"
+        ],
+        "citation_ids": [
+          "CHUNK_LEASE_09"
+        ]
+      }
+    ],
+    "caveat": "Status checks plus review of conditions; not proof of complete policy guidance or independent SQL recalculation."
+  },
+  "additional_live_checks": {
+    "cpf_empty_profile": {
+      "cpu": "answered",
+      "gpu": "answered",
+      "original_reported_cpu_failure": "not reproduced"
+    },
+    "generic_three_grant_stacking_empty_profile": {
+      "gpu": "abstained for missing policy evidence",
+      "cpu": "answered with cited conditional resale prerequisite/PHG paragraph",
+      "remaining": "GPU over-refusal remains when purchase type is unspecified"
+    }
+  },
+  "unchanged": [
+    "relevance threshold 0.20",
+    "verbatim/citation/scope/number checks",
+    "policy snapshot and ACTIVE",
+    "price SQL and source database",
+    "vector index",
+    "evaluation gold labels"
+  ],
+  "remaining_review": [
+    "GPU generic three-grant over-refusal",
+    "SYN-08 coverage/rubric mismatch",
+    "broader household-role conflicts beyond the bounded spouse check",
+    "policy completeness and human semantic review",
+    "income-note versus generic introduction",
+    "current versus older LTV application cohorts",
+    "Stop/Edit/chat switching and new UI headings manual verification"
+  ],
+  "not_performed": [
+    "held-out access/evaluation",
+    "full dev evaluation",
+    "frozen tag",
+    "watcher candidate activation",
+    "semantic/cross-encoder calibration replication",
+    "new semantic relevance gate"
+  ],
+  "local_artifact_sha256": [
+    {
+      "file": "finals-final-suite.xml",
+      "sha256": "ac706ad26b23225b69d53d34ccd291511f091668b39b9b669fb51bee73c94c39"
+    },
+    {
+      "file": "finals-final-mutations.json",
+      "sha256": "623f277db700d4df79e03f37fb54827f61b1b7e4a8af587f553993e289b4d847"
+    },
+    {
+      "file": "synthesis-final-context.json",
+      "sha256": "0e7bff53ffda5a94eb5d77531eff9f9e900d6b18d4f0650c0a114989272a0f5a"
+    },
+    {
+      "file": "synthesis-final-cpu-controls.json",
+      "sha256": "33dd6cafacf98c9dd2b84f41575e1afb40dbed2ce0560606f3ec439b3d7e124b"
+    },
+    {
+      "file": "final-gaps-pr31-baseline.json",
+      "sha256": "a4f06acee2db6781cb726025853ffb9f0aa3df73085a7d2d87aaf577e6fc085c"
+    },
+    {
+      "file": "final-gaps-after-final-prompt.json",
+      "sha256": "f358ce872c4711fb1e9fb5f2db64a1fbd3962bc23fcce570a0fc3f9760a202ca"
+    },
+    {
+      "file": "cpf-cpu.json",
+      "sha256": "2eef85655671d6e08b19e1b1af1c17eeb95b72de3bdb48180bdf0cf463701787"
+    },
+    {
+      "file": "stack-cpu.json",
+      "sha256": "abd9f8b5236dfaaaaf2b28c979b91a38839934dba50063808f202d14654ac9ae"
+    },
+    {
+      "file": "api-followup.json",
+      "sha256": "d87ced1e59d7fff28d87c72cb911e8fec22d7155160c35e67fada7c8aae51ec6"
+    }
+  ]
+}
