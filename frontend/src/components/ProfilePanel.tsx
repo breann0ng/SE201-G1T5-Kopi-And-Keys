@@ -1,5 +1,7 @@
 import { UserRound } from "lucide-react";
+import { useChat } from "../lib/chat";
 import { emptyProfile, useProfile } from "../lib/profile";
+import { clearAll } from "../lib/storage";
 import { citizenshipOptions } from "../lib/vocab";
 import type { BuyerProfile } from "../lib/api";
 import { profileWarnings } from "../lib/profileWarnings";
@@ -10,6 +12,7 @@ const field =
 /** Optional buyer details, sent with each question so answers can be specific. Replaces login. */
 export function ProfilePanel() {
   const { profile, setProfile } = useProfile();
+  const { newChat } = useChat();
   const warnings = profileWarnings(profile);
   const num = (v: string) => (v === "" ? null : Math.max(0, Number(v)));
 
@@ -117,6 +120,24 @@ export function ProfilePanel() {
       >
         Clear details
       </button>
+
+      <div className="space-y-2 border-t border-slate-200 pt-3 dark:border-slate-800">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          No accounts: chats and details stay in this browser. Questions go to the advisor and its
+          model service. Ratings you send are kept for the team to review and never change answers.
+        </p>
+        <button
+          onClick={() => {
+            if (!confirm("Clear your conversations, saved details and preferences from this browser?")) return;
+            clearAll();
+            newChat();
+            setProfile(emptyProfile);
+          }}
+          className="rounded-lg border border-red-300 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50"
+        >
+          Clear my data
+        </button>
+      </div>
     </section>
   );
 }

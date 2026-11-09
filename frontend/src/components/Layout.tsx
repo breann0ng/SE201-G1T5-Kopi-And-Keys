@@ -1,5 +1,5 @@
 import { AssistantRuntimeProvider, useLocalRuntime } from "@assistant-ui/react";
-import { BookOpen, Menu, MessageSquare, Settings, SquarePen, X } from "lucide-react";
+import { BookOpen, Menu, MessageSquare, SquarePen, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { createAdvisorAdapter } from "../lib/adapter";
@@ -7,21 +7,16 @@ import { ChatContext } from "../lib/chat";
 import { changeChat, currentChatId, deleteChat, loadChat, openChat, saveChat, startNewChat, summaries, type ChatSummary } from "../lib/history";
 import { useProfile } from "../lib/profile";
 import { Logo, LogoIcon } from "./Logo";
-import { useTheme, type Theme } from "../lib/theme";
 import { ProfilePanel } from "./ProfilePanel";
 import { ProfileChangeController, type PendingProfileChange } from "../lib/profileChanges";
-
-export type LayoutContext = { theme: Theme; setTheme: (t: Theme) => void };
 
 const NAV = [
   { to: "/", label: "Chat", icon: MessageSquare },
   { to: "/sources", label: "Sources", icon: BookOpen },
-  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Layout() {
   const { profileRef, subscribeChanges } = useProfile();
-  const [theme, setTheme] = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -49,7 +44,6 @@ export function Layout() {
 
   useEffect(() => {
     const title = pathname === "/sources" ? "Sources"
-      : pathname === "/settings" ? "Settings"
       : chats.find((c) => c.id === activeId)?.title ?? "New chat";
     document.title = `${title} | Kopi & Keys`;
   }, [chats, activeId, pathname]);
@@ -199,7 +193,7 @@ export function Layout() {
             </span>
           </header>
           <div className="min-h-0 flex-1 overflow-hidden">
-            <Outlet context={{ theme, setTheme } satisfies LayoutContext} />
+            <Outlet />
           </div>
         </main>
       </div>
