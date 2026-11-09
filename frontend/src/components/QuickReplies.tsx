@@ -6,7 +6,7 @@ import { citizenshipOptions } from "../lib/vocab";
 type Option = { label: string; value: BuyerProfile[keyof BuyerProfile] };
 
 /** Clarification fields with buttons: profile fields, plus price filters that are not profile fields. */
-export type QuickReplyField = keyof BuyerProfile | "flat_type" | "storey_band" | "lease_topic";
+export type QuickReplyField = keyof BuyerProfile | "flat_type" | "storey_band" | "lease_topic" | "topic";
 
 // Price filters: the button only sends the answer as a chat message (the backend resumes the
 // price question from it); there is no sidebar profile field to fill in.
@@ -14,6 +14,7 @@ const MESSAGE_ONLY: Partial<Record<QuickReplyField, string[]>> = {
   flat_type: ["2-room", "3-room", "4-room", "5-room", "Executive"],
   storey_band: ["Low floors (1–6)", "Mid floors (7–12)", "High floors (13+)"],
   lease_topic: ["CPF usage", "HDB loans", "Grant eligibility"],
+  topic: ["Resale eligibility", "Housing grants", "HDB loans", "CPF and lease rules"],
 };
 
 // Fields answered with a button. age / household_income are typed in the chat box.

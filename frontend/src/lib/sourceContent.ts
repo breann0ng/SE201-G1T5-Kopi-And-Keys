@@ -29,6 +29,17 @@ function splitRow(line: string): string[] {
   return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(cleanCell);
 }
 
+/** A narrowly recognisable flattened Yes/No source table; never infer missing cells. */
+export function extractBinaryTable(text: string): SourceTable | null {
+  const tables = text.split("\n").flatMap((line) => {
+    const clean = cleanCell(line).replace(/\s+/g, " ");
+    if ((clean.match(/\b(?:Yes|No)\s+/g) ?? []).length !== 2 || clean.includes("|")) return [];
+    const match = /^(.+?)\s+(Applicable Limits for .+?)\s+Yes\s+(.+?)\bNo\s+(.+)$/.exec(clean);
+    return match ? [{ header: [match[1], match[2]], rows: [["Yes", match[3].trim()], ["No", match[4].trim()]] }] : [];
+  });
+  return tables.length === 1 ? tables[0] : null;
+}
+
 /** Every pipe table in the passage. Tables missing the |---| line are still recognised. */
 /**
  * Added 2026-10-17: some captured tables have a line break inside a cell

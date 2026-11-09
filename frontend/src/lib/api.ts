@@ -114,7 +114,7 @@ export type ChatResponse = {
   retrieval_rounds: number;
   trace: string[];
   /** Field requested by a clarification (a profile field or a price filter); drives quick-reply buttons. */
-  asking_for?: keyof BuyerProfile | "flat_type" | "storey_band" | "lease_topic" | null;
+  asking_for?: keyof BuyerProfile | "flat_type" | "storey_band" | "lease_topic" | "topic" | null;
   /** Identifies this answer for POST /feedback; absent in older saved chats. */
   message_id?: string | null;
   /** The answer's LangSmith trace id when tracing is on, otherwise null. */

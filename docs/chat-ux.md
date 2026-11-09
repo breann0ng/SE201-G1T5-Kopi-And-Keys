@@ -194,3 +194,19 @@ ask about floor 16 and lease restrictions; answer `13+`; ask `lease rules`; then
 ask for 2027 data. Expect a high-floor price result, a lease-topic clarification
 and a dated coverage explanation. Separately select CPF usage after the lease
 prompt and inspect its citations. High-floor figures are not floor-16 valuations.
+
+### Small usability pass
+
+Exact-floor price follow-ups no longer require the opener “what/how about”:
+“what happens if I want to buy 16th floor?” resumes the property context and
+asks for a supported band. Standalone policy questions and scope guards remain.
+The general topic clarification now has quick replies; a selected topic (including
+the observed “resale elgibility” spelling in that reply) becomes a canonical
+question only after that prompt, not a global rewrite of user input.
+
+The display formatter can restore a narrowly recognised flattened Yes/No source
+table. Both adjacent answer paragraphs must cite the same source, include the
+original header, and match the source rows. The table retains all selected words,
+conditions and citation; it does not add a policy interpretation or change the
+backend response/verifier. Incomplete, mismatched or ambiguous rows stay unchanged.
+The formatted table is also retained by Copy answer and sources.

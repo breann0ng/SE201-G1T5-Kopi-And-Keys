@@ -1,0 +1,20 @@
+{
+  "date_sgt": "2026-11-09",
+  "branch": "fix/finals-integration-gaps",
+  "scope": "Bounded clarification and source-text presentation regressions; not held-out evaluation or semantic accuracy.",
+  "backend_passed": 868,
+  "frontend_passed": 22,
+  "new_backend_regression_instances": 9,
+  "new_frontend_test_cases": 2,
+  "lint_errors": 0,
+  "existing_lint_warnings": 4,
+  "frontend_build_passed": true,
+  "live_api": {"natural_floor_followup": "clarifying", "displayed_high_band_reply": "answered", "town": "TAMPINES", "flat_type": "3 ROOM", "storey_band": "high"},
+  "saved_live_cpf_answer_reformatted": true,
+  "new_display_browser_visual_review": false,
+  "raw_policy_answer_changed": false,
+  "policy_sources_changed": false,
+  "price_database_changed": false,
+  "heldout_read": false,
+  "prior_broad_benchmarks_rerun": false
+}

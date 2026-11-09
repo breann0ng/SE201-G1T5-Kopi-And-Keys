@@ -233,3 +233,36 @@ def test_new_price_question_does_not_resurrect_an_older_floor_filter():
     state = initial_state(request)
     routed = route_query(request.message, state, context_question=state["followup_question"])
     assert (routed.town, routed.flat_type, routed.storey_band) == ("BEDOK", "3 ROOM", None)
+
+
+@pytest.mark.parametrize("message", [
+    "what happens if i want to buy 16th floor?",
+    "I would like a flat on the 16th floor instead",
+    "What if I choose floor 16?",
+])
+def test_floor_followups_do_not_require_a_fixed_opener(graph, message):
+    request = follow_up(message, first=(
+        "I own a 4 room flat in Toa Payoh and want to buy a 3-room flat in Tampines. What do they cost?"))
+    state = run_graph(graph, request)
+    assert state.response.status == "clarifying" and state.response.asking_for == "storey_band"
+    assert (state.town, state.flat_type) == ("TAMPINES", "3 ROOM")
+    assert state.model_calls == 0
+
+
+@pytest.mark.parametrize("reply,term", [
+    ("resale elgibility", "eligibility"), ("Resale eligibility", "eligibility"),
+    ("Housing grants", "grants"), ("HDB loans", "loan"), ("CPF and lease rules", "lease"),
+])
+def test_general_topic_clarification_reply_is_scoped_without_llm_classification(reply, term):
+    from kopi_keys.components.query_router import TOPIC_SCOPE_MESSAGE, route_query
+    state = initial_state(ChatRequest(message=reply, history=[
+        HistoryTurn(role="user", content="I want to know about HDB"),
+        HistoryTurn(role="assistant", content=TOPIC_SCOPE_MESSAGE),
+    ]))
+    assert term in state["followup_question"].lower()
+    routed = route_query(reply, state, context_question=state["followup_question"])
+    assert routed.route == "policy" and not routed.needs_confirmation
+
+
+def test_topic_alias_is_not_globally_rewritten():
+    assert initial_state(ChatRequest(message="resale elgibility")).get("followup_question") is None

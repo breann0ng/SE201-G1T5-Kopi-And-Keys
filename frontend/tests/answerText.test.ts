@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { answerForClipboard } from "../src/lib/answerText.ts";
+import { answerForClipboard, numberCitations } from "../src/lib/answerText.ts";
 import type { ChatResponse } from "../src/lib/api.ts";
 
 const response: ChatResponse = {
@@ -49,4 +49,32 @@ test("synthetic evidence warning survives copy", () => {
 test("a clarification with no sources does not invent citations", () => {
   assert.equal(answerForClipboard({ ...response, status: "clarifying", message: "Please provide age.", citations: [] }),
     "Please provide age.");
+});
+
+const binaryHeader = "Fictional lease condition covers age 99 Applicable Limits for Fictional Usage";
+const yesRow = "The fictional amount is capped at $123.";
+const noRow = "The fictional amount is reduced. Another quoted condition applies.";
+const binaryResponse: ChatResponse = {
+  ...response,
+  message: `Other source condition. [B]\n\n${binaryHeader} Yes ${yesRow} [B]\n\nNo ${noRow} [B]`,
+  citations: [{ ...response.citations[0], text: `${binaryHeader} Yes ${yesRow}No ${noRow} Extra unselected explanation.` }],
+};
+
+test("flattened Yes/No quotes display source headers and preserve selected conditions and citations", () => {
+  const text = numberCitations(binaryResponse);
+  assert.match(text, /\| Fictional lease condition covers age 99 \| Applicable Limits for Fictional Usage \|/);
+  assert.ok(text.includes(`| Yes | ${yesRow} |`) && text.includes(`| No | ${noRow} |`));
+  assert.match(text, /Other source condition\. \[1\]/);
+  assert.doesNotMatch(text, /Extra unselected explanation/);
+  assert.ok(answerForClipboard(binaryResponse).includes(`| No | ${noRow} |`));
+});
+
+test("incomplete, altered, differently cited or ambiguous rows are not reconstructed as a table", () => {
+  for (const altered of [
+    { ...binaryResponse, message: binaryResponse.message.split("\n\n").slice(0, 2).join("\n\n") },
+    { ...binaryResponse, message: binaryResponse.message.replace("age 99", "age 100") },
+    { ...binaryResponse, message: binaryResponse.message.replace("$123", "$456") },
+    { ...binaryResponse, message: binaryResponse.message.replace(`No ${noRow} [B]`, `No ${noRow} [A]`) },
+    { ...binaryResponse, citations: [{ ...binaryResponse.citations[0], text: binaryResponse.citations[0].text + " No additional cell." }] },
+  ]) assert.doesNotMatch(numberCitations(altered), /\| Yes \|/);
 });

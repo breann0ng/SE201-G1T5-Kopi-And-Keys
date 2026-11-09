@@ -335,6 +335,21 @@ EXACT_FLOOR_PATTERN = re.compile(
 FLOOR_BAND_PATTERN = re.compile(r"\b(low|mid|middle|high)[- ]floors?\b", re.I)
 FLOOR_SCOPE_PREFIX = "I can compare low floors"
 LEASE_SCOPE_MESSAGE = "Which remaining-lease rules do you mean: CPF usage, HDB housing loans, or housing grants?"
+TOPIC_SCOPE_MESSAGE = "Which part of HDB housing would you like to know about: resale eligibility, grants, housing loans, or CPF and lease rules?"
+
+
+def topic_reply(message: str, previous_reply: str) -> str | None:
+    if not previous_reply.startswith(TOPIC_SCOPE_MESSAGE):
+        return None
+    return {"resale eligibility": "What are the eligibility conditions for buying an HDB resale flat?",
+            "resale elgibility": "What are the eligibility conditions for buying an HDB resale flat?",
+            "eligibility": "What are the eligibility conditions for buying an HDB resale flat?",
+            "housing grants": "What housing grants are available for an HDB resale flat?",
+            "grants": "What housing grants are available for an HDB resale flat?",
+            "hdb loans": "What are the conditions for an HDB housing loan?",
+            "housing loans": "What are the conditions for an HDB housing loan?",
+            "cpf and lease rules": "What remaining-lease rules apply to CPF usage when buying a resale flat?"
+            }.get(message.casefold().strip().strip(".?!"))
 
 
 def floor_band_reply(message: str) -> StoreyBand | None:

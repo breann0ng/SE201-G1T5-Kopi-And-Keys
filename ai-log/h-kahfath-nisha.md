@@ -930,3 +930,30 @@ No policies, SQL data, model prompts, verifier thresholds or held-out files chan
 The updated button interactions were not replayed in the browser in this step;
 the full sequence and topic branch were checked through the live API. Earlier
 browser confirmation of the populated recent-sales disclosure still applies.
+
+## 9 November 2026 — Bounded usability improvements
+
+Expanded price-context floor follow-ups beyond fixed opening phrases, including
+the user's “what happens if I want to buy 16th floor?”. Added general-topic quick
+replies and prompt-scoped canonical questions, including the observed eligibility
+reply spelling. These are navigation questions, not policy facts or eligibility
+verdicts. Scope guards and unrelated-policy resets remain in place.
+
+Found that CHUNK_LEASE_11 has a flattened Yes/No table. Added a display-only
+formatter that reconstructs the two selected rows only when their adjacent quotes,
+header and citation match the same source. It preserves the selected conditions,
+numbers and citation, adds no unselected source explanation, and leaves ambiguous
+or mismatched content unchanged. Copy uses the same formatting. The raw backend
+answer, policy prompts, quote verification and policy snapshots remain unchanged.
+
+Checks: **868 backend tests**, **22 frontend tests**, lint/build pass (existing
+four refresh warnings and bundle warning). Nine new backend regression instances
+and two frontend test cases cover navigation, source/table preservation and
+negative cases. The natural floor wording and displayed high-band button label
+passed through the live GPU-connected API. Applied the frontend formatter to the
+saved live CPF response and confirmed its labelled Yes/No rows and citation.
+The first live probe hit the backend before startup completed; the readiness-
+checked retry passed. Live browser visual review of this display change remains
+for the user; no updated UI interaction is claimed here. No held-out data, price
+database, model prompt or verifier threshold changed. Earlier broad benchmark
+reports retain their own revision scope and were not rerun for this UI pass.

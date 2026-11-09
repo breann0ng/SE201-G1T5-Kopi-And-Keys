@@ -163,6 +163,8 @@ def _price_followup(message: str, previous_question: str | None) -> bool:
         # Keep that context so the router can clarify an unsupported exact floor.
         return lease_scope_question(message) or bool(
             _FOLLOWUP_OPENER.search(message) and EXACT_FLOOR_PATTERN.search(message))
+    if EXACT_FLOOR_PATTERN.search(message):
+        return True  # e.g. "What happens if I want to buy the 16th floor?"
     if _FOLLOWUP_OPENER.search(message):
         return True
     rest = message
@@ -177,7 +179,7 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
     profile = request.profile
     filters = request.price_filters
     from .components.query_router import (classify_intent, extract_month_range, FLOOR_SCOPE_PREFIX,
-                                          floor_band_reply, lease_scope_question, lease_topic_reply)
+                                          floor_band_reply, lease_scope_question, lease_topic_reply, topic_reply)
 
     # History supplies conversation context, never policy evidence. Explicit
     # sidebar fields take precedence; the router then applies the current turn.
@@ -192,7 +194,8 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
             answering_clarification = answering_floor or (previous_reply.startswith("Please provide:") and not re.search(
                 r"\?|\b(?:can|may|what|how|why|eligible|qualify)\b", turn.content, re.I)
             )
-            scoped_policy = lease_topic_reply(turn.content, previous_reply)
+            chosen_topic = topic_reply(turn.content, previous_reply)
+            scoped_policy = lease_topic_reply(turn.content, previous_reply) or chosen_topic
             intent = classify_intent(turn.content)
             price_turn = intent in {"price", "mixed"} or _price_followup(turn.content, price_question)
             if intent in {"price", "mixed"} and not _price_followup(turn.content, previous_question):
@@ -207,6 +210,8 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
                                                      or (price_turn and k in {"lease_band", "storey_band"}))})
             if scoped_policy:
                 previous_question = scoped_policy
+                if chosen_topic:
+                    price_question = None
             elif intent != "unanswerable" and not answering_clarification:
                 if not _price_followup(turn.content, previous_question):
                     previous_question = turn.content
@@ -218,7 +223,7 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
         else:
             previous_reply = turn.content
     current = _reply_fields(request.message, previous_reply)
-    scoped_policy = lease_topic_reply(request.message, previous_reply)
+    scoped_policy = lease_topic_reply(request.message, previous_reply) or topic_reply(request.message, previous_reply)
     answering_floor = previous_reply.startswith(FLOOR_SCOPE_PREFIX) and floor_band_reply(request.message) is not None
     last_reply = request.history[-1] if request.history else None
     if scoped_policy:

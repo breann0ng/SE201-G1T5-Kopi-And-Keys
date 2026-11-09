@@ -283,7 +283,7 @@ def build_graph(
                     state.missing_fields[0], state.missing_fields[0])
                     if state.missing_fields and state.missing_fields[0] in {
                         "user_age", "income", "citizenship", "first_timer", "household_type", "flat_type",
-                        "floor_scope", "lease_scope"} else None,
+                        "floor_scope", "lease_scope", "topic"} else None,
             )}
         parts = [f"{claim.text} [{', '.join(claim.citation_ids)}]" for claim in draft.claims]
         if state.router_note:
