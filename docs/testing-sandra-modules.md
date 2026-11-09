@@ -127,13 +127,33 @@ values of n up to 60. The observed rate then fell outside its own interval. The 
 had passed only because they used n = 9 and n = 22. Fixed by returning exactly 0 or 1 at those
 edges. No reported figure changes, because `rate()` prints one decimal place.
 
-## Weakest spots still open (not yet re-run)
+## Known limitations
+
+Development stopped after the final presentation (10 Nov 2026), so these gaps were left as
+they are. They are listed so the scores above are not read as more than they are.
+
+**Low mutation scores.** Many small changes to these modules would not make any test fail.
+That says the tests are thin here, not that the code is wrong. The behaviour was checked
+end-to-end through the dev-set retrieval and answer evaluations instead
+(`docs/sandra_finals_results.md`).
 
 - **`policy_retrieval.py` (35.6%).** The BM25 formula (lines 136–149) and the plural/stemming
-  rules (lines 95–98) can change without a test failing. One hand-computed BM25 score on a
-  three-chunk corpus would fix most of these, plus a table of word → stem cases.
-- **`policy_index.py` (28.9%).** Vector search and ranking (lines 148–177). This needs a tiny
-  in-memory index with known vectors.
-- **`chunk.py` (31.6%).** Heading and table handling around lines 169, 247–253, 311–316 and
-  339–384. Small HTML/PDF snippets with a known expected chunking would cover these.
-- **`topic_cards.py` (72.5%).** Mostly fine; the survivors are spread thinly.
+  rules (lines 95–98) are not pinned by any test. The property tests and the Hit@5 floor
+  (`tests/test_retrieval_floor.py`) check ranking behaviour, not the exact scores.
+- **`policy_index.py` (28.9%).** Vector search and ranking (lines 148–177). Testing them needs a
+  small in-memory index with known vectors.
+- **`scripts/scraping/chunk.py` (31.6%).** Heading and table handling around lines 169,
+  247–253, 311–316 and 339–384. `validate.py` and `test_chunking.py` check the output for the
+  real snapshot, but not every rule for splitting text.
+- **`topic_cards.py` (72.5%).** Mostly covered; the survivors are spread thinly.
+
+**No tests at all.** `evaluation/baselines.py`, `evaluation/run_baselines.py` and
+`evaluation/retrieval_sweep.py` are one-off scripts that call the model and write reports.
+Their results were checked by reading the output files, not by tests.
+
+**Not re-measured.** The mutation scores for the four untouched modules are from the baseline
+run. Tests added since then (the property, convention and floor tests) may catch some of
+their mutants, which would raise those scores.
+
+**Retrieval floor.** It covers keyword search only. Dense and hybrid search need Ollama and
+the vector index, which CI does not have.
