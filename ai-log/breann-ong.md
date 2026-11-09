@@ -36,23 +36,17 @@ and the numeric verifier into verifier.py. Add placeholders for topic cards
 and the evaluation runner, which other team members will build.
 
 ### How I checked it
-- The test suite went from 59 to 62 passing tests. All 30 development-set
-  routing labels pass without any change to the label file.
+- The test suite went from 59 to 62 passing tests. All 30 development-set routing labels pass without any change to the label file.
 - Nisha's numeric verifier tests were kept and now run through the full
   graph rather than a separate subgraph.
 - The six synthetic price cases pass through the new graph, with a real model
-  (see the next entry).
-- [Describe your own review: e.g. which files you read line by line, and
-  anything you questioned or changed.]
 
 ### What I kept or changed
 The AI made behaviour choices that the team still needs to confirm:
-- price questions with no dates default to the last 12 months
+- price questions with no dates default to the last 12 months 
 - mixed questions still answer the policy part when price data is missing
 - the old "demo" shortcut in the API was removed
-- the owners for Policy Retrieval and Evaluation are marked TBC in
-  docs/architecture.md.
-[Record which of these you kept or changed.]
+- the owners for Policy Retrieval and Evaluation are marked TBC in docs/architecture.md.
 
 ## 2026-10-16 · Run the local Ollama model on macOS
 - **Tool (model):** Claude Code (Claude Opus 5.5)
@@ -125,7 +119,7 @@ suggestions: put evaluation data in one folder, move the build logic into the pa
   tests/test_price_stats.py, tests/test_price_refine.py,
   tests/test_synthesiser_verifier.py, tests/test_development_set_contract.py,
   README.md, docs/architecture.md, docs/price-synthesis-and-verification.md
-- **Outcome:** [Kept / Changed — choose after your review]
+- **Outcome:** Kept all changes
 
 ### What I asked for
 Make the three layout changes and fix every import and path they affect.
@@ -140,17 +134,14 @@ Make the three layout changes and fix every import and path they affect.
   the evaluation code and tests at it.
 - Checked that my held-out questions in data/evaluation-data/held-out/ are
   still ignored by .gitignore and are not in the commit.
-- [Describe your own review: e.g. which diffs you read, and anything you
-  questioned or changed.]
 
 ### What I kept or changed
 The AI left scripts/build_resale_db.py and scripts/build_policy_index.py as thin wrappers, so the commands in the README and docs work unchanged. The team needs to know that data/evaluation/ is now data/evaluation-data/ before merging, because open branches that touch the dev set will conflict.
-[Record anything you kept or changed.]
 
 ## 2026-11-06 · LangSmith evaluators and dev-set experiments
 - **Tool (model):** Claude Code (Claude Opus 5.5)
 - **Files:** backend/kopi_keys/evaluation/langsmith_eval.py (new), pyproject.toml
-- **Outcome:** [Kept / Changed — choose after your review]
+- **Outcome:** Changed
 
 ### What I asked for
 Whether LangSmith's built-in evaluators suit our app, how to set one up on
@@ -167,17 +158,16 @@ live traces, and a way to run the dev set as LangSmith experiments.
   never uploaded) and ran 3-question experiments. Per-question scores reuse
   metrics.end_to_end, so they match run_eval --local.
 - The LLM-judge option (--judge) has not been run yet.
-- [Describe your own review.]
 
 ### What I kept or changed
-[Record anything you kept or changed.]
+- Kept the LLM as a judge on LangSmith, future work to run on dev set 
 
 ## 2026-11-06 · Router scope guard and no-rule-match tracing
 - **Tool (model):** Claude Code (Claude Opus 5.5)
 - **Files:** backend/kopi_keys/components/query_router.py, graph.py, state.py,
   tests/test_query_router.py, tests/test_graph.py, tests/test_api.py,
   tests/test_development_set_contract.py
-- **Outcome:** [Kept / Changed — choose after your review]
+- **Outcome:** Kept 
 
 ### What I asked for
 How to make the rule-based router send more questions to the right place
@@ -197,10 +187,9 @@ first two steps (rules only); the LLM fallback is not built yet.
 - Traces now show query_router:abstain:no_rule_match when no rule fired, to
   measure what an LLM fallback would see. I checked this in the frontend with
   questions with no keywords and with questions that should be declined.
-- [Describe your own review.]
 
 ### What I kept or changed
-[Record anything you kept or changed.]
+Changed 
 
 ## 2026-11-08 · Router: request-type declines and weak-match confirmation
 - **Tool (model):** Claude Code (Claude Opus 5.5)
@@ -299,7 +288,7 @@ Kept the
 ## 2026-11-09 · CI failure: frontend test used chunk IDs from before re-chunking
 - **Tool (model):** Claude Code (Claude Opus 5.5)
 - **Files:** frontend/tests/sourceContent.test.ts
-- **Outcome:** [Kept / Changed — choose after your review]
+- **Outcome:** Changed
 
 ### What I asked for
 Why "Frontend lint and build" failed on the router PR when the PR changed no
@@ -315,10 +304,11 @@ frontend code.
   CHUNK_EHG_46. 12/12 frontend tests pass.
 - Note for the team: tests that look up chunks by ID break whenever the PDFs
   are re-chunked.
-- [Describe your own review.]
 
 ### What I kept or changed
-[Record anything you kept or changed.]
+Kept the ID change as suggested. I chose to fix it on the router PR branch
+rather than in a separate PR to main, so the PR could go green; main was fixed
+when the PR merged.
 
 ## 2026-11-09 · LLM-as-judge (answer relevance): fix, calibrate, run on the dev set
 - **Tool (model):** Claude Code (Claude Opus 5.5); judge model in LangSmith:
@@ -326,7 +316,7 @@ frontend code.
 - **Files:** backend/kopi_keys/evaluation/langsmith_eval.py,
   tests/test_langsmith_eval.py (new); LangSmith evaluator settings (prompt,
   variable mapping, filters) changed through the API
-- **Outcome:** [Kept / Changed — choose after your review]
+- **Outcome:** Kept
 
 ### What I asked for
 Whether our LangSmith "Answer Relevance" judge actually scores our answers,
@@ -369,7 +359,22 @@ Then: fix it, test it on deliberately wrong answers, and run it on the dev set.
   pre-merge, so differences are indicative only.
 - Kept the score binary: pass/fail judgements are more consistent across runs
   than a 1-5 scale; the average over many questions gives the detail.
-- [Describe your own review, e.g. hand-check ~20 of the 21 answers judged relevant.]
+- Manually checked all 21 of the 21 answers judged as relevant, to ensure scoring was not done wrongly.
 
 ### What I kept or changed
-[Record anything you kept or changed.]
+- Replaced the generic relevance prompt with our HDB prompt. My first edit
+  in the LangSmith UI did not save correctly (the answer variable became
+  `{{var1}}` and the mapping could only be set to the whole output), so I
+  had the prompt, mapping and filters set through the API instead.
+- Moved the judge rule from the dataset I had uploaded through the UI
+  (dev_set_questions, which lost the question text) to kopi-dev-set.
+- Replaced the Google API key after the quota errors, then switched the
+  judge from Gemini 3.6 Flash to Gemini 3.5 Flash-Lite: it has higher free
+  limits and scored 10/10 on the calibration pairs.
+- Kept the binary score rather than a 1-5 scale.
+- Changed how errors are counted: quota errors are left out of every
+  average (comment contains `ChatGoogleGenerativeAIError`), not scored as 0.
+- Chose one shared output shape for experiments and live traces instead of
+  two separate evaluators, since the mapping is stored on the evaluator.
+- Did not use the first judge-dev run: it was stopped because it mixed two
+  judge models and used the incomplete index.
