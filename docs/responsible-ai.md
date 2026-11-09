@@ -34,7 +34,7 @@ prerequisite for RAG, refreshing sources or responsible AI.
 ## Data handling and accountability
 
 - **Browser:** profiles, conversations and votes use browser storage. This is not
-  an encrypted account store. Users can clear it in Settings; use fictional
+  an encrypted account store. Users can clear it with "Clear my data" under "Your situation"; use fictional
   profiles for demonstrations, and do not ask for NRICs, passwords or API keys.
 - **Advisor/model:** requests contain the question, applicable profile and enabled
   history. The advisor can retain answer objects in an in-memory response cache
