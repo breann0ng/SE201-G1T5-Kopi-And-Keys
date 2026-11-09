@@ -15,6 +15,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -52,6 +53,7 @@ jobs:
         run: python -m pytest -q -rs
 
       - name: Check policy guardrail mutations (offline)
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.base_ref == github.event.repository.default_branch)
         run: python scripts/mutation_test_policy.py --jobs 2
 
       - name: Save policy mutation evidence

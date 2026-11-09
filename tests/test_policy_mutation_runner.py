@@ -24,6 +24,14 @@ def test_real_assertion_failure_is_a_kill(tmp_path):
     assert result["failures"][0]["reason"] == "AssertionError: expected rejection"
 
 
+@pytest.mark.parametrize("code", [0, 1])
+def test_blocked_http_is_an_isolation_error_even_with_a_legitimate_assertion(tmp_path, code):
+    path = report(tmp_path, '<testsuite><testcase><failure message="AssertionError: expected rejection"/>'
+                           '</testcase></testsuite>')
+    result = runner.classify(code, path, network_attempted=True)
+    assert result["status"] == "error" and "not counted" in result["detail"]
+
+
 @pytest.mark.parametrize("code,contents,expected", [
     (2, '<testsuite><testcase><failure/></testcase></testsuite>', None),
     (1, '<testsuite><testcase><error message="fixture failed"/></testcase></testsuite>', None),
@@ -105,4 +113,47 @@ def test_timeout_is_not_a_kill_and_copy_is_still_cleaned(copied_project, monkeyp
     monkeypatch.setattr(runner.subprocess, "run", timeout)
     assert runner.execute(root, parent, None, 1)["status"] == "timeout"
     assert original.read_text() == "flag = True\n"
+    assert list(parent.iterdir()) == []
+
+
+def test_execute_detects_network_marker_even_when_test_catches_exception(copied_project, monkeypatch):
+    root, parent, original = copied_project
+    def fake_process(command, *, cwd, env, **kwargs):
+        (cwd / "live-http-attempted").touch()
+        report(cwd, '<testsuite><testcase/></testsuite>').rename(cwd / "results.xml")
+        return subprocess.CompletedProcess(command, 0, "", "")
+    monkeypatch.setattr(runner.subprocess, "run", fake_process)
+    result = runner.execute(root, parent, None, 10, 1)
+    assert result["status"] == "error"
+    assert list(parent.iterdir()) == [] and original.read_text() == "flag = True\n"
+
+
+def test_real_http_block_cannot_be_hidden_by_a_test_that_catches_it(copied_project, monkeypatch):
+    root, parent, _ = copied_project
+    package = root / "backend/kopi_keys/components"
+    package.mkdir(parents=True)
+    (package.parent / "__init__.py").write_text("")
+    (package / "__init__.py").write_text("")
+    (package / "verifier.py").write_text("")
+    (root / "tests/test_probe.py").write_text('''
+import httpx
+import pytest
+def test_catches_block():
+    with pytest.raises(RuntimeError, match="Live HTTP is disabled"):
+        httpx.get("https://network-attempt.invalid")
+''')
+    monkeypatch.setattr(runner, "TESTS", ["test_probe.py"])
+    result = runner.execute(root, parent, None, 30, 1)
+    assert result["status"] == "error" and "Live HTTP attempted" in result["detail"]
+    assert list(parent.iterdir()) == []
+
+
+def test_blocked_http_is_still_reported_if_the_child_then_times_out(copied_project, monkeypatch):
+    root, parent, _ = copied_project
+    def timeout(command, *, cwd, **kwargs):
+        (cwd / "live-http-attempted").touch()
+        raise subprocess.TimeoutExpired(command, 1)
+    monkeypatch.setattr(runner.subprocess, "run", timeout)
+    result = runner.execute(root, parent, None, 1)
+    assert result["status"] == "error" and "Live HTTP attempted" in result["detail"]
     assert list(parent.iterdir()) == []

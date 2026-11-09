@@ -843,3 +843,32 @@ independence assignments need review. No held-out file was opened. Raw outputs,
 fictional profiles and local runtime details remain under ignored `.local/`.
 See `docs/finals-readiness.md`, `docs/dependency-audit.md` and the dated curated
 integration summary. These changes still need teammate review before main.
+
+## 9 November 2026 — Follow-up to PR #25/#26 review
+
+Kept the merged reviewed-candidate policy workflow. Limited the policy mutation
+step to pull requests targeting the default branch and manual CI runs, avoiding
+a duplicate mutation run on the subsequent main push. Full pytest still runs on
+main pushes. A blocked HTTPX request now leaves an isolation marker and makes
+the mutation result an error, even if a test catches the exception or later times
+out; it cannot inflate the detected-fault score. This is an HTTPX guard, not an
+operating-system network sandbox.
+
+The policy watcher records the pushed candidate branch before attempting PR
+creation and retains the prepared PR body as an artifact. Documented recovery,
+bot-workflow approval/manual CI on the exact candidate branch, reviewer ownership,
+and repeated candidates while ACTIVE remains unchanged. No automatic branch
+deletion or snapshot activation was added. The earlier monthly workflow also
+required separate activation; its automatic archive commit did not update the
+served policy. Repository Actions permissions still require owner verification.
+
+Validation: the laptop suite passed **834 tests**; the fresh core/dev environment
+passed **833 with 1 expected skip** without Chroma/index. The sandbox first blocked
+the temporary local Git publication test; rerunning with local subprocess access
+passed. The stricter mutation runner
+detected **20/20** curated faults with a passing **109-test** baseline and no
+errors/timeouts. Added regressions include a real subprocess whose test catches
+a blocked HTTP request; the runner still rejects the result. No GPU rerun was
+needed for these CI/tooling/documentation changes. No hosted watcher run, issue,
+or candidate PR was published as part of this follow-up. These results do not
+establish whole-project security or replace independent held-out evaluation.

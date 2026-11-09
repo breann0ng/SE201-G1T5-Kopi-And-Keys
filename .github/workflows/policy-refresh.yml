@@ -1,4 +1,5 @@
-# Change detection only. A candidate PR never changes ACTIVE, chunks or the index.
+# Change detection only. A candidate PR never activates data or rewrites served chunks/index.
+# Owners: Nisha (watcher/review), Sandra (scraping and candidate chunks/cards).
 name: Policy refresh
 
 on:
@@ -82,5 +83,7 @@ jobs:
           name: policy-watch-status-${{ github.run_id }}-${{ github.run_attempt }}
           retention-days: 30
           include-hidden-files: true
-          path: .local/reports/policy-watch-status.json
+          path: |
+            .local/reports/policy-watch-status.json
+            .local/reports/policy-watch-pr.md
           if-no-files-found: warn

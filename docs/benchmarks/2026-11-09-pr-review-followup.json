@@ -1,0 +1,28 @@
+{
+  "date_sgt": "2026-11-09",
+  "branch": "fix/finals-integration-gaps",
+  "scope": "Follow-up to PR 25/26 review; CI, mutation isolation and watcher recovery. Not a whole-project security score.",
+  "application_runtime_changed_in_followup": false,
+  "live_gpu_rerun": false,
+  "hosted_watcher_run": false,
+  "heldout_read": false,
+  "validation": {
+    "local_with_index": {"passed": 834},
+    "fresh_core_dev_without_chroma": {"passed": 833, "skipped": 1},
+    "policy_mutations": {
+      "baseline_passed": 109,
+      "planned": 20,
+      "executed": 20,
+      "detected": 20,
+      "survived": 0,
+      "errors_or_timeouts": 0,
+      "runner_sha256": "b718e6c42e3ac0b02d465689ee4ff93f4d30f805e0b14489f2ce24fde9f7a900"
+    }
+  },
+  "limits": [
+    "HTTPX transport guard is not an operating-system network sandbox.",
+    "Repository Actions permissions and first hosted watcher run still need owner review.",
+    "An inactive merged candidate does not advance ACTIVE; weekly repeats remain possible.",
+    "Human review and separate activation remain required."
+  ]
+}
