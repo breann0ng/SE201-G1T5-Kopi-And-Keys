@@ -143,7 +143,20 @@ def table_claim(passage, quote: str, question: str) -> Claim | None:
     than trusting a paraphrase that may silently move a rule to another column.
     """
     rows = model_evidence(passage, question).get("table_rows", [])
-    matches = [r for r in rows if normalized_policy_text(quote) in normalized_policy_text(r["requirement"])]
+    def matches_cell(row):
+        candidate = normalized_policy_text(quote)
+        # A model sometimes copies the supplied column before its excerpt. Only
+        # strip that exact source column, never an inferred or invented label.
+        # The displayed quote is still restored from the complete source cell.
+        for column in (normalized_policy_text(row["column"]),
+                       normalized_policy_text(scope_label(row["column"])).replace(" Resale ", " / Resale ")):
+            prefix = column + ": "
+            if candidate.startswith(prefix):
+                candidate = candidate[len(prefix):]
+                break
+        return bool(candidate) and candidate in normalized_policy_text(row["requirement"])
+
+    matches = [r for r in rows if matches_cell(r)]
     if len(matches) != 1:
         return None
     row = matches[0]
@@ -232,6 +245,49 @@ def answer_schema(allowed_ids: list[str], maximum_claims: int, question: str, la
     return schema
 
 
+def connected_grant_quotes(selected: list[PolicyClaim], sources: dict, state: GraphState, question: str) -> list[PolicyClaim]:
+    """Restore adjacent selections as one source excerpt, never stitch separate rules.
+
+    A model may split a prerequisite and its following "also" sentence, even
+    though together they form the requested relationship. Require exact unique
+    matches with only whitespace between them; retain original source order and
+    all selected words. The normal verifier still checks the resulting excerpt.
+    """
+    if not combination_question(question):
+        return selected
+    groups = {}
+    for index, claim in enumerate(selected):
+        groups.setdefault(claim.citation_id, []).append((index, claim))
+    replacements, consumed = {}, set()
+    for cid, group in groups.items():
+        source = sources[cid]
+        if len(group) < 2 or source.superseded or len({c.answers_aspect for _, c in group}) > 1:
+            continue
+        if any(source.text.count(c.supporting_quote.strip()) != 1 for _, c in group):
+            continue
+        positions = sorted((source.text.index(c.supporting_quote.strip()), index, c) for index, c in group)
+        if any(right[0] < left[0] + len(left[2].supporting_quote.strip()) or
+               source.text[left[0] + len(left[2].supporting_quote.strip()):right[0]].strip()
+               for left, right in zip(positions, positions[1:])):
+            continue
+        start, end = positions[0][0], positions[-1][0] + len(positions[-1][2].supporting_quote.strip())
+        excerpt = source.text[start:end]
+        if len(excerpt) > 800 or not has_combination_rule(excerpt, requested_grants(question)):
+            continue
+        # Joining an opposite-scoped sentence with another household's sentence
+        # must not conceal the per-selection scope failure.
+        original = [Claim(text=scope_label(c.supporting_quote), supporting_quote=c.supporting_quote,
+                          citation_ids=[cid]) for _, c in group]
+        if household_scope_errors(state.model_copy(update={"draft": Draft(kind="answer", claims=original)}), {cid: source}):
+            continue
+        first = min(index for index, _ in group)
+        replacements[first] = selected[first].model_copy(update={"supporting_quote": excerpt})
+        consumed.update(index for index, _ in group)
+    return [
+        replacements.get(index, claim) for index, claim in enumerate(selected)
+        if index not in consumed or index in replacements]
+
+
 class PolicySummariser:
     def __init__(self, engine: TextEngine, model_override: str | None = None):
         self.engine = engine
@@ -256,19 +312,40 @@ class PolicySummariser:
             ranked = focused_combination_evidence(state, ranked, question, needed)
         passages = []
         words = 0
-        headings = set()
+        headings = {}
+        deferred = []
+        seen_text = set()
         for passage in ranked:
             size = len(passage.text.split())
-            # Distinct chunks under one heading can hold interlocking conditions.
-            # Ordinary questions retain the midpoint heading de-duplication.
+            # One heading can span several distinct eligibility-table criteria.
+            # Keep those additions without filling the budget with duplicate rows.
             heading_key = (passage.source_url, passage.title, passage.id if complex_question else "")
-            if passage.superseded or words + size > max_words or heading_key in headings:
+            criteria = {normalized_policy_text(row["criterion"]).casefold()
+                        for row in model_evidence(passage, question).get("table_rows", [])
+                        if not row["criterion"].lstrip().startswith(("[", "\\["))}
+            fingerprint = (passage.source_url, normalized_policy_text(passage.text))
+            if passage.superseded or words + size > max_words or fingerprint in seen_text:
+                continue
+            if heading_key in headings and (not criteria or criteria <= headings[heading_key]):
+                # Same criterion names do not establish identical conditions.
+                # Prefer new criteria first, then retain variants if space remains.
+                deferred.append(passage)
                 continue
             passages.append(passage)
-            headings.add(heading_key)
+            headings.setdefault(heading_key, set()).update(criteria)
+            seen_text.add(fingerprint)
             words += size
             if len(passages) == max_passages:
                 break
+        for passage in deferred:
+            if len(passages) == max_passages:
+                break
+            size = len(passage.text.split())
+            fingerprint = (passage.source_url, normalized_policy_text(passage.text))
+            if words + size <= max_words and fingerprint not in seen_text:
+                passages.append(passage)
+                words += size
+                seen_text.add(fingerprint)
         if not passages:
             raise ModelEngineError("No policy evidence fits the model context budget.")
         allowed_ids = [p.id for p in passages]
@@ -311,10 +388,11 @@ class PolicySummariser:
                        for item in error.errors(include_input=False, include_url=False)]
             return [], generation, details
         sources = {p.id: p for p in passages}
+        selected = connected_grant_quotes(answer.claims, sources, state, question)
         claims = [(table_claim(sources[c.citation_id], c.supporting_quote, question)
                    or Claim(text=scope_label(c.supporting_quote), citation_ids=[c.citation_id],
                             supporting_quote=c.supporting_quote))
                   .model_copy(update={"answers_aspect": (c.answers_aspect or aspects.OTHER) if label_aspects else None})
-                  for c in answer.claims]
+                  for c in selected]
         errors = ["Missing policy evidence: " + item for item in answer.missing_evidence]
         return claims, generation, errors

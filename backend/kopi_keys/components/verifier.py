@@ -31,7 +31,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from ..schemas import CENT, PriceResult
 from ..state import GraphState
 from . import answer_aspects as aspects
-from .policy_guardrails import contains_model_instruction, grant_coverage_errors, household_scope_errors, normalized_policy_text, score_relevance
+from .policy_guardrails import contains_model_instruction, grant_coverage_errors, household_scope_errors, normalized_policy_text, property_scope_errors, score_relevance
 
 
 # Reject malformed grouping, shorthand (600k), signs, percentages and exponents.
@@ -187,6 +187,7 @@ def verify(state: GraphState) -> list[str]:
             errors.append(aspects.aspect_error(score["claim_index"], score))
     errors.extend(grant_coverage_errors(question, draft.claims, sources))
     errors.extend(household_scope_errors(state, sources))
+    errors.extend(property_scope_errors(question, draft.claims))
     for claim in draft.claims:
         errors.extend(_citation_errors(claim.citation_ids, sources, "policy claim"))
         if contains_model_instruction(claim.text) or contains_model_instruction(claim.supporting_quote or ""):

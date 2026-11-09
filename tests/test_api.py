@@ -74,6 +74,32 @@ def test_streamed_policy_answer_also_keeps_the_submitted_profile_basis():
     assert "Single Singapore Citizen" in json.loads(lines[-1])["response"]["profile_note"]
 
 
+def test_subsidy_change_is_visible_in_answer_context_without_rewriting_a_general_quote():
+    with client() as c:
+        first = c.post("/chat", json={"message": "What is the demo grant policy?", "profile": {
+            "citizenship": "SC_single", "household_type": "single", "subsidy_status": "first_timer",
+        }}).json()
+        second = c.post("/chat", json={"message": "What is the demo grant policy?", "profile": {
+            "citizenship": "SC_single", "household_type": "single", "subsidy_status": "second_timer",
+        }}).json()
+    assert first["status"] == second["status"] == "answered"
+    assert "First-timer household" in first["profile_note"]
+    assert "Second-timer household" in second["profile_note"]
+    assert "Second-timer household" not in first["profile_note"]
+
+
+def test_general_ehg_answer_with_second_timer_sidebar_has_an_explicit_scope_limit():
+    from kopi_keys.components.profile_context import policy_profile_note
+    from kopi_keys.schemas import BuyerProfile, ChatResponse
+    response = ChatResponse(status="answered", mode="demo", route="policy", message="Fixture conditions")
+    note = policy_profile_note(BuyerProfile(citizenship="SC_single", household_type="single",
+        subsidy_status="second_timer"), "Can EHG and PHG be combined for a resale flat?", response)
+    assert "Second-timer household" in note
+    assert "not an assessment of this second-timer household" in note
+    assert "Mixed first-/second-timer couple" in note
+    assert "eligible" not in note.lower()  # the local note makes no housing eligibility claim
+
+
 def test_structured_price_filters_reach_price_tool():
     with client() as c:
         body = c.post("/chat", json={"message": "prices", "price_filters": {

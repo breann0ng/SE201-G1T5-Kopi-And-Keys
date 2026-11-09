@@ -93,6 +93,12 @@ def _terms(text: str) -> set[str]:
 def policy_focus(question: str) -> str:
     """The policy part of a question: without its price half (checked against SQL) or
     instructions on what not to do ("without adding maximum amounts together")."""
+    # References to the UI describe where profile context lives, not a policy
+    # aspect a source quote must repeat. Preserve the actual policy question.
+    profile_reference = r"(?:my|our|the)\s+(?:current\s+)?(?:sidebar\s+)?profile(?:\s+(?:details|values))?"
+    question = re.sub(r"\b(?:based on|according to|using)\s+" + profile_reference + r"\b\s*[:,]?", "", question, flags=re.I)
+    question = re.sub(r"\b(?:apply|applies|applicable|relevant)\s+to\s+" + profile_reference + r"\b", "", question, flags=re.I)
+    question = re.sub(r"\bfor\s+" + profile_reference + r"\b", "", question, flags=re.I)
     # Only remove a conjoined transaction-price clause. Grant amounts, loan
     # costs and lease policy still belong to this check; SQL verifies prices.
     parts = re.split(r"\b(?:and|also)\b", question, flags=re.I)
@@ -180,6 +186,25 @@ def grant_coverage_errors(question: str, claims, sources: dict) -> list[str]:
     return errors
 
 
+def property_scope_errors(question: str, claims) -> list[str]:
+    """A generic HDB loan answer must not drift to EC-purchase financing.
+
+    This checks the subject of a selected restriction, not its legal truth.
+    Explicit EC questions remain supported; incidental EC mentions in property
+    ownership or subsidy lists do not match this financing restriction.
+    """
+    if (re.search(r"\bEC\b|executive\s+condominium", question, re.I) or
+            not re.search(r"\bloans?\b|\bmortgage\b|\bfinancing\b", question, re.I)):
+        return []
+    for claim in claims:
+        quote = normalized_policy_text(claim.supporting_quote or "")
+        if re.search(r"\bhousing loans?\b.{0,80}\bfor\s+(?:the\s+)?purchase\s+of\s+(?:an?\s+)?"
+                     r"(?:executive\s+condominiums?|EC\s+units?)\b", quote, re.I):
+            return ["A loan quote addresses Executive Condominium purchase financing, which was not asked about. "
+                    "Select evidence addressing the requested flat-loan topic."]
+    return []
+
+
 def household_scope_errors(state, sources: dict) -> list[str]:
     """Reject a clearly opposite household scope; ambiguous source layouts stay manual.
 
@@ -199,6 +224,11 @@ def household_scope_errors(state, sources: dict) -> list[str]:
                 source = sources.get(cid)
                 if not source or source.superseded:
                     continue
+                if (state.citizenship == "SC_single" and state.household_type == "single"
+                        and not re.search(r"co-applicant|joint[- ]singles|another\s+(?:single|applicant)", question, re.I)
+                        and re.search(r"include\s+at\s+least\s+(?:1|one)\s+other\s+co-applicant", claim.supporting_quote or "", re.I)):
+                    specialised_errors.append("A policy quote requires another co-applicant, conflicting with the stated single-person profile. "
+                                              "Select conditions for the supplied household or clarify the intended household.")
                 opening = re.sub(r"\s+", " ", source.text[:300])
                 if (re.search(r"amount for (?:an? )?applicant with non-resident spouse", opening, re.I)
                         and state.citizenship not in {None, "SC/NR"}):
