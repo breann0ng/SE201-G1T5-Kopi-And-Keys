@@ -459,7 +459,7 @@ def extract_fields(message: str, bare_town: bool = False) -> dict:
     elif re.search(r"\bfirst[- ]timer\b", message, re.I):
         first_timer = True
     household_type = None
-    household_text = re.sub(r"\bfamily\s+grant\b", " ", message, flags=re.I)
+    household_text = re.sub(r"\bfamily\s+grants?\b", " ", message, flags=re.I)
     if re.search(r"\b(?:couple|married|family|families)\b", household_text, re.I):
         household_type = "couple_family"
     elif re.search(r"\b(?:i am|i'm|as a|buying as a)\s+single\b", message, re.I):

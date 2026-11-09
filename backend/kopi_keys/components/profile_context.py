@@ -37,7 +37,19 @@ def message_profile_conflict(state) -> str | None:
     """Clarify a clear present-spouse/single contradiction; never silently edit a profile."""
     question = state.message
     single = state.household_type == "single" or state.citizenship == "SC_single"
-    spouse = re.search(r"\bmy\s+(?:wife|husband|spouse)\b\s+(?:is|and|has|holds)\b", question, re.I)
+    spouse = False
+    for match in re.finditer(r"\bmy\s+(?:wife|husband|spouse)\b\s+(?:is|and|has|holds)\b", question, re.I):
+        # A marriage premise applies within its clause, not to later present-spouse assertions.
+        context = re.split(r"[.!?;\n]|\b(?:but|however)\b", question[:match.start()], flags=re.I)[-1]
+        hypothetical = re.search(
+            r"\b(?:if|suppose|assuming|imagine)\s+(?:"
+            r"(?:i|we)\s+(?:marry|(?:get|got|am|are|was|were)\s+married|"
+            r"(?:were\s+to|could|would|will)\s+(?:marry|get\s+married))|"
+            r"(?:i['’]m|we['’]re)\s+married)\b", context, re.I,
+        )
+        if not hypothetical:
+            spouse = True
+            break
     past = re.search(r"\b(?:widow\w*|divorc\w*|deceased|died|dead|passed away|ex-wife|ex-husband)\b", question, re.I)
     if single and spouse and not past:
         return ("Your message describes a spouse, but your sidebar describes a single-person household. "

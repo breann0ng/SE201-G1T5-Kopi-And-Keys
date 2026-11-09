@@ -3,7 +3,7 @@ from datetime import date
 
 import pytest
 
-from kopi_keys.components.profile_context import message_profile_conflict
+from kopi_keys.components.profile_context import message_profile_conflict, profile_issue
 from kopi_keys.components.query_router import EXTRACTED_FIELDS, extract_fields, route_query
 from kopi_keys.components.policy_synthesis import table_claim
 from kopi_keys.components.synthesiser import Synthesiser
@@ -26,10 +26,12 @@ def test_explicit_room_alias_replaces_an_earlier_four_room_filter(flat):
     assert result.route == "price" and result.flat_type == "3 ROOM" and result.town == "ANG MO KIO"
 
 
-def test_family_grant_name_does_not_state_the_users_household():
-    assert extract_fields("Can I stack the Family Grant, EHG and PHG?")["household_type"] is None
-    assert extract_fields("For families, can the Family Grant and EHG be combined?")["household_type"] == "couple_family"
-    assert route_query("Can I stack the Family Grant, EHG and PHG?", {"household_type": "single"}).household_type == "single"
+@pytest.mark.parametrize("scheme", ["Family Grant", "Family Grants"])
+def test_family_grant_name_does_not_state_the_users_household(scheme):
+    question = f"Can I stack the {scheme}, EHG and PHG?"
+    assert extract_fields(question)["household_type"] is None
+    assert extract_fields(f"For families, can the {scheme} and EHG be combined?")["household_type"] == "couple_family"
+    assert route_query(question, {"household_type": "single"}).household_type == "single"
 
 
 @pytest.mark.parametrize("relationship", ["wife", "husband", "spouse"])
@@ -51,6 +53,31 @@ def test_single_sidebar_and_a_current_spouse_are_clarified_before_tools(relation
 ])
 def test_past_spouses_and_other_peoples_households_are_not_sidebar_contradictions(message):
     assert message_profile_conflict(GraphState(message=message, citizenship="SC_single", household_type="single")) is None
+
+
+@pytest.mark.parametrize("message", [
+    "If I marry, my wife is PR and I'm Singaporean; can we buy resale?",
+    "If I get married, my husband is PR; can we buy resale?",
+    "Suppose I were married and my spouse is PR; can we buy resale?",
+    "If I were to marry, my wife holds PR; can we buy resale?",
+    "Imagine we get married and my spouse has PR; can we buy resale?",
+    "If I'm married, my wife is PR; can we buy resale?",
+])
+def test_hypothetical_marriage_does_not_assert_a_current_spouse(message):
+    state = GraphState(message=message, citizenship="SC_single", household_type="single")
+    assert message_profile_conflict(state) is None
+    assert profile_issue(state) is None
+
+
+@pytest.mark.parametrize("message", [
+    "If my income changes, my wife is PR and I'm Singaporean; can we buy resale?",
+    "If I marry, my wife is PR. My wife is PR already; can we buy resale?",
+    "If I marry, my wife is PR, but my spouse is PR already; can we buy resale?",
+])
+def test_unrelated_conditions_and_separate_current_spouse_statements_still_conflict(message):
+    state = GraphState(message=message, citizenship="SC_single", household_type="single")
+    assert message_profile_conflict(state) is not None
+    assert profile_issue(state)[0] == "clarify"
 
 
 def test_consistent_couple_or_empty_sidebar_does_not_trigger_message_conflict():
