@@ -125,6 +125,11 @@ def filters_from_state(state, today: date | None = None, latest_month: str | Non
     e.g. "in 2028", which the router caps to start 2028-01, end at the current month)
     raises PriceOutOfRangeError with a plain-English message for the user, so the graph
     abstains cleanly. Messages use month labels, never YYYY-MM codes or field names.
+
+    A period that runs past `latest_month` ("past 6 months" asked in Nov 2026, data to
+    Oct 2026) keeps the user's start month and ends at `latest_month`, so the answer only
+    names months we have sales for. The answer then says which months are missing
+    (price_display.missing_months_note), using the router's requested end month.
     """
     start, end = default_window(today, latest_month)
     start_month, end_month = state.start_month or start, state.end_month or end
@@ -149,6 +154,8 @@ def filters_from_state(state, today: date | None = None, latest_month: str | Non
         raise PriceOutOfRangeError(future, filters)
     if end_month < DATA_START_MONTH:
         raise PriceOutOfRangeError(f"{covered}, so there are no sales before {month_label(DATA_START_MONTH)}.", filters)
+    if latest_month and end_month > latest_month:
+        filters = filters.model_copy(update={"end_month": latest_month})
     return filters
 
 

@@ -18,7 +18,7 @@ from pydantic import ValidationError
 
 from .components.abstention import abstention_message
 from .components.policy_retrieval import TOP_K, PolicyRetriever, KeywordPolicyRetriever
-from .components.price_display import price_answer, month_label
+from .components.price_display import missing_months_note, month_label, price_answer
 from .components.price_query import (
     PriceOutOfRangeError, PriceQueryTool, ToolUnavailableError, UnconfiguredPriceTool, filters_from_state,
     latest_month,
@@ -146,12 +146,21 @@ def build_graph(
         update = {"price_result": result, "trace": [f"price_query:{result.volume} transactions"]}
         from .components.price_query import DATA_START_MONTH
 
-        if result.filters.start_month < DATA_START_MONTH or (data_end and result.filters.end_month > data_end):
+        notes = []
+        # A period past the newest data month ("past 6 months" asked in Nov, data to Oct) was
+        # queried up to that month. Record the months actually used, so the Verifier checks
+        # the result against them, and tell the user which asked-for months are missing.
+        gap = missing_months_note(result.filters, state.end_month)
+        if gap:
+            update["end_month"] = result.filters.end_month
+            notes.append(gap)
+        if result.filters.start_month < DATA_START_MONTH:
             coverage = f"Records are available from {month_label(DATA_START_MONTH)}"
             if data_end:
                 coverage += f" to {month_label(data_end)}"
-            coverage += ". The requested period extends beyond this coverage; figures use only the available sales."
-            update["router_note"] = " ".join(filter(None, [state.router_note, coverage]))
+            notes.append(coverage + ". The requested period extends beyond this coverage; figures use only the available sales.")
+        if notes:
+            update["router_note"] = " ".join(filter(None, [state.router_note, *notes]))
         return update
 
     def topic_cards(state: GraphState):
