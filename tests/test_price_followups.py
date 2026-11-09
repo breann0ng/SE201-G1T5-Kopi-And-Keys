@@ -84,3 +84,66 @@ def test_unrelated_new_question_does_not_inherit_the_price_question(graph):
 def test_no_carry_over_after_a_policy_question():
     request = follow_up("what about 2015", first="How long is an HFE letter valid for?")
     assert initial_state(request).get("followup_question") is None
+
+
+FLOOR_AND_LEASE = "how about 16th floor and what are the remaining lease restrictions?"
+
+
+def floor_history(message):
+    return ChatRequest(message=message, history=[
+        HistoryTurn(role="user", content="What are resale prices for 4-room flats in Tampines?"),
+        HistoryTurn(role="assistant", content="Historical transaction summary."),
+        HistoryTurn(role="user", content=FLOOR_AND_LEASE),
+        HistoryTurn(role="assistant", content="Which floor band would you like to compare?"),
+    ])
+
+
+@pytest.mark.parametrize("message", [FLOOR_AND_LEASE, "what about floor 16?", "16th floor"])
+def test_exact_floor_followup_clarifies_tool_limit_without_model_calls(graph, message):
+    state = run_graph(graph, follow_up(message))
+    assert state.response.status == "clarifying"
+    assert state.missing_fields == ["floor_scope"] and state.model_calls == 0
+    assert state.price_result is None and state.storey_band is None
+    assert "cannot filter transactions to one exact floor" in state.response.message
+    assert "high floors (13+)" in state.response.message
+    if "lease" in message:
+        assert "CPF usage" in state.response.message and "grant eligibility" in state.response.message
+
+
+def test_year_after_floor_lease_clarification_explains_data_coverage(graph):
+    state = run_graph(graph, floor_history("how about the data in 2027"))
+    assert state.followup_question == "What are resale prices for 4-room flats in Tampines?"
+    assert (state.town, state.flat_type) == ("TAMPINES", "4 ROOM")
+    assert state.abstain_reason == "price_out_of_range" and state.model_calls == 0
+    assert "Jan 2017 to Jul 2025" in state.response.message
+    assert "Jan 2027" in state.response.message
+    assert "Past sales can't tell you what future prices will be" in state.response.message
+
+
+def test_answering_floor_clarification_uses_only_the_requested_supported_band(graph):
+    state = run_graph(graph, floor_history("high floor"))
+    assert state.route == "price" and state.storey_band == "high"
+    assert state.price_result.filters.storey_band == "high"
+    assert state.response.status == "abstained"  # fixture has no high-floor transactions
+    assert "No matching" in state.response.message
+
+
+def test_an_unrelated_policy_question_still_resets_price_followup_context():
+    request = floor_history("how about the data in 2027")
+    request.history.extend([
+        HistoryTurn(role="user", content="What is the EHG?"),
+        HistoryTurn(role="assistant", content="Grant overview."),
+    ])
+    assert initial_state(request).get("followup_question") is None
+
+
+@pytest.mark.parametrize("message", [
+    "How about the 16th floor; can you predict prices next year?",
+    "How about recommending a good property agent in Tampines?",
+    "How about the 16th floor; should I buy now or wait?",
+])
+def test_price_context_does_not_bypass_scope_guards(graph, message):
+    request = floor_history(message)
+    assert initial_state(request).get("followup_question") is None
+    state = run_graph(graph, request)
+    assert state.response.status == "abstained" and state.route == "abstain"

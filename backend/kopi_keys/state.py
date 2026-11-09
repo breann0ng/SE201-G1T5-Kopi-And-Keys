@@ -142,25 +142,29 @@ _FOLLOWUP_FILLER = re.compile(
 def _price_followup(message: str, previous_question: str | None) -> bool:
     """A reply that only makes sense as a variation on the previous price question.
 
-    True when the message is unsupported on its own and either starts with "what about",
-    "how about" or "and", or names only a period, town or flat type, and the previous
-    question was price or mixed. Forecast/valuation wording and the router's abstain
-    patterns always win.
+    Carries a short price variation or exact-floor follow-up to a prior price/mixed
+    question. A floor/lease reply is kept as context for clarification, not evidence.
+    Forecast/valuation wording and the router's scope guards always win.
     """
     from .components.query_router import (
-        BARE_TOWN_PATTERN, FLAT_PATTERN, MAISONETTE, UNANSWERABLE_PATTERNS, classify_intent,
+        BARE_TOWN_PATTERN, EXACT_FLOOR_PATTERN, FLOOR_BAND_PATTERN, FLAT_PATTERN,
+        MAISONETTE, UNANSWERABLE_PATTERNS, classify_intent, out_of_scope,
     )
 
     if not previous_question or classify_intent(previous_question) not in ("price", "mixed"):
         return False
+    if (_FOLLOWUP_BLOCKED.search(message) or out_of_scope(message)
+            or any(p in message.casefold() for p in UNANSWERABLE_PATTERNS)):
+        return False
     if classify_intent(message) != "unanswerable":
-        return False
-    if _FOLLOWUP_BLOCKED.search(message) or any(p in message.casefold() for p in UNANSWERABLE_PATTERNS):
-        return False
+        # A floor/lease follow-up still refers to the earlier transaction question.
+        # Keep that context so the router can clarify an unsupported exact floor.
+        return bool(_FOLLOWUP_OPENER.search(message) and EXACT_FLOOR_PATTERN.search(message))
     if _FOLLOWUP_OPENER.search(message):
         return True
     rest = message
-    for pattern in (BARE_TOWN_PATTERN, FLAT_PATTERN, MAISONETTE, re.compile(r"\b(?:19|20)\d{2}\b")):
+    for pattern in (BARE_TOWN_PATTERN, FLAT_PATTERN, MAISONETTE, EXACT_FLOOR_PATTERN,
+                    FLOOR_BAND_PATTERN, re.compile(r"\b(?:19|20)\d{2}\b")):
         rest = pattern.sub(" ", rest)
     return rest != message and not re.sub(r"[\W_]+", "", _FOLLOWUP_FILLER.sub(" ", rest))
 
@@ -188,7 +192,8 @@ def initial_state(request: ChatRequest, data_origin: DataOrigin = "database") ->
             remembered.update({k: v for k, v in fields.items()
                                if v is not None and (k in {"town", "flat_type"} or self_description or answering_clarification)})
             if classify_intent(turn.content) != "unanswerable" and not answering_clarification:
-                previous_question = turn.content
+                if not _price_followup(turn.content, previous_question):
+                    previous_question = turn.content
             previous_reply = ""
         else:
             previous_reply = turn.content

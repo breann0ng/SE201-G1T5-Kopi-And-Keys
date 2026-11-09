@@ -872,3 +872,31 @@ a blocked HTTP request; the runner still rejects the result. No GPU rerun was
 needed for these CI/tooling/documentation changes. No hosted watcher run, issue,
 or candidate PR was published as part of this follow-up. These results do not
 establish whole-project security or replace independent held-out evaluation.
+
+## 9 November 2026 — Exact-floor and period follow-up regression
+
+Reproduced the user's three-turn price/floor/2027 conversation. Exact floors
+cannot be represented by the existing SQL floor bands. The router now requests
+a supported band and disambiguates the lease question, instead of attempting a
+policy answer that the verifier rejects. It does not silently treat floor 16 as
+all high-floor transactions. An explicit band choice can proceed with a scope
+notice. Clarification preserves the original price context for later period
+questions, but an unrelated standalone policy question resets that context.
+Scope guards still take precedence over follow-up inheritance.
+
+Added 11 regression cases. Full backend suite: **845 passed**. The live API on
+the GPU-connected integration checkout returned the correct 3-room Tampines
+result, then a floor/lease clarification in 0.126 seconds and a database-coverage
+explanation for 2027 in 0.106 seconds. These two follow-ups need no model call.
+The shared model was verified loaded entirely in the new job's GPU memory;
+embeddings and SQLite remain local, with tracing disabled. Timing is a single
+development observation, not a controlled speed or accuracy benchmark. Earlier
+broader benchmark reports retain their prior source hashes and were not rerun
+or relabelled as results for this follow-up commit.
+
+Used the computer-use skill to inspect Edge. The recent-sales disclosure was
+closed, and expanding it visibly displayed all five populated transaction rows
+and column headings. No frontend/SQL rewrite was needed: the pasted blank grid
+was the collapsed table's copy representation. Confirmed the app already running
+on port 8000 caused the duplicate-server error; restarted that single backend to
+load the fix. Main and the root checkout remain unchanged.

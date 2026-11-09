@@ -328,6 +328,12 @@ def _canonical_town(text: str) -> str:
 EXTRACTED_FIELDS = ("user_age", "income", "citizenship", "town", "flat_type", "first_timer", "household_type",
                     "lease_band", "storey_band")
 
+# Exact floors cannot be expressed by the price tool's low/mid/high bands.
+EXACT_FLOOR_PATTERN = re.compile(
+    r"\b(?:\d{1,3}(?:st|nd|rd|th)?\s+(?:floor|storey)|(?:floor|storey)\s+\d{1,3})\b", re.I,
+)
+FLOOR_BAND_PATTERN = re.compile(r"\b(low|mid|middle|high)[- ]floors?\b", re.I)
+
 
 def price_bands(message: str) -> dict:
     """Only the tool's documented bands; never round an arbitrary floor/lease into a band."""
@@ -340,7 +346,7 @@ def price_bands(message: str) -> dict:
         if re.search(pattern, message, re.I):
             lease = band
             break
-    floor = re.search(r"\b(low|mid|middle|high)[- ]floors?\b", message, re.I)
+    floor = FLOOR_BAND_PATTERN.search(message)
     return {"lease_band": lease,
             "storey_band": {"middle": "mid"}.get(floor.group(1).lower(), floor.group(1).lower()) if floor else None}
 
@@ -566,13 +572,24 @@ def route_query(message: str, known: dict | None = None, context_question: str |
         missing = ["topic"]
     if intent_source in ("llm_unsure", "llm_error"):
         missing = ["topic"]  # ask which topic they mean rather than decline
+    exact_floor = EXACT_FLOOR_PATTERN.search(message)
+    floor_note = None
+    if exact_floor and intent in {"price", "mixed"}:
+        floor_note = ("I can compare low floors (1–6), mid floors (7–12), or high floors (13+), "
+                      "but cannot filter transactions to one exact floor.")
+        if extracted["storey_band"] is None:
+            missing = ["floor_scope"]
+            floor_note += " Which floor band would you like to compare?"
+            if re.search(r"\blease\b", message, re.I):
+                floor_note += (" For remaining-lease restrictions, do you mean CPF usage, "
+                               "HDB loans, grant eligibility, or comparing prices by lease left?")
     if missing:
         route, status = "clarify", "clarify"
     elif intent == "unanswerable":
         route, status = "abstain", "abstain"
     else:
         route, status = route_for_intent(intent), "continue"
-    notes = []
+    notes = [floor_note] if floor_note else []
     if MAISONETTE.search(message) and not FLAT_PATTERN.search(message) and values.get("flat_type") == "EXECUTIVE":
         notes.append(MAISONETTE_NOTE)
     if intent in ("price", "mixed") and ADDRESS_BLOCK.search(message):

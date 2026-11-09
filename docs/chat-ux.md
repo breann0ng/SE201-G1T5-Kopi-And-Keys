@@ -152,3 +152,25 @@ Expect the welcome screen, an empty composer, selected New chat row and browser
 title `New chat | Kopi & Keys`. Send a new question: only that conversation should
 take the new title. Reopen the earlier conversation and confirm its messages and
 title remain intact. Reload while the draft is empty; New chat should stay selected.
+
+### Price follow-ups and recent sales (9 November 2026)
+
+The price tool supports low (1–6), mid (7–12) and high (13+) floor bands, not an
+exact floor. An exact-floor price request asks the user to choose a band without
+running SQL or the model. A combined floor/lease follow-up also asks whether the
+lease question concerns CPF usage, loans, grants or price comparisons. It does
+not infer an exact-floor price or make an eligibility decision.
+
+That clarification preserves the previous price question. A later “how about the
+data in 2027” uses its town/flat type and the database's actual date coverage to
+explain unavailable records without prediction. A new unrelated policy question
+resets this follow-up context; forecast and other scope guards still apply.
+
+Recent transactions are inside the **5 most recent matching sales** disclosure.
+Click it to show the rows. A browser check confirmed all five rows and headers
+are present; copying a closed disclosure into another app can produce an empty
+table representation. This was not missing SQL data or an empty rendered table.
+
+The development API already running on port 8000 must be stopped before starting
+another copy. Error 10048 indicates the duplicate listener, not an Ollama or GPU
+failure. Refreshing the frontend does not require another backend process.
