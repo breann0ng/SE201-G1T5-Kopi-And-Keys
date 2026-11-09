@@ -312,19 +312,40 @@ class PolicySummariser:
             ranked = focused_combination_evidence(state, ranked, question, needed)
         passages = []
         words = 0
-        headings = set()
+        headings = {}
+        deferred = []
+        seen_text = set()
         for passage in ranked:
             size = len(passage.text.split())
-            # Distinct chunks under one heading can hold interlocking conditions.
-            # Ordinary questions retain the midpoint heading de-duplication.
+            # One heading can span several distinct eligibility-table criteria.
+            # Keep those additions without filling the budget with duplicate rows.
             heading_key = (passage.source_url, passage.title, passage.id if complex_question else "")
-            if passage.superseded or words + size > max_words or heading_key in headings:
+            criteria = {normalized_policy_text(row["criterion"]).casefold()
+                        for row in model_evidence(passage, question).get("table_rows", [])
+                        if not row["criterion"].lstrip().startswith(("[", "\\["))}
+            fingerprint = (passage.source_url, normalized_policy_text(passage.text))
+            if passage.superseded or words + size > max_words or fingerprint in seen_text:
+                continue
+            if heading_key in headings and (not criteria or criteria <= headings[heading_key]):
+                # Same criterion names do not establish identical conditions.
+                # Prefer new criteria first, then retain variants if space remains.
+                deferred.append(passage)
                 continue
             passages.append(passage)
-            headings.add(heading_key)
+            headings.setdefault(heading_key, set()).update(criteria)
+            seen_text.add(fingerprint)
             words += size
             if len(passages) == max_passages:
                 break
+        for passage in deferred:
+            if len(passages) == max_passages:
+                break
+            size = len(passage.text.split())
+            fingerprint = (passage.source_url, normalized_policy_text(passage.text))
+            if words + size <= max_words and fingerprint not in seen_text:
+                passages.append(passage)
+                words += size
+                seen_text.add(fingerprint)
         if not passages:
             raise ModelEngineError("No policy evidence fits the model context budget.")
         allowed_ids = [p.id for p in passages]

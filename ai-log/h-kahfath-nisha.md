@@ -1095,3 +1095,38 @@ scope note. The fixed-evidence GPU check remains **11/12**, including both corre
 negative controls; the same SYN-08 mismatch remains for independent rubric review.
 No held-out data or new policy source was used; tracing stayed off. Browser Stop/
 Edit/chat-switch testing and independent semantic completeness review remain open.
+
+## 9 November 2026 — Distinct table criteria and loan scope
+
+The user's next replay passed price filter propagation (year, flat type and high
+floors across town changes) and Copy with provenance. The personal second-timer
+EHG scope response was expected, but a broader sidebar eligibility question still
+refused. Reproduced with and without its preceding EHG exchange: the model
+reported missing conditions because the synthesis sampler kept only one chunk
+per shared heading. Retrieval had found other relevant table criteria.
+
+Changed sampling to prefer distinct table criteria within the existing 3-passage/
+800-word ordinary budget. Repeated-criterion variants are deferred and reconsidered
+if room remains; their conditions are not assumed identical. Exact-text duplicates
+are excluded. No retrieval weights, chunk/index data or model prompt changed.
+
+The loan follow-up selected a genuine but unrelated EC-purchase financing
+restriction. Added a scoped verifier check, retaining explicit EC questions and
+incidental EC mentions in past-subsidy rules. The existing claim salvage keeps
+the cited general loan-options quote. An additional check rejects a selected
+requirement for another co-applicant in a personal single-person profile unless
+the question explicitly asks about that scenario. All facts still come from
+source quotes, not a new policy eligibility engine.
+
+Validation includes the four fictional GPU replays (second-timer with/without
+EHG history, first-timer control and loan follow-up), **916 backend tests**, and
+the existing fixed-evidence/curated-mutation checks recorded in the dated evidence.
+The initial explicit-EC unit fixture also contained an unrelated general quote;
+corrected it to test the EC quote itself rather than weakening relevance. Context
+tests cover duplicate removal, distinct criteria, differing same-criterion values
+and passage limits. Scope tests include positive and negative controls.
+
+Broad eligibility coverage and detailed loan comparison remain limited by the
+evidence/cohort context. An answered/verified status does not prove completeness.
+No held-out data, SQL database, ACTIVE snapshot, source text, relevance threshold
+or prompt was changed. Raw fictional reports remain local with tracing disabled.

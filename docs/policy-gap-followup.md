@@ -104,3 +104,35 @@ tests and 20/20 curated mutations pass, and the fixed-evidence check remains 11/
 with the same SYN-08 mismatch. No additional age/income input was needed for these
 general-information questions. Personal eligibility and broader completeness are
 still separate checks.
+
+## Distinct eligibility criteria and loan subject scope
+
+A later browser replay passed the price filter-memory and Copy-with-sources
+checks, but reproduced a sidebar eligibility refusal with a second-timer profile.
+The model explicitly reported missing conditions. Context sampling had removed
+different table chunks because they shared the same section heading. The source
+was present in retrieval but absent from the model's evidence budget.
+
+Sampling now prioritises chunks that add table criteria under the same heading.
+Same-criterion variants are deferred, then retained if budget remains; equal
+criterion names are not treated as proof of equal conditions. Exact duplicate
+text is omitted. The existing passage/word limits remain. This is synthesis
+context selection, not a change to the retrieval ranker, chunks or vectors.
+
+The broad loan follow-up also selected an EC-purchase restriction from a genuine
+loan source. A new scope check rejects that unrequested financing subject and
+allows the existing verifier salvage to retain the relevant loan-options quote.
+Explicit EC questions still accept relevant EC evidence, and EC mentions in past
+subsidy lists are not caught by this restriction. Personal single-profile answers
+also reject a selected rule requiring another co-applicant, unless the question
+explicitly asks about that scenario. No policy boundary values are added by code.
+
+The profile replay now answers with and without the preceding personal EHG scope
+refusal. A first-timer control also answers after the contradictory co-applicant
+quote is removed. The loan replay retains the cited HDB/FI options sentence
+without the EC restriction. These are selected source conditions, not a complete
+eligibility checklist or a full loan comparison. Cohort metadata, blank source
+cells and independent semantic completeness remain review tasks.
+
+See the [dated criteria/scope evidence](benchmarks/2026-11-09-policy-criteria-scope.json)
+for final validation. The user has not yet reported Stop/Edit/chat-switch results.
