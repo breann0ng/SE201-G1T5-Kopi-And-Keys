@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COMPONENTS = "backend/kopi_keys/components/"
 TESTS = ["test_synthesiser_verifier.py", "test_policy_finals.py", "test_policy_safety.py",
-         "test_profile_scope.py", "test_graph.py"]
+         "test_profile_scope.py", "test_graph.py", "test_verifier_relevance_wording.py"]
 # One documented fault per case. Exact anchors make code drift fail visibly.
 SPECS = [
     ("Missing citation accepted", COMPONENTS + "verifier.py",
@@ -39,7 +39,11 @@ SPECS = [
     ("Assistant-control output allowed", COMPONENTS + "verifier.py",
      'if contains_model_instruction(claim.text) or contains_model_instruction(claim.supporting_quote or ""):', 'if False:'),
     ("Low-relevance quote accepted", COMPONENTS + "verifier.py",
-     'if score["score"] < minimum:', 'if False:'),
+     'if score["score"] < minimum and not table_row_answers_question(question, claims[score["claim_index"]]):',
+     'if False:'),
+    ("Table-row relevance rule accepts any row", COMPONENTS + "verifier.py",
+     '    return any(aspects.shows_aspect(aspect, criterion) for aspect in aspects.asked_aspects(question))',
+     '    return True'),
     ("Multi-grant coverage check removed", COMPONENTS + "verifier.py",
      'errors.extend(grant_coverage_errors(question, draft.claims, sources))', 'pass'),
     ("Household scope check removed", COMPONENTS + "verifier.py",
