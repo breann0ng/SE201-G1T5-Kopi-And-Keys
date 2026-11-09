@@ -221,3 +221,102 @@ diagram's "LLM fallback" router label was wrong (the router is rule-based).
 Discarded its README/architecture rewrite because teammates had already
 updated both. Kept two small fixes it found when checking them: a stale
 dev-set path and an outdated download date.
+
+## 2026-11-06 · Chunking fixes, income-aware cards, tuned hybrid, baselines (PR #16)
+<!-- DRAFT from commit messages: check against your own notes before committing -->
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** scripts/scraping/chunk.py, build_cards.py, topic_cards.py, policy_retrieval.py,
+  data/policy_index/, evaluation/baselines.py, scripts/go_live.py
+- **Outcome:** Changed
+
+### What I asked for
+Keep sub-labels ("First-timer singles") and table headers with their text, title PDF pages,
+rule cards out by income, tune hybrid fusion, the no-tools and naive-RAG baseline code, and
+a helper to switch the served policy snapshot safely.
+
+### How I checked it
+validate.py and the test suite; retrieval re-measured after each change. A teammate reviewed
+and merged the PR.
+
+### What I kept or changed
+Kept. Review found that a benchmark (SYN-08) still pointed at chunk IDs the re-chunking had
+retired; Nisha remapped it on main.
+
+## 2026-11-08 · Evaluation harness: baselines, retrieval metrics, synonyms
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** evaluation/run_baselines.py, retrieval_report.py, metrics.py, baselines.py,
+  components/policy_retrieval.py
+- **Outcome:** Changed
+
+### What I asked for
+A read-only review of the repo, then a plan from an adviser prompt: a baseline runner, proper
+retrieval metrics, a diagnosis of every miss, and fixes only where the diagnosis supported them.
+
+### How I checked it
+Read the miss table myself. Confirmed the old "Recall@5" was really Hit@5 and that the old
+eval sent only the first turn of two-turn questions. Synonyms re-measured: keyword search
+59% to 64% Hit@5, hybrid unchanged.
+
+### What I kept or changed
+Kept the runner, metrics and synonyms. Skipped table-row chunks and fusion tuning because the
+diagnosis did not support them (tuning on 22 questions would overfit). The AI estimated the
+naive-RAG run at about 11 minutes; it took about 95.
+
+## 2026-11-08 · Review fix: keyword fallback reported as "hybrid"
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** components/policy_retrieval.py, evaluation tools, tests/test_snapshot_retriever.py
+- **Outcome:** Changed
+
+### What I asked for
+A fix for a reviewer's finding on PR #18: if the embedding service failed, the eval quietly
+used keyword search but still reported "hybrid".
+
+### How I checked it
+Two new tests. Re-ran the hybrid report with the real index: same numbers, so earlier results
+were genuinely hybrid.
+
+### What I kept or changed
+Kept. The app still falls back so users get an answer; only the eval tools now fail loudly.
+The AI did not edit Nisha's benchmark file for the related SYN-08 failure; it asked first.
+
+## 2026-11-08 · Topic cards as rules: amount fields, condo exclusion, rule tests
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** topic_cards.py, components/topic_cards.py, build_cards.py, validate.py,
+  data/topic_cards/, tests/test_topic_cards_*.py, tests/test_discovery_connections.py
+- **Outcome:** Changed
+
+### What I asked for
+Why only 1 of 15 expected cards was shown, and fixes following the plan's rules-as-code idea.
+
+### How I checked it
+Each rule cites a snapshot chunk, and the build fails if the quote is not verbatim. Rule tests
+run every combination of citizenship, household, first-timer, condo ownership and income.
+Discovery precision 46% to 54%, recall 87% to 93% (7 questions, so illustrative).
+
+### What I kept or changed
+Kept. The adviser's plan suggested rules from third-party sites (EHG needing Family Grant
+eligibility, lease to 95); these were not encoded because the HDB snapshot does not state
+them. The AI first treated executive condos as private property; I kept the fix that leaves
+them unknown. Three older tests were updated to the new behaviour.
+
+## 2026-11-08 · Error bars and an answer-key audit
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** evaluation/stats.py, compare.py, metrics.py, retrieval_report.py,
+  data/evaluation-data/development/accepted_evidence.json, tests/test_eval_*.py
+- **Outcome:** Changed
+
+### What I asked for
+Confidence intervals and paired tests, and a transparent check of two answer keys (POL-02,
+POL-04) where the top result already stated the answer.
+
+### How I checked it
+Wilson and McNemar values checked against known results in tests. Read both alternative
+chunks myself before accepting them.
+
+### What I kept or changed
+Did not edit the answer key. Alternatives sit in a separate file with a written rule, and
+strict and relaxed scores are always reported together (policy Recall@5 74.2% / 83.3%).
+Hybrid vs keyword search is 6 wins to 1 loss (p = 0.125), so slides say "consistent,
+not significant at n = 22". The adviser's plan claimed the embedding prefixes were missing
+(they were already in place) and that the suite had 240+ tests (it has 515); both corrected.
+No held-out material was opened.
