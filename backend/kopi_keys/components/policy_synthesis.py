@@ -143,7 +143,20 @@ def table_claim(passage, quote: str, question: str) -> Claim | None:
     than trusting a paraphrase that may silently move a rule to another column.
     """
     rows = model_evidence(passage, question).get("table_rows", [])
-    matches = [r for r in rows if normalized_policy_text(quote) in normalized_policy_text(r["requirement"])]
+    def matches_cell(row):
+        candidate = normalized_policy_text(quote)
+        # A model sometimes copies the supplied column before its excerpt. Only
+        # strip that exact source column, never an inferred or invented label.
+        # The displayed quote is still restored from the complete source cell.
+        for column in (normalized_policy_text(row["column"]),
+                       normalized_policy_text(scope_label(row["column"])).replace(" Resale ", " / Resale ")):
+            prefix = column + ": "
+            if candidate.startswith(prefix):
+                candidate = candidate[len(prefix):]
+                break
+        return bool(candidate) and candidate in normalized_policy_text(row["requirement"])
+
+    matches = [r for r in rows if matches_cell(r)]
     if len(matches) != 1:
         return None
     row = matches[0]

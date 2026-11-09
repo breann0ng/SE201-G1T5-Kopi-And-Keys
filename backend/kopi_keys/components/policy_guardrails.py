@@ -93,6 +93,12 @@ def _terms(text: str) -> set[str]:
 def policy_focus(question: str) -> str:
     """The policy part of a question: without its price half (checked against SQL) or
     instructions on what not to do ("without adding maximum amounts together")."""
+    # References to the UI describe where profile context lives, not a policy
+    # aspect a source quote must repeat. Preserve the actual policy question.
+    profile_reference = r"(?:my|our|the)\s+(?:current\s+)?(?:sidebar\s+)?profile(?:\s+(?:details|values))?"
+    question = re.sub(r"\b(?:based on|according to|using)\s+" + profile_reference + r"\b\s*[:,]?", "", question, flags=re.I)
+    question = re.sub(r"\b(?:apply|applies|applicable|relevant)\s+to\s+" + profile_reference + r"\b", "", question, flags=re.I)
+    question = re.sub(r"\bfor\s+" + profile_reference + r"\b", "", question, flags=re.I)
     # Only remove a conjoined transaction-price clause. Grant amounts, loan
     # costs and lease policy still belong to this check; SQL verifies prices.
     parts = re.split(r"\b(?:and|also)\b", question, flags=re.I)
