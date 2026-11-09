@@ -1,10 +1,10 @@
 import { AssistantRuntimeProvider, useLocalRuntime } from "@assistant-ui/react";
 import { BookOpen, Menu, MessageSquare, Settings, SquarePen, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { createAdvisorAdapter } from "../lib/adapter";
 import { ChatContext } from "../lib/chat";
-import { currentChatId, deleteChat, loadChat, openChat, saveChat, startNewChat, summaries, type ChatSummary } from "../lib/history";
+import { changeChat, currentChatId, deleteChat, loadChat, openChat, saveChat, startNewChat, summaries, type ChatSummary } from "../lib/history";
 import { useProfile } from "../lib/profile";
 import { Logo, LogoIcon } from "./Logo";
 import { useTheme, type Theme } from "../lib/theme";
@@ -23,6 +23,7 @@ export function Layout() {
   const [theme, setTheme] = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   // Runtime lives here so the conversation survives switching between pages; it is also
   // saved in this browser so it survives a reload.
   const adapter = useMemo(() => createAdvisorAdapter(() => profileRef.current), [profileRef]);
@@ -38,6 +39,13 @@ export function Layout() {
     setActiveId(currentChatId());
   };
 
+  useEffect(() => {
+    const title = pathname === "/sources" ? "Sources"
+      : pathname === "/settings" ? "Settings"
+      : chats.find((c) => c.id === activeId)?.title ?? "New chat";
+    document.title = `${title} | Kopi & Keys`;
+  }, [chats, activeId, pathname]);
+
   useEffect(
     () =>
       runtime.thread.subscribe(() => {
@@ -51,8 +59,10 @@ export function Layout() {
     () => ({
       runtime,
       newChat: () => {
-        startNewChat();
-        runtime.thread.reset();
+        changeChat(runtime.thread, () => {
+          startNewChat();
+          return [];
+        });
         refresh();
       },
     }),
@@ -99,9 +109,11 @@ export function Layout() {
               <li key={c.id} className="group flex items-center">
                 <button
                   title={c.title}
+                  aria-current={c.id === activeId ? "page" : undefined}
                   onClick={() => {
-                    if (runtime.thread.getState().isRunning) return;
-                    runtime.thread.reset(openChat(c.id));
+                    if (c.id !== activeId) {
+                      changeChat(runtime.thread, () => openChat(c.id));
+                    }
                     refresh();
                     setMenuOpen(false);
                     navigate("/");
@@ -118,8 +130,14 @@ export function Layout() {
                   aria-label={`Delete chat: ${c.title}`}
                   onClick={() => {
                     const wasActive = c.id === activeId;
-                    deleteChat(c.id);
-                    if (wasActive) runtime.thread.reset();
+                    if (wasActive) {
+                      changeChat(runtime.thread, () => {
+                        deleteChat(c.id);
+                        return [];
+                      });
+                    } else {
+                      deleteChat(c.id);
+                    }
                     refresh();
                   }}
                   className="p-1 text-slate-400 opacity-0 group-hover:opacity-100 hover:text-coral-500 focus:opacity-100"

@@ -514,3 +514,62 @@ No access restrictions were bypassed, no policy snapshot was refreshed or
 activated, and the old failed run was not rerun. This handles a blocked refresh
 honestly; it does not restore HDB access or make the existing data newly verified.
 Publishing and activation still require a complete run and the existing review.
+
+## 2026-11-09 - New chat selection and title
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** `frontend/src/components/Layout.tsx`, `frontend/src/lib/history.ts`,
+  `frontend/src/lib/chat.tsx`, `frontend/tests/history.test.ts`,
+  `frontend/tests/sourceContent.test.ts`, `docs/chat-ux.md`
+- **Outcome:** Changed on separate branch `fix/new-chat-selection`
+
+### What I asked for
+Fix New chat showing the welcome screen while retaining an earlier chat's name
+or selection. The user supplied a screenshot from the GPU-connected test app.
+
+### How I checked it
+Added six regression tests covering fresh selection, first-question naming,
+reopening old messages, intermediate reset notifications, composer clearing,
+repeated empty drafts, active-chat deletion and resuming saves after errors.
+All 18 frontend tests passed. Lint passed with four existing React refresh
+warnings; the production build passed with the existing large-bundle warning.
+The first test run exposed outdated EHG fixture IDs in main's existing source
+table tests. Included the same two-line fixture correction already present in
+Breann's pending router PR; no policy text or source values changed.
+Browser click-through remains a manual check; these counts are frontend tests,
+not a repeat of GPU model quality or backend evaluation.
+
+### What I kept or changed
+Empty drafts now appear as one selected New chat row without accumulating saved
+empty chats. The first sent question supplies the title, including the browser
+tab title. Conversation switching pauses saves during replacement, cancels the
+client request and clears the composer. Clicking the current conversation does
+not discard its draft. Earlier saved conversations and profile values remain.
+The source changes were also applied to the isolated local GPU frontend preview;
+no model restart, database change, automatic main merge or backend change was
+needed. Stopping the client is not a claim of immediate remote GPU cancellation.
+
+### Follow-up: Gitleaks download reliability
+PR #23's CI run 42568039899 passed backend, frontend and audit jobs, but GitHub
+returned HTTP 504 while downloading Gitleaks. The scanner did not run. Added four
+bounded curl retries, connection/transfer timeouts and a retry time budget to the
+existing install step, using curl's documented transient-error handling. The
+pinned version/hash, SHA-256 verification, scan range and blocking exit code remain.
+
+Exercised the actual YAML install shell with Git Bash against a localhost fault
+server and an inert archive: two 504s then success recovered on request three;
+permanent 504 stopped after five total attempts; HTTP 404 failed after one;
+an incorrect checksum failed before extraction. All four checks passed. A new
+hosted run is triggered by pushing this follow-up; local checks do not establish
+that the GitHub release endpoint has recovered or that the secret scan has passed.
+
+### Review follow-up — 9 November 2026
+Documented that switching chats during generation cancels the client request and
+can leave the old question without a completed reply. Added two integration
+regressions using the installed assistant-ui runtime rather than mocked reset
+events. Each deliberately releases an old stream after cancellation, checking
+that it cannot alter a new draft or an existing saved conversation. Both pass;
+no late-update leak was reproduced in these scenarios, so no speculative runtime
+rewrite was added. Frontend tests now total 20 passed. Browser tab titles also
+follow Sources and Settings instead of showing the current conversation there.
+Lint/build are checked again; GPU execution and held-out evaluation are outside
+these tests. PR descriptions are prepared separately for review.
