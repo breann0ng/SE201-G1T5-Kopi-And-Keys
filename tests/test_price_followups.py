@@ -266,3 +266,62 @@ def test_general_topic_clarification_reply_is_scoped_without_llm_classification(
 
 def test_topic_alias_is_not_globally_rewritten():
     assert initial_state(ChatRequest(message="resale elgibility")).get("followup_question") is None
+
+
+def test_changed_period_survives_town_and_price_detail_followups():
+    from kopi_keys.components.query_router import EXTRACTED_FIELDS, route_query
+    from kopi_keys.state import GraphState
+    history = []
+    for message, expected in [
+        ("3-room prices in Tampines in 2025", ("TAMPINES", "3 ROOM", "2025-01", "2025-12")),
+        ("How about 2024?", ("TAMPINES", "3 ROOM", "2024-01", "2024-12")),
+        ("And in Bedok?", ("BEDOK", "3 ROOM", "2024-01", "2024-12")),
+        ("give me more details about prices", ("BEDOK", "3 ROOM", "2024-01", "2024-12")),
+    ]:
+        state = GraphState(**initial_state(ChatRequest(message=message, history=history)))
+        known = {field: getattr(state, field) for field in (*EXTRACTED_FIELDS, "start_month", "end_month")}
+        out = route_query(message, known, context_question=state.followup_question)
+        assert (out.town, out.flat_type, out.start_month, out.end_month) == expected
+        history += [HistoryTurn(role="user", content=message), HistoryTurn(role="assistant", content="Price summary.")]
+
+
+@pytest.mark.parametrize("message", ["Show all-floor 4-room prices in Yishun.", "Show all floors for 4 room prices in Yishun"])
+def test_all_floor_request_is_not_misread_as_floor_four(message):
+    from kopi_keys.components.query_router import route_query
+    out = route_query(message, {"storey_band": "high"})
+    assert out.route == "price" and out.missing_fields == []
+    assert (out.town, out.flat_type, out.storey_band) == ("YISHUN", "4 ROOM", None)
+
+
+@pytest.mark.parametrize("reply", ["all", "All floors", "give me all"])
+def test_floor_clarification_can_be_cleared_instead_of_choosing_a_band(graph, reply):
+    from kopi_keys.components.query_router import FLOOR_SCOPE_PREFIX
+    request = floor_history(reply)
+    request.history[-1] = HistoryTurn(role="assistant", content=FLOOR_SCOPE_PREFIX + " (1–6), mid floors (7–12), or high floors (13+).")
+    state = initial_state(request)
+    from kopi_keys.components.query_router import route_query
+    out = route_query(reply, state, context_question=state.get("followup_question"))
+    assert out.route == "price" and out.storey_band is None
+
+
+def test_transaction_period_request_uses_known_property_instead_of_topic_menu(graph):
+    request = ChatRequest(message="give me 2027 transactions", history=[
+        HistoryTurn(role="user", content="3-room prices in Tampines"),
+        HistoryTurn(role="assistant", content="Price summary."),
+        HistoryTurn(role="user", content="What is the EHG?"),
+        HistoryTurn(role="assistant", content="Policy overview."),
+    ])
+    state = run_graph(graph, request)
+    assert state.route == "price" and state.abstain_reason == "price_out_of_range"
+    assert "Jan 2027" in state.response.message and state.model_calls == 0
+
+
+def test_personal_confirmation_reply_has_a_specific_safe_response_without_model(graph):
+    request = ChatRequest(message="Does that mean I definitely qualify for both?", history=[
+        HistoryTurn(role="user", content="Can EHG and PHG be combined?"),
+        HistoryTurn(role="assistant", content="Other conditions apply."),
+    ])
+    state = run_graph(graph, request)
+    assert state.abstain_reason == "eligibility_confirmation" and state.model_calls == 0
+    assert "cannot confirm that you qualify" in state.response.message
+    assert "policy and resale price questions only" not in state.response.message

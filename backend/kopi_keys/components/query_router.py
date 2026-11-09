@@ -108,6 +108,9 @@ GUARANTEE = re.compile(
     r"\bbe\s+(?:approved|successful|accepted)\b",
     re.IGNORECASE,
 )
+ELIGIBILITY_CONFIRMATION = re.compile(
+    r"\b(?:definitely|certainly|guaranteed)\s+(?:qualif\w*|eligible)\b", re.I,
+)
 
 
 # Added 2026-11-08: declines written per request type, not per case, so a new provider or task
@@ -153,7 +156,7 @@ DO_A_TASK = re.compile(
 SCOPE_GUARD = {
     "predict": (FORECAST_WORDS, WILL_VALUE_CHANGE, FUTURE_VALUE),
     "value_one_flat": (OWN_FLAT_VALUE,),
-    "guarantee": (GUARANTEE,),
+    "guarantee": (GUARANTEE, ELIGIBILITY_CONFIRMATION),
     "recommend_provider": (RECOMMEND_PROVIDER,),
     "investment_advice": (INVESTMENT_ADVICE,),
     "do_a_task": (DO_A_TASK,),
@@ -330,12 +333,18 @@ EXTRACTED_FIELDS = ("user_age", "income", "citizenship", "town", "flat_type", "f
 
 # Exact floors cannot be expressed by the price tool's low/mid/high bands.
 EXACT_FLOOR_PATTERN = re.compile(
-    r"\b(?:\d{1,3}(?:st|nd|rd|th)?\s+(?:floor|storey)|(?:floor|storey)\s+\d{1,3})\b", re.I,
+    r"\b(?:\d{1,3}(?:st|nd|rd|th)?\s+(?:floor|storey)|(?:floor|storey)\s+\d{1,3}(?![-\s]*room\b))\b", re.I,
 )
 FLOOR_BAND_PATTERN = re.compile(r"\b(low|mid|middle|high)[- ]floors?\b", re.I)
 FLOOR_SCOPE_PREFIX = "I can compare low floors"
 LEASE_SCOPE_MESSAGE = "Which remaining-lease rules do you mean: CPF usage, HDB housing loans, or housing grants?"
 TOPIC_SCOPE_MESSAGE = "Which part of HDB housing would you like to know about: resale eligibility, grants, housing loans, or CPF and lease rules?"
+
+
+def all_floors(message: str, *, reply: bool = False) -> bool:
+    if re.search(r"\b(?:all[- ]floors?|any\s+floors?|no\s+floor\s+(?:filter|restriction))\b", message, re.I):
+        return True
+    return reply and bool(re.fullmatch(r"\s*(?:give me\s+)?all\s*[.!?]*", message, re.I))
 
 
 def topic_reply(message: str, previous_reply: str) -> str | None:
@@ -344,8 +353,8 @@ def topic_reply(message: str, previous_reply: str) -> str | None:
     return {"resale eligibility": "What are the eligibility conditions for buying an HDB resale flat?",
             "resale elgibility": "What are the eligibility conditions for buying an HDB resale flat?",
             "eligibility": "What are the eligibility conditions for buying an HDB resale flat?",
-            "housing grants": "What housing grants are available for an HDB resale flat?",
-            "grants": "What housing grants are available for an HDB resale flat?",
+            "housing grants": "Explain housing grants for an HDB resale flat.",
+            "grants": "Explain housing grants for an HDB resale flat.",
             "hdb loans": "What are the conditions for an HDB housing loan?",
             "housing loans": "What are the conditions for an HDB housing loan?",
             "cpf and lease rules": "What remaining-lease rules apply to CPF usage when buying a resale flat?"
@@ -585,6 +594,9 @@ def route_query(message: str, known: dict | None = None, context_question: str |
     """
     known = known or {}
     intent, weak = rule_match(context_question or message)
+    if (intent is None and known.get("town") and known.get("flat_type")
+            and re.search(r"\btransactions?\b", message, re.I) and extract_month_range(message)):
+        intent, weak = "price", False
     broad_lease = lease_scope_question(message)
     if broad_lease:
         intent, weak = "policy", False
@@ -611,9 +623,14 @@ def route_query(message: str, known: dict | None = None, context_question: str |
     }
     if context_question:
         for field, value in price_bands(context_question).items():
-            if values[field] is None:
+            if values[field] is None and field not in known:
                 values[field] = value
-    period = extract_month_range(message) or (extract_month_range(context_question) if context_question else None)
+    if all_floors(message):
+        values["storey_band"] = None
+    # The latest remembered period wins over an older anchor question's date.
+    remembered_period = (known.get("start_month"), known.get("end_month"))
+    period = extract_month_range(message) or (remembered_period if all(remembered_period) else None)
+    period = period or (extract_month_range(context_question) if context_question else None)
     values["start_month"], values["end_month"] = period or (known.get("start_month"), known.get("end_month"))
     missing = missing_fields(intent, message, values)
     if re.fullmatch(r"\s*(?:i (?:want|would like) to know about|tell me about|what is|explain)\s+hdb[?.! ]*", message, re.I):

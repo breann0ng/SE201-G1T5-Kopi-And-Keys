@@ -957,3 +957,36 @@ checked retry passed. Live browser visual review of this display change remains
 for the user; no updated UI interaction is claimed here. No held-out data, price
 database, model prompt or verifier threshold changed. Earlier broad benchmark
 reports retain their own revision scope and were not rerun for this UI pass.
+
+## 9 November 2026 — Longer conversation replay and filter-state corrections
+
+Read the user's full pasted replay rather than inferring success from isolated
+checks. Added failing regressions for a changed year followed by town/details,
+all-floor wording and clearing a pending floor choice. Fixed history updates to
+retain the latest period, with current message > remembered period > original
+context precedence. Independent explicit town/flat lookups reset old bands/dates.
+Excluded flat-type numbers from the exact-floor parser and respected explicitly
+cleared floor filters. Added All floors to the existing quick replies.
+
+Explicit personal confirmation requests now receive a fixed explanation that the
+bot cannot confirm eligibility/application approval, with no model call. A dated
+transaction request uses the known property instead of falling through to a
+topic menu. The plain purchase statements in the supplied test are ambiguous
+about the desired task; they are not counted as failed price questions.
+
+Traced the grant-navigation refusal: the added word “available” became the only
+lexical topic term and relevant grant claims scored zero. Restored broad-topic
+navigation wording. The live rerun answered with no verifier errors; no threshold
+or quote check was lowered. The generic resale-eligibility draft passed its
+checks but selected levy/ownership/bankruptcy rows rather than a useful complete
+overview. A focused citizenship/age experiment was still incomplete and was NOT
+activated. This remains a semantic coverage gap for independent component review.
+
+Validation on final code: **876 backend tests**, **22 frontend tests**, lint/build
+pass with existing warnings. Eight new backend cases. Live API replay preserved
+2024 through the Bedok/details/high-floor turns, then answered an all-floor
+4-room Yishun lookup using its reset default period. Personal confirmation also
+used the specific safe response. Raw drafts/reasons and the unsuccessful policy
+experiment remain in ignored local reports. No held-out file, policy snapshot,
+SQL database, policy model prompt or verifier threshold changed. Earlier broad
+benchmark results remain scoped to their own revisions.

@@ -24,7 +24,7 @@ from .components.price_query import (
     latest_month,
 )
 from .components.intent_fallback import IntentClassifier
-from .components.query_router import EXTRACTED_FIELDS, route_query
+from .components.query_router import EXTRACTED_FIELDS, ELIGIBILITY_CONFIRMATION, route_query
 from .components.synthesiser import Synthesiser, SynthesiserAgent
 from .components.topic_cards import (
     TopicCard, discovery_question_field, income_ceiling_checks, load_cards, match_cards,
@@ -81,6 +81,9 @@ def build_graph(
     def query_router(state: GraphState):
         from .components.profile_context import profile_issue
 
+        if ELIGIBILITY_CONFIRMATION.search(state.message):
+            return {"route": "abstain", "status": "abstain", "abstain_reason": "eligibility_confirmation",
+                    "trace": ["query_router:abstain:eligibility_confirmation"]}
         issue = profile_issue(state)
         if issue:
             route, message = issue

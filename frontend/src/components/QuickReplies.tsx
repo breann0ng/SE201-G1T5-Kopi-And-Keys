@@ -12,7 +12,7 @@ export type QuickReplyField = keyof BuyerProfile | "flat_type" | "storey_band" |
 // price question from it); there is no sidebar profile field to fill in.
 const MESSAGE_ONLY: Partial<Record<QuickReplyField, string[]>> = {
   flat_type: ["2-room", "3-room", "4-room", "5-room", "Executive"],
-  storey_band: ["Low floors (1–6)", "Mid floors (7–12)", "High floors (13+)"],
+  storey_band: ["Low floors (1–6)", "Mid floors (7–12)", "High floors (13+)", "All floors"],
   lease_topic: ["CPF usage", "HDB loans", "Grant eligibility"],
   topic: ["Resale eligibility", "Housing grants", "HDB loans", "CPF and lease rules"],
 };

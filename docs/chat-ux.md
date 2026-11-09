@@ -210,3 +210,26 @@ original header, and match the source rows. The table retains all selected words
 conditions and citation; it does not add a policy interpretation or change the
 backend response/verifier. Incomplete, mismatched or ambiguous rows stay unchanged.
 The formatted table is also retained by Copy answer and sources.
+
+### Longer price conversations
+
+History reconstruction now stores each explicit period as a filter update, so
+changing a town or asking for price details retains the latest period instead
+of restoring the original question's year or the default window. Explicit new
+town-and-flat price requests reset old periods/bands; explicit API filters still
+take precedence. A null remembered floor band is respected instead of restoring
+an older high-floor constraint from the anchor question.
+
+“All-floor 4-room” is no longer parsed as “floor 4”. All/any-floor wording clears
+the floor restriction. A pending floor prompt also accepts “all” / “give me all”
+and offers an All floors button. Interpretation remains bounded to price context.
+
+The grant-topic navigation question uses broad-topic wording without the extra
+availability term that falsely caused zero lexical relevance. This does not
+lower verifier thresholds. Explicit requests to definitely confirm eligibility
+receive a specific capability-limit response rather than an unrelated topic menu.
+
+The longer replay exposed a separate unresolved content issue: generic resale
+eligibility can produce an incomplete selection of genuine source conditions.
+Do not treat that as solved by these conversation fixes or by a passing citation
+check. The experimental citizenship/age-focused question was not activated.
