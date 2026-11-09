@@ -174,3 +174,48 @@ mutant equivalent too; the rebuilt database is unchanged at 242,737 rows. In the
 draft CI workflow I changed setup-python from v7.1.0 (two weeks old) to v7.0.0
 and kept the gitleaks step as it was. The workflow stays a draft on this branch
 until the team agrees.
+
+## 2026-11-07 · Answer feedback loop
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** backend/kopi_keys/feedback.py, backend/kopi_keys/main.py,
+  backend/kopi_keys/graph.py, backend/kopi_keys/schemas.py,
+  frontend/src/components/FeedbackControls.tsx,
+  frontend/src/components/Thread.tsx, frontend/src/lib/api.ts,
+  frontend/src/pages/SettingsPage.tsx, scripts/review_feedback.py,
+  docs/feedback-loop.md, docs/responsible-ai.md, .gitignore,
+  tests/test_feedback.py, tests/test_review_feedback.py, tests/test_api.py,
+  tests/conftest.py, tests/fixtures/feedback_isolation_baseline.json
+- **Outcome:** Changed
+
+### What I asked for
+Thumbs up/down under every answer with an optional reason and comment,
+recorded for the team to review: on the answer's LangSmith trace (primary)
+and in a git-ignored local SQLite backup, through a write-only
+POST /api/feedback. Feedback must never change answers, prompts, retrieval,
+routing, topic cards, the price tool or the model. Also a fallback review
+script, a doc covering the review and fix process, and tests proving
+isolation. Investigate first and wait for my OK before editing.
+
+### How I checked it
+TODO (Tasha)
+
+### What I kept or changed
+After its investigation I changed the plan in four ways. /chat keeps calling
+run_chat, which gained an optional run_id that only goes into the graph
+config (it had proposed calling graph.invoke directly, which would skip
+run_graph's state validation and recursion limit). I dropped the
+browser-supplied question/answer fallback: context comes only from a
+bounded in-memory map of the last 1000 answers, and a miss is stored with
+context_missing=1. I asked for regression tests against answers captured
+on main before the change, and for a cache hit to keep the original trace
+id with a new message_id. I approved the Settings wording and the
+responsible-AI Feedback bullet. Choices it made that I kept: ratings must
+be exactly the integers 1 or -1 (Pydantic otherwise accepts true and 1.0);
+the server's own trace id wins over the browser's copy; feedback does not
+extend LangSmith trace retention; a database error returns 503 without
+affecting chat. Two existing cache tests in test_api.py now ignore
+message_id. After review on PR #17 (2026-11-08) I changed two things: a later
+click now updates one LangSmith feedback item (id derived from message_id)
+instead of adding another, and the run id comes only from the server, so
+requests that include one are rejected and unknown messages are saved locally
+without calling LangSmith.

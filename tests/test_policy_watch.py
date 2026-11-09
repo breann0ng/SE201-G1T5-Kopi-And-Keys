@@ -155,6 +155,40 @@ def test_changed_candidate_prepares_only_draft_pr_and_allowed_paths(candidate, m
     assert not (candidate / "data/chroma").exists()
 
 
+def test_successful_inactive_build_is_included_in_review_without_served_paths(candidate, monkeypatch):
+    change(candidate, FOLDER + "changes_since_2026-10-15.json", changed=[{}])
+    monkeypatch.setenv("POLICY_CANDIDATE_BUILD_STATUS", "success")
+    for name in ("policy_chunks", "topic_cards"):
+        (candidate / "data" / name / "2026-11-09").mkdir(parents=True)
+    write(candidate / "data/policy_chunks/chunk_id_registry.json", {"fixture": "CHUNK_FAKE_01"})
+    calls = fake_commands(monkeypatch)
+    assert watch.main(root=candidate, do_publish=True) == 0
+    added = next(args for args in calls if args[:3] == ("git", "add", "--"))
+    assert "data/policy_chunks/2026-11-09" in added
+    assert "data/topic_cards/2026-11-09" in added
+    assert "data/policy_chunks/chunk_id_registry.json" in added
+    assert not any("2026-10-15" in name or "ACTIVE" in name or "chroma" in name for name in added)
+    assert "date folders are inactive" in (candidate / ".local/reports/policy-watch-pr.md").read_text()
+
+
+def test_missing_successful_build_outputs_fail_before_git_writes(candidate, monkeypatch):
+    change(candidate, FOLDER + "changes_since_2026-10-15.json", added=[{}])
+    monkeypatch.setenv("POLICY_CANDIDATE_BUILD_STATUS", "success")
+    calls = fake_commands(monkeypatch)
+    assert watch.main(root=candidate, do_publish=True) == 1
+    assert not any(args[0] == "git" for args in calls)
+
+
+def test_failed_build_publishes_snapshot_only_with_explicit_warning(candidate, monkeypatch):
+    change(candidate, FOLDER + "changes_since_2026-10-15.json", changed=[{}])
+    monkeypatch.setenv("POLICY_CANDIDATE_BUILD_STATUS", "failure")
+    calls = fake_commands(monkeypatch)
+    assert watch.main(root=candidate, do_publish=True) == 0
+    added = next(args for args in calls if args[:3] == ("git", "add", "--"))
+    assert len(added) == 5
+    assert "No candidate chunks/cards are included" in (candidate / ".local/reports/policy-watch-pr.md").read_text()
+
+
 def test_existing_candidate_is_not_overwritten_or_duplicated(candidate, monkeypatch):
     change(candidate, FOLDER + "changes_since_2026-10-15.json", added=[{"slug": "new"}])
     calls = fake_commands(monkeypatch, pending=[{

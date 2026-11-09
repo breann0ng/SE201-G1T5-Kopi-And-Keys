@@ -2,8 +2,8 @@
 
 Run refresh.py first. Default mode writes local reports only:
     python scripts/policy_watch.py
-Only --publish uses git/gh to notify maintainers. Never writes ACTIVE, chunks,
-topic cards or the vector index. A failed check never means unchanged policy.
+Only --publish uses git/gh to notify maintainers. Never changes ACTIVE, the
+served chunks/cards or the vector index. A failed check never means unchanged policy.
 """
 from __future__ import annotations
 
@@ -148,6 +148,18 @@ def publish(report: dict, root: Path = ROOT) -> dict:
     candidate = snapshot_date(report["candidate_snapshot"])
     branch = f"{BRANCH_PREFIX}{candidate}-{os.environ['GITHUB_RUN_ID']}"
     paths = [f"data/policy_snapshots/{candidate}", "scripts/scraping/seeds.json"]
+    build_status = os.environ.get("POLICY_CANDIDATE_BUILD_STATUS", "not_run")
+    if build_status == "success":
+        extras = [f"data/policy_chunks/{candidate}", f"data/topic_cards/{candidate}",
+                  "data/policy_chunks/chunk_id_registry.json"]
+        if not all((root / name).exists() for name in extras):
+            raise ValueError("Candidate build reported success but its review artifacts are missing")
+        paths.extend(extras)
+        build_note = ("Candidate chunks and topic cards passed build/validation and are included, "
+                      "with their chunk-ID registry updates, for review. Their date folders are inactive.")
+    else:
+        build_note = (f"Candidate build status: `{build_status}`. **No candidate chunks/cards are included.** "
+                      "Review the build logs and regenerate/validate them locally before activation.")
     if run(root, "git", "diff", "--cached", "--name-only"):
         raise ValueError("Refusing to commit unrelated staged changes")
     run(root, "git", "switch", "-c", branch)
@@ -157,7 +169,8 @@ def publish(report: dict, root: Path = ROOT) -> dict:
     run(root, "git", "commit", "-m", f"data: stage policy snapshot {candidate} for review")
     run(root, "git", "push", "origin", f"HEAD:refs/heads/{branch}")
     body += (f"Candidate: `{candidate}`. Change counts: `{json.dumps(report['counts'])}`.\n\n"
-             "**Merging this PR does not activate it.** ACTIVE, chunks, topic cards and the "
+             f"{build_note}\n\n"
+             "**Merging this PR does not activate it.** ACTIVE, the served chunks/topic cards and the "
              "index are unchanged. This is change detection, not an eligibility certification.\n\n"
              "- [ ] Read the complete diff and original official pages/PDFs; inspect conditions "
              "and table labels, not just amounts.\n"

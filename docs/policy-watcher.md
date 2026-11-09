@@ -44,9 +44,13 @@ evidence, finish or close the older candidate, then rerun if a newer candidate P
 
 ## Evidence dates and frozen evaluation
 
-The workflow never changes ACTIVE, chunks, topic cards, income rules, SQLite prices, prompts,
-model settings or the vector index. Merging a candidate PR only stores an inactive snapshot and
-newly discovered seeds. Detection can run during held-out evaluation; activation and tuning wait
+The workflow never changes ACTIVE, the served chunks/topic cards, income rules, SQLite prices,
+prompts, model settings or the vector index. Sandra's candidate pre-build step is retained:
+new chunks and cards are built and validated only in the candidate date's folders. On success,
+the draft PR also includes these inactive folders and the chunk-ID registry updates. On failure,
+it includes only the snapshot/seeds and an explicit build warning; activation must wait for a
+successful local rebuild and review. Missing supposedly successful build outputs fail publication.
+Detection can run during held-out evaluation; activation and tuning wait
 until the frozen evaluation is complete. Record the code commit, ACTIVE date, model and retrieval
 configuration alongside evaluation results.
 

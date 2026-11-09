@@ -422,43 +422,60 @@ income, eligibility and new-flat questions retain their wider evidence. Tests
 cover those boundaries, and explicit missing-evidence errors still force repair
 or abstention. No policy facts, snapshots, numeric-price logic or stored chats
 were rewritten. The loading message now reflects possible multi-minute CPU work.
-## 2026-11-01 - Policy refresh deprecation and blocked-source handling
+## 2026-11-07 - Profile scope, source tables and scrolling follow-up
 - **Tool (model):** OpenAI Codex (GPT-6)
-- **Files:** `.github/workflows/policy-refresh.yml`, `scripts/scraping/fetch.py`,
-  `scripts/scraping/refresh.py`, `tests/test_policy_refresh.py`, `data/README.md`
-- **Outcome:** Changed
+- **Files:** BuyerProfile/state/profile controls and `profile_context.py` from the saved
+  profile commit; follow-up changes in `graph.py`, `policy_synthesis.py`,
+  `policy_guardrails.py`, frontend layout/thread/source formatting, new regression
+  tests, and `docs/chat-ux.md`
+- **Outcome:** Changed on `fix/chat-edit-copy-and-responsiveness`
 
 ### What I asked for
-Investigate the failed scheduled policy refresh, then address both the deprecated
-GitHub Actions warning and HDB access-denied handling on a separate branch.
+Resume the second-timer profile, blank-space scrolling and grant chart/formatting
+fixes after the laptop shut down. Keep the policy watcher on its separate branch.
 
 ### How I checked it
-Codex read job 124800881060 in run 41290607456. HDB robots.txt returned HTTP 403,
-and the sitemap step stopped before any snapshot commit or review issue. The
-Node.js and Ubuntu notices were separate from the failure. The official action
-definitions confirm Node24 for checkout v5, setup-python v6 and upload-artifact v6.
+Confirmed the profile edits survived in commit `eb73bbe`, despite its misleading
+"policy watching" message. Added 18 profile regressions, including a production
+graph check that a second-timer personal EHG request stops before retrieval/model
+execution, mixed-household distinctions, missing/contradictory inputs, current
+profile precedence over history, specialised PDF scope, and unrelated price queries.
+A real local HTTP request returned the second-timer scope explanation with no
+citations or model step. The frontend's 12 tests pass, including every range and
+amount from the actual committed non-resident-spouse PDF chunk, half-income labels,
+clipboard provenance and refusing to reconstruct partial/altered number lists.
+Lint passes with four existing React refresh warnings; production build passes
+with the existing large-bundle warning.
 
-The new regression tests simulate inaccessible robots, explicit disallow rules,
-challenge pages, ordinary network failures, incomplete block diagnostics, stale
-block records and successful completion without fetching live policy websites.
-All 21 refresh tests passed within the full suite: 372 passed and 4 expected
-failures. The first full run had one unrelated retrieval failure while local
-EmbeddingGemma was stopped; it passed after restoring that dependency. Workflow
-YAML, publication conditions and extracted shell syntax were also checked.
+The first full backend run found an unavailable local embedding dependency after
+shutdown. Restarted the existing local Ollama server, reran the affected retrieval
+test successfully, and completed full regression testing. No GPU cluster was used.
+Final backend result: 479 passed and 4 existing expected failures. This count is
+for the UI/profile branch; the isolated watcher branch has its own test additions.
+Tried browser inspection using the computer-use skill: the native helper worked,
+but user input interrupted the navigation; the separate browser host was unavailable.
+Visual scrolling/mobile/chart checks remain manual and are listed in the guide.
+No real personal profile or trace data was submitted for these tests.
 
 ### What I kept or changed
-Created `fix/policy-refresh-node24`, upgraded the actions, and introduced explicit
-ready, blocked and failed outcomes. Fetcher access blocks have a dedicated exit
-code and structured reason. GitHub mode handles a confirmed block with a notice,
-a job summary and a diagnostic artifact; it skips publication and retains ACTIVE.
-Local mode still exits nonzero for a block. Other errors continue to fail the job.
-Only ready can reach the existing commit/push step. Diagnostics contain the
-explicitly named status and fetch-log JSON files, with 14-day artifact retention.
+The profile distinguishes first-timer, second-timer and mixed households. Personal
+"like me" questions request required inputs or explain a source-scope limitation.
+First-timer ceiling comparisons are withheld for second/mixed profiles. The
+verifier checks specialised PDF opening qualifications even when page titles are
+generic. A general hypothetical cohort can differ from the sidebar without
+contradictory subsidy fields reaching the model. Pure price queries remain usable
+without fixing unrelated eligibility details.
 
-No access restrictions were bypassed, no policy snapshot was refreshed or
-activated, and the old failed run was not rerun. This handles a blocked refresh
-honestly; it does not restore HDB access or make the existing data newly verified.
-Publishing and activation still require a complete run and the existing review.
+Replaced the live sidebar-based historical chart highlight with clearly labelled
+source tables and optional collapsed charts. Half-household-income tables retain
+that basis and explicit household scope, without implying a personal grant award.
+Complete verified source-band blocks are formatted as tables for display/copy;
+surrounding conditions, source values and citations remain. Historical response
+metadata is rendered through the same formatter without rewriting saved chats.
+Constrained outer page overflow and bounded the chat viewport/footer to address
+the blank-space scrolling. No policy facts, snapshot files, active version or
+price calculations were changed. Clarifications/charts are code; policy excerpts
+are selected by the LLM and verified against source text.
 
 ## 2026-11-07 - Reviewed policy website watcher
 - **Tool (model):** OpenAI Codex (GPT-6)
@@ -509,3 +526,57 @@ evaluation boundary. No live scrape, issue, PR, external push or activation was 
 for implementation testing. A hosted run is still needed to verify actual GitHub
 permissions and current website accessibility. Feedback collection and LangSmith
 annotation remain Tasha's work; existing privacy filters were not relaxed.
+
+### Integration refresh ? 9 November 2026
+Merged main through PR #22 and resolved the workflow conflict by retaining
+Sandra's inactive chunk/card build and validation step. Successful candidates
+include their new date folders and registry updates in the draft PR; failed
+builds include only snapshot/seeds with an explicit warning. ACTIVE, served
+chunks/cards, prices and the index stay unchanged. Added three regression cases
+for successful/missing/failed build artifacts. All 57 watcher/refresh checks and
+the full suite passed: 721 passed, 1 skipped and 2 existing expected failures.
+The checkout has no built vector index; these counts do not claim live hybrid
+retrieval or held-out evaluation. The Sources page now says weekly to match the
+schedule. Pinned workflow actions match the existing CI pins, and CI includes
+PR #23's bounded Gitleaks download retries. Publication tests still use mocks
+and a local bare Git remote; no live scrape, notification or activation was run.
+A hosted schedule remains necessary to verify actual source access and bot PR
+permissions after merge.
+
+## 2026-11-01 - Policy refresh deprecation and blocked-source handling
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** `.github/workflows/policy-refresh.yml`, `scripts/scraping/fetch.py`,
+  `scripts/scraping/refresh.py`, `tests/test_policy_refresh.py`, `data/README.md`
+- **Outcome:** Changed
+
+### What I asked for
+Investigate the failed scheduled policy refresh, then address both the deprecated
+GitHub Actions warning and HDB access-denied handling on a separate branch.
+
+### How I checked it
+Codex read job 124800881060 in run 41290607456. HDB robots.txt returned HTTP 403,
+and the sitemap step stopped before any snapshot commit or review issue. The
+Node.js and Ubuntu notices were separate from the failure. The official action
+definitions confirm Node24 for checkout v5, setup-python v6 and upload-artifact v6.
+
+The new regression tests simulate inaccessible robots, explicit disallow rules,
+challenge pages, ordinary network failures, incomplete block diagnostics, stale
+block records and successful completion without fetching live policy websites.
+All 21 refresh tests passed within the full suite: 372 passed and 4 expected
+failures. The first full run had one unrelated retrieval failure while local
+EmbeddingGemma was stopped; it passed after restoring that dependency. Workflow
+YAML, publication conditions and extracted shell syntax were also checked.
+
+### What I kept or changed
+Created `fix/policy-refresh-node24`, upgraded the actions, and introduced explicit
+ready, blocked and failed outcomes. Fetcher access blocks have a dedicated exit
+code and structured reason. GitHub mode handles a confirmed block with a notice,
+a job summary and a diagnostic artifact; it skips publication and retains ACTIVE.
+Local mode still exits nonzero for a block. Other errors continue to fail the job.
+Only ready can reach the existing commit/push step. Diagnostics contain the
+explicitly named status and fetch-log JSON files, with 14-day artifact retention.
+
+No access restrictions were bypassed, no policy snapshot was refreshed or
+activated, and the old failed run was not rerun. This handles a blocked refresh
+honestly; it does not restore HDB access or make the existing data newly verified.
+Publishing and activation still require a complete run and the existing review.

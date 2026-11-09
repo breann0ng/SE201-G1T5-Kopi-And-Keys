@@ -83,6 +83,15 @@ def _terms(text: str) -> set[str]:
     return {t for t in policy_tokens(text) if len(t) > 1 and t not in _GENERIC and not t.isdigit()}
 
 
+def policy_focus(question: str) -> str:
+    """The policy part of a question: without its price half (checked against SQL) or
+    instructions on what not to do ("without adding maximum amounts together")."""
+    question = re.split(r"\band\b(?=.{0,60}\b(?:median price|resale price|price of|price for)\b)", question,
+                        maxsplit=1, flags=re.I)[0]
+    return re.sub(r"\b(?:without|do not|don't|never)\s+(?:adding|add|summing|sum|calculating|calculate)\b[^.?!;]*",
+                  "", question, flags=re.I)
+
+
 @dataclass(frozen=True)
 class RelevanceScore:
     score: float
@@ -99,11 +108,7 @@ def score_relevance(question: str, quote: str, source_title: str = "", criterion
     asks about a specific aspect (income, employment, etc.), the quoted text or
     table criterion must address an aspect too; a matching title alone is not enough.
     """
-    # Price details in a mixed request are checked independently against SQL.
-    question = re.split(r"\band\b(?=.{0,60}\b(?:median price|resale price|price of|price for)\b)", question,
-                        maxsplit=1, flags=re.I)[0]
-    question = re.sub(r"\b(?:without|do not|don't|never)\s+(?:adding|add|summing|sum|calculating|calculate)\b[^.?!;]*",
-                      "", question, flags=re.I)
+    question = policy_focus(question)
     needed = requested_grants(question)
     covered = mentioned_grants(quote + " " + source_title) & needed
     query_terms = _terms(question)
@@ -166,16 +171,34 @@ def household_scope_errors(state, sources: dict) -> list[str]:
     first/second-timer couples can use EHG (Singles), so that case is not treated
     as an ordinary all-first-timer family question.
     """
+    from .profile_context import personal_question
+
     question = state.followup_question or state.message
+    specialised_errors = []
+    # PDF page titles can retain the preceding page's generic "singles" heading.
+    # Check explicit opening qualifications before the broad household comparison.
+    if personal_question(question):
+        for claim in state.draft.claims if state.draft else []:
+            for cid in claim.citation_ids:
+                source = sources.get(cid)
+                if not source or source.superseded:
+                    continue
+                opening = re.sub(r"\s+", " ", source.text[:300])
+                if (re.search(r"amount for (?:an? )?applicant with non-resident spouse", opening, re.I)
+                        and state.citizenship not in {None, "SC/NR"}):
+                    specialised_errors.append("A policy amount table is for an applicant with a non-resident spouse, not the stated profile.")
+                if (re.search(r"comprising a first-timer and second-timer", opening, re.I)
+                        and state.subsidy_status != "mixed"):
+                    specialised_errors.append("A policy amount table is for a mixed first-/second-timer household, not the stated profile.")
     single = bool(re.search(r"\bsingles?\b", question, re.I))
     family = bool(re.search(r"\bcouples?\b|\bfamil(?:y|ies)\b", question, re.I))
     if single and family:
-        return []  # Explicit comparison, not a household-specific request.
-    if re.search(r"second[- ]timer|non[- ]resident spouse", question, re.I) or state.first_timer is False:
-        return []
+        return specialised_errors  # Explicit comparison, not a household-specific request.
+    if re.search(r"second[- ]timer|non[- ]resident spouse", question, re.I) or state.subsidy_status == "mixed":
+        return specialised_errors
     expected = "single" if state.household_type == "single" or single else (
         "family" if state.household_type in {"couple_family", "fiance", "extended_family"} or family else None)
-    errors = []
+    errors = specialised_errors
     for claim in state.draft.claims if state.draft else []:
         for cid in claim.citation_ids:
             source = sources.get(cid)

@@ -30,7 +30,17 @@ class BuyerProfile(Contract):
     age: int | None = Field(default=None, ge=0, le=120)
     household_income: float | None = Field(default=None, ge=0)
     first_timer: bool | None = None
+    subsidy_status: Literal["first_timer", "second_timer", "mixed"] | None = None
     household_type: Literal["single", "couple_family", "fiance", "extended_family", "senior"] | None = None
+
+    @model_validator(mode="after")
+    def consistent_subsidy_status(self):
+        if self.subsidy_status is not None:
+            expected = self.subsidy_status == "first_timer"
+            if self.first_timer is not None and self.first_timer != expected:
+                raise ValueError("first_timer and subsidy_status must describe the same profile")
+            self.first_timer = expected
+        return self
 
 
 class HistoryTurn(Contract):
@@ -158,6 +168,8 @@ class Claim(Contract):
     supporting_quote: str | None = None
     source_scope: str | None = None
     source_criterion: str | None = None
+    # Which asked aspect the quote answers, as the model labelled it (components/answer_aspects.py).
+    answers_aspect: str | None = None
 
 
 class Suggestion(Contract):
@@ -227,3 +239,7 @@ class ChatResponse(Contract):
     income_notes: list[IncomeNote] = Field(default_factory=list)
     # Discovery question where a missing "Your situation" detail would unlock more topic cards.
     profile_hint: bool = False
+    # Set by main.py when an answer is delivered, for POST /feedback. langsmith_run_id is null when
+    # tracing is off. Neither affects how the answer is produced.
+    message_id: str | None = None
+    langsmith_run_id: str | None = None

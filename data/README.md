@@ -110,6 +110,9 @@ newest folder". Only a person changes it, after review; to roll back, set it to 
    attention issue. A green job with `outcome=blocked` does **not** mean the data was refreshed.
    Unexpected script, extraction and network errors still fail the job. Only `outcome=ready` can
    reach candidate inspection; the workflow never activates the candidate automatically.
+   The candidate chunk/card pre-build remains: successful outputs and registry updates accompany
+   the draft PR in inactive date folders. Failed builds are labelled explicitly and publish only
+   the snapshot/seeds for investigation; they cannot make the candidate ready for activation.
    `python refresh.py` locally exits 0 for ready, 2 for blocked, or 1 for an unexpected error;
    `.local/reports/policy-refresh-status.json` records the result. `--github-actions` handles only
    confirmed source blocks without failing the job. Do not bypass robots or a challenge: use an
@@ -118,7 +121,7 @@ newest folder". Only a person changes it, after review; to roll back, set it to 
    not retry it automatically. A fresh Actions run has no unpublished blocked snapshot to reuse.
    The watcher refuses to refresh ACTIVE or an older dated snapshot.
 2. **Alert (automatic).** `diff.py` compares the new snapshot with ACTIVE and writes
-   `changes_since_<ACTIVE date>.md`, listing pages whose dollar, year or age figures changed first. If
+   `changes_since_<ACTIVE date>.md`, listing pages whose dollar, year or age figures changed first. These
    complete changed candidates open a draft PR with a review checklist. A pending candidate is not
    overwritten; its review issue links the newest run's evidence. Unchanged checks do not commit data.
 3. **Review.** Check wording, conditions, table relationships, dates and original official sources;

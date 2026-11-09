@@ -17,6 +17,11 @@ const manifests = import.meta.glob<Manifest>("../../../data/policy_snapshots/*/m
   import: "default",
 });
 const active = activeRaw.trim();
+// Snapshots captured after ACTIVE are candidates still waiting for review (data/README.md, 4.1).
+const pending = Object.keys(manifests)
+  .map((path) => path.split("/").slice(-2, -1)[0] ?? "")
+  .filter((date) => date > active)
+  .sort();
 
 const TIERS: Record<number, string> = {
   1: "Official scheme pages (HDB, CPF) and HDB documents",
@@ -54,8 +59,19 @@ export function SourcesPage() {
         <section className="rounded-xl border border-slate-200 p-4 text-sm dark:border-slate-800">
           <h2 className="font-semibold">How we keep it current</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-slate-600 dark:text-slate-400">
-            <li>Pages are re-captured monthly and after announced policy changes.</li>
-            <li>Every change in figures is reviewed by a person before the advisor uses it.</li>
+            <li>
+              A weekly check, and a manual one after announced policy changes, captures these pages
+              again when the official sites allow it.
+            </li>
+            <li>
+              A new capture is used only after a person reviews every change in figures. Until then,
+              answers stay on the capture above.
+            </li>
+            {pending.length > 0 && (
+              <li>
+                A newer capture from <strong>{pending[pending.length - 1]}</strong> is waiting for review.
+              </li>
+            )}
             <li>Outdated passages are marked superseded and can no longer be cited.</li>
             <li>We only show an "effective date" when the official page states one.</li>
           </ul>

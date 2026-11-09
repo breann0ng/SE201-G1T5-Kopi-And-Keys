@@ -1,0 +1,565 @@
+{
+ "all": {
+  "n": 29,
+  "hit_at_5": 0.517,
+  "recall_at_5": 0.42,
+  "recall_at_20": 0.621,
+  "mrr_at_20": 0.368,
+  "not_in_index": 0
+ },
+ "policy_retrieval": {
+  "n": 22,
+  "hit_at_5": 0.636,
+  "recall_at_5": 0.53,
+  "recall_at_20": 0.75,
+  "mrr_at_20": 0.436,
+  "not_in_index": 0
+ },
+ "discovery": {
+  "n": 7,
+  "hit_at_5": 0.143,
+  "recall_at_5": 0.071,
+  "recall_at_20": 0.214,
+  "mrr_at_20": 0.156,
+  "not_in_index": 0
+ },
+ "cases": [
+  {
+   "id": "POL-01",
+   "category": "policy",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    14
+   ],
+   "best_rank": 14,
+   "miss_type": "rank_6_20",
+   "top5": [
+    "CHUNK_BTO_250",
+    "CHUNK_BTO_114",
+    "CHUNK_BTO_103",
+    "CHUNK_BTO_188",
+    "CHUNK_BTO_180"
+   ]
+  },
+  {
+   "id": "POL-02",
+   "category": "policy",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    null
+   ],
+   "best_rank": null,
+   "miss_type": "not_in_top20",
+   "top5": [
+    "CHUNK_SINGLES_05",
+    "CHUNK_ELIG_76",
+    "CHUNK_ELIG_68",
+    "CHUNK_BTO_06",
+    "CHUNK_EHG_23"
+   ]
+  },
+  {
+   "id": "POL-03",
+   "category": "policy",
+   "n_gold": 1,
+   "found_at_5": 1,
+   "item_ranks": [
+    5
+   ],
+   "best_rank": 5,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_LOAN_06",
+    "CHUNK_FINANCE_02",
+    "CHUNK_LEASE_01",
+    "CHUNK_BTO_205",
+    "CHUNK_LEASE_11"
+   ]
+  },
+  {
+   "id": "POL-04",
+   "category": "policy",
+   "n_gold": 1,
+   "found_at_5": 1,
+   "item_ranks": [
+    2
+   ],
+   "best_rank": 2,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_EIP_04",
+    "CHUNK_EIP_01",
+    "CHUNK_EIP_02",
+    "CHUNK_EIP_03",
+    "CHUNK_EIP_05"
+   ]
+  },
+  {
+   "id": "POL-05",
+   "category": "policy",
+   "n_gold": 2,
+   "found_at_5": 1,
+   "item_ranks": [
+    3,
+    12
+   ],
+   "best_rank": 3,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_ELIG_127",
+    "CHUNK_BTO_83",
+    "CHUNK_BTO_79",
+    "CHUNK_HFE_25",
+    "CHUNK_HFE_17"
+   ]
+  },
+  {
+   "id": "POL-06",
+   "category": "policy",
+   "n_gold": 1,
+   "found_at_5": 1,
+   "item_ranks": [
+    1
+   ],
+   "best_rank": 1,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_RESALE_41",
+    "CHUNK_RESALE_42",
+    "CHUNK_RESALE_52",
+    "CHUNK_RESALE_45",
+    "CHUNK_RESALE_125"
+   ]
+  },
+  {
+   "id": "POL-07",
+   "category": "policy",
+   "n_gold": 1,
+   "found_at_5": 1,
+   "item_ranks": [
+    1
+   ],
+   "best_rank": 1,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_ELIG_127",
+    "CHUNK_INCOME_01",
+    "CHUNK_EIP_05",
+    "CHUNK_RESALE_110",
+    "CHUNK_BTO_33"
+   ]
+  },
+  {
+   "id": "MIX-01",
+   "category": "mixed",
+   "n_gold": 1,
+   "found_at_5": 1,
+   "item_ranks": [
+    2
+   ],
+   "best_rank": 2,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_EHG_49",
+    "CHUNK_EHG_29",
+    "CHUNK_EHG_24",
+    "CHUNK_EHG_12",
+    "CHUNK_EHG_15"
+   ]
+  },
+  {
+   "id": "MIX-02",
+   "category": "mixed",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    null
+   ],
+   "best_rank": null,
+   "miss_type": "not_in_top20",
+   "top5": [
+    "CHUNK_FINANCE_03",
+    "CHUNK_CPF_46",
+    "CHUNK_EHG_11",
+    "CHUNK_EHG_15",
+    "CHUNK_BTO_101"
+   ]
+  },
+  {
+   "id": "MIX-03",
+   "category": "mixed",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    6
+   ],
+   "best_rank": 6,
+   "miss_type": "rank_6_20",
+   "top5": [
+    "CHUNK_BTO_312",
+    "CHUNK_BTO_116",
+    "CHUNK_PHG_05",
+    "CHUNK_PHG_10",
+    "CHUNK_PHG_06"
+   ]
+  },
+  {
+   "id": "MIX-04",
+   "category": "mixed",
+   "n_gold": 2,
+   "found_at_5": 1,
+   "item_ranks": [
+    3,
+    null
+   ],
+   "best_rank": 3,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_EHG_15",
+    "CHUNK_EHG_17",
+    "CHUNK_EHG_05",
+    "CHUNK_EHG_21",
+    "CHUNK_EHG_27"
+   ]
+  },
+  {
+   "id": "MIX-05",
+   "category": "mixed",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    6
+   ],
+   "best_rank": 6,
+   "miss_type": "rank_6_20",
+   "top5": [
+    "CHUNK_CPF_32",
+    "CHUNK_EHG_22",
+    "CHUNK_EHG_25",
+    "CHUNK_BTO_14",
+    "CHUNK_BTO_100"
+   ]
+  },
+  {
+   "id": "MIX-06",
+   "category": "mixed",
+   "n_gold": 1,
+   "found_at_5": 1,
+   "item_ranks": [
+    1
+   ],
+   "best_rank": 1,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_EHG_29",
+    "CHUNK_EHG_49",
+    "CHUNK_EHG_15",
+    "CHUNK_EHG_12",
+    "CHUNK_EHG_46"
+   ]
+  },
+  {
+   "id": "MIX-07",
+   "category": "mixed",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    14
+   ],
+   "best_rank": 14,
+   "miss_type": "rank_6_20",
+   "top5": [
+    "CHUNK_BTO_99",
+    "CHUNK_BTO_100",
+    "CHUNK_BTO_332",
+    "CHUNK_BTO_131",
+    "CHUNK_FAMILY_10"
+   ]
+  },
+  {
+   "id": "MIX-08",
+   "category": "mixed",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    null
+   ],
+   "best_rank": null,
+   "miss_type": "not_in_top20",
+   "top5": [
+    "CHUNK_CPF_32",
+    "CHUNK_BTO_122",
+    "CHUNK_PHG_10",
+    "CHUNK_BTO_69",
+    "CHUNK_PHG_05"
+   ]
+  },
+  {
+   "id": "DSC-01",
+   "category": "discovery",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    11
+   ],
+   "best_rank": 11,
+   "miss_type": "rank_6_20",
+   "top5": [
+    "CHUNK_BTO_334",
+    "CHUNK_RESALE_66",
+    "CHUNK_BTO_114",
+    "CHUNK_BTO_116",
+    "CHUNK_BTO_99"
+   ]
+  },
+  {
+   "id": "DSC-02",
+   "category": "discovery",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    null
+   ],
+   "best_rank": null,
+   "miss_type": "not_in_top20",
+   "top5": [
+    "CHUNK_EIP_05",
+    "CHUNK_BTO_05",
+    "CHUNK_FAMILY_03",
+    "CHUNK_ELIG_59",
+    "CHUNK_EIP_01"
+   ]
+  },
+  {
+   "id": "DSC-03",
+   "category": "discovery",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    null
+   ],
+   "best_rank": null,
+   "miss_type": "not_in_top20",
+   "top5": [
+    "CHUNK_ELIG_128",
+    "CHUNK_ELIG_68",
+    "CHUNK_ELIG_76",
+    "CHUNK_BTO_313",
+    "CHUNK_ELIG_24"
+   ]
+  },
+  {
+   "id": "DSC-04",
+   "category": "discovery",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    null
+   ],
+   "best_rank": null,
+   "miss_type": "not_in_top20",
+   "top5": [
+    "CHUNK_EC_06",
+    "CHUNK_EC_18",
+    "CHUNK_EC_08",
+    "CHUNK_EC_29",
+    "CHUNK_EC_17"
+   ]
+  },
+  {
+   "id": "DSC-05",
+   "category": "discovery",
+   "n_gold": 1,
+   "found_at_5": 0,
+   "item_ranks": [
+    null
+   ],
+   "best_rank": null,
+   "miss_type": "not_in_top20",
+   "top5": [
+    "CHUNK_EHG_40",
+    "CHUNK_RESALE_123",
+    "CHUNK_EIP_05",
+    "CHUNK_BTO_107",
+    "CHUNK_GRANTS_04"
+   ]
+  },
+  {
+   "id": "DSC-06",
+   "category": "discovery",
+   "n_gold": 2,
+   "found_at_5": 0,
+   "item_ranks": [
+    null,
+    null
+   ],
+   "best_rank": null,
+   "miss_type": "not_in_top20",
+   "top5": [
+    "CHUNK_BTO_99",
+    "CHUNK_BTO_121",
+    "CHUNK_BTO_332",
+    "CHUNK_BTO_100",
+    "CHUNK_BTO_120"
+   ]
+  },
+  {
+   "id": "DSC-07",
+   "category": "discovery",
+   "n_gold": 2,
+   "found_at_5": 1,
+   "item_ranks": [
+    null,
+    1
+   ],
+   "best_rank": 1,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_ELIG_127",
+    "CHUNK_EIP_05",
+    "CHUNK_BTO_265",
+    "CHUNK_BTO_97",
+    "CHUNK_BTO_100"
+   ]
+  },
+  {
+   "id": "CHG-01",
+   "category": "policy_changed",
+   "n_gold": 2,
+   "found_at_5": 1,
+   "item_ranks": [
+    1,
+    null
+   ],
+   "best_rank": 1,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_EHG_05",
+    "CHUNK_EHG_46",
+    "CHUNK_EHG_07",
+    "CHUNK_GRANTS_04",
+    "CHUNK_EHG_38"
+   ]
+  },
+  {
+   "id": "CHG-02",
+   "category": "policy_changed",
+   "n_gold": 2,
+   "found_at_5": 1,
+   "item_ranks": [
+    2,
+    null
+   ],
+   "best_rank": 2,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_EHG_47",
+    "CHUNK_EHG_17",
+    "CHUNK_EHG_49",
+    "CHUNK_EHG_43",
+    "CHUNK_EHG_23"
+   ]
+  },
+  {
+   "id": "CHG-03",
+   "category": "policy_changed",
+   "n_gold": 2,
+   "found_at_5": 2,
+   "item_ranks": [
+    1,
+    1
+   ],
+   "best_rank": 1,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_EC_33",
+    "CHUNK_EC_47",
+    "CHUNK_INCOME_01",
+    "CHUNK_ELIG_128",
+    "CHUNK_EC_13"
+   ]
+  },
+  {
+   "id": "CHG-04",
+   "category": "policy_changed",
+   "n_gold": 3,
+   "found_at_5": 2,
+   "item_ranks": [
+    9,
+    2,
+    2
+   ],
+   "best_rank": 2,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_LOAN_54",
+    "CHUNK_BTO_213",
+    "CHUNK_LOAN_47",
+    "CHUNK_FINANCE_11",
+    "CHUNK_RESALE_187"
+   ]
+  },
+  {
+   "id": "CHG-05",
+   "category": "policy_changed",
+   "n_gold": 2,
+   "found_at_5": 2,
+   "item_ranks": [
+    4,
+    4
+   ],
+   "best_rank": 4,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_LOAN_47",
+    "CHUNK_LOAN_57",
+    "CHUNK_FINANCE_11",
+    "CHUNK_RESALE_187",
+    "CHUNK_FINANCE_05"
+   ]
+  },
+  {
+   "id": "CHG-06",
+   "category": "policy_changed",
+   "n_gold": 2,
+   "found_at_5": 0,
+   "item_ranks": [
+    null,
+    null
+   ],
+   "best_rank": null,
+   "miss_type": "not_in_top20",
+   "top5": [
+    "CHUNK_FINANCE_16",
+    "CHUNK_ELIG_17",
+    "CHUNK_BTO_207",
+    "CHUNK_FINANCE_02",
+    "CHUNK_FINANCE_03"
+   ]
+  },
+  {
+   "id": "CHG-07",
+   "category": "policy_changed",
+   "n_gold": 3,
+   "found_at_5": 3,
+   "item_ranks": [
+    1,
+    1,
+    1
+   ],
+   "best_rank": 1,
+   "miss_type": "hit",
+   "top5": [
+    "CHUNK_BTO_36",
+    "CHUNK_BTO_33",
+    "CHUNK_BTO_283",
+    "CHUNK_BTO_34",
+    "CHUNK_SINGLES_09"
+   ]
+  }
+ ],
+ "mode": "bm25",
+ "mean_latency_ms": 31.1
+}
