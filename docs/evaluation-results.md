@@ -1,4 +1,4 @@
-# Sandra's finals: retrieval, topic cards and evaluation
+# Evaluation results: retrieval, topic cards and end-to-end comparison
 
 Branch `feat/sandra-finals-eval-retrieval` (PR #18, stacked on #16). Written 8 Nov 2026.
 All figures are on the **50-question development set** (`dev_set_questions.jsonl`) with the
@@ -19,8 +19,9 @@ single question moves a rate by 4.5 points.
 | Discovery card recall, suggested (7 Qs, 15 cards) | 87% (13/15) | 93% (14/15) | ≥70% |
 | Discovery card precision, suggested | 46% (13/28) | 54% (14/26) | ≥80% |
 | Eval reports keyword-only search as "hybrid" when embeddings fail | possible | fails loudly | — |
-| Correct price figures, full system vs no-tools (21 Qs) | 0% (no-tools) | 71.4% (15/21) | — |
-| Cited answers, full system (42 answerable) | 0% (no-tools) | 73.8% (31/42) | 0 uncited |
+| Correct price figures, full system vs no-tools (21 Qs) | 0% (no-tools) | 76.2% (16/21) on main @c36f6b9 (7b); 71.4% on 8 Nov | — |
+| Cited answers, full system (42 answerable) | 0% (no-tools) | 69.0% (29/42) on main @c36f6b9; 73.8% on 8 Nov | 0 uncited |
+| Safe on should-abstain questions, full system (8 Qs) | 75.0% (8 Nov) | 100% (8/8) on main @c36f6b9 | — |
 
 The retrieval pipeline was already near its ceiling on this set: of the 4 policy misses, 2 are
 answer-key problems (section 5), not retrieval problems. Discovery is still the weakest
@@ -179,15 +180,120 @@ safety are not significantly different on these small populations.
 
 | Question | Flag | What happened | Owner / status |
 |---|---|---|---|
-| OOS-06 (price "next year") | unsafe | Gave past prices instead of declining a forecast (it did say "past sales only") | Router: Breann's unmerged `feat/router-scope-guard` declines forecasts and guarantees |
-| OOS-07 ("guarantee my Family Grant") | unsafe | Quoted an unrelated Step-Up Grant sentence | Router (same branch); the quote-relevance check is shadow-only there |
+| OOS-06 (price "next year") | unsafe | Gave past prices instead of declining a forecast (it did say "past sales only") | Fixed by Breann's router (#20): declined in the 9 Nov re-run (section 7a) |
+| OOS-07 ("guarantee my Family Grant") | unsafe | Quoted an unrelated Step-Up Grant sentence | Fixed by the same router change: declined in the 9 Nov re-run |
 | CHG-05 (loan-to-value limit now) | stale | Quoted the old 80% rule, correctly dated "before 20 August 2024", without the current 75% | Quote selection; see limitation L1 in section 8 |
 | CHG-07 (singles and Standard/Plus/Prime) | stale | Quoted "Previously, singles were limited to…" without the current rule | Quote selection; see L1 |
 
 Retrieval found the right passage in both cases (rank 5 and rank 1); the old and current rule
 sit in the same passage. Neither stale case presents an old figure as current, but neither
-answers the question. If Breann's router branch is merged before the held-out run, the full
-system must be re-run.
+answers the question. Breann's router branch has since been merged; the re-run is in 7a.
+
+### 7a. Re-run on main after the router change (9 Nov)
+
+The 8 Nov run predates Breann's router (#20, rules plus an LLM fallback that declines
+forecasts and guarantees). The full system was re-run on main at `19eeaec` (after #20–#26),
+same 50 questions, same index, database and model. No run errors. Files:
+`20261109T112136Z_full_dev*.json(l)` and `comparison_dev_20261109.md`.
+
+| Metric (population) | Full, 8 Nov (before #20) | **Full, 9 Nov (main @19eeaec)** | Paired p (9 vs 8 Nov) |
+|---|---|---|---|
+| Correct route (50) | 90.0% (45/50) | **94.0% (47/50)**, CI 83.8–97.9% | 0.5 |
+| Safe on should-abstain questions (8) | 75.0% (6/8) | **100% (8/8)**, CI 67.6–100% | 0.5 |
+| Answers answerable questions (42) | 76.2% (32/42) | 71.4% (30/42), CI 56.4–82.8% | 0.73 |
+| Answer with a citation (42) | 73.8% (31/42) | 69.0% (29/42), CI 54.0–80.9% | 0.73 |
+| Not stale on changed policies (7) | 71.4% (5/7) | 57.1% (4/7) | 1 |
+| Correct price figures (21) | 71.4% (15/21) | 61.9% (13/21), CI 40.9–79.2% | 0.5 |
+| Mean latency per question | 85.7 s | 100.1 s | |
+
+Against the baselines the conclusion is unchanged: prices 13/21 vs 0/21 for both baselines
+(p = 2.4×10⁻⁴), routing 47/50 vs 0/50, cited answers 29/42 vs 0/42 without tools (p = 3.7×10⁻⁹).
+
+**What changed and why.**
+
+- *Safety (real change).* OOS-06 (forecast) and OOS-07 (guarantee) are now declined by the
+  router's rules, every time, so this is a fix, not run-to-run noise.
+- *Answering and citations (noise).* Questions moved both ways: POL-07, DSC-03 and DSC-05
+  went from answered to declined, while DSC-04, DSC-07 and CHG-03 went from declined to
+  answered. Nearly all the declines are the verifier rejecting a draft ("I could not verify
+  the drafted answer…"), so the drafts differ between runs even at temperature 0. No
+  difference is significant (all paired p ≥ 0.5).
+- *Prices.*
+  - MIX-01 failed because the local model did not respond ("language model engine was
+    unavailable"). That is infrastructure, but it is still counted as a failure.
+  - MIX-08 was declined by the verifier.
+  - PRC-10 failed on the evaluation's clock, not the app (see the note below).
+  - PRC-11 and PRC-12 are real misses: "newer" and "high floor" were not applied as filters.
+  - MIX-07 gave no price.
+- *Routing.* PRC-07 ("a flat in Toa Payoh") and DSC-04 should have asked a follow-up
+  question but answered directly; MIX-06 asked for profile details when it should have
+  answered.
+- *Staleness.* CHG-05 and CHG-07 are still limitation L1. CHG-03 is new: asked about EC
+  income ceilings, it quoted the resale-flat ceilings.
+
+**Evaluation clock (PRC-10).** The dev labels resolve "past 6 months" as of `AS_OF`
+(Oct 2026), but `run_baselines --system full` used the real date: PRC-10 was answered for
+Jun–Nov (147 sales) against a label for May–Oct (188 sales). This affects both full runs.
+#27 (Nisha) now pins the router's date to `AS_OF` in `run_baselines`, as `run_eval` already
+did, so later runs score PRC-10 on the labels' own timeline. That fixes the score, not
+the app; what it meant for the app is L2 in section 8 (now fixed by #29). The run on
+main @c36f6b9 (7b) is the first with the pinned clock.
+
+### 7b. Main @c36f6b9 (9 Nov, after #27 and #28)
+
+A second full run on main at `c36f6b9` (after Nisha's #27 and #28: router follow-ups,
+floor and lease filters, synthesis and verifier fixes, and the pinned evaluation clock).
+Same questions, index, database and model; no run errors. **These are the latest measured
+full-system figures.** Merged afterwards and not re-measured:
+
+- #29 (Tasha, missing months) does not change dev scores: with the clock pinned to Oct 2026,
+  no dev period runs past the data;
+- #30 (policy answer coverage) and #31 (verifier relevance) change how policy answers are
+  drafted and checked, and may raise the answering and citation rates.
+
+A final run is planned on the frozen commit, the same one the held-out run uses. Files:
+`20261109T142139Z_full_dev*.json(l)` and `comparison_dev_20261109_main.md` (all five runs).
+
+| Metric (population) | Full, 8 Nov | Full @19eeaec | **Full @c36f6b9** | No-tools | Naive RAG |
+|---|---|---|---|---|---|
+| Correct route (50) | 90.0% (45/50) | 94.0% (47/50) | **94.0% (47/50)**, CI 83.8–97.9% | 0% | 0% |
+| Safe on should-abstain questions (8) | 75.0% (6/8) | 100% (8/8) | **100% (8/8)**, CI 67.6–100% | 100% | 75.0% |
+| Correct price figures (21) | 71.4% (15/21) | 61.9% (13/21) | **76.2% (16/21)**, CI 54.9–89.4% | 0% | 0% |
+| Answers answerable questions (42) | 76.2% (32/42) | 71.4% (30/42) | **71.4% (30/42)**, CI 56.4–82.8% | 64.3% | 64.3% |
+| Answer with a citation (42) | 73.8% (31/42) | 69.0% (29/42) | **69.0% (29/42)**, CI 54.0–80.9% | 0% | 61.9% |
+| Not stale on changed policies (7) | 71.4% (5/7) | 57.1% (4/7) | **42.9% (3/7)**, CI 15.8–75.0% | 71.4% | 85.7% |
+| Mean latency per question | 85.7 s | 100.1 s | **87.3 s** | 10.0 s | 113.6 s |
+
+**@c36f6b9 vs the baselines (paired):** prices 16/21 vs 0/21 for both (p = 3.1×10⁻⁵),
+routing 47/50 vs 0/50 (p = 1.4×10⁻¹⁴), cited answers 29/42 vs 0/42 without tools
+(p = 3.7×10⁻⁹). Against naive RAG, citations (p = 0.69) and answering (p = 0.68) are not
+significantly different.
+
+**@c36f6b9 vs @19eeaec.**
+
+- *Prices: 4 fixed, 1 lost (p = 0.375).*
+  - Fixed: PRC-10 (the clock is now pinned, so the label's May–Oct is queried); PRC-11
+    ("newer") and PRC-12 ("high floor"), whose filters are now applied; MIX-07 now gives
+    the price.
+  - Lost: MIX-04, because the local model did not respond.
+  - The 5 remaining price failures are all mixed questions: MIX-01 and MIX-04 (model did
+    not respond), MIX-02 and MIX-08 (verifier rejected the draft), and MIX-06 (asked for
+    profile details instead of answering; also a routing miss).
+- *Answering and citations.* Exactly 3 questions flipped each way (p = 1): run-to-run
+  variation, as between the earlier runs.
+- *Routing.* The same three misses as before: PRC-07 and DSC-04 should have asked a
+  follow-up question but answered; MIX-06 asked for profile details when it should have
+  answered.
+- *Staleness (4 flagged), checked by hand.*
+  - CHG-05, CHG-06 and CHG-07 are limitation L1. CHG-06 (upfront payment with an HDB loan)
+    was declined in the earlier run; this time it was answered with the pre-August-2024
+    footnote from CHUNK_RESALE_187 (20% initial payment).
+  - CHG-03 (EC income ceiling) is a different failure. The answer quotes the resale flat
+    ceilings (Plus flat: $16,000) instead of the EC ceiling. The automatic screen flags it
+    because $16,000 is also the old EC figure; in substance it answers for the wrong
+    scheme.
+  - 43% vs 57% on 7 questions is not significant (p = 1), but L1 is now the clearest
+    remaining weakness.
 
 ## 8. Limits and threats to validity
 
@@ -201,15 +307,17 @@ system must be re-run.
   - CHUNK_BTO_36: opens with "**Previously**, singles were limited to…", and the current
     Standard/Plus/Prime options follow in a table.
 
-  Asked what applies *now* (CHG-05, CHG-07), the model quoted the plain-text historical
-  sentence instead of the table row, so the answer is true and correctly dated but does not
-  give the current rule.
+  Asked what applies *now* (CHG-05, CHG-07, and in the @c36f6b9 run also CHG-06), the
+  model quoted the plain-text historical sentence instead of the table row, so the answer is
+  true and correctly dated but does not give the current rule.
 - *What is not wrong.* Retrieval found the right passage (rank 5 and rank 1). Neither passage
   is superseded, and the verifier correctly accepted the quotes because they are verbatim and
   not presented as current. No old figure was shown as the current one.
-- *How often.* 2 of the 7 changed-policy dev questions (staleness check 71.4%, 5/7). It can
-  happen on any page that keeps a dated footnote or a "Previously…" sentence next to the
-  current table, and is most likely exactly where policy has recently changed.
+- *How often.* 2 of the 7 changed-policy dev questions on 8 Nov, and 3 of 7 on main @c36f6b9
+  (CHG-05, -06, -07; section 7b). CHG-06 was declined in the other runs, so whether it
+  shows up depends on the run. It can happen on any page that keeps a dated footnote or a
+  "Previously…" sentence next to the current table, and is most likely exactly where policy
+  has recently changed.
 - *Why it was not fixed now.* The cause sits between chunking (Sandra) and quote selection
   (Nisha), and any fix needs the full dev evaluation re-run (about 70 minutes) a day before
   submission. It is documented instead of patched.
@@ -222,6 +330,46 @@ system must be re-run.
      carries a past date ("before 20 August 2024", "Previously") and repair it once.
 - *For users today.* Answers show the snapshot date and source link, and the passage itself
   (with the current table) is one click away under Sources.
+
+**L2 (fixed on main by #29). Relative periods could run past the newest price data.**
+
+- *What happened.* The price data ends at the newest month in the import (Oct 2026; 0 sales
+  for Nov). On 8–9 Nov, "past 6 months" was resolved as Jun–Nov 2026 and the answer was
+  labelled "Jun 2026 to Nov 2026", although only five of those months have sales. The same
+  applied to "past 3 months", "this year" and "in 2026". Questions with no period were not
+  affected: the default window already ends at the newest data month.
+- *Why the dev evaluation could not see it.* It pins its clock to `AS_OF` (Oct 2026), where
+  the data and the calendar agree.
+- *Fix (Tasha, #29, merged 9 Nov).* The period is queried up to the newest data month and
+  the answer starts with "We don't have sales data for Nov 2026 yet: our records go up to
+  Oct 2026, so these figures cover Jun 2026 to Oct 2026." The full dev runs in section 7a
+  are unaffected: with the clock pinned to Oct 2026 no dev period runs past the data.
+- *Confirmed by the live freshness check below:* on 9 Nov, 4 of 6 probes are cut to Oct
+  with that sentence, and all 6 pass.
+
+**Live freshness check.** `python -m kopi_keys.evaluation.freshness [--today YYYY-MM-DD]`
+runs without a language model, in under a minute on an idle laptop. For six price
+questions phrased with relative periods, generated from the date (not taken from the dev
+labels), it checks:
+
+- the period the app asks for matches the phrase on that day (worked out independently of
+  the router);
+- the period it queries does not run past the newest data month, and if the asked-for
+  period does, the answer says which months are missing;
+- the figures equal plain SQL over the queried period.
+
+It also fails if the price data is more than 2 months behind, or the active policy snapshot
+is more than 45 days old. On 9 Nov (main with #29):
+
+- period, coverage and figures: 6/6;
+- price data: newest month Oct 2026, 1 month behind (ok);
+- policy snapshot: 15 Oct 2026, 25 days old (ok).
+
+Tests (`test_eval_freshness.py`, 14) include a year boundary, stale data, an old snapshot,
+and the behaviour before #29 (period labelled up to November), which the check fails.
+
+The dev scores stay pinned, so they are reproducible; freshness is checked live, so it
+moves with the calendar.
 
 - Dev only, and the dev set was used while tuning; dev numbers are optimistic. The held-out
   run must use a frozen tag (`git tag finals-frozen`) and record the model digests and

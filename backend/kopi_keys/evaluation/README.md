@@ -18,6 +18,7 @@ answered price questions are also checked against `expected_price`.
 | `retrieval_report.py` | Hit@5, Recall@5, Recall@20 and MRR@20 for `bm25` / `dense` / `hybrid`, in three slices (all, policy, discovery), with a miss type per question. Prints strict and relaxed scores |
 | `stats.py`, `compare.py` | 95% Wilson intervals and paired exact McNemar tests; `compare.py` lines up result files question by question on fixed populations (a run error counts as a failure) |
 | `run_eval.py` | The command below; reports go to `.local/reports/` (gitignored) |
+| `freshness.py` | Live freshness check on the real date (no model calls): relative periods ("past 6 months", "this year") match the phrase and stay within the newest price data, figures equal plain SQL, price data and policy snapshot not too old. Exit 1 on a failure; reports go to `.local/reports/` |
 | `synthesis_benchmark.py` | Nisha's fixed-evidence CPU synthesis comparison; independent of the team dev/held-out splits. See [the finals guide](../../../docs/finals-nisha.md). |
 
 ## Question sets
@@ -85,11 +86,12 @@ Finals runs (from `backend/`):
 ..\.venv\Scripts\python.exe -m kopi_keys.evaluation.retrieval_report --mode hybrid      # strict + relaxed
 ..\.venv\Scripts\python.exe -m kopi_keys.evaluation.run_baselines --system no-tools     # naive-rag-dense, naive-rag, full
 ..\.venv\Scripts\python.exe -m kopi_keys.evaluation.compare <result files>              # CIs + paired McNemar
+..\.venv\Scripts\python.exe -m kopi_keys.evaluation.freshness                         # live, real date
 ```
 
 ## Finals development results (2026-11-08, 50-question dev set)
 
-See [Sandra's finals results](../../../docs/sandra_finals_results.md) for the full tables, the
+See [the evaluation results](../../../docs/evaluation-results.md) for the full tables, the
 miss diagnosis and limits. Headline figures (95% Wilson intervals):
 
 | Metric | Result |

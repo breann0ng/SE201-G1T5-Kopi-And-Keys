@@ -27,6 +27,21 @@ def test_paired_counts_only_shared_questions():
     assert (p["n"], p["only_a"], p["only_b"]) == (3, 1, 1)
 
 
+def test_paired_tells_the_two_systems_apart():
+    # q1 both right, q2 only A, q3 only B twice over: counts must not swap or include ties.
+    a = {"q1": True, "q2": True, "q3": False, "q4": False, "q5": False}
+    b = {"q1": True, "q2": False, "q3": True, "q4": True, "q5": False}
+    p = stats.paired(a, b)
+    assert (p["n"], p["a"], p["b"], p["only_a"], p["only_b"]) == (5, 2, 3, 1, 2)
+    assert p["p"] == 1.0  # 1 vs 2 discordant: no evidence of a difference
+
+
+def test_rate_formats_percent_count_and_interval():
+    assert stats.rate(18, 22) == "81.8% (18/22), 95% CI 61.5-92.7%"
+    assert stats.rate(0, 9) == "0.0% (0/9), 95% CI 0.0-29.9%"
+    assert stats.rate(0, 0) == "n/a"
+
+
 def test_run_errors_count_as_failures_on_a_fixed_population():
     questions = [
         {"id": "A", "category": "policy", "should_abstain": False},

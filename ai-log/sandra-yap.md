@@ -320,3 +320,30 @@ Hybrid vs keyword search is 6 wins to 1 loss (p = 0.125), so slides say "consist
 not significant at n = 22". The adviser's plan claimed the embedding prefixes were missing
 (they were already in place) and that the suite had 240+ tests (it has 515); both corrected.
 No held-out material was opened.
+
+## 2026-11-09 · Full-system re-run after the router change, and a live freshness check
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** evaluation/freshness.py, tests/test_eval_freshness.py, evaluation/README.md,
+  docs/evaluation-results.md (7a, L2), data/evaluation-data/results/20261109T112136Z_full_dev*
+- **Outcome:** Changed
+
+### What I asked for
+Re-run the full system on main after Breann's router (#20), and a check that the app is
+fresh on the real date, after a teammate pointed out the dev evaluation pins "today" to
+Oct 2026.
+
+### How I checked it
+Compared both re-runs (main @19eeaec, then main @c36f6b9 after #27/#28) question by
+question with the 8 Nov run and both baselines (paired McNemar). Read the flagged answers. For freshness, compared the app's periods with SQL over
+the price database and ran 12 tests, including a year boundary and stale data.
+
+### What I kept or changed
+Safety went from 6/8 to 8/8 (forecast and guarantee now declined); on main @c36f6b9 prices
+are 16/21. The other differences
+went both ways and none is significant, so I report them as run-to-run variation, not a
+regression. Kept the pinned date for dev scoring (reproducible) and added the live check
+alongside it instead of changing the labels. The first version showed "past 6 months" on
+9 Nov labelled Jun–Nov although the data ends in Oct. Tasha had already fixed this in #29
+(cut to Oct and say November is missing), so I updated the check to expect that behaviour
+and kept a test that fails the old one. Documented as L2, fixed; I did not edit the price
+tool or router.
