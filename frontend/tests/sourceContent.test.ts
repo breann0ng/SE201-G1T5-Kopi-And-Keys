@@ -7,7 +7,7 @@ import type { ChatResponse, PolicyPassage } from "../src/lib/api.ts";
 
 const chunks = readFileSync(new URL("../../data/policy_chunks/2026-10-15/chunks.jsonl", import.meta.url), "utf8")
   .trim().split("\n").map((line) => JSON.parse(line));
-const chunk = chunks.find((row) => row.chunk_id === "CHUNK_EHG_32");
+const chunk = chunks.find((row) => row.chunk_id === "CHUNK_EHG_48");
 const source: PolicyPassage = { id: chunk.chunk_id, title: chunk.section_heading, text: chunk.content,
   source_url: chunk.source_url, snapshot_id: chunk.snapshot_date, verified_on: chunk.verified_on,
   effective_date: chunk.effective_date, page_last_updated: chunk.page_last_updated, superseded: false };
@@ -29,7 +29,7 @@ test("actual split PDF header identifies half-income and non-resident spouse sco
 });
 
 test("mixed-couple source retains its distinct scope", () => {
-  const family = chunks.find((row) => row.chunk_id === "CHUNK_EHG_30");
+  const family = chunks.find((row) => row.chunk_id === "CHUNK_EHG_46");
   const bands = extractBands(family.content)!;
   assert.equal(bands.incomeBasis, "half_household");
   assert.equal(bands.scope, "Couple comprising a first-timer and second-timer");

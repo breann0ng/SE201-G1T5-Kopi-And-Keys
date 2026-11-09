@@ -18,6 +18,7 @@ from pathlib import Path
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 
+from .components.intent_fallback import SCHEMA as INTENT_SCHEMA, LLMIntentClassifier
 from .components.policy_retrieval import HybridPolicyRetriever
 from .components.price_query import SqlitePriceTool
 from .graph import build_graph, run_chat
@@ -80,6 +81,13 @@ def _warm_up() -> None:
         pass
 
 
+def router_fallback():
+    """The LLM fallback for questions no router rule matches; KOPI_ROUTER_FALLBACK=off disables it."""
+    if os.getenv("KOPI_ROUTER_FALLBACK", "llm").strip().lower() == "off":
+        return None
+    return LLMIntentClassifier(OllamaEngine().for_router(INTENT_SCHEMA))
+
+
 def create_app(graph=None) -> FastAPI:
     application = FastAPI(
         title="Kopi & Keys",
@@ -88,7 +96,8 @@ def create_app(graph=None) -> FastAPI:
     )
     # Without a built database the SQLite tool reports "unavailable", like the old placeholder.
     if graph is None:
-        graph = build_graph(retriever=HybridPolicyRetriever(), price_tool=SqlitePriceTool())
+        graph = build_graph(retriever=HybridPolicyRetriever(), price_tool=SqlitePriceTool(),
+                            intent_classifier=router_fallback())
         if os.getenv("KOPI_WARM_UP", "1") != "0":
             threading.Thread(target=_warm_up, daemon=True).start()
     cache = ResponseCache(int(os.getenv("KOPI_RESPONSE_CACHE", "200")))
@@ -133,14 +142,15 @@ def create_app(graph=None) -> FastAPI:
     def feedback(item: FeedbackRequest, background: BackgroundTasks) -> dict:
         """Write-only: records a rating for human review. There is no endpoint that reads it back."""
         context = contexts.get(item.message_id)
-        # Prefer the server's own record of the trace id; the browser's copy is only a fallback
-        # after a restart.
-        run_id = context.langsmith_run_id if context else item.langsmith_run_id
         try:
-            feedback_store.save(item, context, run_id)
+            first = feedback_store.save(item, context)
         except (OSError, sqlite3.Error):
             raise HTTPException(status_code=503, detail="Feedback could not be recorded.") from None
-        background.add_task(send_to_langsmith, run_id, item.rating, item.reason, item.comment)
+        # The trace id only ever comes from this server's record of the answer. Unknown message
+        # (for example after a restart): saved locally, and LangSmith is not called at all.
+        if context is not None:
+            background.add_task(send_to_langsmith, context.langsmith_run_id, item.message_id, item.rating,
+                                item.reason, item.comment, first)
         return {"status": "recorded"}
 
     @application.post("/chat/stream")

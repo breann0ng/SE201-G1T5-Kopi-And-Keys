@@ -39,7 +39,7 @@ def test_unsupported_request_abstains():
     with client() as c:
         body = c.post("/chat", json={"message": "Tell me a joke."}).json()
     assert body["status"] == "abstained"
-    assert body["trace"] == ["query_router:abstain", "abstention:unsupported"]
+    assert body["trace"] == ["query_router:abstain:no_rule_match", "abstention:unsupported"]
 
 
 def test_structured_price_filters_reach_price_tool():

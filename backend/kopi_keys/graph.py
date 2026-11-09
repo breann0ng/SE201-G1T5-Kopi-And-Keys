@@ -23,6 +23,7 @@ from .components.price_query import (
     PriceOutOfRangeError, PriceQueryTool, ToolUnavailableError, UnconfiguredPriceTool, filters_from_state,
     latest_month,
 )
+from .components.intent_fallback import IntentClassifier
 from .components.query_router import EXTRACTED_FIELDS, route_query
 from .components.synthesiser import Synthesiser, SynthesiserAgent
 from .components.topic_cards import (
@@ -62,7 +63,10 @@ def build_graph(
     cards: list[TopicCard] | None = None,
     max_repairs: int = MAX_REPAIRS,
     data_mode: str | None = None,
+    intent_classifier: IntentClassifier | None = None,
 ):
+    # intent_classifier: the LLM fallback for questions no rule matches. None = rules only
+    # (tests, router-only evaluation); main.py passes one unless KOPI_ROUTER_FALLBACK=off.
     retriever = retriever or KeywordPolicyRetriever()
     # Stamped on every response: the retriever declares its evidence ("snapshot" or "demo");
     # data_mode overrides it (tests with stub retrievers). Undeclared stubs count as demo.
@@ -85,12 +89,26 @@ def build_graph(
                     "trace": [f"query_router:{route}:profile_scope"]}
         known = {field: getattr(state, field) for field in (*EXTRACTED_FIELDS, "start_month", "end_month")}
         routed = route_query(state.message, known, context_question=state.followup_question)
-        update = routed.model_dump()
+        usage = {}
+        if (routed.intent_source == "no_match" or routed.needs_confirmation) and intent_classifier is not None:
+            decision = intent_classifier.classify(state.followup_question or state.message)
+            routed = route_query(state.message, known, context_question=state.followup_question,
+                                 fallback=decision)
+            if decision.model:  # the model was called (an unreachable engine records no call)
+                usage = {"model_calls": state.model_calls + 1,
+                         "model_usage": [*state.model_usage, {"model": decision.model, **decision.usage}]}
+        update = {**routed.model_dump(), **usage}
         # An explicit hypothetical cohort can differ from the sidebar. Do not send
         # contradictory first-timer and subsidy-status values to the synthesiser.
         if state.subsidy_status and routed.first_timer is not None and routed.first_timer != state.first_timer:
             update["subsidy_status"] = None
-        return {**update, "trace": [f"query_router:{routed.route}"]}
+        # The suffix says how the intent was chosen, so LangSmith can count fallback use:
+        # no_rule_match (rules only, declined by default), llm, llm_unsure, llm_error, and for
+        # weak rule matches llm_confirmed / llm_declined.
+        suffix = {"no_match": ":no_rule_match", "llm": ":llm", "llm_unsure": ":llm_unsure",
+                  "llm_error": ":llm_error", "rules_confirmed": ":llm_confirmed",
+                  "llm_declined": ":llm_declined"}.get(routed.intent_source, "")
+        return {**update, "trace": [f"query_router:{routed.route}{suffix}"]}
 
     def policy_retrieval(state: GraphState):
         query = state.followup_question or state.message

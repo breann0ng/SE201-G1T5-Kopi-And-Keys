@@ -9,6 +9,7 @@ from pydantic import Field, ValidationError, ValidationInfo, model_validator
 from ..llm import Generation, ModelEngineError, OllamaEngine, TextEngine
 from ..schemas import Contract, Claim, Draft
 from ..state import GraphState
+from . import answer_aspects as aspects
 from .policy_guardrails import (mentioned_grants, normalized_policy_text, requested_grants,
                                 combination_question, score_relevance, has_combination_rule,
                                 prerequisite_sentences, household_scope_errors)
@@ -19,6 +20,8 @@ class PolicyClaim(Contract):
     text: str = Field(default="", max_length=900)
     citation_id: str = Field(min_length=1)
     supporting_quote: str = Field(min_length=12, max_length=800)
+    # Required in the schema sent to the model unless KOPI_ASPECT_CHECK=off (see generate).
+    answers_aspect: str | None = None
 
 
 class PolicyAnswer(Contract):
@@ -206,6 +209,21 @@ def focused_combination_evidence(state: GraphState, ranked: list, question: str,
     return ranked
 
 
+def answer_schema(allowed_ids: list[str], maximum_claims: int, question: str, label_aspects: bool) -> dict:
+    """The JSON schema sent to the model. With label_aspects, every claim must name the asked
+    aspect its quote answers, from the aspects asked in this question (plus "other")."""
+    schema = PolicyAnswer.model_json_schema()
+    schema["properties"]["claims"]["maxItems"] = maximum_claims
+    claim_schema = schema["$defs"]["PolicyClaim"]
+    claim_schema["properties"]["citation_id"]["enum"] = allowed_ids
+    if label_aspects:
+        claim_schema["properties"]["answers_aspect"] = {"type": "string", "enum": aspects.schema_choices(question)}
+        claim_schema["required"] = [*claim_schema.get("required", []), "answers_aspect"]
+    else:
+        claim_schema["properties"].pop("answers_aspect", None)
+    return schema
+
+
 class PolicySummariser:
     def __init__(self, engine: TextEngine, model_override: str | None = None):
         self.engine = engine
@@ -244,11 +262,10 @@ class PolicySummariser:
         if not passages:
             raise ModelEngineError("No policy evidence fits the model context budget.")
         allowed_ids = [p.id for p in passages]
-        schema = PolicyAnswer.model_json_schema()
         maximum_claims = 6 if complex_question else 3
-        schema["properties"]["claims"]["maxItems"] = maximum_claims
-        schema["$defs"]["PolicyClaim"]["properties"]["citation_id"]["enum"] = allowed_ids
-        engine = self.engine.for_policy(schema, model_override=self.model_override) if isinstance(self.engine, OllamaEngine) else self.engine
+        label_aspects = aspects.model_labels()
+        schema = answer_schema(allowed_ids, maximum_claims, question, label_aspects)
+        engine =self.engine.for_policy(schema, model_override=self.model_override) if isinstance(self.engine, OllamaEngine) else self.engine
         context = {
             "question": question,
             "latest_message": state.message,
@@ -265,10 +282,12 @@ class PolicySummariser:
                 "do_not_compute_grant_totals": True,
             },
         }
+        if label_aspects:
+            context["answer_requirements"]["asked_aspects"] = aspects.asked_aspects(question)
         if state.verification_errors:
             context["previous_verification_errors"] = state.verification_errors
         generation = engine.complete([
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": SYSTEM_PROMPT + (aspects.PROMPT if label_aspects else "")},
             {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
         ])
         try:
@@ -280,8 +299,10 @@ class PolicySummariser:
                        for item in error.errors(include_input=False, include_url=False)]
             return [], generation, details
         sources = {p.id: p for p in passages}
-        claims = [table_claim(sources[c.citation_id], c.supporting_quote, question)
-                  or Claim(text=scope_label(c.supporting_quote), citation_ids=[c.citation_id], supporting_quote=c.supporting_quote)
+        claims = [(table_claim(sources[c.citation_id], c.supporting_quote, question)
+                   or Claim(text=scope_label(c.supporting_quote), citation_ids=[c.citation_id],
+                            supporting_quote=c.supporting_quote))
+                  .model_copy(update={"answers_aspect": (c.answers_aspect or aspects.OTHER) if label_aspects else None})
                   for c in answer.claims]
         errors = ["Missing policy evidence: " + item for item in answer.missing_evidence]
         return claims, generation, errors

@@ -115,3 +115,121 @@ def test_town_anywhere_go_for_maisonettes_and_address_blocks():
     # A town in someone else's address is not read as the user's town for declined questions.
     assert route_query("There's a unit at Blk 201 Tampines St 21 asking $620k. "
                        "What will it actually sell for?", {}).town is None
+
+
+# Scope guard (2026-11-06). Questions written for these tests, not taken from the dev set.
+@pytest.mark.parametrize("question", [
+    "What will 4-room flats in Bedok cost next year?",
+    "Will HDB prices go up?",
+    "Are prices going to drop next year?",
+    "What will a 5-room in Sengkang be worth in 10 years?",
+    "Forecast resale prices in Woodlands",
+    "Can you guarantee my grant application will be approved?",
+    "Will my application be approved?",
+    "How much is our flat in Bedok worth today?",
+    "How much could we sell our 4-room for?",
+])
+def test_forecasts_and_guarantees_are_declined_even_with_price_or_policy_words(question):
+    routed = route_query(question, {})
+    assert (routed.route, routed.intent_source) == ("abstain", "rules"), question
+
+
+@pytest.mark.parametrize("question, route", [
+    ("How much will a 4-room flat in Bishan cost?", "price"),
+    ("What are the prices of 4-room flats in Tampines? We're buying next year.", "price"),
+    ("How have prices changed in the past 5 years for 4-room flats in Punggol?", "price"),
+    ("I plan to buy next year, what grants can I get?", "policy"),
+    ("Will I get the EHG if I earn $5,000?", "policy"),
+    ("Is a 99-year lease worth less after 30 years?", "policy"),
+])
+def test_future_wording_alone_does_not_trigger_the_scope_guard(question, route):
+    assert route_query(question, {}).route == route, question
+
+
+def test_no_rule_match_is_kept_apart_from_an_explicit_decline():
+    from kopi_keys.components.query_router import classify_intent, rule_intent
+    assert rule_intent("Tell me a joke.") is None
+    assert classify_intent("Tell me a joke.") == "unanswerable"  # follow-up logic relies on this
+    routed = route_query("Tell me a joke.", {})
+    assert (routed.route, routed.intent_source) == ("abstain", "no_match")
+    assert route_query("Should we buy now or wait?", {}).intent_source == "rules"
+
+
+# --- Request-type declines and weak matches (2026-11-08) ----------------------
+
+@pytest.mark.parametrize("question, request_type", [
+    ("Recommend me a good mortgage broker", "recommend_provider"),
+    ("Which bank gives the cheapest home loan right now?", "recommend_provider"),
+    ("Who is a reliable lawyer for the conveyancing?", "recommend_provider"),
+    ("Which renovation contractor is the best?", "recommend_provider"),
+    ("Is a resale flat a better investment than stocks?", "investment_advice"),
+    ("Should I put my money in shares or a 4-room flat?", "investment_advice"),
+    ("Is now a good time to buy a 4-room in Bedok?", "investment_advice"),
+    ("Can you write my appeal letter to HDB?", "do_a_task"),
+    ("Could you please fill in the HFE form for me?", "do_a_task"),
+    ("Draft an email to the seller about the option fee", "do_a_task"),
+])
+def test_request_types_are_declined_whatever_the_topic(question, request_type):
+    from kopi_keys.components.query_router import SCOPE_GUARD
+    assert any(p.search(question) for p in SCOPE_GUARD[request_type]), question
+    routed = route_query(question, {})
+    assert (routed.route, routed.intent_source) == ("abstain", "rules"), question
+
+
+@pytest.mark.parametrize("question", [
+    "Can I use a bank loan for a resale flat?",
+    "Is the HDB loan interest rate lower than a bank loan?",
+    "Can you tell me how to submit my resale application?",
+    "What does the agent need to do after the OTP?",
+    "Which documents do I need for the HFE letter?",
+    "I'm single, turning 35 next year. Should I wait to buy or can I get anything now?",
+])
+def test_request_type_rules_leave_in_scope_questions_alone(question):
+    from kopi_keys.components.query_router import out_of_scope
+    assert not out_of_scope(question), question
+
+
+@pytest.mark.parametrize("question, weak", [
+    ("What time does the HDB hub open on Saturday?", True),       # "hdb" only
+    ("Can I get a car loan with my salary?", True),               # "loan" only
+    ("Is my block full for Indian buyers?", True),                # "block", "full"
+    ("If I take an HDB loan for a resale flat, how much do I pay upfront?", False),  # "hdb loan"
+    ("Can I use my CPF for a resale flat?", False),
+    ("What is the resale price of a 4-room flat in Yishun?", False),  # price rules are strong
+])
+def test_generic_keywords_alone_make_a_weak_match(question, weak):
+    routed = route_query(question, {})
+    assert routed.route != "abstain" and routed.needs_confirmation is weak, question
+
+
+def test_a_follow_up_is_never_sent_for_confirmation():
+    routed = route_query("and in 2020?", {}, context_question="Is my block full for Indian buyers?")
+    assert not routed.needs_confirmation
+
+
+# Code review on PR #20: a provider word describing something else is not a request for a provider.
+@pytest.mark.parametrize("question", [
+    "Which bank loan documents are required for buying a resale flat?",
+    "Which bank documents do I need for the HDB loan?",
+    "Which lawyer fees can I pay with CPF for a resale flat?",
+    "Who pays the agent's commission when buying a resale flat?",
+    "What are good bank loan interest rates compared with the HDB loan?",
+])
+def test_provider_word_as_a_modifier_is_not_a_recommendation(question):
+    from kopi_keys.components.query_router import RECOMMEND_PROVIDER
+    assert not RECOMMEND_PROVIDER.search(question), question
+    routed = route_query(question, {})
+    # Never declined by a rule: routed as policy, or (no keyword) left to the LLM fallback.
+    assert routed.route == "policy" or routed.intent_source == "no_match", question
+
+
+@pytest.mark.parametrize("question", [
+    "Which bank gives the cheapest home loan right now?",
+    "Which bank should I go with for my mortgage?",
+    "Recommend me a good mortgage broker",
+    "Who is the best property agent in Tampines?",
+    "Which lawyers are good for resale conveyancing?",
+])
+def test_choosing_a_provider_is_still_declined(question):
+    routed = route_query(question, {})
+    assert (routed.route, routed.intent_source) == ("abstain", "rules"), question
