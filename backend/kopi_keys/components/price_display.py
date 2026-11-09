@@ -87,6 +87,23 @@ def lease_note(price: PriceResult) -> str | None:
             "Use **Narrow it down** below to compare like with like.")
 
 
+def missing_months_note(filters: PriceFilters, requested_end: str | None) -> str | None:
+    """Say which asked-for months have no data yet, if the period was cut short.
+
+    "Past 6 months" asked in Nov 2026 is Jun to Nov 2026; with sales data to Oct 2026 the
+    figures cover Jun to Oct 2026 and this line says November is not in the data yet.
+    The graph shows it above the price answer (graph.price_query).
+    """
+    if not requested_end or requested_end <= filters.end_month:
+        return None
+    year, month = map(int, filters.end_month.split("-"))
+    first_missing = f"{year + month // 12:04d}-{month % 12 + 1:02d}"
+    missing = month_label(first_missing) if first_missing == requested_end else (
+        f"{month_label(first_missing)} to {month_label(requested_end)}")
+    return (f"We don't have sales data for {missing} yet: our records go up to "
+            f"{month_label(filters.end_month)}, so these figures cover {period_label(filters)}.")
+
+
 def _parse(price_text: str) -> dict[str, tuple[str, ...]] | None:
     found: dict[str, tuple[str, ...]] = {}
     for line in price_text.strip().splitlines():
