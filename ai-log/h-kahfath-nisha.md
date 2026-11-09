@@ -1,5 +1,59 @@
 # AI Use Log: H Kahfath Nisha
 
+## 2026-11-09 - Candidate-only resale price watcher
+- **Tool (model):** OpenAI Codex (GPT-6)
+- **Files:** `backend/kopi_keys/ingest/price_watch.py`,
+  `scripts/watch_resale_prices.py`, `.github/workflows/price-refresh.yml`,
+  `tests/test_price_watch.py`, `docs/price-watcher.md`, `README.md`
+- **Outcome:** Changed on separate branch `feat/nisha-price-watcher`
+
+### What I asked for
+Build a separate candidate-only watcher for official data.gov.sg resale prices,
+similar to policy change monitoring, while keeping the tested price dataset fixed.
+
+### How I checked it
+The 39 offline watcher tests passed. Full backend regression on this branch:
+610 passed, 1 skipped and 4 existing expected failures. The isolated checkout had
+no policy vector index and reported keyword-fallback warnings; these results do
+not claim a live hybrid retrieval evaluation or hosted Actions success.
+
+A live official export check on 9 November downloaded 244,312 rows through
+2026-11, against the frozen 242,737-row baseline through 2026-10. It found 1,586
+added and 11 removed rows, including possible corrections rather than solely new
+sales. The inactive database passed SQLite integrity and row-count checks. SHA-256
+checks before/after confirmed that the existing active CSV and database were
+unchanged. No candidate was activated, live GitHub issue published or held-out
+question opened. The first hosted schedule/notification still requires checking
+after merge.
+
+### What I kept or changed
+Reused Tasha's validated importer without changing price calculations. Downloads
+use the fixed official dataset API, bounded polling, HTTPS destination checks,
+redirect rejection and a size limit. Normalised comparisons preserve duplicate
+multiplicity. Every run retains a unique candidate directory and a provenance/
+comparison report. Access blocks and incomplete checks fail visibly and retain
+active data. The scheduled workflow saves narrow diagnostic/candidate artifacts
+for 30 days and explicitly requests review through an issue/comment. It has no
+contents-write permission or automatic activation step. Notification failures
+remain visible; unchanged checks do not close outstanding review issues.
+
+The watcher needs neither a GPU nor an LLM. Separate GPU integration checks used
+another frozen checkout and are not included in this watcher's test counts.
+
+### Review follow-up — 9 November 2026
+Changed automatic checks from daily to Monday approximately 10:33 SGT to limit
+repeat notifications and large candidate uploads while the active dataset stays
+frozen. Manual dispatch remains. Documented that unchanged-versus-last-candidate
+deduplication is not implemented: a candidate still different from the active CSV
+can be reported again in a later week, as can an unresolved access failure.
+The 39 watcher tests still pass; workflow YAML, the weekly cron, manual trigger
+and read-contents/write-issues permissions were checked. No active data, comparison
+rules, notification failure handling or candidate validation were relaxed.
+The follow-up CI run hit the same Gitleaks download failure before scanning.
+Copied the bounded retry/timeouts already validated in PR #23, preserving its
+version/hash pin and blocking checksum/scan steps. This is a CI download fix,
+not a secret finding or relaxation of scanning.
+
 ## 2026-10-15 · Local CPU model, price synthesiser and numeric verifier
 - **Tool (model):** OpenAI Codex (GPT-6)
 - **Files:** originally `backend/kopi_keys/midpoint/`, setup scripts, tests and

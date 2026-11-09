@@ -279,3 +279,7 @@ ai-log/                 Team AI-use records
 Further details: [frontend](frontend/README.md),
 [policy advisor](docs/policy-advisor.md), and
 [price synthesis and verification](docs/price-synthesis-and-verification.md).
+
+The [candidate-only price watcher](docs/price-watcher.md) checks data.gov.sg for
+resale transaction changes and prepares inactive review artifacts. It never
+replaces the active price dataset or evaluation labels automatically.
