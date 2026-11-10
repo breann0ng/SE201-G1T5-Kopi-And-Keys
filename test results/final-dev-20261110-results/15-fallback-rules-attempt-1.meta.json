@@ -1,0 +1,19 @@
+﻿{
+    "step":  "15-fallback-rules",
+    "attempt":  1,
+    "status":  "finished",
+    "started_utc":  "2026-11-09T18:45:56.2474347Z",
+    "python_args":  [
+                        "-m",
+                        "kopi_keys.evaluation.fallback_eval",
+                        "--rules-only"
+                    ],
+    "device":  "cpu",
+    "log":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\15-fallback-rules-attempt-1.txt",
+    "exit_code":  0,
+    "finished_utc":  "2026-11-09T18:45:58.3064339Z",
+    "elapsed_seconds":  2.059,
+    "new_result_files":  [
+
+                         ]
+}

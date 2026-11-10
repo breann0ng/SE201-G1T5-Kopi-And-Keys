@@ -15,10 +15,11 @@ reads them from here, and every answer cites where they came from.
                               policy_chunks/<date>/chunks.jsonl  ──┬──► policy retrieval (keyword ranker)
                                   │ build_policy_index.py          │
                                   ▼                                │
+                              policy_index/<date>/ (vectors)       │
                               chroma/  (vector index, local)  ─────┴──► policy retrieval (vector search)
                                   │ build_cards.py
                                   ▼
-                              topic_cards/*.json  ───────────────────► topic cards: matching, suggestions,
+                              topic_cards/<date>/*.json  ────────────► topic cards: matching, suggestions,
                               schema/vocab.json   (shared values)        overview table, clarifying fields
 
  data.gov.sg resale CSV  ──►  raw/2017-onwards-resale-prices.csv
@@ -28,7 +29,7 @@ reads them from here, and every answer cites where they came from.
 
  HDB grant pages         ──►  rules/income_ceilings.json  (in backend/) ► income-ceiling notes
 
- Team-written questions  ──►  evaluation/development/   ─────────────► evaluation harness and router test
+ Team-written questions  ──►  evaluation-data/development/   ────────► evaluation harness and router test
                               held-out set: outside the repository ──► final evaluation only
 ```
 
@@ -38,15 +39,20 @@ reads them from here, and every answer cites where they came from.
 |---|---|---|---|---|
 | `policy_snapshots/<YYYY-MM-DD>/` | Dated copy of 95 official pages and PDFs: raw bytes, clean text, tables, manifest with hashes | Yes | `scripts/scraping/` (`refresh.py`) | `chunk.py`, `validate.py` |
 | `policy_snapshots/ACTIVE` | One line: the snapshot date the advisor serves | Yes | A person, after review | Every loader of chunks |
-| `policy_chunks/<date>/chunks.jsonl` | 849 passages with stable IDs, source, dates, tags | Yes | `scripts/scraping/chunk.py` | Retrievers, evaluation |
+| `policy_chunks/<date>/chunks.jsonl` | 898 passages (ACTIVE snapshot) with stable IDs, source, dates, tags | Yes | `scripts/scraping/chunk.py` | Retrievers, evaluation |
 | `policy_chunks/chunk_id_registry.json` | Keeps chunk IDs stable across snapshots | Yes | `chunk.py` | `chunk.py` |
 | `schema/vocab.json` | Shared values for profile fields (citizenship codes, flat types, towns) | Yes | By hand (DRAFT) | Cards, evaluation, frontend |
-| `topic_cards/*.json` | 12 discovery cards, each with a verified overview quote | Yes | `scripts/scraping/build_cards.py` | `topic_cards.py` |
-| `chroma/` | Vector index of the ACTIVE chunks (EmbeddingGemma) | No (generated) | `scripts/build_policy_index.py` | `HybridPolicyRetriever` |
+| `topic_cards/<date>/*.json` | 12 discovery cards per snapshot, each with a verified overview quote and cited rules | Yes | `scripts/scraping/build_cards.py` | `topic_cards.py` |
+| `policy_index/<date>/` | EmbeddingGemma vectors for the snapshot's chunks (`vectors.f32`, `vectors.json`), so each machine can load the index without re-embedding | Yes | `scripts/build_policy_index.py` | `components/policy_index.py`, `go_live.py` |
+| `chroma/` | Local ChromaDB vector index of the ACTIVE chunks | No (generated) | `scripts/build_policy_index.py` | `HybridPolicyRetriever` |
 | `raw/2017-onwards-resale-prices.csv` | data.gov.sg resale transactions | Yes (PR #4) | Downloaded | `build_resale_db.py` |
 | `processed/hdb_prices.db` | SQLite database of 242,737 sales | No (generated) | `scripts/build_resale_db.py` | `SqlitePriceTool` |
-| `evaluation/development/` | 50 dev questions and generated router labels; `archive/` holds the earlier sets | Yes | By hand; labels by `python -m kopi_keys.evaluation.dataset` | Evaluation harness, `test_development_set_contract.py` |
-| held-out questions | 40 final-evaluation questions | **Never** (outside the repository) | A teammate who hasn't tuned the system | `run_eval --split heldout --final` |
+| `benchmarks/` | Fixed-evidence synthesis cases and the policy safety cases | Yes | By hand | `synthesis_benchmark.py`, `policy_safety.py` |
+| `evaluation-data/development/` | 50 dev questions, generated router labels and `accepted_evidence.json` (relaxed-label alternatives); `archive/` holds the earlier, retired sets | Yes | By hand; labels by `python -m kopi_keys.evaluation.dataset` | Evaluation harness, `test_development_set_contract.py` |
+| `evaluation-data/fallback/` | Questions for evaluating the router's LLM intent fallback | Yes | By hand | `fallback_eval.py` |
+| `evaluation-data/results/` | Committed development run outputs (8–9 Nov 2026) and comparison tables | Yes | Evaluation runners | `compare.py`, docs |
+| `evaluation-data/question_template.jsonl` | Template for writing new questions | Yes | By hand | Question writers |
+| held-out questions | 40 final-evaluation questions | **Never** (outside the repository) | Each member, for their assigned categories outside the parts they built, drafted with a fresh AI chat; compiled and SQL-checked | `run_eval --split heldout --final` |
 
 Generated files (`chroma/`, `processed/`) are rebuilt on each machine from what *is* committed, so the
 repository stays small and every machine builds the same data. Git ignore rules only prevent accidental
@@ -87,9 +93,12 @@ each verified ceiling and the answer shows a note, never an eligibility verdict.
 ### 3.4 Evaluation: questions to scores
 
 `dev_set_questions.jsonl` holds each question with router labels and answer labels (verbatim evidence
-resolved to chunk IDs). `stage1_gateway_labels.jsonl` is generated from it. The harness in
-`backend/kopi_keys/evaluation/` scores routing, discovery and Recall@5, and end-to-end runs through the
-app. See its README.
+resolved to chunk IDs; price labels computed with plain SQL on `hdb_prices.db`, not through the app).
+`stage1_gateway_labels.jsonl` is generated from it. `accepted_evidence.json` lists accepted alternative
+evidence for two questions under a written rule; strict and relaxed scores are always reported together.
+The harness in `backend/kopi_keys/evaluation/` scores routing, discovery, retrieval (Hit@5, Recall@5,
+MRR) and end-to-end answers for the full system and both baselines. See its README and
+[evaluation results](../docs/evaluation-results.md).
 
 ## 4. Reference
 
@@ -179,7 +188,13 @@ and matching rules). The app never uses fictional evidence: test-only passages l
 interpolation (Excel `QUARTILE.INC`); mean, median and IQR are rounded once to cents. Zero matches return
 `volume: 0`. Unknown towns or flat types and dates outside the data raise `InvalidPriceFilterError` (a
 `ToolUnavailableError`, so the graph stores it in `price_error`), with suggestions. `is_low_volume()` flags
-fewer than 10 sales. An absent dataset is never replaced with invented price figures.
+fewer than 10 sales, and answers with fewer than 5 sales list them instead of giving a median. An absent
+dataset is never replaced with invented price figures.
+
+**Price watcher.** `.github/workflows/price-refresh.yml` runs weekly (Monday, about 10:33 SGT) and
+`scripts/watch_resale_prices.py` checks data.gov.sg for new transactions. It prepares inactive review
+artifacts only; it never replaces the committed CSV, the database or evaluation labels. See
+[the price watcher guide](../docs/price-watcher.md).
 
 ### 4.5 Income ceilings
 
@@ -214,7 +229,8 @@ buying with other singles or with parents (EHG).
 The development set is committed so the team can reproduce routing and evaluation results. The held-out
 set must not be used while tuning routing, extraction or prompts: keep its questions and labels outside the
 workspace and provide them only for the final evaluation (`KOPI_HELDOUT_DIR`). See
-`evaluation/development/README.md` and `backend/kopi_keys/evaluation/README.md`.
+`evaluation-data/development/README.md`, `backend/kopi_keys/evaluation/README.md` and
+[the held-out guide](../docs/heldout-guide.md).
 
 ## 5. Rules for adding or changing data
 

@@ -1,0 +1,21 @@
+﻿{
+    "step":  "09-naive-rag",
+    "attempt":  1,
+    "status":  "finished",
+    "started_utc":  "2026-11-09T18:37:42.5208171Z",
+    "python_args":  [
+                        "-m",
+                        "kopi_keys.evaluation.run_baselines",
+                        "--system",
+                        "naive-rag-dense"
+                    ],
+    "device":  "gpu",
+    "log":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\09-naive-rag-attempt-1.txt",
+    "exit_code":  0,
+    "finished_utc":  "2026-11-09T18:38:34.3316070Z",
+    "elapsed_seconds":  51.811,
+    "new_result_files":  [
+                             "20261109T183743Z_naive-rag-dense_dev.jsonl",
+                             "20261109T183743Z_naive-rag-dense_dev_metrics.json"
+                         ]
+}

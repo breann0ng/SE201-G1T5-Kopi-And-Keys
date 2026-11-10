@@ -1,0 +1,22 @@
+﻿{
+    "step":  "03-retrieval-bm25",
+    "attempt":  1,
+    "status":  "finished",
+    "started_utc":  "2026-11-09T18:28:16.9420245Z",
+    "python_args":  [
+                        "-m",
+                        "kopi_keys.evaluation.retrieval_report",
+                        "--mode",
+                        "bm25",
+                        "--tag",
+                        "final"
+                    ],
+    "device":  "gpu",
+    "log":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\03-retrieval-bm25-attempt-1.txt",
+    "exit_code":  0,
+    "finished_utc":  "2026-11-09T18:28:18.6602142Z",
+    "elapsed_seconds":  1.718,
+    "new_result_files":  [
+                             "20261109T182818Z_retrieval_bm25_final_dev.json"
+                         ]
+}

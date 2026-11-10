@@ -1,0 +1,179 @@
+{
+  "today": "2026-11-10",
+  "ok": true,
+  "probes": [
+    {
+      "id": "past-6-months",
+      "question": "What did 4-room flats in Tampines sell for in the past 6 months?",
+      "intended": [
+        "2026-06",
+        "2026-11"
+      ],
+      "asked": [
+        "2026-06",
+        "2026-11"
+      ],
+      "app": [
+        "2026-06",
+        "2026-10"
+      ],
+      "intent": true,
+      "covered": true,
+      "disclosure": "We don't have sales data for Nov 2026 yet: our records go up to Oct 2026, so these figures cover Jun 2026 to Oct 2026.",
+      "figures": true,
+      "volume": 412,
+      "median": "669000.00",
+      "sql": [
+        412,
+        "669000.00"
+      ]
+    },
+    {
+      "id": "past-3-months",
+      "question": "How much were 3-room flats in Queenstown in the last 3 months?",
+      "intended": [
+        "2026-09",
+        "2026-11"
+      ],
+      "asked": [
+        "2026-09",
+        "2026-11"
+      ],
+      "app": [
+        "2026-09",
+        "2026-10"
+      ],
+      "intent": true,
+      "covered": true,
+      "disclosure": "We don't have sales data for Nov 2026 yet: our records go up to Oct 2026, so these figures cover Sep 2026 to Oct 2026.",
+      "figures": true,
+      "volume": 40,
+      "median": "496500.00",
+      "sql": [
+        40,
+        "496500.00"
+      ]
+    },
+    {
+      "id": "this-year",
+      "question": "How much are 4-room flats in Ang Mo Kio this year?",
+      "intended": [
+        "2026-01",
+        "2026-11"
+      ],
+      "asked": [
+        "2026-01",
+        "2026-11"
+      ],
+      "app": [
+        "2026-01",
+        "2026-10"
+      ],
+      "intent": true,
+      "covered": true,
+      "disclosure": "We don't have sales data for Nov 2026 yet: our records go up to Oct 2026, so these figures cover Jan 2026 to Oct 2026.",
+      "figures": true,
+      "volume": 240,
+      "median": "620000.00",
+      "sql": [
+        240,
+        "620000.00"
+      ]
+    },
+    {
+      "id": "last-year",
+      "question": "What were 5-room prices in Punggol last year?",
+      "intended": [
+        "2025-01",
+        "2025-12"
+      ],
+      "asked": [
+        "2025-01",
+        "2025-12"
+      ],
+      "app": [
+        "2025-01",
+        "2025-12"
+      ],
+      "intent": true,
+      "covered": true,
+      "disclosure": null,
+      "figures": true,
+      "volume": 456,
+      "median": "749000.00",
+      "sql": [
+        456,
+        "749000.00"
+      ]
+    },
+    {
+      "id": "in-current-year",
+      "question": "How much is a 3-room flat in Jurong West in 2026?",
+      "intended": [
+        "2026-01",
+        "2026-11"
+      ],
+      "asked": [
+        "2026-01",
+        "2026-11"
+      ],
+      "app": [
+        "2026-01",
+        "2026-10"
+      ],
+      "intent": true,
+      "covered": true,
+      "disclosure": "We don't have sales data for Nov 2026 yet: our records go up to Oct 2026, so these figures cover Jan 2026 to Oct 2026.",
+      "figures": true,
+      "volume": 233,
+      "median": "392000.00",
+      "sql": [
+        233,
+        "392000.00"
+      ]
+    },
+    {
+      "id": "default",
+      "question": "How much is a 4-room flat in Bedok?",
+      "intended": [
+        "2025-11",
+        "2026-10"
+      ],
+      "asked": [
+        "2025-11",
+        "2026-10"
+      ],
+      "app": [
+        "2025-11",
+        "2026-10"
+      ],
+      "intent": true,
+      "covered": true,
+      "disclosure": null,
+      "figures": true,
+      "volume": 517,
+      "median": "599000.00",
+      "sql": [
+        517,
+        "599000.00"
+      ]
+    }
+  ],
+  "sources": {
+    "price_data": {
+      "newest_month": "2026-10",
+      "downloaded_on": "2026-10-14",
+      "lag_months": 1,
+      "ok": true
+    },
+    "policy_snapshot": {
+      "date": "2026-10-15",
+      "age_days": 26,
+      "ok": true
+    }
+  },
+  "thresholds": {
+    "max_data_lag_months": 2,
+    "max_policy_age_days": 45
+  }
+}

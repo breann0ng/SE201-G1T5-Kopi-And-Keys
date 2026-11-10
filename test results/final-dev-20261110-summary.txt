@@ -1,0 +1,96 @@
+KOPI & KEYS - FINAL DEVELOPMENT EVALUATION
+Completed: 2026-11-09T18:49:52.361525+00:00 (UTC)
+Frozen main commit: 1c4d87c0ad8afc0ecc3bb2afed942eec1fd159eb
+
+Completed all 15 Part 4 checklist steps, plus setup/sanity checks and frontend
+tests, lint and production build. Production code and frozen data are unchanged.
+No commits or pushes. No held-out access. No cloud judge or LangSmith uploads.
+
+SETUP
+Model: qwen2.5:3b, Q4_K_M, digest 357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b
+GPU Ollama: 0.34.2; full GPU offload verified before and
+after evaluation. Job 360625 on block; 24,192 MiB allocated MIG slice.
+The user requested retaining the running allocation for the team's next test.
+The private server remains running; the model has been unloaded from GPU memory.
+Embeddings: local embeddinggemma, digest 85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1
+Snapshot: 2026-10-15; complete index: 898/898 IDs matched.
+Database: 242,737 rows, Jan 2017 to Oct 2026. Source data and DB hashes verified.
+Sampling: temperature 0, seed 42. Evaluation router date pinned to October 2026.
+Existing Python environment and matching-lockfile frontend package cache reused;
+versions are recorded in run-setup.json and frontend-checks.json.
+
+AUTOMATED CHECKS
+Backend: 1100 passed (one expected missing-index warning).
+Frontend: 32 passed; lint exit 0 (four React Refresh warnings); build exit 0
+(existing large-bundle warning). No browser interaction/visual QA in this session.
+Snapshot/card validation passed. Freshness: 6/6 passed on real date 10 Nov 2026.
+Price fixtures: 6/6 input-validation checks and 6/6 live checks passed.
+All 22 recorded command steps completed with exit 0, no transport retries.
+Benchmark quality failures below are preserved even where a CLI exits 0.
+
+FULL SYSTEM - TWO RUNS ON ALL 50 DEV QUESTIONS
+Both runs: final route 47/50 (94%); initial route 49/50 (98%).
+Both runs: 30 completed answers, 11 refusals and 1 clarification on the
+42 answerable cases; all 8 should-abstain cases refused. Zero uncited answers.
+Both runs: correct returned figures on 18/21 expected-price questions (85.7%).
+Both runs: no run errors or engine-unavailable results.
+Mean end-to-end latency: 2.41 s, 2.35 s; whole command durations: 125.436 s, 122.406 s.
+Status, route and price-result fields matched on all 50 questions. One displayed
+answer (POL-04) differed in quote coverage; headline metric outcomes were identical.
+
+BASELINES - SAME MODEL, GPU AND 50 DEV QUESTIONS
+No tools: 26/42 answerable cases answered; 1/8 out-of-scope cases answered;
+27 uncited answers; 0/21 correct price cases; mean latency 0.38 s.
+Naive dense RAG: 26/42 answerable cases answered; 1/8 out-of-scope cases answered;
+0 uncited answers; 0/21 correct price cases; mean latency 1.01 s.
+See system-comparison.md for paired results and confidence intervals.
+Baselines have no route output: their printed routing=0 is not an intent test.
+
+RETRIEVAL / CARDS / SQL
+Policy Recall@5 (22 policy questions): hybrid 74.2% strict / 83.3% relaxed;
+BM25 53.0% strict; dense 67.4% strict. Hybrid still below the 85% Recall target.
+Policy Hit@5 is different: hybrid 81.8% strict / 90.9% relaxed.
+All required gold IDs exist in the complete index; poor rank/selection remains.
+Component rules routing: 50/50. Price filters and SQL figures: each 23/23.
+Suggested-card precision 14/26 (54%), recall 14/15 (93%). Shown-only 2/2 precision
+has only 2/15 recall and must not be presented as overall precision.
+
+SAFETY / SYNTHESIS / ROUTER FALLBACK
+Synthetic safety suite: 16/16 passed; no availability
+errors. Positive controls: 3/3. Answerable probes answered: 7/8; some cases allow
+a safe refusal. This finite probe set is not a comprehensive security guarantee.
+Fixed-evidence synthesis: 9/12 automatic coverage/outcome
+checks passed; failures: SYN-03, SYN-06, SYN-07. All three are refusals on answerable
+cases. No engine errors. Median synthesis latency 1.466 s.
+Hybrid router fallback: 36/38;
+rules only: 21/38.
+Hybrid failures: FB-C02 (vague question routed as policy), FB-F01 (HDB opening
+hours not declined). All 9 rescue cases and 10 rule-decline cases passed.
+
+GAPS / REVIEW REQUIRED
+Three current-policy questions (CHG-05/06/07) receive historical-only excerpts.
+Source matching does not establish temporal applicability. Inspect the original
+answers, not only the literal staleness score. This remains an unresolved concern.
+Eleven answerable refusals include quote-matching and/or relevance failures.
+SYN-03 misses singles grant-stacking coverage; SYN-06 and SYN-07 fail source-quote
+matching. See dev-review.json, synthesis-final.json and REVIEW-NOTES.txt.
+Human semantic review, held-out evaluation, and optional cloud judge remain undone.
+Optional long mutation campaigns were not selected and were not run in this session.
+No tuning or fixes were made in response to these results.
+
+METRIC CAVEATS
+answers_answerable=31/42 in the compare tool includes 1 clarification; completed
+answers are 30/42. Raw price_figures=18/18 is conditional: overall is 18/21.
+Staleness is a literal string screen, not an independently validated accuracy rate.
+Citation presence does not establish correctness, relevance or complete conditions.
+Latencies include laptop retrieval and SSH overhead; no controlled CPU/GPU speedup
+comparison was performed. Small dev denominators limit generalisation.
+
+FILES
+Raw session results: results/ (only the 13 files produced by this session).
+Diagnostics: dev-review.json; synthesis-final.json; policy-safety-live.json.
+Comparisons: system-comparison*.md; retrieval-comparison*.md.
+Reproducibility: run-setup.json; session-audit.json; per-step logs/metadata;
+reproduce/ operational scripts. Source/data integrity: PASS, no tracked edits.
+MANIFEST.json records every other packaged file's byte length and SHA-256.
+This ZIP was created locally; it has not been sent to anyone or committed.

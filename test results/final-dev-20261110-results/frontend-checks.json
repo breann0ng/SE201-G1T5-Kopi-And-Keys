@@ -1,0 +1,22 @@
+﻿{
+    "node_version":  "v22.19.0",
+    "npm_version":  "10.9.3",
+    "dependency_cache":  "Reused matching-lockfile installed node_modules through a junction; no install or dependency changes",
+    "checks":  [
+                   {
+                       "check":  "test",
+                       "exit_code":  0,
+                       "elapsed_seconds":  2.791
+                   },
+                   {
+                       "check":  "lint",
+                       "exit_code":  0,
+                       "elapsed_seconds":  9.316
+                   },
+                   {
+                       "check":  "build",
+                       "exit_code":  0,
+                       "elapsed_seconds":  37.397
+                   }
+               ]
+}

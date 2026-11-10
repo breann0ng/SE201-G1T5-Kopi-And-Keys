@@ -1,0 +1,258 @@
+{
+  "split": "dev",
+  "questions": 50,
+  "snapshot": "2026-10-15",
+  "retriever": "hybrid (keyword + embeddinggemma)",
+  "router_as_of": "2026-10",
+  "remote_clock_uncontrolled": false,
+  "stage1": {
+    "routing_accuracy": "100% (50/50)",
+    "mismatches": []
+  },
+  "discovery": {
+    "precision": "54% (14/26)",
+    "recall": "93% (14/15)",
+    "precision_shown": "100% (2/2)",
+    "recall_shown": "13% (2/15)",
+    "ask_next_accuracy": "60% (3/5)",
+    "cases": [
+      {
+        "id": "DSC-01",
+        "extra": [
+          "CARD_EIP_SPR_QUOTA",
+          "CARD_NON_CITIZEN_ELIGIBILITY"
+        ],
+        "missed": [],
+        "shown": [],
+        "ruled_out": {},
+        "ask_next": "citizenship",
+        "expected_ask": "citizenship"
+      },
+      {
+        "id": "DSC-02",
+        "extra": [
+          "CARD_NON_CITIZEN_ELIGIBILITY",
+          "CARD_PHG",
+          "CARD_STEPUP_GRANT"
+        ],
+        "missed": [],
+        "shown": [],
+        "ruled_out": {
+          "CARD_EHG": "income of $11,000 is above the highest Enhanced CPF Housing Grant (Families) ceiling of $9,000"
+        },
+        "ask_next": "first_timer",
+        "expected_ask": "first_timer"
+      },
+      {
+        "id": "DSC-03",
+        "extra": [
+          "CARD_PHG"
+        ],
+        "missed": [],
+        "shown": [],
+        "ruled_out": {},
+        "ask_next": "age",
+        "expected_ask": "household_income"
+      },
+      {
+        "id": "DSC-04",
+        "extra": [
+          "CARD_EIP_SPR_QUOTA",
+          "CARD_NON_CITIZEN_ELIGIBILITY",
+          "CARD_PHG"
+        ],
+        "missed": [
+          "CARD_HFE_LETTER"
+        ],
+        "shown": [],
+        "ruled_out": {
+          "CARD_EHG": "owns private residential property: this grant needs no private property owned, or disposed of in the last 30 months (CHUNK_EHG_36)",
+          "CARD_FAMILY_GRANT": "owns private residential property: this grant needs no private property owned, or disposed of in the last 30 months (CHUNK_FAMILY_08)",
+          "CARD_SINGLES_GRANT": "owns private residential property: this grant needs no private property owned, or disposed of in the last 30 months (CHUNK_SINGLES_06)",
+          "CARD_STEPUP_GRANT": "owns private residential property: this grant needs no private property owned, or disposed of in the last 30 months (CHUNK_STEPUP_07)"
+        },
+        "ask_next": "citizenship",
+        "expected_ask": null
+      },
+      {
+        "id": "DSC-05",
+        "extra": [
+          "CARD_PHG"
+        ],
+        "missed": [],
+        "shown": [
+          "CARD_EHG",
+          "CARD_SINGLES_GRANT"
+        ],
+        "ruled_out": {},
+        "ask_next": "lives_with_or_near_parents_or_child",
+        "expected_ask": null
+      },
+      {
+        "id": "DSC-06",
+        "extra": [
+          "CARD_FAMILY_GRANT",
+          "CARD_PHG"
+        ],
+        "missed": [],
+        "shown": [],
+        "ruled_out": {},
+        "ask_next": "household_income",
+        "expected_ask": "household_income"
+      },
+      {
+        "id": "DSC-07",
+        "extra": [],
+        "missed": [],
+        "shown": [],
+        "ruled_out": {},
+        "ask_next": "age",
+        "expected_ask": "household_income"
+      }
+    ]
+  },
+  "retrieval": {
+    "recall_at_5": "69% (20/29)",
+    "misses": [
+      {
+        "id": "POL-02",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_SINGLES_05",
+          "CHUNK_ELIG_68",
+          "CHUNK_ELIG_65",
+          "CHUNK_ELIG_01",
+          "CHUNK_ELIG_76"
+        ],
+        "expected": [
+          "CHUNK_GRANTS_05",
+          "CHUNK_GRANTS_09"
+        ]
+      },
+      {
+        "id": "POL-04",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_EIP_02",
+          "CHUNK_RESALE_117",
+          "CHUNK_RESALE_140",
+          "CHUNK_EIP_05",
+          "CHUNK_BTO_317"
+        ],
+        "expected": [
+          "CHUNK_EIP_01"
+        ]
+      },
+      {
+        "id": "MIX-04",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_EHG_29",
+          "CHUNK_EHG_49",
+          "CHUNK_EHG_47",
+          "CHUNK_EHG_15",
+          "CHUNK_EHG_48"
+        ],
+        "expected": [
+          "CHUNK_EHG_05",
+          "CHUNK_EHG_01"
+        ]
+      },
+      {
+        "id": "MIX-08",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_SINGLES_05",
+          "CHUNK_PHG_09",
+          "CHUNK_SINGLES_01",
+          "CHUNK_CPF_32",
+          "CHUNK_PHG_08"
+        ],
+        "expected": [
+          "CHUNK_PHG_06"
+        ]
+      },
+      {
+        "id": "DSC-01",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_ELIG_44",
+          "CHUNK_ELIG_52",
+          "CHUNK_ELIG_24",
+          "CHUNK_ELIG_128",
+          "CHUNK_ELIG_122"
+        ],
+        "expected": [
+          "CHUNK_PHG_01"
+        ]
+      },
+      {
+        "id": "DSC-02",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_ELIG_52",
+          "CHUNK_ELIG_24",
+          "CHUNK_ELIG_44",
+          "CHUNK_ELIG_59",
+          "CHUNK_ELIG_127"
+        ],
+        "expected": [
+          "CHUNK_FAMILY_04"
+        ]
+      },
+      {
+        "id": "DSC-03",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_FAMILY_10",
+          "CHUNK_SINGLES_01",
+          "CHUNK_SINGLES_05",
+          "CHUNK_FAMILY_09",
+          "CHUNK_FAMILY_08"
+        ],
+        "expected": [
+          "CHUNK_LEASE_11"
+        ]
+      },
+      {
+        "id": "DSC-04",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_EC_06",
+          "CHUNK_RESALE_27",
+          "CHUNK_EC_05",
+          "CHUNK_RESALE_150",
+          "CHUNK_EC_04"
+        ],
+        "expected": [
+          "CHUNK_GRANTS_04",
+          "CHUNK_GRANTS_05",
+          "CHUNK_GRANTS_09"
+        ]
+      },
+      {
+        "id": "DSC-06",
+        "hit": false,
+        "retrieved": [
+          "CHUNK_BTO_100",
+          "CHUNK_ELIG_52",
+          "CHUNK_ELIG_24",
+          "CHUNK_ELIG_44",
+          "CHUNK_BTO_99"
+        ],
+        "expected": [
+          "CHUNK_STEPUP_01",
+          "CHUNK_STEPUP_03"
+        ]
+      }
+    ]
+  },
+  "price_filters": {
+    "accuracy": "100% (23/23)",
+    "mismatches": []
+  },
+  "price_figures": {
+    "accuracy": "100% (23/23)",
+    "mismatches": []
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "mode": "validation_only",
+  "results": [
+    {
+      "case": "zero_transactions",
+      "expected": "valid_input",
+      "actual": "valid_input",
+      "passed": true
+    },
+    {
+      "case": "single_transaction",
+      "expected": "valid_input",
+      "actual": "valid_input",
+      "passed": true
+    },
+    {
+      "case": "decimal_rounding",
+      "expected": "valid_input",
+      "actual": "valid_input",
+      "passed": true
+    },
+    {
+      "case": "large_amounts",
+      "expected": "valid_input",
+      "actual": "valid_input",
+      "passed": true
+    },
+    {
+      "case": "invalid_missing_median",
+      "expected": "rejected",
+      "actual": "rejected",
+      "passed": true,
+      "model_calls": 0,
+      "validation_error": "1 validation error for PriceCase\nsql_result\n  Value error, Non-empty SQL results require mean, median, IQR, minimum and maximum. [type=value_error, input_value={'query_id': 'synthetic-i...0', 'maximum': '780000'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error"
+    },
+    {
+      "case": "invalid_price_range",
+      "expected": "rejected",
+      "actual": "rejected",
+      "passed": true,
+      "model_calls": 0,
+      "validation_error": "1 validation error for PriceCase\nsql_result\n  Value error, Mean must lie within the SQL price range. [type=value_error, input_value={'query_id': 'synthetic-i...0', 'maximum': '500000'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error"
+    }
+  ]
+}

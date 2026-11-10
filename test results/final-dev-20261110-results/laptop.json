@@ -1,0 +1,14 @@
+﻿{
+    "model":  "82YL",
+    "ram_bytes":  16891371520,
+    "cpu_name":  [
+                     "13th Gen Intel(R) Core(TM) i5-1340P"
+                 ],
+    "cores":  [
+                  12
+              ],
+    "logical_processors":  [
+                               16
+                           ],
+    "node_version":  "v22.19.0"
+}

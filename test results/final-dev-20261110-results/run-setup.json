@@ -1,0 +1,574 @@
+{
+  "commit": "1c4d87c0ad8afc0ecc3bb2afed942eec1fd159eb",
+  "collected_at_utc": "2026-11-09T18:23:45.247683+00:00",
+  "runner": "Nisha; assisted execution",
+  "python": "3.11.4 (tags/v3.11.4:d2340ef, Jun  7 2023, 05:45:37) [MSC v.1934 64 bit (AMD64)]",
+  "platform": "Windows-10-10.0.26300-SP0",
+  "logical_cpus": 16,
+  "packages": [
+    {
+      "name": "aiohappyeyeballs",
+      "version": "2.7.1"
+    },
+    {
+      "name": "aiohttp",
+      "version": "3.14.5"
+    },
+    {
+      "name": "aiohttp-retry",
+      "version": "2.9.1"
+    },
+    {
+      "name": "aiosignal",
+      "version": "1.4.0"
+    },
+    {
+      "name": "annotated-doc",
+      "version": "0.0.5"
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.8.0"
+    },
+    {
+      "name": "anyio",
+      "version": "4.15.1"
+    },
+    {
+      "name": "attrs",
+      "version": "26.1.0"
+    },
+    {
+      "name": "bcrypt",
+      "version": "5.0.0"
+    },
+    {
+      "name": "build",
+      "version": "1.6.1"
+    },
+    {
+      "name": "certifi",
+      "version": "2026.10.23"
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.5.2"
+    },
+    {
+      "name": "chromadb",
+      "version": "1.5.9"
+    },
+    {
+      "name": "click",
+      "version": "8.5.0"
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6"
+    },
+    {
+      "name": "distro",
+      "version": "1.9.0"
+    },
+    {
+      "name": "durationpy",
+      "version": "0.11"
+    },
+    {
+      "name": "fastapi",
+      "version": "0.143.0"
+    },
+    {
+      "name": "filelock",
+      "version": "4.2.1"
+    },
+    {
+      "name": "flatbuffers",
+      "version": "25.12.19"
+    },
+    {
+      "name": "frozenlist",
+      "version": "1.8.0"
+    },
+    {
+      "name": "fsspec",
+      "version": "2026.9.0"
+    },
+    {
+      "name": "googleapis-common-protos",
+      "version": "1.75.5"
+    },
+    {
+      "name": "grpcio",
+      "version": "1.84.0"
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0"
+    },
+    {
+      "name": "hf-xet",
+      "version": "1.7.0"
+    },
+    {
+      "name": "httpcore",
+      "version": "1.0.9"
+    },
+    {
+      "name": "httpcore2",
+      "version": "2.13.1"
+    },
+    {
+      "name": "httptools",
+      "version": "0.9.0"
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1"
+    },
+    {
+      "name": "httpx2",
+      "version": "2.13.1"
+    },
+    {
+      "name": "huggingface_hub",
+      "version": "2.2.0"
+    },
+    {
+      "name": "idna",
+      "version": "3.20"
+    },
+    {
+      "name": "importlib_resources",
+      "version": "7.1.0"
+    },
+    {
+      "name": "iniconfig",
+      "version": "2.3.1"
+    },
+    {
+      "name": "jsonpatch",
+      "version": "1.35"
+    },
+    {
+      "name": "jsonpointer",
+      "version": "3.2.1"
+    },
+    {
+      "name": "jsonschema",
+      "version": "4.26.0"
+    },
+    {
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1"
+    },
+    {
+      "name": "kopi-and-keys",
+      "version": "0.1.0",
+      "editable_project_location": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys"
+    },
+    {
+      "name": "kubernetes",
+      "version": "37.0.1"
+    },
+    {
+      "name": "langchain-core",
+      "version": "1.6.10"
+    },
+    {
+      "name": "langchain-protocol",
+      "version": "0.0.19"
+    },
+    {
+      "name": "langgraph",
+      "version": "1.2.15"
+    },
+    {
+      "name": "langgraph-checkpoint",
+      "version": "4.3.0"
+    },
+    {
+      "name": "langgraph-prebuilt",
+      "version": "1.1.0"
+    },
+    {
+      "name": "langgraph-sdk",
+      "version": "0.4.7"
+    },
+    {
+      "name": "langsmith",
+      "version": "0.14.8"
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "4.2.0"
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2"
+    },
+    {
+      "name": "mmh3",
+      "version": "5.3.1"
+    },
+    {
+      "name": "multidict",
+      "version": "7.1.0"
+    },
+    {
+      "name": "numpy",
+      "version": "2.4.6"
+    },
+    {
+      "name": "oauthlib",
+      "version": "4.0.1"
+    },
+    {
+      "name": "onnxruntime",
+      "version": "1.31.0"
+    },
+    {
+      "name": "opentelemetry-api",
+      "version": "1.45.1"
+    },
+    {
+      "name": "opentelemetry-exporter-otlp-common",
+      "version": "0.66b1"
+    },
+    {
+      "name": "opentelemetry-exporter-otlp-proto-common",
+      "version": "1.45.1"
+    },
+    {
+      "name": "opentelemetry-exporter-otlp-proto-grpc",
+      "version": "1.45.1"
+    },
+    {
+      "name": "opentelemetry-proto",
+      "version": "1.45.1"
+    },
+    {
+      "name": "opentelemetry-sdk",
+      "version": "1.45.1"
+    },
+    {
+      "name": "opentelemetry-semantic-conventions",
+      "version": "0.66b1"
+    },
+    {
+      "name": "orjson",
+      "version": "3.13.0"
+    },
+    {
+      "name": "ormsgpack",
+      "version": "1.12.2"
+    },
+    {
+      "name": "overrides",
+      "version": "7.7.0"
+    },
+    {
+      "name": "packaging",
+      "version": "26.3"
+    },
+    {
+      "name": "pip",
+      "version": "26.3"
+    },
+    {
+      "name": "pluggy",
+      "version": "1.6.0"
+    },
+    {
+      "name": "propcache",
+      "version": "0.5.4"
+    },
+    {
+      "name": "protobuf",
+      "version": "7.36.2"
+    },
+    {
+      "name": "pybase64",
+      "version": "1.5.1"
+    },
+    {
+      "name": "pydantic",
+      "version": "2.14.1"
+    },
+    {
+      "name": "pydantic_core",
+      "version": "2.50.1"
+    },
+    {
+      "name": "pydantic-settings",
+      "version": "2.16.0"
+    },
+    {
+      "name": "Pygments",
+      "version": "2.21.0"
+    },
+    {
+      "name": "PyPika",
+      "version": "0.51.1"
+    },
+    {
+      "name": "pyproject_hooks",
+      "version": "1.3.3"
+    },
+    {
+      "name": "pytest",
+      "version": "9.1.1"
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0"
+    },
+    {
+      "name": "python-dotenv",
+      "version": "1.2.4"
+    },
+    {
+      "name": "PyYAML",
+      "version": "6.0.3"
+    },
+    {
+      "name": "referencing",
+      "version": "0.37.0"
+    },
+    {
+      "name": "requests",
+      "version": "2.34.2"
+    },
+    {
+      "name": "requests-oauthlib",
+      "version": "2.0.0"
+    },
+    {
+      "name": "requests-toolbelt",
+      "version": "1.0.0"
+    },
+    {
+      "name": "rich",
+      "version": "15.0.0"
+    },
+    {
+      "name": "rpds-py",
+      "version": "2026.9.1"
+    },
+    {
+      "name": "setuptools",
+      "version": "84.2.1"
+    },
+    {
+      "name": "shellingham",
+      "version": "1.5.4"
+    },
+    {
+      "name": "six",
+      "version": "1.17.0"
+    },
+    {
+      "name": "sniffio",
+      "version": "1.3.1"
+    },
+    {
+      "name": "starlette",
+      "version": "1.7.0"
+    },
+    {
+      "name": "tenacity",
+      "version": "9.2.1"
+    },
+    {
+      "name": "tokenizers",
+      "version": "0.23.3"
+    },
+    {
+      "name": "tqdm",
+      "version": "4.70.1"
+    },
+    {
+      "name": "truststore",
+      "version": "0.10.5"
+    },
+    {
+      "name": "typer",
+      "version": "0.27.3"
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.16.0"
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.4"
+    },
+    {
+      "name": "urllib3",
+      "version": "2.8.0"
+    },
+    {
+      "name": "uuid_utils",
+      "version": "0.17.1"
+    },
+    {
+      "name": "uvicorn",
+      "version": "0.54.0"
+    },
+    {
+      "name": "watchfiles",
+      "version": "1.3.0"
+    },
+    {
+      "name": "websocket-client",
+      "version": "1.9.2"
+    },
+    {
+      "name": "websockets",
+      "version": "16.1.1"
+    },
+    {
+      "name": "xxhash",
+      "version": "4.0.1"
+    },
+    {
+      "name": "yarl",
+      "version": "1.25.1"
+    },
+    {
+      "name": "zstandard",
+      "version": "0.25.0"
+    }
+  ],
+  "python_module": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\backend\\kopi_keys\\llm.py",
+  "gpu_job": "360625",
+  "compute_host": "block",
+  "allocated_gpu": "MIG-992565c1-1e43-5cf5-bc6f-af258abd8b75",
+  "gpu_ollama_version": "0.34.2",
+  "gpu_loaded_model": {
+    "name": "qwen2.5:3b",
+    "model": "qwen2.5:3b",
+    "size": 2159374499,
+    "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen2",
+      "families": [
+        "qwen2"
+      ],
+      "parameter_size": "3.1B",
+      "quantization_level": "Q4_K_M"
+    },
+    "expires_at": "2026-11-10T02:53:43.901757055+08:00",
+    "size_vram": 2159374499,
+    "context_length": 4096
+  },
+  "local_ollama_version": "0.40.4",
+  "embedding_model": {
+    "name": "embeddinggemma:latest",
+    "digest": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+    "size": 621875917
+  },
+  "database": {
+    "rows": 242737,
+    "min_month": "2017-01",
+    "max_month": "2026-10",
+    "source_sha256": "248694f3cf7cc07e7e166b8eab3c5ebe3b18c39f76156282a6f618137fa49dc8",
+    "downloaded_on": "2026-10-14",
+    "sha256": "cf66aaef8503f7fed4f461be46bc297857bb7c4bb5edd49c5b5593d5a689b40d"
+  },
+  "snapshot": "2026-10-15",
+  "index_count": 898,
+  "data_sha256": {
+    "data\\evaluation-data\\development\\dev_set_questions.jsonl": "f64fe3abf10238216c63f6fe27a6bb941d076bdbfdcaef7c76c3a1e995ebc88b",
+    "data\\policy_snapshots\\ACTIVE": "3ea57917cee8302f16d879c68941a1854b89869b2c2dc3564dd9b0fb51242241",
+    "data\\policy_chunks\\2026-10-15\\chunks.jsonl": "abbc48b3036560c2959da067ab26feb5815caf3e252df17797eec3fd51a93f78",
+    "data\\policy_index\\2026-10-15\\vectors.json": "2b444eab4804bb2bde4d2aa687f5714b722ad6dd4078322c12764b9e261468be",
+    "data\\policy_index\\2026-10-15\\vectors.f32": "dd050b2cf948d35264ca5c58e53102e8588b3159e0f2143050b3442b42bfa96c",
+    "data\\topic_cards\\2026-10-15\\card_ehg.json": "3bc31e254c61ba370a20368d3af622d04d739bc41a1bd352c5df69857740da8c",
+    "data\\topic_cards\\2026-10-15\\card_eip_spr_quota.json": "673d0715f511b829f2e0e39a7aa3fb460a5fcd5741146a8314b98e90f4dc369a",
+    "data\\topic_cards\\2026-10-15\\card_family_grant.json": "2c471e9aee3c9930730a353b74d8da1d288d92b813bf1e265bf34f075a74f0fb",
+    "data\\topic_cards\\2026-10-15\\card_hdb_loan.json": "5d71fd68125eef330c246ef834d40143c250073c3f03e9060c4ca63419a012ed",
+    "data\\topic_cards\\2026-10-15\\card_hfe_letter.json": "7247f6b797513d0564f55bfd6194bbcef2f7b4b7b6567cda2dab8858746950f6",
+    "data\\topic_cards\\2026-10-15\\card_income_ceiling.json": "ea7b8ec6db6efd8c67770bedc106be8afe8e0aeeb8b73b34608d4a8c97b31a1f",
+    "data\\topic_cards\\2026-10-15\\card_lease_eligibility.json": "68622838619bdbe69cf78fb6bb453a6a91519562cf5aece5ffbb3d18d8f1e193",
+    "data\\topic_cards\\2026-10-15\\card_non_citizen_eligibility.json": "a42fb5c843b3b9033b0b9223eed43f5cf1d795712ef335d180230d1014a153ec",
+    "data\\topic_cards\\2026-10-15\\card_phg.json": "7d0a4cc7efa5946218eb7051a9f547a31c69761e6ffa5cfec605108c227e7c8a",
+    "data\\topic_cards\\2026-10-15\\card_resale_otp_deposit.json": "d18fe612b9db4dd0f8a2862336abdae9062a4379f9a5671e4701de6d2034e092",
+    "data\\topic_cards\\2026-10-15\\card_singles_grant.json": "f50e8f816ef02e7a6de98f2fd84d87d47337b7397f99901c2c48a7f264571f44",
+    "data\\topic_cards\\2026-10-15\\card_stepup_grant.json": "5d95ff29c0a9a08e7ddfb9ce5ee80e7d48fcde0c1dfd34d3f094d4f87d3c8e76"
+  },
+  "source_sha256": {
+    "backend\\kopi_keys\\__init__.py": "a498e9c0f56a76c6c651a03dcdd76c53bc6474aa7c66c80052c6a8060b8a9e69",
+    "backend\\kopi_keys\\cancellation.py": "d1e67dacfae72f75623c0fd84facd5a20f20dfd78cbc51a4d5d044f448a40e0c",
+    "backend\\kopi_keys\\cli.py": "a5053f076e4053ff51781495566e2716bb91ff519b24b223751107ab50d29cf7",
+    "backend\\kopi_keys\\components\\__init__.py": "fd1780a3b404f18a38dfbc5c34f5099bd424b45ce26a0d0a4f093b4ebb476e70",
+    "backend\\kopi_keys\\components\\abstention.py": "e3b1a8eeb6aa3e5f7fac8281adddb5d7069e4d6fab4fa5a8c238b2819ae93b10",
+    "backend\\kopi_keys\\components\\answer_aspects.py": "6821f43a86f914d1e58e112f58dc1df18179496ca45a2c9cb5435caad5b0db5a",
+    "backend\\kopi_keys\\components\\intent_fallback.py": "afff9b73df43b24bf8b4bba8c5483162b80af3d38619fc5766b12b8c89cbb249",
+    "backend\\kopi_keys\\components\\policy_guardrails.py": "3916dcf7798b4af3f97963cc027999f978d3101c420cf28d0bb1086f991f106c",
+    "backend\\kopi_keys\\components\\policy_index.py": "f8c4acf19c909c065ea9b347590404762f40f051d3d400388f9d47fe626156cf",
+    "backend\\kopi_keys\\components\\policy_retrieval.py": "bd0f380e48f40bf19decd7257c2732bcb764035674b4fadee1d826183dfdbe8c",
+    "backend\\kopi_keys\\components\\policy_synthesis.py": "9c1249d8e148506af1e7d6b0ab13fcdd85ad83f15b05266fa2287ca48bcd6d43",
+    "backend\\kopi_keys\\components\\price_display.py": "67c7282b47c1a25bd1dde32e0868cc412d8ae0ad14f30ba2b392a08dea27dbdb",
+    "backend\\kopi_keys\\components\\price_query.py": "9d77f8f4bdbb926c5c6ce701520e879487a62a76be1351a02b22d67d12baff6f",
+    "backend\\kopi_keys\\components\\profile_context.py": "f5c56fe97a2a9019eabb7a83b0fb67603fd83330b8215e63196dfaf8a6e05d57",
+    "backend\\kopi_keys\\components\\query_router.py": "0c8cd54472c476083ae16aaefc3cdfc013a53fbc1cf3209f363c4a625651bab6",
+    "backend\\kopi_keys\\components\\synthesiser.py": "2add44e0300862d050b50d446fc87d9dbca3b19cb6c3c6c56bf40807c24f2391",
+    "backend\\kopi_keys\\components\\topic_cards.py": "44682d29a992b7710f26bdefc6f0caf7150ee9d1d248bb50b4c3ee0665e92b26",
+    "backend\\kopi_keys\\components\\verifier.py": "c3bafb4bec193e3bbaeb6a95c3e863ce75ef319977443f51120cf87ed49efe0b",
+    "backend\\kopi_keys\\evaluation\\__init__.py": "d9473d0b78b0dcce99d12753ec17ff79972398a5a82dace844c8d92a8e7a4d40",
+    "backend\\kopi_keys\\evaluation\\baselines.py": "02c005f0c9f5edf3c2bfdd756772341cb4b927e52b7117a308dde2ef2fa7e689",
+    "backend\\kopi_keys\\evaluation\\compare.py": "25a493855557d69837bf6de22463a5d84c1d13cad7f89b943f466d34f4cbffdc",
+    "backend\\kopi_keys\\evaluation\\dataset.py": "8fa48775bb9489d4ef01334926450b180e469f7ef4f9a979c4b87d3933da7292",
+    "backend\\kopi_keys\\evaluation\\dev_review.py": "35823f7537d494de28b52108b7db9b0a8540a7c54dff192d4f8f034fdc5a56ca",
+    "backend\\kopi_keys\\evaluation\\fallback_eval.py": "dbae37e1a280bed7d17b21df01b173eaa6a238e3ef7672437fa5746d0257ff5a",
+    "backend\\kopi_keys\\evaluation\\freshness.py": "851cc2ae6fbc60445543c8f696efb44ba2f727a3c15e722576e378748a73028e",
+    "backend\\kopi_keys\\evaluation\\langsmith_eval.py": "c3ad227443e4103aad3e7312bf1078f3f527e4a071eb9b81c64420efc61bd634",
+    "backend\\kopi_keys\\evaluation\\metrics.py": "adb4cfad471d47c4e4f30d6013ee0decdc64abc2a8f65c5d8d688cb76efd25ac",
+    "backend\\kopi_keys\\evaluation\\policy_safety.py": "076eb5f4a5155cd0f50078f78738aaf5d8a45d413e1ada606ecd6d2dd31daf59",
+    "backend\\kopi_keys\\evaluation\\retrieval_report.py": "c6d4a28c2c343fcdf5e2e76351326c5a839ab6470739e5395d5d5b31ac6c0aa2",
+    "backend\\kopi_keys\\evaluation\\retrieval_sweep.py": "d0ca768971b420e73721a44b81b8868649429503623639001f9f8b6bb6d9fd54",
+    "backend\\kopi_keys\\evaluation\\run_baselines.py": "dcf1295ad13ae1b5abbc70efebca507fbf3a55c0d3734163efb4f1981ce5d685",
+    "backend\\kopi_keys\\evaluation\\run_eval.py": "269a996907087edb46d0d9fe892a7035b8487f9e113ed275ed1e62fc33324792",
+    "backend\\kopi_keys\\evaluation\\stats.py": "2d9ed3927d49dc9e2207b747a703bb845742d5a8eb5944bb60d6b8eec82e9399",
+    "backend\\kopi_keys\\evaluation\\synthesis_benchmark.py": "2bf0bd124a4884cae1552925abd16ec9e77d96597f0c1dce5b6e6c040b070102",
+    "backend\\kopi_keys\\feedback.py": "06852c03ead852a3ddddb7a1619f824f197f1581b9589c4eac54ae4c4d393271",
+    "backend\\kopi_keys\\graph.py": "6c262a3c792199cb27c6d32a4b93ac985368fe091ee7d5e8cc907facb26f2168",
+    "backend\\kopi_keys\\ingest\\__init__.py": "07e336dcff4f2bf5abb3f15d8aedb6af280ea6427a13fb2a59063b9c415da0c3",
+    "backend\\kopi_keys\\ingest\\policy_index.py": "240a52bbb0eec586c87befe5f1591a6fe2e93c04dfbfb71d0e0f90d95a3e7aca",
+    "backend\\kopi_keys\\ingest\\price_watch.py": "04862abea21534f1ce06a2011904a023c41ed269614bdb81fd1f7f7d5f729e71",
+    "backend\\kopi_keys\\ingest\\resale_db.py": "c571c6f08ca2a6b1feacebd12e0a09a757a79d1c7134bb348c96702478e23a98",
+    "backend\\kopi_keys\\llm.py": "5f48812d376f3aa89ae5822a109f7be24638bdb45f3593b8980bdb4fd39fcc8c",
+    "backend\\kopi_keys\\main.py": "bdc510a90f9e85f1cacc28015c24beb533ecb9d85b835677618216d88106be4f",
+    "backend\\kopi_keys\\rules\\__init__.py": "c8daa1c78130b484b2657c0866e1cd535e964a16d3220ef6b5699e5668dcaaa9",
+    "backend\\kopi_keys\\rules\\income.py": "255295821bf44e4337d40033b5ddae71bad943931aca04ff14bf79ed94af5680",
+    "backend\\kopi_keys\\schemas.py": "6542c1a22e65edebf9bcdfc5ee6eec1e659e32931ac1880bf0fe1d1da90fe538",
+    "backend\\kopi_keys\\state.py": "48cf3b2637aa5569a8fb8995994e8740ced21313cf97a56d2b01f031e5113f59",
+    "backend\\kopi_keys\\topic_cards.py": "f08c358170139e43e5ec99e80c220b2282f4329d87a1a58e3150299959ae3cb1"
+  },
+  "configuration": {
+    "KOPI_OLLAMA_BASE_URL": "http://127.0.0.1:11437",
+    "KOPI_EMBED_BASE_URL": "http://127.0.0.1:11434",
+    "KOPI_OLLAMA_MODEL": "qwen2.5:3b",
+    "KOPI_POLICY_MODEL": "qwen2.5:3b",
+    "KOPI_ROUTER_MODEL": "qwen2.5:3b",
+    "KOPI_OLLAMA_DEVICE": "gpu",
+    "KOPI_ASPECT_CHECK": "shadow",
+    "KOPI_ASPECT_LABEL": "code",
+    "KOPI_POLICY_MIN_RELEVANCE": "0.20",
+    "LANGSMITH_TRACING": "false",
+    "LANGCHAIN_TRACING_V2": "false"
+  },
+  "sampling": {
+    "temperature": 0,
+    "seed": 42
+  },
+  "notes": [
+    "Existing Python environment reused with explicit pinned backend path; no dependency updates.",
+    "GPU tunnel uses local port 11437 to avoid obsolete tunnels.",
+    "Only this session output folder and its explicit result manifest will be packaged.",
+    "Held-out not accessed; optional cloud judge not selected."
+  ]
+}

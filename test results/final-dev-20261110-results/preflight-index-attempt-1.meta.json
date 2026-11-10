@@ -1,0 +1,17 @@
+﻿{
+    "step":  "preflight-index",
+    "attempt":  1,
+    "status":  "finished",
+    "started_utc":  "2026-11-09T18:22:35.4440195Z",
+    "python_args":  [
+                        "scripts/build_policy_index.py"
+                    ],
+    "device":  "cpu",
+    "log":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\preflight-index-attempt-1.txt",
+    "exit_code":  0,
+    "finished_utc":  "2026-11-09T18:22:42.9547937Z",
+    "elapsed_seconds":  7.511,
+    "new_result_files":  [
+
+                         ]
+}

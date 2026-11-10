@@ -1,0 +1,24 @@
+﻿{
+    "step":  "12-synthesis",
+    "attempt":  1,
+    "status":  "finished",
+    "started_utc":  "2026-11-09T18:44:14.9388974Z",
+    "python_args":  [
+                        "-m",
+                        "kopi_keys.evaluation.synthesis_benchmark",
+                        "--device",
+                        "gpu",
+                        "--models",
+                        "qwen2.5:3b",
+                        "--output",
+                        ".local/reports/final-dev-20261110/synthesis-final.json"
+                    ],
+    "device":  "gpu",
+    "log":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\12-synthesis-attempt-1.txt",
+    "exit_code":  0,
+    "finished_utc":  "2026-11-09T18:44:35.5225378Z",
+    "elapsed_seconds":  20.584,
+    "new_result_files":  [
+
+                         ]
+}
