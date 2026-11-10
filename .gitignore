@@ -34,3 +34,6 @@ held-out/
 # data/evaluation-data/development/archive/, are not affected.
 *heldout*
 !docs/heldout-guide.md
+
+# macOS folder metadata
+.DS_Store

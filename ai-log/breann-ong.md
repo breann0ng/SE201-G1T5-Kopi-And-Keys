@@ -26,7 +26,7 @@ revised layout (one module per diagram box) and the order of steps.
   main.py, components/*, evaluation/* (placeholders), data/topic_cards/README.md,
   tests/*, scripts/run_price_cases.py, README.md, docs/architecture.md,
   docs/price-synthesis-and-verification.md, examples/price_cases/
-- **Outcome:** [Kept / Changed — choose after your review]
+- **Outcome:** Kept
 
 ### What I asked for
 Merge the old Advisor workflow, the Stage 1 gateway graph and the midpoint
@@ -119,7 +119,7 @@ suggestions: put evaluation data in one folder, move the build logic into the pa
   tests/test_price_stats.py, tests/test_price_refine.py,
   tests/test_synthesiser_verifier.py, tests/test_development_set_contract.py,
   README.md, docs/architecture.md, docs/price-synthesis-and-verification.md
-- **Outcome:** Kept all changes
+- **Outcome:** Kept
 
 ### What I asked for
 Make the three layout changes and fix every import and path they affect.
@@ -189,14 +189,14 @@ first two steps (rules only); the LLM fallback is not built yet.
   questions with no keywords and with questions that should be declined.
 
 ### What I kept or changed
-Changed 
+Kept the scope guard and no rule match as possible path (query_router:abstain:no_rule_match), over original router path of classifying all failures as query_router:abstain. 
 
 ## 2026-11-08 · Router: request-type declines and weak-match confirmation
 - **Tool (model):** Claude Code (Claude Opus 5.5)
 - **Files:** backend/kopi_keys/components/query_router.py, graph.py,
   evaluation/fallback_eval.py, data/evaluation-data/fallback/fallback_questions.jsonl,
   tests/test_query_router.py, tests/test_intent_fallback.py
-- **Outcome:** [Kept / Changed — choose after your review]
+- **Outcome:** Kept
 
 ### What I asked for
 How to stop patching the scope guard one case at a time. Three fresh questions
@@ -218,17 +218,16 @@ policy on "loan" / "hdb" alone.
   "What time does the HDB hub open on Saturday?" confirmed as policy). The AI
   wrote these questions alongside the rules, so they are regression checks,
   not an independent test. 528 tests pass (2 known flat-type gaps remain).
-- [Describe your own review.]
 
 ### What I kept or changed
-[Record anything you kept or changed.]
+Kept strong vs weak question intent to filter unanswerable questions. 
 
 ## 2026-11-08 · Policy relevance: answers_aspect check (shadow mode)
 - **Tool (model):** Claude Code (Claude Opus 5.5)
 - **Files:** backend/kopi_keys/components/answer_aspects.py (new),
   policy_guardrails.py, policy_synthesis.py, verifier.py, schemas.py,
   tests/test_answer_aspects.py
-- **Outcome:** [Kept / Changed — choose after your review]
+- **Outcome:** Changed 
 
 ### What I asked for
 score_relevance compares words, not meaning, so a quote that shares the
@@ -251,14 +250,15 @@ check that a quote answers what was asked.
   blocks. The benchmark has no wrong-answer quotes, so it shows no harm, not
   benefit; enforce waits for shadow traces compared with the LangSmith judge.
   554 tests pass in shadow and enforce mode.
-- [Describe your own review.]
 
 ### What I kept or changed
+- Removed shadow mode after moving test on to dev set in Langsmith
+
 ## 2026-11-08 · PR review: provider rule declined valid questions; merge with main
 - **Tool (model):** Claude Code (Claude Opus 5.5)
 - **Files:** backend/kopi_keys/components/query_router.py, graph.py (merge),
   tests/test_query_router.py, tests/test_intent_fallback.py
-- **Outcome:** [Kept]
+- **Outcome:** Kept
 
 ### What I asked for
 Fixes for two review comments on the PR: a merge conflict in graph.py that
@@ -280,10 +280,9 @@ flat?" being declined as a provider recommendation, with no LLM appeal.
   set are unchanged. 676 tests pass (2 known flat-type gaps remain).
 - Found while testing, not fixed: "first-timers" (plural) is not extracted
   as first_timer; only the singular is.
-- [Describe your own review.]
 
 ### What I kept or changed
-Kept the 
+Kept both profile/subsidy-status fix and LLM router hybrid for routing questions. profile/subsidy-status fix still takes precedence, LLM router acts as a fallback.
 
 ## 2026-11-09 · CI failure: frontend test used chunk IDs from before re-chunking
 - **Tool (model):** Claude Code (Claude Opus 5.5)
@@ -378,3 +377,30 @@ Then: fix it, test it on deliberately wrong answers, and run it on the dev set.
   two separate evaluators, since the mapping is stored on the evaluator.
 - Did not use the first judge-dev run: it was stopped because it mixed two
   judge models and used the incomplete index.
+
+## Reflection (Use of AI)
+### What I learned about using these tools effectively
+The tools worked best when I gave them a way to check their own work. 
+
+For example, before changing the router, I saved the routes for all 50 dev questions and compared them afterwards. That showed exactly which answers a change affected (for example, only OOS-06 and OOS-07 changed after the scope guard). 
+
+I also learned to ask for general fixes rather than single patches. Early router changes fixed one question at a time. When I asked how to stop doing that, we grouped declines by request type, and a new provider or task was covered without a new rule. 
+
+I learned to question a result that looks too clean, too. Every LangSmith relevance score being 0 was a sign of a setup problem, not of bad answers. Finally, I learned to say up front what a result would and wouldn't prove. The fallback questions were written by the same AI that wrote the rules, so I recorded them as regression checks, not as an independent test.
+
+### Where the tools were strong, and where they were weak
+The tools were strongest at large, mechanical changes and at finding causes. They merged three graphs into one without changing any dev-set routing labels. They also traced a frontend CI failure to chunk IDs renumbered by an earlier re-chunking commit, and found that our LLM judge was scoring the user's question instead of the answer. When something unexpected happened, such as the evaluation folder being renamed during a session, the tool stopped and asked instead of guessing, which pleasantly surprised me. 
+
+Their weakness was suggesting things that sounded right but didn't work. The LangSmith filter syntax it suggested was rejected, and the first scope guard declined valid questions like "How much will a 4-room in Bishan cost?". It also didn't account for our small local model. Asking qwen2.5:3b to label each quote cut benchmark quality passes from 10 to 5 of 12, which a larger model may not have done. It assumed our proposal's design too, including a separate Discovery Agent our team had already merged. I had to check its claims against our code, our decisions and real runs.
+
+### What went wrong, and what I would do differently
+Several problems stayed hidden because no check s were in place for the setup itself: 
+1) The LLM judge mapped the wrong field, so it produced scores that meant nothing. 
+
+2) The local Chroma index was missing 195 of 898 chunks after merges, which would have made retrieval results look worse than they were. 
+
+3) A frontend test looked up chunks by ID, so it broke when the PDFs were re-chunked. 
+
+4) The biggest miss was out-of-date answers. The judge run on 9 November showed the system answering "What is the LTV limit now?" with the pre-August-2024 80% footnote. 
+
+We froze the dev evaluation before fixing it, and three policy-change questions still quote historical rules. Next time I would add setup checks to the evaluation itself (index complete, judge reading the answer) before trusting any score. I would also turn every real failure found in a trace into a test and fix it before freezing, rather than noting it for later.

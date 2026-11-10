@@ -1,0 +1,97 @@
+{
+  "mode": "live_ollama",
+  "results": [
+    {
+      "case": "zero_transactions",
+      "expected": "no_data",
+      "actual": "no_data",
+      "passed": true,
+      "model_calls": 0,
+      "verification_errors": [],
+      "final_response": "No matching resale transactions were found for the requested filters. Try a wider date range, another town or another flat type.",
+      "model_usage": []
+    },
+    {
+      "case": "single_transaction",
+      "expected": "answered",
+      "actual": "answered",
+      "passed": true,
+      "model_calls": 1,
+      "verification_errors": [],
+      "final_response": "SYNTHETIC TEST DATA - not actual market statistics.\n\n**3-room flats in Bedok** had only 1 matching sale (Jul 2025): too few for a reliable summary, and not a guide to what any particular flat is worth. It sold for $450,000; each sale is listed below. Widen the filters for a summary.\n\n*Source: HDB resale flat prices (data.gov.sg). Past sales only, not a valuation of any particular flat.*",
+      "model_usage": [
+        {
+          "model": "qwen2.5:3b",
+          "elapsed_seconds": 2.234,
+          "prompt_tokens": 245,
+          "output_tokens": 74,
+          "num_gpu_requested": null,
+          "device_requested": "gpu",
+          "load_seconds": 1.352,
+          "prompt_eval_seconds": 0.088,
+          "generation_seconds": 0.635
+        }
+      ]
+    },
+    {
+      "case": "decimal_rounding",
+      "expected": "answered",
+      "actual": "answered",
+      "passed": true,
+      "model_calls": 1,
+      "verification_errors": [],
+      "final_response": "SYNTHETIC TEST DATA - not actual market statistics.\n\n**4-room flats in Yishun** sold for a median of **$610,000.01** (Jan 2025 to Dec 2025, 7 sales).\n\n- Average (mean): $612,345.13\n- Middle 50% of prices fall within a $33,333.34 band\n- Lowest to highest: $500,000 to $750,000\n\n*Source: HDB resale flat prices (data.gov.sg). Past sales only, not a valuation of any particular flat.*",
+      "model_usage": [
+        {
+          "model": "qwen2.5:3b",
+          "elapsed_seconds": 0.555,
+          "prompt_tokens": 251,
+          "output_tokens": 79,
+          "num_gpu_requested": null,
+          "device_requested": "gpu",
+          "load_seconds": 0.001,
+          "prompt_eval_seconds": 0.02,
+          "generation_seconds": 0.477
+        }
+      ]
+    },
+    {
+      "case": "large_amounts",
+      "expected": "answered",
+      "actual": "answered",
+      "passed": true,
+      "model_calls": 1,
+      "verification_errors": [],
+      "final_response": "SYNTHETIC TEST DATA - not actual market statistics.\n\n**5-room flats in Queenstown** sold for a median of **$1,400,000** (Jan 2025 to Jun 2025, 1,250 sales).\n\n- Average (mean): $1,420,000\n- Middle 50% of prices fall within a $180,000 band\n- Lowest to highest: $1,100,000 to $1,750,000\n\n*Source: HDB resale flat prices (data.gov.sg). Past sales only, not a valuation of any particular flat.*",
+      "model_usage": [
+        {
+          "model": "qwen2.5:3b",
+          "elapsed_seconds": 0.664,
+          "prompt_tokens": 264,
+          "output_tokens": 91,
+          "num_gpu_requested": null,
+          "device_requested": "gpu",
+          "load_seconds": 0.001,
+          "prompt_eval_seconds": 0.02,
+          "generation_seconds": 0.55
+        }
+      ]
+    },
+    {
+      "case": "invalid_missing_median",
+      "expected": "rejected",
+      "actual": "rejected",
+      "passed": true,
+      "model_calls": 0,
+      "validation_error": "1 validation error for PriceCase\nsql_result\n  Value error, Non-empty SQL results require mean, median, IQR, minimum and maximum. [type=value_error, input_value={'query_id': 'synthetic-i...0', 'maximum': '780000'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error"
+    },
+    {
+      "case": "invalid_price_range",
+      "expected": "rejected",
+      "actual": "rejected",
+      "passed": true,
+      "model_calls": 0,
+      "validation_error": "1 validation error for PriceCase\nsql_result\n  Value error, Mean must lie within the SQL price range. [type=value_error, input_value={'query_id': 'synthetic-i...0', 'maximum': '500000'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error"
+    }
+  ]
+}

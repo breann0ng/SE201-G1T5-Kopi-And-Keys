@@ -1,0 +1,50 @@
+FINAL DEVELOPMENT EVALUATION: interpretation and review notes
+
+Frozen main commit: 1c4d87c0ad8afc0ecc3bb2afed942eec1fd159eb
+Development data only. No held-out access, tuning, production-code changes,
+commits, pushes, automatic feedback learning, or cloud judge calls.
+
+Important temporal-relevance issue
+The first full run flags CHG-05, CHG-06 and CHG-07 in its literal staleness
+screen. Inspect the original responses before reporting these as false positives:
+- CHG-05 asks about the loan limit now; the answer supplies only a condition
+  explicitly applicable to resale applications before 20 August 2024.
+- CHG-06 asks about upfront payment; the answer supplies that same historical
+  cohort's condition, without a current-cohort explanation.
+- CHG-07 asks about singles' options now; the answer describes previous rules.
+The wording is source-grounded, but grounding alone does not establish temporal
+relevance or completeness. These are unresolved quality concerns. This session
+does not independently adjudicate current HDB eligibility rules.
+
+Refusals on answerable development questions
+In full run 1: POL-07, MIX-02, MIX-08, DSC-01, DSC-02, DSC-04, DSC-05,
+DSC-06, CHG-02, CHG-03 and CHG-04 were refused. The separate dev-review run
+records source-quote mismatches and/or low relevance checks for these cases.
+MIX-06 finishes with a clarification requesting missing profile fields.
+See dev-review.json for retrieved IDs, drafts, relevance scores and verifier
+errors. These are diagnostic observations, not proof that every refusal is the
+verifier's fault; inspect retrieval, scope and source qualifications together.
+
+How to report the metrics
+- The full run 1 has 30 completed answers, 11 refusals and 1 clarification among
+  42 answerable cases. The compare tool's answers_answerable metric counts
+  anything not abstained, including that clarification: 31/42.
+- Original price_figures=18/18 is conditional on returned statistics. Across the
+  fixed set of 21 expected-price questions, correct figures are 18/21. Both
+  baselines score 0/21 on the same population. Do not report 100% overall.
+- Policy Recall@5 is 74.2% strict / 83.3% relaxed. Hit@5 is a different metric:
+  81.8% strict / 90.9% relaxed over 22 policy questions. Do not interchange them.
+- Suggested-card precision is 14/26 (54%), below the 80% target. The shown-only
+  precision of 2/2 covers a very small subset and is not overall precision.
+- Baselines emit no router labels. Their displayed zero routing score is not
+  evidence that the same model cannot classify intent.
+- The full-system 0/8 unsafe result and the 16-case safety suite cover finite
+  development probes, not all threats or all harmful policy advice.
+- Citation presence and verbatim quote checks do not establish semantic accuracy,
+  useful completeness, or applicability to the user's profile/date.
+- Latency includes laptop retrieval, SQL and the SSH tunnel. This session does
+  not establish a controlled CPU-versus-GPU speedup.
+- Human semantic review and an independent held-out evaluation remain separate.
+
+The session-audit.json and comparison tables retain fixed denominators and
+confidence intervals. Raw outputs remain unchanged for independent review.

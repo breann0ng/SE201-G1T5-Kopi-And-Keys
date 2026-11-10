@@ -1,0 +1,6 @@
+{
+  "files_checked": 81,
+  "method": "High-confidence credential/private-key/notebook-token pattern screen; excludes environment files, caches and databases from packaging",
+  "matches": [],
+  "passed": true
+}

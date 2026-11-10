@@ -1,5 +1,47 @@
 # AI Use Log: Sandra Yap
 
+## Reflection (final submission, 10 Nov 2026)
+
+### What did I learn about how to use these tools effectively?
+- Give every task a check the tool cannot talk its way past. The scraper came with
+  `validate.py` and checksums, each fixed phrasing came with a regression test, and the tests
+  themselves were checked with mutation testing.
+- Set the pass mark before the experiment. I wrote the acceptance rule before trying the
+  reranker and the meaning-based relevance checks, so the results could not be tuned
+  afterwards. Both were rejected by that rule.
+- Ask it to recompute, not recall. Slide figures (242,737 sales, the $633,800 median, the
+  94 pages) were recomputed from the database and the snapshot manifest instead of copied from
+  earlier documents.
+- Keep it inside my own area. When my work needed a change in a teammate's file, it worked
+  better to have the tool stop and tell me the change, so I could ask the owner.
+- Make the important decisions myself and say them explicitly: which scope to scrape, how to
+  treat discovery questions, not to edit the answer key, and not to commit or push without
+  being asked.
+
+### Where were the tools strong, and where were they weak?
+- **Strong:** building a polite scraper and chunker quickly; writing tests and finding untested
+  code (mutation scores for my four weakest modules went from 28% to 93%); statistics, where a
+  property test it wrote found a real bug in the Wilson interval; fact-checking slides and
+  READMEs against the code; explaining concepts I had not used before.
+- **Weak:** confident but wrong claims, for example that the embedding prefixes were missing,
+  that the suite had 240+ tests (it had 515), a naive-RAG run "about 11 minutes" that took 95,
+  and a frontend test count of 31 from a text search when the test runner reported 32. It
+  brought in eligibility rules from third-party sites that the official snapshot does not
+  state, and first treated executive condominiums as private property. Early on it edited
+  teammates' files (a Step-Up ceiling entry, a benchmark remap, graph wiring), which I had it undo.
+
+### What went wrong, and what would I do differently?
+- We tuned on the development set for too long. Held-out routing fell from 94% to 80% and half
+  of the answerable questions were declined. I would write the held-out set earlier and track
+  answer coverage, not only safety, while building.
+- Chunking kept old and new rules in one passage, which is why some answers quote an outdated
+  rule. I would design chunking around dated clauses from the start.
+- A silent fallback hid a problem: when embeddings failed, search became keyword-only but the
+  evaluation still called it hybrid. I would make evaluation tools fail loudly from day one.
+- Numbers drifted between documents and slides. I would keep one results file per run, commit
+  it immediately, and take every figure from it; the final run's files were not committed,
+  which left the README and supporting documents depending on the deck.
+
 ## 2026-10-15 · Scrape official HDB/CPF pages into a policy snapshot
 - **Tool (model):** Claude Code (Claude Opus 5.5)
 - **Files:** scripts/scraping/*, data/policy_snapshots/2026-10-15/, data/policy_chunks/,
@@ -393,3 +435,80 @@ Limitations listed plainly: policy_retrieval, policy_index and chunk.py at 29-36
 score, no tests for the one-off baseline scripts, four modules not re-measured, and a
 keyword-only retrieval floor. Files now named by content (evaluation-results.md,
 testing-retrieval-and-evaluation.md, mutation_test_retrieval_eval.py); the AI log keeps my name.
+
+## 2026-11-10 · Final deck: citations, speaker notes and presentation script
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** none in the repository (the final slide deck, outside the repo)
+- **Outcome:** Changed
+
+### What I asked for
+Official sources for the figures on the problem slide, speaker notes that work as the written
+report (the deck replaces a report), a check of every slide against the repo, and a spoken
+script for 15 minutes including a 3-minute demo, split across the four presenters.
+
+### How I checked it
+The AI recomputed the slide figures from the data: 95 sources in the snapshot manifest with
+one PDF unusable (94), 242,737 sales from Jan 2017 to Oct 2026, and a median of $633,800 over
+20,671 sales from Jan to Oct 2026. It traced each of the 12 topic cards to its source pages. I
+compared the notes with docs/evaluation-results.md and the result files.
+
+### What I kept or changed
+The check found errors I fixed or passed to the slide owners: "MND" pages on slide 3 (the
+sources are HDB, CPF and MyNiceHome), broken slide cross-references, a held-out row labelled
+Recall@5 that is really Hit@5, and test, mutation and log counts that did not match the repo.
+I asked for the notes as plain text without Markdown symbols, and for a simpler script that is
+easy to memorise but not abrupt. Final GPU and held-out figures were taken from the team's
+final run, because those result files are not in the repository.
+
+## 2026-11-10 · README and data guide updated for submission
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** README.md, data/README.md, .gitignore, three data/**/.DS_Store files (removed)
+- **Outcome:** Changed
+
+### What I asked for
+Check whether both READMEs reflect the whole repository, then update them on behalf of the
+team before submission.
+
+### How I checked it
+The AI listed each outdated claim and checked it against the code: 898 chunks (the data guide
+said 849), the evaluation and topic-card paths, and the committed vectors. It ran the backend
+suite (1,100 passed) and the frontend tests (32 passed), confirmed every new command's module
+can be run, and checked that every relative link in both files resolves.
+
+### What I kept or changed
+Added the final evaluation and held-out results, the current limitations, the newer features
+and files, and a table of checks with their guides. The AI first wrote 31 frontend tests from
+a text search; running the tests showed 32, so I corrected it. It also linked the GPU runbook,
+which I had moved out of the repo, so that link was removed. The README states that the
+per-question logs for the final runs are in the submitted supporting documents.
+
+## 2026-11-10 · Supporting documents for the final submission
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** none in the repository (Test Results, Held-out Evaluation Log and AI Use
+  Disclosure Log, as Word documents in the submission folder)
+- **Outcome:** Changed
+
+### What I asked for
+Readable supporting documents for the zip: test results, the held-out log, and a document
+describing the team's AI use logs with the team declaration and each member's reflection,
+following the SE201 AI Use Disclosure Policy.
+
+### How I checked it
+Re-ran the backend and frontend tests, the snapshot validator and the price cases on main
+@d9c5d29 on 10 Nov. Rebuilt the test results from Nisha's final development package
+(final-dev-20261110-results) once it arrived, and checked the held-out figures against the
+run's own output file. Counted the log entries and the Assisted-by trailers from git, checked
+every log entry against the policy's format, and confirmed the finals-frozen tag points to
+1c4d87c.
+
+### What I kept or changed
+The final package corrected two figures the deck had used: answered questions are 31/42 vs
+26/42 (p = 0.383, not significant), not "71.4% vs 61.9%, p = 0.523", and keyword-only Hit@5
+is 63.6% because it now includes the synonyms. I updated the test results and README to match
+and passed the slide fix to the team. Held-out results stay in their own log, separate from
+the test results. How the held-out questions were drafted is recorded in that submission
+document, not in the AI logs. The disclosure document was restructured to the policy: team
+declaration, how we disclosed, tools and checks, and one reflection per member. A line saying
+every AI change was reviewed by another member was softened, because branch protection
+settings were not verified. I found an earlier draft of one teammate's log had been pasted in
+by mistake and reverted every change made from it.

@@ -1,0 +1,21 @@
+﻿{
+    "step":  "07-full-run-2",
+    "attempt":  1,
+    "status":  "finished",
+    "started_utc":  "2026-11-09T18:41:59.8988782Z",
+    "python_args":  [
+                        "-m",
+                        "kopi_keys.evaluation.run_baselines",
+                        "--system",
+                        "full"
+                    ],
+    "device":  "gpu",
+    "log":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\07-full-run-2-attempt-1.txt",
+    "exit_code":  0,
+    "finished_utc":  "2026-11-09T18:44:02.3045029Z",
+    "elapsed_seconds":  122.406,
+    "new_result_files":  [
+                             "20261109T184200Z_full_dev.jsonl",
+                             "20261109T184200Z_full_dev_metrics.json"
+                         ]
+}

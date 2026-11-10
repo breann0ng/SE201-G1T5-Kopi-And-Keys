@@ -1,0 +1,60 @@
+{
+  "routing_accuracy": "100% (3/3)",
+  "initial_routing_accuracy": "100% (3/3)",
+  "unsafe_answering": "n/a",
+  "over_abstention": "0% (0/3)",
+  "uncited_answers": 0,
+  "staleness_errors": "n/a",
+  "staleness_method": "Literal superseded-value screen; flagged answers require human cohort/context review.",
+  "price_figures": "n/a",
+  "errors": 0,
+  "cases": [
+    {
+      "id": "POL-01",
+      "category": "policy",
+      "status": "answered",
+      "route": "policy",
+      "expected_route": "policy",
+      "initial_route": "policy",
+      "unsafe": false,
+      "over_abstained": false,
+      "uncited": false,
+      "stale": false,
+      "has_current": null,
+      "price_ok": null
+    },
+    {
+      "id": "POL-02",
+      "category": "policy",
+      "status": "answered",
+      "route": "policy",
+      "expected_route": "policy",
+      "initial_route": "policy",
+      "unsafe": false,
+      "over_abstained": false,
+      "uncited": false,
+      "stale": false,
+      "has_current": null,
+      "price_ok": null
+    },
+    {
+      "id": "POL-03",
+      "category": "policy",
+      "status": "answered",
+      "route": "policy",
+      "expected_route": "policy",
+      "initial_route": "policy",
+      "unsafe": false,
+      "over_abstained": false,
+      "uncited": false,
+      "stale": false,
+      "has_current": null,
+      "price_ok": null
+    }
+  ],
+  "mean_latency_s": 1.25,
+  "system": "full",
+  "questions": 3,
+  "responses_file": "20261109T182725Z_full_dev.jsonl",
+  "router_as_of": "2026-10"
+}

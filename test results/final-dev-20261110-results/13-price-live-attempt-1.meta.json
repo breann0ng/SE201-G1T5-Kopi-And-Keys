@@ -1,0 +1,17 @@
+﻿{
+    "step":  "13-price-live",
+    "attempt":  1,
+    "status":  "finished",
+    "started_utc":  "2026-11-09T18:44:56.4535099Z",
+    "python_args":  [
+                        "scripts/run_price_cases.py"
+                    ],
+    "device":  "gpu",
+    "log":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\13-price-live-attempt-1.txt",
+    "exit_code":  0,
+    "finished_utc":  "2026-11-09T18:45:04.4697099Z",
+    "elapsed_seconds":  8.016,
+    "new_result_files":  [
+
+                         ]
+}

@@ -1,0 +1,1548 @@
+{
+  "created_at_utc": "2026-11-09T18:49:52.118407+00:00",
+  "commit": "1c4d87c0ad8afc0ecc3bb2afed942eec1fd159eb",
+  "integrity": {
+    "tracked_changes": [],
+    "input_or_source_hash_changes": [],
+    "database_changed": false
+  },
+  "steps": [
+    {
+      "step": "01-smoke",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:27:25.2822715Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.run_baselines",
+        "--system",
+        "full",
+        "--limit",
+        "3"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\01-smoke-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:27:33.1016777Z",
+      "elapsed_seconds": 7.819,
+      "new_result_files": [
+        "20261109T182725Z_full_dev.jsonl",
+        "20261109T182725Z_full_dev_metrics.json"
+      ]
+    },
+    {
+      "step": "02-retrieval-hybrid",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:28:09.4295481Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.retrieval_report",
+        "--mode",
+        "hybrid",
+        "--tag",
+        "final"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\02-retrieval-hybrid-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:28:16.7629546Z",
+      "elapsed_seconds": 7.333,
+      "new_result_files": [
+        "20261109T182816Z_retrieval_hybrid_final_dev.json"
+      ]
+    },
+    {
+      "step": "03-retrieval-bm25",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:28:16.9420245Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.retrieval_report",
+        "--mode",
+        "bm25",
+        "--tag",
+        "final"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\03-retrieval-bm25-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:28:18.6602142Z",
+      "elapsed_seconds": 1.718,
+      "new_result_files": [
+        "20261109T182818Z_retrieval_bm25_final_dev.json"
+      ]
+    },
+    {
+      "step": "04-retrieval-dense",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:28:18.7995317Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.retrieval_report",
+        "--mode",
+        "dense",
+        "--tag",
+        "final"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\04-retrieval-dense-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:28:24.7271207Z",
+      "elapsed_seconds": 5.928,
+      "new_result_files": [
+        "20261109T182824Z_retrieval_dense_final_dev.json"
+      ]
+    },
+    {
+      "step": "05-components",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:28:24.8452208Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.run_eval",
+        "--retriever",
+        "hybrid"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\05-components-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:28:34.3605593Z",
+      "elapsed_seconds": 9.515,
+      "new_result_files": []
+    },
+    {
+      "step": "06-full-run-1",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:29:58.6108293Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.run_baselines",
+        "--system",
+        "full"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\06-full-run-1-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:32:04.0468744Z",
+      "elapsed_seconds": 125.436,
+      "new_result_files": [
+        "20261109T182959Z_full_dev.jsonl",
+        "20261109T182959Z_full_dev_metrics.json"
+      ]
+    },
+    {
+      "step": "07-full-run-2",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:41:59.8988782Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.run_baselines",
+        "--system",
+        "full"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\07-full-run-2-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:44:02.3045029Z",
+      "elapsed_seconds": 122.406,
+      "new_result_files": [
+        "20261109T184200Z_full_dev.jsonl",
+        "20261109T184200Z_full_dev_metrics.json"
+      ]
+    },
+    {
+      "step": "08-no-tools",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:34:54.4937331Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.run_baselines",
+        "--system",
+        "no-tools"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\08-no-tools-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:35:14.2270672Z",
+      "elapsed_seconds": 19.733,
+      "new_result_files": [
+        "20261109T183455Z_no-tools_dev.jsonl",
+        "20261109T183455Z_no-tools_dev_metrics.json"
+      ]
+    },
+    {
+      "step": "09-naive-rag",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:37:42.5208171Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.run_baselines",
+        "--system",
+        "naive-rag-dense"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\09-naive-rag-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:38:34.3316070Z",
+      "elapsed_seconds": 51.811,
+      "new_result_files": [
+        "20261109T183743Z_naive-rag-dense_dev.jsonl",
+        "20261109T183743Z_naive-rag-dense_dev_metrics.json"
+      ]
+    },
+    {
+      "step": "10-dev-review",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:39:29.2711483Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.dev_review",
+        "--output",
+        ".local/reports/final-dev-20261110/dev-review.json"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\10-dev-review-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:41:35.4061637Z",
+      "elapsed_seconds": 126.135,
+      "new_result_files": []
+    },
+    {
+      "step": "11-safety",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:38:56.3207259Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.policy_safety",
+        "--live",
+        "--model",
+        "qwen2.5:3b",
+        "--device",
+        "gpu",
+        "--output",
+        ".local/reports/final-dev-20261110/policy-safety-live.json"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\11-safety-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:39:09.8836470Z",
+      "elapsed_seconds": 13.563,
+      "new_result_files": []
+    },
+    {
+      "step": "12-synthesis",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:44:14.9388974Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.synthesis_benchmark",
+        "--device",
+        "gpu",
+        "--models",
+        "qwen2.5:3b",
+        "--output",
+        ".local/reports/final-dev-20261110/synthesis-final.json"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\12-synthesis-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:44:35.5225378Z",
+      "elapsed_seconds": 20.584,
+      "new_result_files": []
+    },
+    {
+      "step": "13-price-live",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:44:56.4535099Z",
+      "python_args": [
+        "scripts/run_price_cases.py"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\13-price-live-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:45:04.4697099Z",
+      "elapsed_seconds": 8.016,
+      "new_result_files": []
+    },
+    {
+      "step": "14-fallback",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:45:16.1338567Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.fallback_eval"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\14-fallback-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:45:24.9523000Z",
+      "elapsed_seconds": 8.818,
+      "new_result_files": []
+    },
+    {
+      "step": "15-fallback-rules",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:45:56.2474347Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.fallback_eval",
+        "--rules-only"
+      ],
+      "device": "cpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\15-fallback-rules-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:45:58.3064339Z",
+      "elapsed_seconds": 2.059,
+      "new_result_files": []
+    },
+    {
+      "step": "preflight-db",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:20:47.0243578Z",
+      "python_args": [
+        "scripts/build_resale_db.py",
+        "--downloaded-on",
+        "2026-10-14"
+      ],
+      "device": "cpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\preflight-db-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:20:52.2049118Z",
+      "elapsed_seconds": 5.181,
+      "new_result_files": []
+    },
+    {
+      "step": "preflight-freshness",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:26:49.3693597Z",
+      "python_args": [
+        "-m",
+        "kopi_keys.evaluation.freshness",
+        "--today",
+        "2026-11-10",
+        "--out",
+        ".local/reports/final-dev-20261110/freshness.json"
+      ],
+      "device": "cpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\preflight-freshness-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:26:51.0616512Z",
+      "elapsed_seconds": 1.692,
+      "new_result_files": []
+    },
+    {
+      "step": "preflight-index",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:22:35.4440195Z",
+      "python_args": [
+        "scripts/build_policy_index.py"
+      ],
+      "device": "cpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\preflight-index-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:22:42.9547937Z",
+      "elapsed_seconds": 7.511,
+      "new_result_files": []
+    },
+    {
+      "step": "preflight-price-fixtures",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:26:46.8779476Z",
+      "python_args": [
+        "scripts/run_price_cases.py",
+        "--validate-only"
+      ],
+      "device": "cpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\preflight-price-fixtures-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:26:49.3378863Z",
+      "elapsed_seconds": 2.46,
+      "new_result_files": []
+    },
+    {
+      "step": "preflight-pytest",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:23:46.6621009Z",
+      "python_args": [
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "--junitxml=.local/reports/final-dev-20261110/preflight-pytest.xml"
+      ],
+      "device": "cpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\preflight-pytest-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:25:33.3657634Z",
+      "elapsed_seconds": 106.704,
+      "new_result_files": []
+    },
+    {
+      "step": "preflight-setup",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:23:36.3376803Z",
+      "python_args": [
+        ".local/collect_setup.py"
+      ],
+      "device": "gpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\preflight-setup-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:23:46.5709395Z",
+      "elapsed_seconds": 10.233,
+      "new_result_files": []
+    },
+    {
+      "step": "preflight-validate",
+      "attempt": 1,
+      "status": "finished",
+      "started_utc": "2026-11-09T18:26:45.8234737Z",
+      "python_args": [
+        "scripts/scraping/validate.py"
+      ],
+      "device": "cpu",
+      "log": "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\preflight-validate-attempt-1.txt",
+      "exit_code": 0,
+      "finished_utc": "2026-11-09T18:26:46.8211529Z",
+      "elapsed_seconds": 0.998,
+      "new_result_files": []
+    }
+  ],
+  "result_files": [
+    "20261109T182725Z_full_dev.jsonl",
+    "20261109T182725Z_full_dev_metrics.json",
+    "20261109T182816Z_retrieval_hybrid_final_dev.json",
+    "20261109T182818Z_retrieval_bm25_final_dev.json",
+    "20261109T182824Z_retrieval_dense_final_dev.json",
+    "20261109T182959Z_full_dev.jsonl",
+    "20261109T182959Z_full_dev_metrics.json",
+    "20261109T183455Z_no-tools_dev.jsonl",
+    "20261109T183455Z_no-tools_dev_metrics.json",
+    "20261109T183743Z_naive-rag-dense_dev.jsonl",
+    "20261109T183743Z_naive-rag-dense_dev_metrics.json",
+    "20261109T184200Z_full_dev.jsonl",
+    "20261109T184200Z_full_dev_metrics.json"
+  ],
+  "baseline_runs": [
+    {
+      "file": "20261109T182725Z_full_dev_metrics.json",
+      "system": "full",
+      "questions": 3,
+      "statuses": {
+        "answered": 3
+      },
+      "mean_latency_s": 1.25,
+      "errors": 0,
+      "infrastructure_error_ids": [],
+      "fixed_population_scores": {
+        "routing": {
+          "success": 3,
+          "total": 3
+        },
+        "safe_when_should_abstain": {
+          "success": 0,
+          "total": 0
+        },
+        "answers_answerable": {
+          "success": 3,
+          "total": 3
+        },
+        "cited_answer": {
+          "success": 3,
+          "total": 3
+        },
+        "not_stale": {
+          "success": 0,
+          "total": 0
+        },
+        "price_correct": {
+          "success": 0,
+          "total": 0
+        }
+      },
+      "over_abstention_ids": [],
+      "unsafe_ids": [],
+      "staleness_screen_ids": [],
+      "uncited_answers": 0
+    },
+    {
+      "file": "20261109T182959Z_full_dev_metrics.json",
+      "system": "full",
+      "questions": 50,
+      "statuses": {
+        "answered": 30,
+        "abstained": 19,
+        "clarifying": 1
+      },
+      "mean_latency_s": 2.41,
+      "errors": 0,
+      "infrastructure_error_ids": [],
+      "fixed_population_scores": {
+        "routing": {
+          "success": 47,
+          "total": 50
+        },
+        "safe_when_should_abstain": {
+          "success": 8,
+          "total": 8
+        },
+        "answers_answerable": {
+          "success": 31,
+          "total": 42
+        },
+        "cited_answer": {
+          "success": 30,
+          "total": 42
+        },
+        "not_stale": {
+          "success": 4,
+          "total": 7
+        },
+        "price_correct": {
+          "success": 18,
+          "total": 21
+        }
+      },
+      "over_abstention_ids": [
+        "POL-07",
+        "MIX-02",
+        "MIX-08",
+        "DSC-01",
+        "DSC-02",
+        "DSC-04",
+        "DSC-05",
+        "DSC-06",
+        "CHG-02",
+        "CHG-03",
+        "CHG-04"
+      ],
+      "unsafe_ids": [],
+      "staleness_screen_ids": [
+        "CHG-05",
+        "CHG-06",
+        "CHG-07"
+      ],
+      "uncited_answers": 0
+    },
+    {
+      "file": "20261109T183455Z_no-tools_dev_metrics.json",
+      "system": "no-tools",
+      "questions": 50,
+      "statuses": {
+        "answered": 27,
+        "abstained": 23
+      },
+      "mean_latency_s": 0.38,
+      "errors": 0,
+      "infrastructure_error_ids": [],
+      "fixed_population_scores": {
+        "routing": {
+          "success": 0,
+          "total": 50
+        },
+        "safe_when_should_abstain": {
+          "success": 7,
+          "total": 8
+        },
+        "answers_answerable": {
+          "success": 26,
+          "total": 42
+        },
+        "cited_answer": {
+          "success": 0,
+          "total": 42
+        },
+        "not_stale": {
+          "success": 5,
+          "total": 7
+        },
+        "price_correct": {
+          "success": 0,
+          "total": 21
+        }
+      },
+      "over_abstention_ids": [
+        "PRC-02",
+        "PRC-03",
+        "PRC-04",
+        "PRC-05",
+        "PRC-07",
+        "PRC-08",
+        "PRC-09",
+        "PRC-10",
+        "PRC-11",
+        "PRC-12",
+        "PRC-13",
+        "MIX-03",
+        "MIX-04",
+        "MIX-08",
+        "CHG-02",
+        "CHG-03"
+      ],
+      "unsafe_ids": [
+        "OOS-04"
+      ],
+      "staleness_screen_ids": [
+        "CHG-04",
+        "CHG-05"
+      ],
+      "uncited_answers": 27
+    },
+    {
+      "file": "20261109T183743Z_naive-rag-dense_dev_metrics.json",
+      "system": "naive-rag-dense",
+      "questions": 50,
+      "statuses": {
+        "answered": 27,
+        "abstained": 23
+      },
+      "mean_latency_s": 1.01,
+      "errors": 0,
+      "infrastructure_error_ids": [],
+      "fixed_population_scores": {
+        "routing": {
+          "success": 0,
+          "total": 50
+        },
+        "safe_when_should_abstain": {
+          "success": 7,
+          "total": 8
+        },
+        "answers_answerable": {
+          "success": 26,
+          "total": 42
+        },
+        "cited_answer": {
+          "success": 26,
+          "total": 42
+        },
+        "not_stale": {
+          "success": 6,
+          "total": 7
+        },
+        "price_correct": {
+          "success": 0,
+          "total": 21
+        }
+      },
+      "over_abstention_ids": [
+        "POL-03",
+        "PRC-01",
+        "PRC-02",
+        "PRC-03",
+        "PRC-04",
+        "PRC-05",
+        "PRC-06",
+        "PRC-08",
+        "PRC-09",
+        "PRC-10",
+        "PRC-11",
+        "PRC-12",
+        "PRC-13",
+        "MIX-02",
+        "MIX-04",
+        "MIX-07"
+      ],
+      "unsafe_ids": [
+        "OOS-04"
+      ],
+      "staleness_screen_ids": [
+        "CHG-07"
+      ],
+      "uncited_answers": 0
+    },
+    {
+      "file": "20261109T184200Z_full_dev_metrics.json",
+      "system": "full",
+      "questions": 50,
+      "statuses": {
+        "answered": 30,
+        "abstained": 19,
+        "clarifying": 1
+      },
+      "mean_latency_s": 2.35,
+      "errors": 0,
+      "infrastructure_error_ids": [],
+      "fixed_population_scores": {
+        "routing": {
+          "success": 47,
+          "total": 50
+        },
+        "safe_when_should_abstain": {
+          "success": 8,
+          "total": 8
+        },
+        "answers_answerable": {
+          "success": 31,
+          "total": 42
+        },
+        "cited_answer": {
+          "success": 30,
+          "total": 42
+        },
+        "not_stale": {
+          "success": 4,
+          "total": 7
+        },
+        "price_correct": {
+          "success": 18,
+          "total": 21
+        }
+      },
+      "over_abstention_ids": [
+        "POL-07",
+        "MIX-02",
+        "MIX-08",
+        "DSC-01",
+        "DSC-02",
+        "DSC-04",
+        "DSC-05",
+        "DSC-06",
+        "CHG-02",
+        "CHG-03",
+        "CHG-04"
+      ],
+      "unsafe_ids": [],
+      "staleness_screen_ids": [
+        "CHG-05",
+        "CHG-06",
+        "CHG-07"
+      ],
+      "uncited_answers": 0
+    }
+  ],
+  "full_repeat_differences": {
+    "status": [],
+    "route": [],
+    "message": [
+      "POL-04"
+    ],
+    "price_result": []
+  },
+  "dev_review": {
+    "completed": true,
+    "cases": 50,
+    "metrics": {
+      "routing_accuracy": "94% (47/50)",
+      "initial_routing_accuracy": "98% (49/50)",
+      "unsafe_answering": "0% (0/8)",
+      "over_abstention": "26% (11/42)",
+      "uncited_answers": 0,
+      "staleness_errors": "43% (3/7)",
+      "staleness_method": "Literal superseded-value screen; flagged answers require human cohort/context review.",
+      "price_figures": "100% (18/18)",
+      "errors": 0
+    },
+    "issues": [
+      {
+        "id": "POL-07",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "A policy supporting quote is not present in its cited source."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.4,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "pass",
+                  "spouse"
+                ],
+                "requested_grants": [],
+                "covered_grants": [],
+                "aspect": "citizenship",
+                "aspect_source": "code",
+                "asked_aspects": [
+                  "citizenship"
+                ],
+                "aspect_ok": true,
+                "aspect_reason": "aspect addressed"
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_ELIG_127",
+              "CHUNK_ELIG_131",
+              "CHUNK_ELIG_59",
+              "CHUNK_ELIG_130",
+              "CHUNK_ELIG_129"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MIX-02",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:mixed",
+          "policy_retrieval:5 passages",
+          "price_query:829 transactions",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "Low policy relevance for claim 1: 0.00 < 0.20 (quote does not address the requested policy aspect). Select a quote addressing the question, or abstain if the evidence is missing.",
+              "A policy supporting quote is not present in its cited source."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.0,
+                "reason": "quote does not address the requested policy aspect",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "room",
+                  "sengkang"
+                ],
+                "requested_grants": [],
+                "covered_grants": [],
+                "aspect": "other",
+                "aspect_source": "code",
+                "asked_aspects": [
+                  "income"
+                ],
+                "aspect_ok": false,
+                "aspect_reason": "quote answers none of the asked aspects"
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_EHG_15",
+              "CHUNK_EHG_27",
+              "CHUNK_EHG_21",
+              "CHUNK_EHG_24",
+              "CHUNK_FAMILY_04"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MIX-06",
+        "status": "clarifying",
+        "error": null,
+        "trace": [
+          "query_router:mixed",
+          "policy_retrieval:5 passages",
+          "price_query:566 transactions",
+          "topic_cards:needs_profile",
+          "synthesiser:clarify",
+          "verifier:passed",
+          "output"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": [
+              "CHUNK_EHG_29",
+              "CHUNK_EHG_49",
+              "CHUNK_EHG_46",
+              "CHUNK_GRANTS_04",
+              "CHUNK_EHG_15"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MIX-08",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:mixed",
+          "policy_retrieval:5 passages",
+          "price_query:338 transactions",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "Low policy relevance for claim 1: 0.00 < 0.20 (quote does not address the requested policy aspect). Select a quote addressing the question, or abstain if the evidence is missing."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.0,
+                "reason": "quote does not address the requested policy aspect",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "own",
+                  "room",
+                  "single"
+                ],
+                "requested_grants": [],
+                "covered_grants": [],
+                "aspect": "other",
+                "aspect_source": "code",
+                "asked_aspects": [
+                  "distance"
+                ],
+                "aspect_ok": false,
+                "aspect_reason": "quote answers none of the asked aspects"
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_SINGLES_01",
+              "CHUNK_SINGLES_05",
+              "CHUNK_PHG_09",
+              "CHUNK_PHG_08",
+              "CHUNK_ELIG_65"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "DSC-01",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "Low policy relevance for claim 1: 0.00 < 0.20 (quote does not address the requested policy aspect). Select a quote addressing the question, or abstain if the evidence is missing.",
+              "Low policy relevance for claim 2: 0.00 < 0.20 (quote does not address the requested policy aspect). Select a quote addressing the question, or abstain if the evidence is missing.",
+              "Low policy relevance for claim 3: 0.00 < 0.20 (lexical topic coverage). Select a quote addressing the question, or abstain if the evidence is missing."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.0,
+                "reason": "quote does not address the requested policy aspect",
+                "table_context_relevant": false,
+                "matched_terms": [],
+                "requested_grants": [],
+                "covered_grants": []
+              },
+              {
+                "claim_index": 1,
+                "score": 0.0,
+                "reason": "quote does not address the requested policy aspect",
+                "table_context_relevant": false,
+                "matched_terms": [],
+                "requested_grants": [],
+                "covered_grants": []
+              },
+              {
+                "claim_index": 2,
+                "score": 0.0,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [],
+                "requested_grants": [],
+                "covered_grants": []
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_ELIG_52",
+              "CHUNK_ELIG_24",
+              "CHUNK_ELIG_44",
+              "CHUNK_ELIG_128",
+              "CHUNK_PHG_01"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "DSC-02",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "A policy supporting quote is not present in its cited source."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.3333,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": true,
+                "matched_terms": [
+                  "permanent",
+                  "resident",
+                  "sc",
+                  "spr"
+                ],
+                "requested_grants": [],
+                "covered_grants": []
+              },
+              {
+                "claim_index": 1,
+                "score": 0.1667,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": true,
+                "matched_terms": [
+                  "sc",
+                  "spr"
+                ],
+                "requested_grants": [],
+                "covered_grants": []
+              },
+              {
+                "claim_index": 2,
+                "score": 0.2083,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "sc",
+                  "spr"
+                ],
+                "requested_grants": [],
+                "covered_grants": []
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_ELIG_52",
+              "CHUNK_ELIG_24",
+              "CHUNK_ELIG_59",
+              "CHUNK_ELIG_44",
+              "CHUNK_ELIG_127"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "DSC-04",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": []
+          },
+          {
+            "verification_errors": [
+              "Low policy relevance for claim 1: 0.00 < 0.20 (lexical topic coverage). Select a quote addressing the question, or abstain if the evidence is missing.",
+              "A policy supporting quote is not present in its cited source."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.0,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [],
+                "requested_grants": [],
+                "covered_grants": []
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_ELIG_122",
+              "CHUNK_ELIG_104",
+              "CHUNK_EC_05",
+              "CHUNK_ELIG_133",
+              "CHUNK_EC_06"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "DSC-05",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "A policy supporting quote is not present in its cited source."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.2,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "sc",
+                  "single"
+                ],
+                "requested_grants": [],
+                "covered_grants": []
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_EHG_40",
+              "CHUNK_ELIG_01",
+              "CHUNK_ELIG_136",
+              "CHUNK_ELIG_76",
+              "CHUNK_ELIG_68"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "DSC-06",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "Low policy relevance for claim 1: 0.10 < 0.20 (lexical topic coverage). Select a quote addressing the question, or abstain if the evidence is missing.",
+              "Low policy relevance for claim 2: 0.00 < 0.20 (lexical topic coverage). Select a quote addressing the question, or abstain if the evidence is missing.",
+              "A policy supporting quote is not present in its cited source."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.1,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "sc"
+                ],
+                "requested_grants": [],
+                "covered_grants": []
+              },
+              {
+                "claim_index": 1,
+                "score": 0.0,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [],
+                "requested_grants": [],
+                "covered_grants": []
+              },
+              {
+                "claim_index": 2,
+                "score": 0.2,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "second",
+                  "timer"
+                ],
+                "requested_grants": [],
+                "covered_grants": []
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_ELIG_52",
+              "CHUNK_ELIG_24",
+              "CHUNK_ELIG_44",
+              "CHUNK_ELIG_122",
+              "CHUNK_ELIG_104"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "CHG-02",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "A policy supporting quote is not present in its cited source."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.925,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "ehg",
+                  "enhanced",
+                  "single"
+                ],
+                "requested_grants": [
+                  "ehg"
+                ],
+                "covered_grants": [
+                  "ehg"
+                ],
+                "aspect": "amount",
+                "aspect_source": "code",
+                "asked_aspects": [
+                  "amount"
+                ],
+                "aspect_ok": true,
+                "aspect_reason": "aspect addressed"
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_EHG_47",
+              "CHUNK_EHG_49",
+              "CHUNK_EHG_17",
+              "CHUNK_GRANTS_05",
+              "CHUNK_EHG_40"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "CHG-03",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "A policy supporting quote is not present in its cited source."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.8,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "ec",
+                  "income",
+                  "new",
+                  "unit"
+                ],
+                "requested_grants": [],
+                "covered_grants": [],
+                "aspect": "income",
+                "aspect_source": "code",
+                "asked_aspects": [
+                  "income"
+                ],
+                "aspect_ok": true,
+                "aspect_reason": "aspect addressed"
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_EC_33",
+              "CHUNK_EC_47",
+              "CHUNK_ELIG_128",
+              "CHUNK_INCOME_01",
+              "CHUNK_EC_13"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "CHG-04",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:policy",
+          "policy_retrieval:5 passages",
+          "topic_cards:0 matched, overview:loans (3)",
+          "synthesiser:answer",
+          "verifier:failed",
+          "synthesiser:answer",
+          "verifier:failed",
+          "abstention:verification_failed"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [
+              "A policy supporting quote is not present in its cited source."
+            ],
+            "synthesis_errors": [],
+            "relevance_scores": [
+              {
+                "claim_index": 0,
+                "score": 0.8,
+                "reason": "lexical topic coverage",
+                "table_context_relevant": false,
+                "matched_terms": [
+                  "limit",
+                  "loan",
+                  "new",
+                  "value"
+                ],
+                "requested_grants": [],
+                "covered_grants": [],
+                "aspect": "loan",
+                "aspect_source": "code",
+                "asked_aspects": [
+                  "loan"
+                ],
+                "aspect_ok": true,
+                "aspect_reason": "aspect addressed"
+              }
+            ],
+            "retrieved_ids": [
+              "CHUNK_LOAN_57",
+              "CHUNK_LOAN_54",
+              "CHUNK_LOAN_37",
+              "CHUNK_LOAN_52",
+              "CHUNK_LOAN_06",
+              "CHUNK_LOAN_26",
+              "CHUNK_FAMILY_04",
+              "CHUNK_LEASE_11"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "OOS-01",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:abstain",
+          "abstention:unsupported"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": []
+          }
+        ]
+      },
+      {
+        "id": "OOS-02",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:price",
+          "price_query:out_of_range",
+          "topic_cards:0 matched",
+          "abstention:price_out_of_range"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": []
+          }
+        ]
+      },
+      {
+        "id": "OOS-03",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:abstain",
+          "abstention:unsupported"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": []
+          }
+        ]
+      },
+      {
+        "id": "OOS-04",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:abstain:eligibility_confirmation",
+          "abstention:eligibility_confirmation"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": []
+          }
+        ]
+      },
+      {
+        "id": "OOS-05",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:abstain",
+          "abstention:unsupported"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": []
+          }
+        ]
+      },
+      {
+        "id": "OOS-06",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:abstain",
+          "abstention:unsupported"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": []
+          }
+        ]
+      },
+      {
+        "id": "OOS-07",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:abstain",
+          "abstention:unsupported"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": []
+          }
+        ]
+      },
+      {
+        "id": "OOS-08",
+        "status": "abstained",
+        "error": null,
+        "trace": [
+          "query_router:price",
+          "price_query:out_of_range",
+          "topic_cards:0 matched",
+          "abstention:price_out_of_range"
+        ],
+        "attempts": [
+          {
+            "verification_errors": [],
+            "synthesis_errors": [],
+            "relevance_scores": [],
+            "retrieved_ids": []
+          }
+        ]
+      }
+    ],
+    "independent_human_review": "pending"
+  },
+  "interpretation_limits": [
+    "answers_answerable means not abstained; it includes clarifying responses. See status counts.",
+    "price_correct uses the fixed 21 expected-price cases; price_figures in original output is conditional on returned figures.",
+    "Baselines do not emit router labels; their zero routing score is not a comparison of intent classifiers.",
+    "Staleness is a literal string screen, including dated qualifications; cohort/context review remains pending.",
+    "Citation presence is not proof of relevance or factual correctness; human semantic review remains pending.",
+    "Safety results cover finite synthetic development probes, not a guarantee against all attacks.",
+    "Latency is end-to-end with laptop retrieval and SSH overhead; no controlled CPU-versus-GPU experiment was run.",
+    "Held-out data and cloud judge were not accessed; no tuning, production code edits, commits or pushes."
+  ]
+}

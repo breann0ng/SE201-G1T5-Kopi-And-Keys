@@ -1,0 +1,1322 @@
+{
+  "benchmark": "finals-synthesis-development-v1",
+  "scope": "Development-only, fixed-evidence synthesis comparison. Not the team dev/held-out evaluation set.",
+  "created_at_utc": "20261109T184417Z",
+  "planned_models": [
+    "qwen2.5:3b"
+  ],
+  "planned_case_ids": [
+    "SYN-01",
+    "SYN-02",
+    "SYN-03",
+    "SYN-04",
+    "SYN-05",
+    "SYN-06",
+    "SYN-07",
+    "SYN-08",
+    "SYN-09",
+    "SYN-10",
+    "SYN-11",
+    "SYN-12"
+  ],
+  "repeats": 1,
+  "completed": true,
+  "snapshot_id": "2026-10-15",
+  "cases_sha256": "138240bcafd38ec086643ef081895396c02707f22edaad7cab225ab4b35a4d11",
+  "evidence_sha256": "e70d5678b6eead3bdb45e95c26709a3a18bda9360b852c89e94d22ff3d5f2dae",
+  "host": {
+    "os": "Windows-10-10.0.26300-SP0",
+    "cpu": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "logical_cpus": 16
+  },
+  "settings": {
+    "base_url": "http://127.0.0.1:11437",
+    "model": "qwen2.5:3b",
+    "timeout_seconds": 240,
+    "num_threads": 4,
+    "context_size": 2048,
+    "max_output_tokens": 220,
+    "response_format": "request-specific citation enum",
+    "keep_alive": "30m",
+    "device": "gpu",
+    "policy_context_size": 4096,
+    "policy_output_token_cap": 850,
+    "num_gpu": "automatic offload",
+    "temperature": 0,
+    "seed": 42,
+    "max_repairs": 1,
+    "minimum_relevance": 0.2,
+    "memory_policy": "other compared models unloaded before each batch; active model unloaded after batch",
+    "warmup": "one unscored policy-budget load before each model batch"
+  },
+  "ollama_version": "0.34.2",
+  "gpu_load_checks": [
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "loaded_model": {
+        "name": "qwen2.5:3b",
+        "model": "qwen2.5:3b",
+        "size": 2159374499,
+        "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen2",
+          "families": [
+            "qwen2"
+          ],
+          "parameter_size": "3.1B",
+          "quantization_level": "Q4_K_M"
+        },
+        "expires_at": "2026-11-10T03:14:19.478468318+08:00",
+        "size_vram": 2159374499,
+        "context_length": 4096
+      }
+    }
+  ],
+  "records": [
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-01",
+      "category": "family_grant_combination",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ],
+      "elapsed_seconds": 1.035,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.784,
+            "prompt_tokens": 1225,
+            "output_tokens": 94,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.074,
+            "generation_seconds": 0.587
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n      \"citation_id\": \"CHUNK_EHG_05\",\n      \"supporting_quote\": \"If you are buying a resale flat, you must first qualify for the CPF Housing Grants for resale flats (Families) before you may be eligible for the EHG. You may also apply for the Proximity Housing Grant (PHG) (Families) if you meet the eligibility conditions.\"\n    }\n  ]\n}",
+          "verification_errors": [],
+          "original_verification_errors": [],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.9,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced",
+                "family",
+                "first",
+                "phg",
+                "proximity"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg",
+                "phg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            }
+          ]
+        }
+      ],
+      "answer": "If you are buying a resale flat, you must first qualify for the CPF Housing Grants for resale flats (Families) before you may be eligible for the EHG. You may also apply for the Proximity Housing Grant (PHG) (Families) if you meet the eligibility conditions. [CHUNK_EHG_05]",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-02",
+      "category": "three_grant_combination",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ],
+      "elapsed_seconds": 1.358,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 1.341,
+            "prompt_tokens": 1583,
+            "output_tokens": 178,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.115,
+            "generation_seconds": 1.119
+          },
+          "raw_output": "{\n    \"claims\": [\n        {\n        \"citation_id\": \"CHUNK_GRANTS_07\",\n        \"supporting_quote\": \"If you’re buying a resale flat from the open market, you may also be eligible for the CPF Housing Grant for Resale Flat as well as the Proximity Housing Grant. You must first qualify for the CPF Housing Grants for Resale Flats, before you may be eligible for the EHG.\"\n        },\n        {\n        \"citation_id\": \"CHUNK_GRANTS_11\",\n        \"supporting_quote\": \"You may also be eligible for the Enhanced CPF Housing Grant as well as the Proximity Housing Grant. In total, eligible first-timer families can receive up to $230,000 in grants, while singles can receive up to $115,000.\"\n        }\n    ]\n}",
+          "verification_errors": [],
+          "original_verification_errors": [],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.85,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced",
+                "proximity"
+              ],
+              "requested_grants": [
+                "ehg",
+                "family_grant",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg",
+                "family_grant",
+                "phg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            },
+            {
+              "claim_index": 1,
+              "score": 0.8,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "enhanced",
+                "proximity"
+              ],
+              "requested_grants": [
+                "ehg",
+                "family_grant",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg",
+                "family_grant",
+                "phg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            }
+          ]
+        }
+      ],
+      "answer": "If you’re buying a resale flat from the open market, you may also be eligible for the CPF Housing Grant for Resale Flat as well as the Proximity Housing Grant. You must first qualify for the CPF Housing Grants for Resale Flats, before you may be eligible for the EHG. [CHUNK_GRANTS_07]\n\nYou may also be eligible for the Enhanced CPF Housing Grant as well as the Proximity Housing Grant. In total, eligible first-timer families can receive up to $230,000 in grants, while singles can receive up to $115,000. [CHUNK_GRANTS_11]",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-03",
+      "category": "single_grant_combination",
+      "expected": "answered",
+      "status": "abstained",
+      "quality_pass": false,
+      "required_quote_groups_matched": [
+        false,
+        false,
+        false
+      ],
+      "elapsed_seconds": 2.269,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.746,
+            "prompt_tokens": 1254,
+            "output_tokens": 85,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.074,
+            "generation_seconds": 0.542
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n    \"citation_id\": \"CHUNK_EHG_17\",\n    \"supporting_quote\": \"If you are a first-timer applicant buying a flat on your own or with your non-resident spouse, you may be eligible for an Enhanced CPF Housing Grant (EHG) (Singles) to help with your new or resale flat purchase.\"\n  }\n  ]\n}",
+          "verification_errors": [
+            "Missing requested grant coverage: phg.",
+            "Missing a cited combination rule connecting all requested grants; separate grants do not establish stacking.",
+            "The resale EHG prerequisite is missing; quote the supplied qualification condition in full."
+          ],
+          "original_verification_errors": [
+            "Missing requested grant coverage: phg.",
+            "Missing a cited combination rule connecting all requested grants; separate grants do not establish stacking.",
+            "The resale EHG prerequisite is missing; quote the supplied qualification condition in full."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.5375,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced",
+                "first",
+                "single",
+                "timer"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            }
+          ]
+        },
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 1.483,
+            "prompt_tokens": 1304,
+            "output_tokens": 217,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.025,
+            "generation_seconds": 1.36
+          },
+          "raw_output": "{\n    \"claims\": [\n        {\n            \"citation_id\": \"CHUNK_EHG_17\",\n            \"supporting_quote\": \"If you are a first-timer applicant buying a flat on your own or with your non-resident spouse, you may be eligible for an Enhanced CPF Housing Grant (EHG) (Singles) to help with your new or resale flat purchase.\"\n        },\n        {\n            \"citation_id\": \"CHUNK_EHG_17\",\n            \"supporting_quote\": \"If you are buying a resale flat, you must first qualify for the CPF Housing Grant for Resale Flats (Singles) before you may be eligible for the EHG.\"\n        },\n        {\n            \"citation_id\": \"CHUNK_EHG_17\",\n            \"supporting_quote\": \"If you are buying with other first-timer single(s), up to 2 singles may each be eligible for an EHG (Singles), i.e., a total of up to $120,000.\"\n        }\n    ]\n}",
+          "verification_errors": [
+            "Missing requested grant coverage: phg.",
+            "Missing a cited combination rule connecting all requested grants; separate grants do not establish stacking."
+          ],
+          "original_verification_errors": [
+            "Missing requested grant coverage: phg.",
+            "Missing a cited combination rule connecting all requested grants; separate grants do not establish stacking."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.5375,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced",
+                "first",
+                "single",
+                "timer"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            },
+            {
+              "claim_index": 1,
+              "score": 0.5,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced",
+                "first",
+                "single"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            },
+            {
+              "claim_index": 2,
+              "score": 0.5375,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced",
+                "first",
+                "single",
+                "timer"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            }
+          ]
+        }
+      ],
+      "answer": "",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-04",
+      "category": "new_vs_resale",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "required_quote_groups_matched": [
+        true,
+        true,
+        true
+      ],
+      "elapsed_seconds": 0.929,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.917,
+            "prompt_tokens": 1204,
+            "output_tokens": 121,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.068,
+            "generation_seconds": 0.757
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n    \"citation_id\": \"CHUNK_GRANTS_07\",\n    \"supporting_quote\": \"If you’re buying a new flat from HDB, the only housing grant you may be eligible for is the EHG.\"\n  },\n    {\n    \"citation_id\": \"CHUNK_GRANTS_12\",\n    \"supporting_quote\": \"The Proximity Housing Grant (PHG) helps first-timer flat buyers who are buying a resale flat on the open market, to live with or near their parents/ child.\"\n  }\n  ]\n}",
+          "verification_errors": [],
+          "original_verification_errors": [],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.5214,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced",
+                "from",
+                "new"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            },
+            {
+              "claim_index": 1,
+              "score": 0.4357,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "phg",
+                "proximity"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "phg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            }
+          ]
+        }
+      ],
+      "answer": "If you’re buying a new flat from HDB, the only housing grant you may be eligible for is the EHG. [CHUNK_GRANTS_07]\n\nThe Proximity Housing Grant (PHG) helps first-timer flat buyers who are buying a resale flat on the open market, to live with or near their parents/ child. [CHUNK_GRANTS_12]",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-05",
+      "category": "income_family",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ],
+      "elapsed_seconds": 1.576,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 1.565,
+            "prompt_tokens": 1400,
+            "output_tokens": 216,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.093,
+            "generation_seconds": 1.366
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n    \"citation_id\": \"CHUNK_GRANTS_04\",\n    \"supporting_quote\": \"To be eligible for the EHG, you must meet the following conditions:\\n- **Citizenship:** Singapore Citizen, and include at least 1 other Singapore Citizen or Singapore Permanent Resident in the HFE letter application\\n- **Age:** At least 21 years old\\n- **Monthly household income ceiling**: $9,000\\n- **Employment:** Have worked continuously for at least 12 months and are working at the time of the HFE letter application. When assessing your eligibility, HDB looks at your employment over a 12-month assessment period. This 12-month period is computed as at 2 months before the month you submit your HFE letter application. For example, if you submitted your HFE letter application in May 2025, the assessment period will be from April 2024 to March 2025.\"\n  }\n]}",
+          "verification_errors": [],
+          "original_verification_errors": [],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.88,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ceiling",
+                "ehg",
+                "enhanced",
+                "household",
+                "income",
+                "monthly"
+              ],
+              "requested_grants": [
+                "ehg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "income",
+              "aspect_source": "code",
+              "asked_aspects": [
+                "income"
+              ],
+              "aspect_ok": true,
+              "aspect_reason": "aspect addressed"
+            }
+          ]
+        }
+      ],
+      "answer": "To be eligible for the EHG, you must meet the following conditions: - Citizenship: Singapore Citizen, and include at least 1 other Singapore Citizen or Singapore Permanent Resident in the HFE letter application - Age: At least 21 years old - Monthly household income ceiling: $9,000 - Employment: Have worked continuously for at least 12 months and are working at the time of the HFE letter application. When assessing your eligibility, HDB looks at your employment over a 12-month assessment period. This 12-month period is computed as at 2 months before the month you submit your HFE letter application. For example, if you submitted your HFE letter application in May 2025, the assessment period will be from April 2024 to March 2025. [CHUNK_GRANTS_04]",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-06",
+      "category": "income_single",
+      "expected": "answered",
+      "status": "abstained",
+      "quality_pass": false,
+      "required_quote_groups_matched": [
+        false,
+        false
+      ],
+      "elapsed_seconds": 2.585,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 1.317,
+            "prompt_tokens": 1469,
+            "output_tokens": 174,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.103,
+            "generation_seconds": 1.106
+          },
+          "raw_output": "{\n    \"claims\": [\n        {\n        \"citation_id\": \"CHUNK_GRANTS_05\",\n        \"supporting_quote\": \"To be eligible for the EHG, you must meet the following conditions:\\\\n- **Citizenship:** Singapore Citizen\\\\n- **Age:** Be at least 35 years old\\\\n- **Monthly household income ceiling**: $4,500\\\\n- **Employment:** Have worked continuously for at least 12 months, as at 2 months before the HFE letter application; and is working at the time of the HFE letter application\\\\n- **Property ownership:** Must not own or have an interest in any private residential property (local or overseas) and must not have disposed of one in the last 30 months before your HFE application.\"\n    }\n    ]\n}",
+          "verification_errors": [
+            "A policy supporting quote is not present in its cited source."
+          ],
+          "original_verification_errors": [
+            "A policy supporting quote is not present in its cited source."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.88,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ceiling",
+                "ehg",
+                "enhanced",
+                "household",
+                "income",
+                "monthly"
+              ],
+              "requested_grants": [
+                "ehg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "income",
+              "aspect_source": "code",
+              "asked_aspects": [
+                "income"
+              ],
+              "aspect_ok": true,
+              "aspect_reason": "aspect addressed"
+            }
+          ]
+        },
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 1.248,
+            "prompt_tokens": 1488,
+            "output_tokens": 174,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.021,
+            "generation_seconds": 1.106
+          },
+          "raw_output": "{\n    \"claims\": [\n        {\n        \"citation_id\": \"CHUNK_GRANTS_05\",\n        \"supporting_quote\": \"To be eligible for the EHG, you must meet the following conditions:\\\\n- **Citizenship:** Singapore Citizen\\\\n- **Age:** Be at least 35 years old\\\\n- **Monthly household income ceiling**: $4,500\\\\n- **Employment:** Have worked continuously for at least 12 months, as at 2 months before the HFE letter application; and is working at the time of the HFE letter application\\\\n- **Property ownership:** Must not own or have an interest in any private residential property (local or overseas) and must not have disposed of one in the last 30 months before your HFE application.\"\n    }\n    ]\n}",
+          "verification_errors": [
+            "A policy supporting quote is not present in its cited source."
+          ],
+          "original_verification_errors": [
+            "A policy supporting quote is not present in its cited source."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.88,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ceiling",
+                "ehg",
+                "enhanced",
+                "household",
+                "income",
+                "monthly"
+              ],
+              "requested_grants": [
+                "ehg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "income",
+              "aspect_source": "code",
+              "asked_aspects": [
+                "income"
+              ],
+              "aspect_ok": true,
+              "aspect_reason": "aspect addressed"
+            }
+          ]
+        }
+      ],
+      "answer": "",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-07",
+      "category": "proximity_condition",
+      "expected": "answered",
+      "status": "abstained",
+      "quality_pass": false,
+      "required_quote_groups_matched": [
+        false
+      ],
+      "elapsed_seconds": 1.587,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.848,
+            "prompt_tokens": 1491,
+            "output_tokens": 102,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.103,
+            "generation_seconds": 0.639
+          },
+          "raw_output": "{\n    \"claims\": [\n        {\n        \"citation_id\": \"CHUNK_PHG_01\",\n        \"supporting_quote\": \"If you are buying a resale flat to live with or near your parents/ child, you may apply for the following Proximity Housing Grant (PHG): $30,000 to live with your parents/ child, $20,000 to live near your parents/ child (within 4km).\"\n        }\n    ]\n}",
+          "verification_errors": [
+            "A policy supporting quote is not present in its cited source."
+          ],
+          "original_verification_errors": [
+            "A policy supporting quote is not present in its cited source."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.94,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "near",
+                "parent",
+                "phg",
+                "proximity"
+              ],
+              "requested_grants": [
+                "phg"
+              ],
+              "covered_grants": [
+                "phg"
+              ],
+              "aspect": "distance",
+              "aspect_source": "code",
+              "asked_aspects": [
+                "distance"
+              ],
+              "aspect_ok": true,
+              "aspect_reason": "aspect addressed"
+            }
+          ]
+        },
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.717,
+            "prompt_tokens": 1510,
+            "output_tokens": 102,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.003,
+            "prompt_eval_seconds": 0.021,
+            "generation_seconds": 0.64
+          },
+          "raw_output": "{\n    \"claims\": [\n        {\n        \"citation_id\": \"CHUNK_PHG_01\",\n        \"supporting_quote\": \"If you are buying a resale flat to live with or near your parents/ child, you may apply for the following Proximity Housing Grant (PHG): $30,000 to live with your parents/ child, $20,000 to live near your parents/ child (within 4km).\"\n        }\n    ]\n}",
+          "verification_errors": [
+            "A policy supporting quote is not present in its cited source."
+          ],
+          "original_verification_errors": [
+            "A policy supporting quote is not present in its cited source."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.94,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "near",
+                "parent",
+                "phg",
+                "proximity"
+              ],
+              "requested_grants": [
+                "phg"
+              ],
+              "covered_grants": [
+                "phg"
+              ],
+              "aspect": "distance",
+              "aspect_source": "code",
+              "asked_aspects": [
+                "distance"
+              ],
+              "aspect_ok": true,
+              "aspect_reason": "aspect addressed"
+            }
+          ]
+        }
+      ],
+      "answer": "",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-08",
+      "category": "loan_control",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "required_quote_groups_matched": [
+        true,
+        true,
+        true
+      ],
+      "elapsed_seconds": 0.74,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.732,
+            "prompt_tokens": 1259,
+            "output_tokens": 93,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.002,
+            "prompt_eval_seconds": 0.073,
+            "generation_seconds": 0.581
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n      \"citation_id\": \"CHUNK_LOAN_49\",\n      \"supporting_quote\": \"Your average gross monthly household income must not exceed: $16,000 for families $24,000 for extended families (refer to the guide for more details) $8,000 for singles buying under the Single Singapore Citizen (SSC) Scheme\"\n    }\n  ]\n}",
+          "verification_errors": [],
+          "original_verification_errors": [],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.7083,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "family",
+                "household",
+                "income",
+                "monthly"
+              ],
+              "requested_grants": [],
+              "covered_grants": [],
+              "aspect": "income",
+              "aspect_source": "code",
+              "asked_aspects": [
+                "income",
+                "loan"
+              ],
+              "aspect_ok": true,
+              "aspect_reason": "aspect addressed"
+            }
+          ]
+        }
+      ],
+      "answer": "Your average gross monthly household income must not exceed: $16,000 for families $24,000 for extended families (refer to the guide for more details) $8,000 for singles buying under the Single Singapore Citizen (SSC) Scheme [CHUNK_LOAN_49]",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-09",
+      "category": "missing_combination_evidence",
+      "expected": "abstained",
+      "status": "abstained",
+      "quality_pass": true,
+      "required_quote_groups_matched": [],
+      "elapsed_seconds": 1.899,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.922,
+            "prompt_tokens": 1074,
+            "output_tokens": 128,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.054,
+            "generation_seconds": 0.796
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n    \"citation_id\": \"CHUNK_GRANTS_03\",\n    \"supporting_quote\": \"The Enhanced CPF Housing Grant (EHG) helps first-timer flat buyers who are buying a new flat from HDB or a resale flat on the open market.\"\n  },\n  {\n    \"citation_id\": \"CHUNK_GRANTS_12\",\n    \"supporting_quote\": \"The Proximity Housing Grant (PHG) helps first-timer flat buyers who are buying a resale flat on the open market, to live with or near their parents/ child.\"\n  }\n]\n}",
+          "verification_errors": [
+            "Missing a cited combination rule connecting all requested grants; separate grants do not establish stacking."
+          ],
+          "original_verification_errors": [
+            "Missing a cited combination rule connecting all requested grants; separate grants do not establish stacking."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.47,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            },
+            {
+              "claim_index": 1,
+              "score": 0.47,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "phg",
+                "proximity"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "phg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            }
+          ]
+        },
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.947,
+            "prompt_tokens": 1098,
+            "output_tokens": 128,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.021,
+            "generation_seconds": 0.819
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n    \"citation_id\": \"CHUNK_GRANTS_03\",\n    \"supporting_quote\": \"The Enhanced CPF Housing Grant (EHG) helps first-timer flat buyers who are buying a new flat from HDB or a resale flat on the open market.\"\n  },\n  {\n    \"citation_id\": \"CHUNK_GRANTS_12\",\n    \"supporting_quote\": \"The Proximity Housing Grant (PHG) helps first-timer flat buyers who are buying a resale flat on the open market, to live with or near their parents/ child.\"\n  }\n] }",
+          "verification_errors": [
+            "Missing a cited combination rule connecting all requested grants; separate grants do not establish stacking."
+          ],
+          "original_verification_errors": [
+            "Missing a cited combination rule connecting all requested grants; separate grants do not establish stacking."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.47,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            },
+            {
+              "claim_index": 1,
+              "score": 0.47,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "phg",
+                "proximity"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "phg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            }
+          ]
+        }
+      ],
+      "answer": "",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-10",
+      "category": "irrelevant_evidence",
+      "expected": "abstained",
+      "status": "abstained",
+      "quality_pass": true,
+      "required_quote_groups_matched": [],
+      "elapsed_seconds": 1.16,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.685,
+            "prompt_tokens": 1123,
+            "output_tokens": 86,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.058,
+            "generation_seconds": 0.533
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n      \"citation_id\": \"CHUNK_LOAN_02\",\n      \"supporting_quote\": \"Choosing the right housing loan is important because it affects how much you can borrow, your monthly repayments, and your long-term financial commitments. A loan that suits your income, financial situation, lifestyle, and risk tolerance can help make home ownership more manageable.\"\n    }\n  ]\n}",
+          "verification_errors": [
+            "Low policy relevance for claim 1: 0.00 < 0.20 (quote does not address a requested grant). Select a quote addressing the question, or abstain if the evidence is missing."
+          ],
+          "original_verification_errors": [
+            "Low policy relevance for claim 1: 0.00 < 0.20 (quote does not address a requested grant). Select a quote addressing the question, or abstain if the evidence is missing."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.0,
+              "reason": "quote does not address a requested grant",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "income"
+              ],
+              "requested_grants": [
+                "ehg"
+              ],
+              "covered_grants": [],
+              "aspect": "income",
+              "aspect_source": "code",
+              "asked_aspects": [
+                "income"
+              ],
+              "aspect_ok": true,
+              "aspect_reason": "aspect addressed"
+            }
+          ]
+        },
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.462,
+            "prompt_tokens": 1174,
+            "output_tokens": 63,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.025,
+            "generation_seconds": 0.389
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n      \"citation_id\": \"CHUNK_LOAN_02\",\n      \"supporting_quote\": \"Choosing the right housing loan is important because it affects how much you can borrow, your monthly repayments, and your long-term financial commitments.\"\n    }\n  ]\n}",
+          "verification_errors": [
+            "Low policy relevance for claim 1: 0.00 < 0.20 (quote does not address the requested policy aspect). Select a quote addressing the question, or abstain if the evidence is missing."
+          ],
+          "original_verification_errors": [
+            "Low policy relevance for claim 1: 0.00 < 0.20 (quote does not address the requested policy aspect). Select a quote addressing the question, or abstain if the evidence is missing."
+          ],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.0,
+              "reason": "quote does not address the requested policy aspect",
+              "table_context_relevant": false,
+              "matched_terms": [],
+              "requested_grants": [
+                "ehg"
+              ],
+              "covered_grants": [],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [
+                "income"
+              ],
+              "aspect_ok": false,
+              "aspect_reason": "quote answers none of the asked aspects"
+            }
+          ]
+        }
+      ],
+      "answer": "",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-11",
+      "category": "grant_comparison",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ],
+      "elapsed_seconds": 0.907,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 0.897,
+            "prompt_tokens": 1088,
+            "output_tokens": 128,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.055,
+            "generation_seconds": 0.795
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n    \"citation_id\": \"CHUNK_GRANTS_03\",\n    \"supporting_quote\": \"The Enhanced CPF Housing Grant (EHG) helps first-timer flat buyers who are buying a new flat from HDB or a resale flat on the open market.\"\n  },\n  {\n    \"citation_id\": \"CHUNK_GRANTS_12\",\n    \"supporting_quote\": \"The Proximity Housing Grant (PHG) helps first-timer flat buyers who are buying a resale flat on the open market, to live with or near their parents/ child.\"\n  }\n]\n}",
+          "verification_errors": [],
+          "original_verification_errors": [],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.41,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "enhanced"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            },
+            {
+              "claim_index": 1,
+              "score": 0.41,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "phg",
+                "proximity"
+              ],
+              "requested_grants": [
+                "ehg",
+                "phg"
+              ],
+              "covered_grants": [
+                "phg"
+              ],
+              "aspect": "other",
+              "aspect_source": "code",
+              "asked_aspects": [],
+              "aspect_ok": true,
+              "aspect_reason": "question names no specific aspect"
+            }
+          ]
+        }
+      ],
+      "answer": "The Enhanced CPF Housing Grant (EHG) helps first-timer flat buyers who are buying a new flat from HDB or a resale flat on the open market. [CHUNK_GRANTS_03]\n\nThe Proximity Housing Grant (PHG) helps first-timer flat buyers who are buying a resale flat on the open market, to live with or near their parents/ child. [CHUNK_GRANTS_12]",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    },
+    {
+      "model": "qwen2.5:3b",
+      "repeat": 1,
+      "case_id": "SYN-12",
+      "category": "employment_condition",
+      "expected": "answered",
+      "status": "answered",
+      "quality_pass": true,
+      "required_quote_groups_matched": [
+        true,
+        true
+      ],
+      "elapsed_seconds": 1.574,
+      "attempts": [
+        {
+          "model": "qwen2.5:3b",
+          "usage": {
+            "elapsed_seconds": 1.569,
+            "prompt_tokens": 1390,
+            "output_tokens": 216,
+            "num_gpu_requested": null,
+            "device_requested": "gpu",
+            "load_seconds": 0.001,
+            "prompt_eval_seconds": 0.092,
+            "generation_seconds": 1.368
+          },
+          "raw_output": "{\n  \"claims\": [\n    {\n    \"citation_id\": \"CHUNK_GRANTS_04\",\n    \"supporting_quote\": \"To be eligible for the EHG, you must meet the following conditions:\\n- **Citizenship:** Singapore Citizen, and include at least 1 other Singapore Citizen or Singapore Permanent Resident in the HFE letter application\\n- **Age:** At least 21 years old\\n- **Monthly household income ceiling**: $9,000\\n- **Employment:** Have worked continuously for at least 12 months and are working at the time of the HFE letter application. When assessing your eligibility, HDB looks at your employment over a 12-month assessment period. This 12-month period is computed as at 2 months before the month you submit your HFE letter application. For example, if you submitted your HFE letter application in May 2025, the assessment period will be from April 2024 to March 2025.\"\n  }\n]}",
+          "verification_errors": [],
+          "original_verification_errors": [],
+          "claims_dropped": 0,
+          "relevance_scores": [
+            {
+              "claim_index": 0,
+              "score": 0.8286,
+              "reason": "lexical topic coverage",
+              "table_context_relevant": false,
+              "matched_terms": [
+                "ehg",
+                "employment",
+                "enhanced"
+              ],
+              "requested_grants": [
+                "ehg"
+              ],
+              "covered_grants": [
+                "ehg"
+              ],
+              "aspect": "employment",
+              "aspect_source": "code",
+              "asked_aspects": [
+                "employment"
+              ],
+              "aspect_ok": true,
+              "aspect_reason": "aspect addressed"
+            }
+          ]
+        }
+      ],
+      "answer": "To be eligible for the EHG, you must meet the following conditions: - Citizenship: Singapore Citizen, and include at least 1 other Singapore Citizen or Singapore Permanent Resident in the HFE letter application - Age: At least 21 years old - Monthly household income ceiling: $9,000 - Employment: Have worked continuously for at least 12 months and are working at the time of the HFE letter application. When assessing your eligibility, HDB looks at your employment over a 12-month assessment period. This 12-month period is computed as at 2 months before the month you submit your HFE letter application. For example, if you submitted your HFE letter application in May 2025, the assessment period will be from April 2024 to March 2025. [CHUNK_GRANTS_04]",
+      "human_review": {
+        "condition_scope_0_to_2": null,
+        "grant_logic_0_to_2": null,
+        "relevance_0_to_2": null,
+        "clarity_0_to_2": null,
+        "notes": ""
+      }
+    }
+  ],
+  "summary": {
+    "qwen2.5:3b": {
+      "cases": 12,
+      "quality_passes": 9,
+      "answered": 7,
+      "correct_abstentions": 2,
+      "engine_errors": 0,
+      "median_seconds": 1.466,
+      "p95_seconds": 2.585,
+      "model_calls": 17,
+      "first_attempt_verifier_passes": 7,
+      "raw_first_attempt_passes": 7,
+      "answers_after_claim_pruning": 0,
+      "answerable_cases": 10,
+      "over_abstentions": 3,
+      "output_tokens": 2305,
+      "human_quality_review": "pending; automatic quote coverage is not factual accuracy"
+    }
+  }
+}

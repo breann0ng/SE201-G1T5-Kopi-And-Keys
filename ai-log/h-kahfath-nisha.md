@@ -1194,3 +1194,36 @@ was changed or used.
 
 Final validation: all **1,091 backend tests passed**, with the existing expected
 missing-index warning. Frontend files were unchanged in this follow-up.
+
+
+## Final reflection (10 November 2026)
+
+
+### What I learned about using the tools effectively
+
+I learned to give AI a specific task, the current code and the expected behaviour,
+then ask it to explain its changes. For my synthesiser and verifier, asking for
+edge cases helped me understand what each check actually covered. I checked work
+through synthetic SQL cases, regression tests and frontend trials. I also learned
+to distinguish a component benchmark from an end-to-end result and to record the
+commit, model and device whenever sharing evaluation figures.
+
+### Where the tools were strong and weak
+
+AI was useful for implementation drafts, test ideas, PR reviews and troubleshooting
+Ollama and GPU setup. Its explanations helped me understand unfamiliar tools.
+However, generated explanations and copied statistics still needed checking.
+Our chatbot could select a genuine, cited passage that applied to an older rule
+or the wrong situation. The strict verifier also made answers rigid and rejected
+some useful responses. I learned that source matching and passing tests establish
+specific properties; they do not prove complete policy correctness.
+
+### What went wrong and what I would do differently
+
+I underestimated how much integration and evaluation remained after individual
+checks passed. The held-out run made this clear: routing was 80%, and 17 of 34
+answerable questions were declined. Next time, I would test varied phrasing,
+profile changes and component interactions earlier, and reserve time for human
+review of policy dates, household scope and missing conditions. I would keep
+evaluation results tied to one frozen setup, preserve the held-out set for final
+evaluation, and report limitations without changing the system to fit those results.

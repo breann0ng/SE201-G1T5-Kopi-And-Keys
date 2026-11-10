@@ -1,0 +1,21 @@
+﻿{
+    "step":  "preflight-pytest",
+    "attempt":  1,
+    "status":  "finished",
+    "started_utc":  "2026-11-09T18:23:46.6621009Z",
+    "python_args":  [
+                        "-m",
+                        "pytest",
+                        "-q",
+                        "-rs",
+                        "--junitxml=.local/reports/final-dev-20261110/preflight-pytest.xml"
+                    ],
+    "device":  "cpu",
+    "log":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110\\.local\\reports\\final-dev-20261110\\preflight-pytest-attempt-1.txt",
+    "exit_code":  0,
+    "finished_utc":  "2026-11-09T18:25:33.3657634Z",
+    "elapsed_seconds":  106.704,
+    "new_result_files":  [
+
+                         ]
+}

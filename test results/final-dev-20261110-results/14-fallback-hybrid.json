@@ -1,0 +1,401 @@
+{
+  "mode": "hybrid",
+  "summary": {
+    "rescue": "100% (9/9)",
+    "decline": "100% (6/6)",
+    "vague": "67% (2/3)",
+    "rule_decline": "100% (10/10)",
+    "weak_keep": "100% (5/5)",
+    "weak_decline": "80% (4/5)"
+  },
+  "llm_calls": 26,
+  "llm_seconds_mean": 0.26,
+  "llm_seconds_max": 2.81,
+  "cases": [
+    {
+      "id": "FB-A01",
+      "group": "rescue",
+      "route": "policy",
+      "source": "llm",
+      "accept": [
+        "policy",
+        "clarify"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-A02",
+      "group": "rescue",
+      "route": "policy",
+      "source": "llm",
+      "accept": [
+        "policy"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-A03",
+      "group": "rescue",
+      "route": "policy",
+      "source": "llm",
+      "accept": [
+        "policy",
+        "discovery"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-A04",
+      "group": "rescue",
+      "route": "policy",
+      "source": "llm",
+      "accept": [
+        "policy"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-A05",
+      "group": "rescue",
+      "route": "policy",
+      "source": "llm",
+      "accept": [
+        "policy",
+        "clarify"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-A06",
+      "group": "rescue",
+      "route": "policy",
+      "source": "llm",
+      "accept": [
+        "policy"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-A07",
+      "group": "rescue",
+      "route": "price",
+      "source": "llm",
+      "accept": [
+        "price"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-A08",
+      "group": "rescue",
+      "route": "price",
+      "source": "llm",
+      "accept": [
+        "price"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-A09",
+      "group": "rescue",
+      "route": "price",
+      "source": "llm",
+      "accept": [
+        "price",
+        "clarify"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-B01",
+      "group": "decline",
+      "route": "abstain",
+      "source": "llm",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-B02",
+      "group": "decline",
+      "route": "abstain",
+      "source": "llm",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-B03",
+      "group": "decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-B04",
+      "group": "decline",
+      "route": "abstain",
+      "source": "llm",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-B05",
+      "group": "decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-B06",
+      "group": "decline",
+      "route": "abstain",
+      "source": "llm",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-C01",
+      "group": "vague",
+      "route": "clarify",
+      "source": "llm_unsure",
+      "accept": [
+        "clarify"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-C02",
+      "group": "vague",
+      "route": "policy",
+      "source": "llm",
+      "accept": [
+        "clarify"
+      ],
+      "ok": false
+    },
+    {
+      "id": "FB-C03",
+      "group": "vague",
+      "route": "clarify",
+      "source": "llm",
+      "accept": [
+        "clarify"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D01",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D02",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D03",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D04",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D05",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D06",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D07",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D08",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D09",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-D10",
+      "group": "rule_decline",
+      "route": "abstain",
+      "source": "rules",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-E01",
+      "group": "weak_keep",
+      "route": "policy",
+      "source": "rules_confirmed",
+      "accept": [
+        "policy"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-E02",
+      "group": "weak_keep",
+      "route": "policy",
+      "source": "rules_confirmed",
+      "accept": [
+        "policy"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-E03",
+      "group": "weak_keep",
+      "route": "clarify",
+      "source": "rules_confirmed",
+      "accept": [
+        "policy",
+        "clarify"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-E04",
+      "group": "weak_keep",
+      "route": "policy",
+      "source": "rules_confirmed",
+      "accept": [
+        "policy"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-E05",
+      "group": "weak_keep",
+      "route": "policy",
+      "source": "rules_confirmed",
+      "accept": [
+        "policy"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-F01",
+      "group": "weak_decline",
+      "route": "policy",
+      "source": "rules_confirmed",
+      "accept": [
+        "abstain"
+      ],
+      "ok": false
+    },
+    {
+      "id": "FB-F02",
+      "group": "weak_decline",
+      "route": "abstain",
+      "source": "llm_declined",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-F03",
+      "group": "weak_decline",
+      "route": "abstain",
+      "source": "llm_declined",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-F04",
+      "group": "weak_decline",
+      "route": "abstain",
+      "source": "llm_declined",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    },
+    {
+      "id": "FB-F05",
+      "group": "weak_decline",
+      "route": "abstain",
+      "source": "llm_declined",
+      "accept": [
+        "abstain"
+      ],
+      "ok": true
+    }
+  ]
+}

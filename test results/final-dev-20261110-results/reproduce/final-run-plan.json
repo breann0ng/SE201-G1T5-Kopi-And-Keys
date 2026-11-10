@@ -1,0 +1,41 @@
+﻿{
+    "commit":  "1c4d87c0ad8afc0ecc3bb2afed942eec1fd159eb",
+    "root":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.local\\reviews\\final-dev-20261110",
+    "python":  "C:\\wamp64\\www\\SE201-G1T5-Kopi-And-Keys\\.venv\\Scripts\\python.exe",
+    "gpu_job":  "360625",
+    "gpu_node":  "block",
+    "gpu_device":  "MIG-992565c1-1e43-5cf5-bc6f-af258abd8b75",
+    "gpu_url":  "http://127.0.0.1:11437",
+    "embedding_url":  "http://127.0.0.1:11434",
+    "model":  "qwen2.5:3b",
+    "main_priority_order":  [
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6,
+                                8,
+                                9
+                            ],
+    "next_priority_order":  [
+                                11,
+                                10
+                            ],
+    "remaining_order":  [
+                            7,
+                            12,
+                            13,
+                            14,
+                            15
+                        ],
+    "cloud_judge":  "not selected",
+    "heldout":  "not accessed; excluded",
+    "optional_mutation_campaigns":  "not selected",
+    "notes":  [
+                  "No code or data tuning during final run.",
+                  "Preserve interrupted and failed attempts; rerun entire step only for confirmed infrastructure failure.",
+                  "Package explicit session artifacts; no automatic sending or Git commits/pushes.",
+                  "No fetch/pull after pinning the checkout."
+              ]
+}

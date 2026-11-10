@@ -1,0 +1,9 @@
+﻿{
+    "at_utc":  "2026-11-09T18:46:03.4261495Z",
+    "model_unloaded":  true,
+    "slurm_job":  "360625",
+    "allocation_cancelled":  false,
+    "allocation_cleanup":  "User explicitly requested keeping job 360625 running for the team next evaluation.",
+    "allocation_retained_by_user_request":  true,
+    "private_server_stopped":  false
+}
